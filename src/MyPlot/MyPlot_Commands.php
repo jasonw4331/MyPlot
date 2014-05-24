@@ -14,7 +14,7 @@ class MyPlot_Commands extends Command implements PluginIdentifiableCommand{
     
     public function __construct(MyPlot $plugin){
         parent::__construct("plot", "MyPlot Commands", "/plot [action]", ["myplot"]);
-        $this->setPermission('myplot.command');
+        $this->setPermission("myplot.command");
         $this->owningPlugin = $plugin;
     }
     

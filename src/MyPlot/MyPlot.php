@@ -12,6 +12,7 @@ use pocketmine\level\generator\Generator;
 use pocketmine\utils\Config;
 use pocketmine\event\EventPriority;
 use pocketmine\plugin\MethodEventExecutor;
+use pocketmine\command\CommandExecutor;
 
 class MyPlot extends PluginBase implements Listener{
     private $server;
@@ -59,7 +60,7 @@ class MyPlot extends PluginBase implements Listener{
         $pluginManager = $this->server->getPluginManager();
         $pluginManager->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGH, new MethodEventExecutor('onBlockBreak'), $this, false);
         $pluginManager->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", $this, EventPriority::HIGH, new MethodEventExecutor('onBlockPlace'), $this, false);
-        $this->server->getCommandMap()->register("MyPlot\\MyPlot_Commands", new MyPlot_Commands());
+        $this->server->getCommandMap()->register("MyPlot\\MyPlot_Commands", new MyPlot_Commands($this));
     }
 
     public function onBlockBreak(BlockBreakEvent $event){
