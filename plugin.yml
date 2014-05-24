@@ -1,7 +1,6 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.0
-load: POSTWORLD
-api: [1.0.0]
+version: 1.0.0
+api: 1.0.0
 author: Wies
 description: Plot and protection plugin

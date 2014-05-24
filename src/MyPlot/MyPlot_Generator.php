@@ -7,7 +7,6 @@ use pocketmine\math\Vector3 as Vector3;
 use pocketmine\utils\Random;
 
 class MyPlot_Generator extends Generator{
-
     private $level, $settings, $columnPlot, $airChunk, $fillChunk;
 
     public function __construct(array $settings = array()){

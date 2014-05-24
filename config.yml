@@ -1,0 +1,21 @@
+---
+MaxPlotsPerPlayer: 1
+PlotSize: 20
+RoadWidth: 7
+Height: 64
+PlotFloorBlockId:
+- 2
+- 0
+PlotFillingBlockId:
+- 3
+- 0
+RoadBlockId:
+- 5
+- 0
+WallBlockId:
+- 44
+- 0
+BottomBlockId:
+- 7
+- 0
+...
