@@ -12,7 +12,6 @@ use pocketmine\level\generator\Generator;
 use pocketmine\utils\Config;
 use pocketmine\event\EventPriority;
 use pocketmine\plugin\MethodEventExecutor;
-use pocketmine\command\CommandExecutor;
 
 class MyPlot extends PluginBase implements Listener{
     private $server;
