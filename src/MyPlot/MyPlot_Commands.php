@@ -6,12 +6,20 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use pocketmine\command\PluginIdentifiableCommand;
 
-class MyPlot_Commands extends Command{
-    public function __construct(){
+class MyPlot_Commands extends Command implements PluginIdentifiableCommand{
+    /** @var \pocketmine\plugin\Plugin */
+    public $owningPlugin;
+    
+    public function __construct(MyPlot $plugin){
         parent::__construct("plot", "MyPlot Commands", "/plot [action]", ["myplot"]);
         $this->setPermission('myplot.command');
-        $this->server = Server::getInstance();
+        $this->owningPlugin = $plugin;
+    }
+    
+    public function getPlugin() {
+        return $this->owningPlugin;
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
