@@ -39,14 +39,14 @@ class MyPlot_Plot{
 
     }
 
-    public function addHelper(Player $username){
+    public function addHelper($username){
         if(in_array($username, $this->helpers))
             return false;
         $this->helpers [] = $username;
         return true;
     }
 
-    public function removeHelper(Player $username){
+    public function removeHelper($username){
         $key = array_search(strtolower($username), $this->helpers);
         if($key === false)
             return false;
