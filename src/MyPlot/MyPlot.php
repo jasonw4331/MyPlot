@@ -25,6 +25,9 @@ class MyPlot extends PluginBase implements Listener{
         if(!is_dir(self::$folder))
             mkdir(self::$folder);
 
+        if(!is_dir(self::$folder.'players'))
+            mkdir(self::$folder.'players');
+
         if(!is_dir(self::$folder.'worlds'))
             mkdir(self::$folder.'worlds');
 
@@ -155,8 +158,9 @@ class MyPlot extends PluginBase implements Listener{
         $username = strtolower($username);
         $folder = self::$folder.'players/'.$username[0].'/';
 
-        if(!is_dir($folder))
+        if(!is_dir($folder)){
             mkdir($folder);
+        }
 
         file_put_contents($folder.$username.'.dat', json_encode($data));
     }
