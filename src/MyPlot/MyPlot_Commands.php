@@ -11,10 +11,11 @@ class MyPlot_Commands extends PluginCommand{
     private $server, $commands;
 
     public function __construct(MyPlot $plugin){
-        parent::__construct('plot', $plugin);
+        parent::__construct('p', $plugin);
 
         $this->setPermission('myplot.command');
-        $this->setDescription('MyPlot commands');
+        $this->setDescription('Claim and manage your plot');
+        $this->setUsage('/p');
 
         $this->server = Server::getInstance();
         $this->commands = array(
@@ -41,15 +42,15 @@ class MyPlot_Commands extends PluginCommand{
         }
 
         if(!isset($args[0])){
-            $sender->sendMessage(TextFormat::YELLOW.'Usage: /plot <command>');
-            $sender->sendMessage(TextFormat::YELLOW.wordwrap('The commands for MyPlot are: '.implode(', ', $this->commands), 60));
+            $sender->sendMessage(TextFormat::YELLOW.'+===[MyPlot]===+');
+            $sender->sendMessage(TextFormat::YELLOW.wordwrap('Run /p help to view all parameters');
             return true;
         }
 
         $subCommand = strtolower($args[0]);
         if(!in_array($subCommand, $this->commands)){
-            $sender->sendMessage(TextFormat::YELLOW."That command doesn't exist");
-            $sender->sendMessage(TextFormat::YELLOW.wordwrap('The commands for MyPlot are: '.implode(', ', $this->commands), 60));
+            $sender->sendMessage(TextFormat::RED."Invalid command");
+            $sender->sendMessage(TextFormat::YELLOW.wordwrap('Rung /p help to view all parameters');
             return true;
         }
 
@@ -62,7 +63,7 @@ class MyPlot_Commands extends PluginCommand{
 
     public function commandNewworld($username, $args, $sender){
         if($this->server->isOp($username) === false){
-            $sender->sendMessage(TextFormat::RED."Only OP's can use this command!");
+            $sender->sendMessage(TextFormat::RED."You have no permissions to run this command.");
             return;
         }
         $settings = array(
@@ -76,15 +77,15 @@ class MyPlot_Commands extends PluginCommand{
             'BottomBlockId' => [7,0] // bedrock
         );
 
-        $settings = array_merge($settings, MyPlot::$config->getAll());
+        $settings = array_merge($settings, MyPlot::$settings->getAll());
 
         for($i=1;;$i++){
-            if(!isset(MyPlot::$levelData['plotworld'.$i])){
+            if(!isset(MyPlot::$levelData['Plots'.$i])){
                 break;
             }
         }
 
-        $levelName = 'plotworld'.$i;
+        $levelName = 'Plots'.$i;
         $this->server->generateLevel($levelName, NULL, "MyPlot\\MyPlot_Generator", $settings);
 
         $dir = MyPlot::$folder.'worlds/'.$levelName.'/';
@@ -99,11 +100,9 @@ class MyPlot_Commands extends PluginCommand{
 
         $this->server->loadLevel($levelName);
         $player = $this->server->getPlayer($username);
-        $spawn = $this->server->getLevel($levelName)->getSpawn();
-        $spawn->y += 2;
-        $player->teleport($spawn);
-
-        $sender->sendMessage(TextFormat::GREEN.'You successfully made a new plot world: '.TextFormat::WHITE.$levelName);
+        $spawn = $this->server->getLevel($levelName);
+    
+        $sender->sendMessage(TextFormat::GREEN.'You have created a new plot world: '.TextFormat::YELLOW.$levelName);
     }
 
     public function commandClaim($username, $args, $sender){
@@ -111,17 +110,17 @@ class MyPlot_Commands extends PluginCommand{
         $plot = MyPlot::getPlotByPos($position);
 
         if($plot === false){
-            $sender->sendMessage(TextFormat::RED.'You need to stand in a plot');
+            $sender->sendMessage(TextFormat::RED.'You need to be standing in a plot to claim one');
             return;
         }
 
         if($plot->owner !== false){
-            $sender->sendMessage(TextFormat::RED.'This plot is already claimed by someone');
+            $sender->sendMessage(TextFormat::RED.'This plot is already claimed');
             return;
         }
 
         $data = MyPlot::getPlayerData($username);
-        $maxPlots = MyPlot::$config->get('MaxPlotsPerPlayer');
+        $maxPlots = MyPlot::$settings->get('MaxPlotsPerPlayer');
         if($data[0] >= $maxPlots and $this->server->isOp($username) === false){
             $sender->sendMessage(TextFormat::RED."You can't own more than ".$maxPlots.' plots.');
             return;
@@ -165,7 +164,7 @@ class MyPlot_Commands extends PluginCommand{
         }
 
         $data = MyPlot::getPlayerData($username);
-        $maxPlots = MyPlot::$config->get('MaxPlotsPerPlayer');
+        $maxPlots = MyPlot::$settings->get('MaxPlotsPerPlayer');
         if($data[0] >= $maxPlots and $this->server->isOp($username) === false){
             $sender->sendMessage(TextFormat::RED."You can't own more than ".TextFormat::WHITE.$maxPlots.' plots.');
             return;

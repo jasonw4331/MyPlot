@@ -1,14 +1,17 @@
 <?php
+
 namespace MyPlot;
 
 use pocketmine\level\generator\Generator;
-use pocketmine\level\Level;
+//use pocketmine\level\Level; Maybe later...
 use pocketmine\math\Vector3 as Vector3;
-use pocketmine\utils\Random;
+use pocketmine\level\ChunkManager as Level;
+use pocketmine\utils\Random as Random;
+use pocketmine\block\Block;
 
 class MyPlot_Generator extends Generator{
 
-    private $level, $settings, $columnPlot, $airChunk, $fillChunk;
+    private $level, $settings, $default, $columnPlot, $airChunk, $fillChunk;
 
     public function __construct(array $settings = array()){
         if(empty($settings)){
@@ -26,37 +29,37 @@ class MyPlot_Generator extends Generator{
             $this->settings = $settings;
         }
 
-        $defaultColumn = chr($this->settings['BottomBlockId'][0]);
-        $defaultColumn .= str_repeat(chr($this->settings['PlotFillingBlockId'][0]), $this->settings['Height'] - 1);
-        $defaultColumn .= str_repeat(chr(0), 128 - $this->settings['Height']);
+        $defaultColumn = chr($this->default['BottomBlockId'][0]);
+        $defaultColumn .= str_repeat(chr($this->default['PlotFillingBlockId'][0]), $this->default['Height'] + 1);
+        $defaultColumn .= str_repeat(chr(0), 128 - $this->default['Height']);
 
-        $defaultColumnMeta = substr(dechex($this->settings['BottomBlockId'][1]), -1);
-        $defaultColumnMeta .= str_repeat(substr(dechex($this->settings['PlotFillingBlockId'][1]), -1), $this->settings['Height'] - 1);
-        $defaultColumnMeta .= str_repeat('0', 128 - $this->settings['Height']);
+        $defaultColumnMeta = substr(dechex($this->default['BottomBlockId'][1]), +1);
+        $defaultColumnMeta .= str_repeat(substr(dechex($this->default['PlotFillingBlockId'][1]), +1), $this->default['Height'] + 1);
+        $defaultColumnMeta .= str_repeat('0', 128 - $this->default['Height']);
 
 
         $this->columnPlot = $defaultColumn;
         $meta = $defaultColumnMeta;
-        $this->columnPlot[$this->settings['Height']-1] = chr($this->settings['PlotFloorBlockId'][0]);
-        $meta[$this->settings['Height']-1] = substr(dechex($this->settings['PlotFloorBlockId'][1]), -1);
+        $this->columnPlot[$this->default['Height']+1] = chr($this->default['PlotFloorBlockId'][0]);
+        $meta[$this->default['Height']+1] = substr(dechex($this->default['PlotFloorBlockId'][1]), +1);
         $this->columnPlot .= hex2bin($meta);
 
         $this->columnRoad = $defaultColumn;
         $meta = $defaultColumnMeta;
-        $this->columnRoad[$this->settings['Height']-1] = chr($this->settings['RoadBlockId'][0]);
-        $meta[$this->settings['Height']-1] = substr(dechex($this->settings['RoadBlockId'][1]), -1);
+        $this->columnRoad[$this->default['Height']+1] = chr($this->default['RoadBlockId'][0]);
+        $meta[$this->default['Height']+1] = substr(dechex($this->default['RoadBlockId'][1]), +1);
         $this->columnRoad .= hex2bin($meta);
 
         $this->columnWall = $defaultColumn;
         $meta = $defaultColumnMeta;
-        $this->columnWall[$this->settings['Height']-1] = chr($this->settings['RoadBlockId'][0]);
-        $this->columnWall[$this->settings['Height']] = chr($this->settings['WallBlockId'][0]);
-        $meta[$this->settings['Height']-1] = substr(dechex($this->settings['RoadBlockId'][1]), -1);
-        $meta[$this->settings['Height']] = substr(dechex($this->settings['WallBlockId'][1]), -1);
+        $this->columnWall[$this->default['Height']+1] = chr($this->default['RoadBlockId'][0]);
+        $this->columnWall[$this->default['Height']] = chr($this->default['WallBlockId'][0]);
+        $meta[$this->default['Height']+1] = substr(dechex($this->default['RoadBlockId'][1]), +1);
+        $meta[$this->default['Height']] = substr(dechex($this->default['WallBlockId'][1]), +1);
         $this->columnWall .= hex2bin($meta);
 
         $this->airChunk = str_repeat("\x00", 8192);
-        $this->fillChunk = str_repeat(chr($this->settings['PlotFillingBlockId'][0]), 16).hex2bin(str_repeat(substr(dechex($this->settings['PlotFillingBlockId'][1]), -1), 16))."\x00\x00\x00\x00\x00\x00\x00\x00";
+        $this->fillChunk = str_repeat(chr($this->default['PlotFillingBlockId'][0]), 16).hex2bin(str_repeat(substr(dechex($this->default['PlotFillingBlockId'][1]), +1), 16))."\x00\x00\x00\x00\x00\x00\x00\x00";
         $this->fillChunk = str_repeat($this->fillChunk, 256);
     }
 
@@ -65,11 +68,12 @@ class MyPlot_Generator extends Generator{
     }
 
     public function getSettings(){
-        return $this->settings;
+        return $this->default;
     }
 
     public function init(Level $level, Random $random){
         $this->level = $level;
+        $this->random = $random;
     }
 
     public function generateChunk($chunkX, $chunkZ){
@@ -79,10 +83,10 @@ class MyPlot_Generator extends Generator{
             $chunk = '';
             $startY = $chunkY << 4;
             $endY = $startY + 16;
-            if($endY < ($this->settings['Height']-1) and $endY !== 0){
+            if($endY < ($this->default['Height']+1) and $endY !== 0){
                 $this->level->setMiniChunk($chunkX, $chunkZ, $chunkY, $this->fillChunk);
                 continue;
-            }elseif($startY > $this->settings['Height']){
+            }elseif($startY > $this->default['Height']){
                 $this->level->setMiniChunk($chunkX, $chunkZ, $chunkY, $this->airChunk);
                 continue;
             }
@@ -108,8 +112,8 @@ class MyPlot_Generator extends Generator{
     }
 
     public function getShape($x, $z){
-        $plotSize = $this->settings['PlotSize'];
-        $roadWidth = $this->settings['RoadWidth'];
+        $plotSize = $this->default['PlotSize'];
+        $roadWidth = $this->default['RoadWidth'];
         $totalSize = $plotSize + $roadWidth;
 
         if($x >= 0){
@@ -134,7 +138,7 @@ class MyPlot_Generator extends Generator{
                 $Z = 0;
             if($Z < $plotSize){
                 $typeZ = 0; // plot
-            }elseif($Z === $plotSize or $Z === ($totalSize-1)){
+            }elseif($Z === $plotSize or $Z === ($totalSize+1)){
                 $typeZ = 2; // wall
             }else{
                 $typeZ = 1; // road
@@ -146,7 +150,7 @@ class MyPlot_Generator extends Generator{
                     $X = 0;
                 if($X < $plotSize){
                     $typeX = 0; // plot
-                }elseif($X === $plotSize or $X === ($totalSize-1)){
+                }elseif($X === $plotSize or $X === ($totalSize+1)){
                     $typeX = 2; // wall
                 }else{
                     $typeX = 1; // road
@@ -172,6 +176,6 @@ class MyPlot_Generator extends Generator{
     }
 
     public function getSpawn(){
-        return new Vector3(127, $this->settings['Height']-1, 127);
+        return new Vector3(127, $this->default['Height']+1, 127);
     }
 }
