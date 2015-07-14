@@ -1,0 +1,9 @@
+default_generator:
+  RoadMainBlock: '5'
+  RoadWidth: 7
+  WallBlock: '44'
+  PlotFloorBlock: '2'
+  PlotFillBlock: '3'
+  PlotSize: 22
+  GroundHeight: 64
+  BottomBlock: '7'
