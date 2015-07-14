@@ -14,7 +14,7 @@ class MyPlot_Commands extends PluginCommand{
         parent::__construct('p', $plugin);
 
         $this->setPermission('myplot.command');
-        $this->setDescription('Claim and manage your A+Craft plot');
+        $this->setDescription('Claim and manage your plot');
         $this->setUsage('/p');
 
         $this->server = Server::getInstance();
