@@ -15,45 +15,44 @@ class MyPlotGenerator extends Generator
     public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
     public $roadWidth, $plotSize, $groundHeight;
 
-    public function __construct(array $settings = array()) {
-        $defaultBlocks = array (
-            "RoadBlock" => new Block(5),
-            "WallBlock" => new Block(44),
-            "PlotFloorBlock" => new Block(2),
-            "PlotFillBlock" => new Block(3),
-            "BottomBlock" => new Block(7),
-        );
-        foreach($defaultBlocks as $key => $defaultBlock) {
-            if (isset($settings[$key])) {
-                $blockStr = $settings[$key];
-                if (is_numeric($blockStr)) {
-                    $block = new Block($blockStr);
-                } else {
-                    $split = explode(":", $blockStr);
-                    if (count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
-                        $block = new Block($split[0], $split[1]);
-                    } else {
-                        $block = $defaultBlock;
-                    }
-                }
-            } else {
-                $block = $defaultBlock;
-            }
-            $this->{lcfirst($key)} = $block;
-        }
+    public function __construct(array $settings = array())
+    {
+        $this->settings = $settings;
 
-        $defaultNumbers = array(
-            "RoadWidth" => 7,
-            "PlotSize" => 22,
-            "GroundHeight" => 64,
-        );
-        foreach ($defaultNumbers as $key => $defaultNumber) {
-            if (isset($settings[$key]) and is_numeric($settings[$key])) {
-                $number = $settings[$key];
+        $this->roadBlock = $this->parseBlock($settings, "RoadBlock", new Block(5));
+        $this->wallBlock = $this->parseBlock($settings, "WallBlock", new Block(44));
+        $this->plotFloorBlock = $this->parseBlock($settings, "PlotFloorBlock", new Block(2));
+        $this->plotFillBlock = $this->parseBlock($settings, "PlotFillBlock", new Block(3));
+        $this->bottomBlock = $this->parseBlock($settings, "BottomBlock", new Block(7));
+        $this->roadWidth = $this->parseNumber($settings, "RoadWidth", 7);
+        $this->plotSize = $this->parseNumber($settings, "PlotSize", 22);
+        $this->groundHeight = $this->parseNumber($settings, "GroundHeight", 64);
+    }
+
+    private function parseBlock($array, $key, $default) {
+        if (isset($array[$key])) {
+            $id = $array[$key];
+            if (is_numeric($id)) {
+                $block = new Block($id);
             } else {
-                $number = $defaultNumber;
+                $split = explode(":", $id);
+                if (count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
+                    $block = new Block($split[0], $split[1]);
+                } else {
+                    $block = $default;
+                }
             }
-            $this->{lcfirst($key)} = $number;
+        } else {
+            $block = $default;
+        }
+        return $block;
+    }
+
+    private function parseNumber($array, $key, $default) {
+        if (isset($array[$key]) and is_numeric($array[$key])) {
+            return $array[$key];
+        } else {
+            return $default;
         }
     }
 
