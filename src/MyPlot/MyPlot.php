@@ -15,10 +15,7 @@ use SQLite3;
 
 class MyPlot extends PluginBase implements Listener
 {
-    private $config;
-    public static $levelData = array(), $folder;
-    public $db;
-    public $levels;
+    public $db, $levels;
     private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot, $sqlRemovePlotById;
 
     public function onEnable() {

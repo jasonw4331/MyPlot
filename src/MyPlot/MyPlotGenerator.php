@@ -10,15 +10,11 @@ use pocketmine\level\generator\biome\Biome;
 
 class MyPlotGenerator extends Generator
 {
-    private $level;
-    private $settings = array();
+    private $level, $settings;
     public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
     public $roadWidth, $plotSize, $groundHeight;
 
-    public function __construct(array $settings = array())
-    {
-        $this->settings = $settings;
-
+    public function __construct(array $settings = []) {
         $this->roadBlock = $this->parseBlock($settings, "RoadBlock", new Block(5));
         $this->wallBlock = $this->parseBlock($settings, "WallBlock", new Block(44));
         $this->plotFloorBlock = $this->parseBlock($settings, "PlotFloorBlock", new Block(2));
@@ -27,6 +23,17 @@ class MyPlotGenerator extends Generator
         $this->roadWidth = $this->parseNumber($settings, "RoadWidth", 7);
         $this->plotSize = $this->parseNumber($settings, "PlotSize", 22);
         $this->groundHeight = $this->parseNumber($settings, "GroundHeight", 64);
+
+        $this->settings = [
+            "RoadBlock" => $this->roadBlock->getId() . (($meta = $this->roadBlock->getDamage()) ? '' : ':'.$meta),
+            "WallBlock" => $this->wallBlock->getId() . (($meta = $this->wallBlock->getDamage()) ? '' : ':'.$meta),
+            "PlotFloorBlock" => $this->plotFloorBlock->getId() . (($meta = $this->plotFloorBlock->getDamage()) ? '' : ':'.$meta),
+            "PlotFillBlock" => $this->bottomBlock->getId() . (($meta = $this->bottomBlock->getDamage()) ? '' : ':'.$meta),
+            "BottomBlock" => $this->wallBlock->getId() . (($meta = $this->wallBlock->getDamage()) ? '' : ':'.$meta),
+            "RoadWidth" => $this->roadWidth,
+            "PlotSize" => $this->plotSize,
+            "GroundHeight" => $this->groundHeight,
+        ];
     }
 
     private function parseBlock($array, $key, $default) {
