@@ -56,7 +56,7 @@ class Commands extends PluginCommand
         $commandId = $this->subCommands[$subCommand];
         $command = $this->commandObjects[$commandId];
         $canUse = $command->canUse($sender);
-        if ($sender->hasPermission("myplot.command." . $command->getName()) and $canUse) {
+        if ($sender->hasPermission("myplot.command") and $canUse) {
             if ($command->execute($sender, $args) === false) {
                 $sender->sendMessage(TextFormat::YELLOW."Usage: /p " . $command->getName() . " " . $command->getUsage());
             }
