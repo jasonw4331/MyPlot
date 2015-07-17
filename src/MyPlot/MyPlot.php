@@ -15,6 +15,7 @@ use pocketmine\plugin\MethodEventExecutor;
 use pocketmine\Player;
 use pocketmine\block\Block;
 use MyPlot\provider\DataProvider;
+use pocketmine\utils\TextFormat;
 
 class MyPlot extends PluginBase implements Listener
 {
@@ -260,6 +261,8 @@ class MyPlot extends PluginBase implements Listener
 
         $this->saveDefaultConfig();
         $this->reloadConfig();
+        $this->getLogger()->info(TextFormat::GREEN."Loading the Plot Framework!");
+        $this->getLogger()->warning(TextFormat::YELLOW."It seems that you are running the development build of MyPlot! Thats cool, but it CAN be very, very buggy! Just be careful when using this plugin and report any issues to".TextFormat::GOLD." http://github.com/wiez/MyPlot/issues");
 
         $pluginManager = $this->getServer()->getPluginManager();
         $pluginManager->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onBlockBreak"), $this, false);
@@ -279,6 +282,8 @@ class MyPlot extends PluginBase implements Listener
 
     public function onDisable() {
         $this->provider->close();
+        $this->getLogger()->info(TextFormat::GREEN."Saving plots");
+        $this->getLogger()->info(TextFormat::BLUE."Disabled the plot framework!");
     }
 
     public function onBlockBreak(BlockBreakEvent $event) {
@@ -288,9 +293,8 @@ class MyPlot extends PluginBase implements Listener
             $plot = $this->getPlotByPosition($event->getBlock());
             if ($plot !== null) {
                 $username = $player->getName();
-                if (!($plot->owner === $username or $plot->isHelper($username))) {
+                if (!($plot->owner == $username or $plot->isHelper($username))) {
                     $event->setCancelled(true);
-                    $username->sendMessage(TextFormat::DARK_RED."You cannot break blocks in plots you do not own.");
                 }
             }
         }
@@ -303,9 +307,8 @@ class MyPlot extends PluginBase implements Listener
             $plot = $this->getPlotByPosition($event->getBlock());
             if ($plot !== null) {
                 $username = $player->getName();
-                if (!($plot->owner === $username or $plot->isHelper($username))) {
+                if (!($plot->owner == $username or $plot->isHelper($username))) {
                     $event->setCancelled(true);
-                    $username->sendMessage(TextFormat::DARK_RED."You cannot place blocks in plots you do not own.");
 
                 }
             }
