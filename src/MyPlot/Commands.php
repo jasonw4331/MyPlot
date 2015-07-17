@@ -11,6 +11,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 use MyPlot\subcommand\SubCommand;
 use pocketmine\Player;
+use MyPlot\subcommand\RemoveHelperSubCommand;
 
 class Commands extends PluginCommand
 {
@@ -30,6 +31,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new ListSubCommand($plugin));
         $this->loadSubCommand(new InfoSubCommand($plugin));
         $this->loadSubCommand(new AddHelperSubCommand($plugin));
+        $this->loadSubCommand(new RemoveHelperSubCommand($plugin));
     }
 
     private function loadSubCommand(Subcommand $command) {
@@ -56,7 +58,7 @@ class Commands extends PluginCommand
         $canUse = $command->canUse($sender);
         if ($sender->hasPermission("myplot.command." . $command->getName()) and $canUse) {
             if ($command->execute($sender, $args) === false) {
-                $sender->sendMessage("Usage: /p " . $command->getName() . " " . $command->getUsage());
+                $sender->sendMessage(TextFormat::YELLOW."Usage: /p " . $command->getName() . " " . $command->getUsage());
             }
         } elseif ($canUse === false and !($sender instanceof Player)) {
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
