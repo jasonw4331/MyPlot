@@ -54,15 +54,16 @@ class SQLiteDataProvider implements DataProvider
 
     public function savePlot(Plot $plot) {
         $helpers = implode(",", $plot->helpers);
-        if ($plot->id >= 0) {
-            $stmt = $this->sqlSavePlotById;
-            $stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
-        } else {
+        // Need to be fixed
+        //if ($plot->id >= 0) {
+        //    $stmt = $this->sqlSavePlotById;
+        //    $stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
+        //} else {
             $stmt = $this->sqlSavePlot;
             $stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
             $stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
             $stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
-        }
+        //}
         $stmt->bindValue(":name", $plot->name, SQLITE3_TEXT);
         $stmt->bindValue(":owner", $plot->owner, SQLITE3_TEXT);
         $stmt->bindValue(":helpers", $helpers, SQLITE3_TEXT);
@@ -100,7 +101,11 @@ class SQLiteDataProvider implements DataProvider
         $this->sqlGetPlot->bindValue(":Z", $Z, SQLITE3_INTEGER);
         $result = $this->sqlGetPlot->execute();
         if ($val = $result->fetchArray(SQLITE3_ASSOC)) {
-            $helpers = explode(",", (string) $val["helpers"]);
+            if ($val["helpers"] === null or $val["helpers"] === "") {
+                $helpers = [];
+            } else {
+                $helpers = explode(",", (string) $val["helpers"]);
+            }
             return new Plot($levelName, $X, $Z, (string) $val["name"], (string) $val["owner"],
                             $helpers, (int) $val["id"]);
         }

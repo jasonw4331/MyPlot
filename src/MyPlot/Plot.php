@@ -28,7 +28,7 @@ class Plot
      * @return bool
      */
     public function addHelper($username) {
-        if ($this->isHelper($username)) {
+        if (!$this->isHelper($username)) {
             $this->helpers[] = $username;
             return true;
         }

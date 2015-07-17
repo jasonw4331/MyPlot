@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot;
 
+use MyPlot\subcommand\AddHelperSubCommand;
 use MyPlot\subcommand\ClaimSubCommand;
 use MyPlot\subcommand\GenerateSubCommand;
 use MyPlot\subcommand\InfoSubCommand;
@@ -28,6 +29,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new GenerateSubCommand($plugin));
         $this->loadSubCommand(new ListSubCommand($plugin));
         $this->loadSubCommand(new InfoSubCommand($plugin));
+        $this->loadSubCommand(new AddHelperSubCommand($plugin));
     }
 
     private function loadSubCommand(Subcommand $command) {
