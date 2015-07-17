@@ -14,6 +14,8 @@ Command | Usage |
 /p claim|Claim the plot you are standing on
 /p list|List all the plots you own
 /p generate (name)|Generate a plot world
+/p addhelper|Add a helper to your plot
+/p removehelper|Remove a helper from your plot
 
 **PERMISSIONS:**
 
