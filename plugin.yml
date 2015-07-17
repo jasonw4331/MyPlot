@@ -1,7 +1,11 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.0.0
+version: 1.0
 load: STARTUP
 api: 1.0.0
-author: Wies
+author: Wies and Exxarion
 description: Plot and protection plugin
+permissions:
+  myplot.command:
+    description: Allows users to use myplot features
+    default: true
