@@ -1,5 +1,7 @@
+data_provider: 'sqlite'
+
 default_generator:
-  RoadMainBlock: '5'
+  RoadBlock: '5'
   RoadWidth: 7
   WallBlock: '44'
   PlotFloorBlock: '2'

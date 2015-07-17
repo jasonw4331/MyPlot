@@ -3,7 +3,10 @@ namespace MyPlot;
 
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\level\LevelLoadEvent;
+use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
+use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
@@ -11,111 +14,76 @@ use pocketmine\event\EventPriority;
 use pocketmine\plugin\MethodEventExecutor;
 use pocketmine\Player;
 use pocketmine\block\Block;
-use SQLite3;
+use MyPlot\provider\DataProvider;
 
 class MyPlot extends PluginBase implements Listener
 {
-    public $db, $levels;
-    private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot, $sqlRemovePlotById;
+    private $levels;
 
-    public function onEnable() {
-        $folder = $this->getDataFolder();
-        if (!is_dir($folder)) {
-            mkdir($folder);
-        }
+    /** @var DataProvider */
+    private $provider;
 
-        Generator::addGenerator(MyPlotGenerator::class, "myplot");
 
-        $this->saveDefaultConfig();
-        $this->reloadConfig();
-
-        $pluginManager = $this->getServer()->getPluginManager();
-        $pluginManager->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onBlockBreak"), $this, false);
-        $pluginManager->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onBlockPlace"), $this, false);
-
-        $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
-
-        $this->reloadWorlds();
-        $this->initDB();
+    /**
+     * @api
+     * @return DataProvider
+     */
+    public function getProvider() {
+        return $this->provider;
     }
 
-    public function onDisable() { }
-
-    public function reloadWorlds() {
-        foreach ($this->getServer()->getLevels() as $level) {
-            if ($level->getProvider()->getGenerator() === "myplot") {
-                $this->levels[$level->getName()] = $level->getProvider()->getGeneratorOptions();
-            }
-        }
-    }
-
-    private function initDB() {
-        $this->db = new SQLite3($this->getDataFolder() . "plots.db");
-        $this->db->exec("CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY, level TEXT, X INT, Z INT, owner TEXT, helpers TEXT)");
-        $this->db->exec("CREATE TABLE IF NOT EXISTS comments (plotID INT, player TEXT, comment TEXT)");
-
-        $this->sqlGetPlot = $this->db->prepare("SELECT id, owner, helpers FROM plots WHERE level = :level AND X = :X AND Z = :Z");
-        $this->sqlSavePlot = $this->db->prepare(
-            "UPDATE plots SET owner = :owner, helpers = :helpers WHERE level = :level AND X = :X AND Z = :Z;
-            IF @@ROWCOUNT = 0
-                INSERT INTO Table1 VALUES level = :level AND X = :X AND Z = :Z, owner = :owner, helpers = :helpers"
-        );
-        $this->sqlSavePlotById = $this->db->prepare("UPDATE plots SET owner = :owner, helpers = :helpers WHERE id = :id");
-        $this->sqlRemovePlot = $this->db->prepare("DELETE FROM plots WHERE level = :level AND X = :X AND Z = :Z");
-        $this->sqlRemovePlotById = $this->db->prepare("DELETE FROM plots WHERE id = :id");
-    }
-
-    public function onBlockBreak(BlockBreakEvent $event) {
-        $player = $event->getPlayer();
-        $levelName = $player->getLevel()->getName();
+    /**
+     * @api
+     * @param string $levelName
+     * @return array
+     */
+    public function getLevelOptions($levelName) {
         if (isset($this->levels[$levelName])) {
-            $plot = $this->getPlotByPos($event->getBlock());
-            if ($plot !== false) {
-                $username = $player->getName();
-                if (!($plot->owner === $username or $plot->isHelper($username))) {
-                    $event->setCancelled(true);
-                }
-            }
+            return $this->levels[$levelName];
+        } else {
+            return [];
         }
     }
 
-    public function onBlockPlace(BlockPlaceEvent $event) {
-        $player = $event->getPlayer();
-        $levelName = $player->getLevel()->getName();
-        if (isset($this->levels[$levelName])) {
-            $plot = $this->getPlotByPos($event->getBlock());
-            if ($plot !== false) {
-                $username = $player->getName();
-                if (!($plot->owner === $username or $plot->isHelper($username))) {
-                    $event->setCancelled(true);
-                }
-            }
-        }
-    }
-
-    public function getPlot($levelName, $X, $Z) {
-        $this->sqlGetPlot->bindValue(':level', $levelName, SQLITE3_TEXT);
-        $this->sqlGetPlot->bindValue(':X', $X, SQLITE3_INTEGER);
-        $this->sqlGetPlot->bindValue(':Z', $Z, SQLITE3_INTEGER);
-        if ($result = $this->sqlGetPlot->execute()) {
-            if ($result->numColumns()) {
-                return $result->fetchArray(SQLITE3_ASSOC);
-            }
-        }
-        return false;
-    }
-
-    public function levelExists($levelName) {
+    /**
+     * @api
+     * @param string $levelName
+     * @return bool
+     */
+    public function isLevelLoaded($levelName) {
         return isset($this->levels[$levelName]);
     }
 
-    public function getPlotByPos(Position $position) {
+    /**
+     * @api
+     * @param string $levelName
+     * @return bool
+     */
+    public function generateLevel($levelName, $options = []) {
+        if ($this->getServer()->isLevelGenerated($levelName) === true) {
+            return false;
+        }
+        if (count($options) === 0) {
+            $options = $this->getConfig()->get("default_generator");
+        }
+        $options = [
+            "preset" => json_encode($options)
+        ];
+        return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $options);
+    }
+
+    /**
+     * @api
+     * @param Position $position
+     * @return Plot|null
+     */
+    public function getPlotByPosition(Position $position) {
         $x = $position->x;
         $z = $position->z;
         $levelName = $position->level->getName();
 
-        if (isset($this->levels[$levelName]) === false) {
-            return false;
+        if (!isset($this->levels[$levelName])) {
+            return null;
         }
         $levelData = $this->levels[$levelName];
 
@@ -140,59 +108,26 @@ class MyPlot extends PluginBase implements Listener
         }
 
         if (($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
-            return false;
+            return null;
         }
 
-        $plot = $this->getPlot($levelName, $X, $Z);
-        if ($plot === false) {
-            return new Plot($levelName, $X, $Z);
-        } else {
-            return $plot;
+        $plot = $this->provider->getPlot($levelName, $X, $Z);
+        if ($plot === null) {
+            $plot = new Plot($levelName, $X, $Z);
         }
+        return $plot;
     }
 
-    public function savePlot(Plot $plot) {
-        $helpers = implode(",", $plot->helpers);
-        if ($plot->id >= 0) {
-            $this->sqlSavePlotById->bindValue(":id", $plot->id, SQLITE3_INTEGER);
-            $this->sqlSavePlotById->bindValue(":owner", $plot->owner, SQLITE3_TEXT);
-            $this->sqlSavePlotById->bindValue(":helpers", $helpers, SQLITE3_TEXT);
-            $result = $this->sqlSavePlotById->execute();
-        } else {
-            $this->sqlSavePlot->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
-            $this->sqlSavePlot->bindValue(":X", $plot->X, SQLITE3_INTEGER);
-            $this->sqlSavePlot->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
-            $this->sqlSavePlot->bindValue(":owner", $plot->X, SQLITE3_TEXT);
-            $this->sqlSavePlot->bindValue(":helpers", $plot->Z, SQLITE3_TEXT);
-            $result = $this->sqlSavePlot->execute();
-        }
-        if ($result === false) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public function removePlot(Plot $plot) {
-        if ($plot->id >= 0) {
-            $this->sqlRemovePlotById->bindValue(":id", $plot->id, SQLITE3_INTEGER);
-            $result = $this->sqlRemovePlotById->execute();
-        } else {
-            $this->sqlRemovePlot->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
-            $this->sqlRemovePlot->bindValue(":X", $plot->X, SQLITE3_INTEGER);
-            $this->sqlRemovePlot->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
-            $result = $this->sqlRemovePlot->execute();
-        }
-        if ($result === false) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
+    /**
+     *  Get the begin position of a plot
+     *
+     * @api
+     * @param Plot $plot
+     * @return Position|null
+     */
     public function getPlotPosition(Plot $plot) {
         if (isset($this->levels[$plot->levelName]) === false) {
-            return false;
+            return null;
         }
         $levelData = $this->levels[$plot->levelName];
 
@@ -213,8 +148,14 @@ class MyPlot extends PluginBase implements Listener
         return new Position($x, $levelData["GroundHeight"], $z, $level);
     }
 
-    public function teleportToPlot(Plot $plot, Player $player) {
-        if (isset($this->levels[$plot->levelName]) === false) {
+    /**
+     * @api
+     * @param Player $player
+     * @param Plot $plot
+     * @return bool
+     */
+    public function teleportPlayerToPlot(Player $player, Plot $plot) {
+        if (!isset($this->levels[$plot->levelName])) {
             return false;
         }
         $pos = $this->getPlotPosition($plot);
@@ -225,8 +166,15 @@ class MyPlot extends PluginBase implements Listener
         return true;
     }
 
-    public function clearPlot(Plot $plot) {
-        if (isset($this->levels[$plot->levelName]) === false) {
+    /**
+     *  Reset all the blocks inside a plot
+     *
+     * @api
+     * @param Plot $plot
+     * @return bool
+     */
+    public function resetPlot(Plot $plot) {
+        if (!isset($this->levels[$plot->levelName])) {
             return false;
         }
         $levelData = $this->levels[$plot->levelName];
@@ -267,8 +215,14 @@ class MyPlot extends PluginBase implements Listener
         return true;
     }
 
-    public function changePlotBiome(Plot $plot, Block $floorBlock) {
-        if (isset($this->levels[$plot->levelName]) === false) {
+    /**
+     * @api
+     * @param Plot $plot
+     * @param Biome $biome
+     * @return bool
+     */
+    public function setPlotBiome(Plot $plot, Biome $biome) {
+        if (!isset($this->levels[$plot->levelName])) {
             return false;
         }
         $levelData = $this->levels[$plot->levelName];
@@ -279,16 +233,106 @@ class MyPlot extends PluginBase implements Listener
         $pos2->x += $plotSize;
         $pos2->z += $plotSize;
 
-        $pos = new Position(0, $levelData["GroundHeight"], 0, $pos1->level);
         for ($x = $pos1->x; $x < $pos2->x; $x++) {
-            $pos->x = $x;
             for ($z = $pos1->z; $z < $pos2->z; $z++) {
-                $pos->z = $z;
-                if ($level->setBlock($pos, $floorBlock, false, false) === false) {
-                    return false;
-                }
+                $level->setBiomeId($x, $z, $biome->getId());
+                $color = $biome->getColor();
+                $R = $color >> 16;
+                $G = ($color >> 8) & 0xff;
+                $B = $color & 0xff;
+                $level->setBiomeColor($x, $z, $R, $G, $B);
             }
         }
         return true;
+    }
+
+
+    /* -------------------------- Non-API part -------------------------- */
+
+
+    public function onEnable() {
+        $folder = $this->getDataFolder();
+        if (!is_dir($folder)) {
+            mkdir($folder);
+        }
+
+        Generator::addGenerator(MyPlotGenerator::class, "myplot");
+
+        $this->saveDefaultConfig();
+        $this->reloadConfig();
+
+        $pluginManager = $this->getServer()->getPluginManager();
+        $pluginManager->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onBlockBreak"), $this, false);
+        $pluginManager->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onBlockPlace"), $this, false);
+        $pluginManager->registerEvent("pocketmine\\event\\level\\LevelLoadEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onLevelLoad"), $this, false);
+        $pluginManager->registerEvent("pocketmine\\event\\level\\LevelUnloadEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onLevelUnload"), $this, false);
+        $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
+
+        switch (strtolower($this->getConfig()->get("data_provider"))) {
+            case "sqlite":
+                $this->provider = new provider\SQLiteDataProvider($this);
+                break;
+            default:
+                $this->provider = new provider\SQLiteDataProvider($this);
+        }
+    }
+
+    public function onDisable() {
+        $this->provider->close();
+    }
+
+    public function onBlockBreak(BlockBreakEvent $event) {
+        $player = $event->getPlayer();
+        $levelName = $player->getLevel()->getName();
+        if (isset($this->levels[$levelName])) {
+            $plot = $this->getPlotByPosition($event->getBlock());
+            if ($plot !== null) {
+                $username = $player->getName();
+                if (!($plot->owner === $username or $plot->isHelper($username))) {
+                    $event->setCancelled(true);
+                }
+            }
+        }
+    }
+
+    public function onBlockPlace(BlockPlaceEvent $event) {
+        $player = $event->getPlayer();
+        $levelName = $player->getLevel()->getName();
+        if (isset($this->levels[$levelName])) {
+            $plot = $this->getPlotByPosition($event->getBlock());
+            if ($plot !== null) {
+                $username = $player->getName();
+                if (!($plot->owner === $username or $plot->isHelper($username))) {
+                    $event->setCancelled(true);
+                }
+            }
+        }
+    }
+
+    public function onLevelLoad(LevelLoadEvent $event) {
+        if ($event->getLevel()->getProvider()->getGenerator() === "myplot") {
+            $settings = $event->getLevel()->getProvider()->getGeneratorOptions();
+            if (isset($settings["preset"]) === false or $settings["preset"] === "") {
+                return;
+            }
+            $settings = json_decode($settings["preset"], true);
+            if ($settings === false) {
+                return;
+            }
+            $requiredKeys = [
+                "RoadBlock", "WallBlock", "PlotFloorBlock", "PlotFillBlock",
+                "BottomBlock", "RoadWidth", "PlotSize", "GroundHeight"
+            ];
+            if (count(array_intersect_key(array_flip($requiredKeys), $settings)) === count($requiredKeys)) {
+                $this->levels[$event->getLevel()->getName()] = $settings;
+            }
+        }
+    }
+
+    public function onLevelUnload(LevelUnloadEvent $event) {
+        $levelName = $event->getLevel()->getName();
+        if (isset($this->levels[$levelName])) {
+            unset($this->levels[$levelName]);
+        }
     }
 }

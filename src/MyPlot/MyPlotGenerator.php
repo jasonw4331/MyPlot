@@ -7,14 +7,29 @@ use pocketmine\level\ChunkManager;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\level\generator\biome\Biome;
+use pocketmine\level\Level;
 
 class MyPlotGenerator extends Generator
 {
-    private $level, $settings;
+    /** @var Level */
+    private $level;
+
+    private $settings;
+
+    /** @var Block */
     public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
+
     public $roadWidth, $plotSize, $groundHeight;
 
     public function __construct(array $settings = []) {
+        if (isset($settings["preset"])) {
+            $settings = json_decode($settings["preset"], true);
+            if ($settings === false) {
+                $settings = [];
+            }
+        } else {
+            $settings = [];
+        }
         $this->roadBlock = $this->parseBlock($settings, "RoadBlock", new Block(5));
         $this->wallBlock = $this->parseBlock($settings, "WallBlock", new Block(44));
         $this->plotFloorBlock = $this->parseBlock($settings, "PlotFloorBlock", new Block(2));
@@ -24,7 +39,8 @@ class MyPlotGenerator extends Generator
         $this->plotSize = $this->parseNumber($settings, "PlotSize", 22);
         $this->groundHeight = $this->parseNumber($settings, "GroundHeight", 64);
 
-        $this->settings = [
+        $this->settings = [];
+        $this->settings["preset"] = json_encode([
             "RoadBlock" => $this->roadBlock->getId() . (($meta = $this->roadBlock->getDamage()) ? '' : ':'.$meta),
             "WallBlock" => $this->wallBlock->getId() . (($meta = $this->wallBlock->getDamage()) ? '' : ':'.$meta),
             "PlotFloorBlock" => $this->plotFloorBlock->getId() . (($meta = $this->plotFloorBlock->getDamage()) ? '' : ':'.$meta),
@@ -33,7 +49,7 @@ class MyPlotGenerator extends Generator
             "RoadWidth" => $this->roadWidth,
             "PlotSize" => $this->plotSize,
             "GroundHeight" => $this->groundHeight,
-        ];
+        ]);
     }
 
     private function parseBlock($array, $key, $default) {
