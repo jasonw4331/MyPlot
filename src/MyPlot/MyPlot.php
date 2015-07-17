@@ -290,6 +290,7 @@ class MyPlot extends PluginBase implements Listener
                 $username = $player->getName();
                 if (!($plot->owner === $username or $plot->isHelper($username))) {
                     $event->setCancelled(true);
+                    $username->sendMessage(TextFormat::DARK_RED."You cannot break blocks in plots you do not own.");
                 }
             }
         }
@@ -304,6 +305,8 @@ class MyPlot extends PluginBase implements Listener
                 $username = $player->getName();
                 if (!($plot->owner === $username or $plot->isHelper($username))) {
                     $event->setCancelled(true);
+                    $username->sendMessage(TextFormat::DARK_RED."You cannot place blocks in plots you do not own.");
+
                 }
             }
         }
