@@ -3,11 +3,13 @@ namespace MyPlot;
 
 use MyPlot\subcommand\ClaimSubCommand;
 use MyPlot\subcommand\GenerateSubCommand;
+use MyPlot\subcommand\InfoSubCommand;
 use MyPlot\subcommand\ListSubCommand;
 use pocketmine\command\PluginCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 use MyPlot\subcommand\SubCommand;
+use pocketmine\Player;
 
 class Commands extends PluginCommand
 {
@@ -25,6 +27,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new ClaimSubCommand($plugin));
         $this->loadSubCommand(new GenerateSubCommand($plugin));
         $this->loadSubCommand(new ListSubCommand($plugin));
+        $this->loadSubCommand(new InfoSubCommand($plugin));
     }
 
     private function loadSubCommand(Subcommand $command) {
@@ -48,10 +51,13 @@ class Commands extends PluginCommand
         }
         $commandId = $this->subCommands[$subCommand];
         $command = $this->commandObjects[$commandId];
-        if ($sender->hasPermission("myplot.command." . $command->getName()) and $command->canUse($sender)) {
+        $canUse = $command->canUse($sender);
+        if ($sender->hasPermission("myplot.command." . $command->getName()) and $canUse) {
             if ($command->execute($sender, $args) === false) {
                 $sender->sendMessage("Usage: /p " . $command->getName() . " " . $command->getUsage());
             }
+        } elseif ($canUse === false and !($sender instanceof Player)) {
+            $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
         } else {
             $sender->sendMessage(TextFormat::RED . "You do not have permissions to run this command");
         }
