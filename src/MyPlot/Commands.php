@@ -1,12 +1,13 @@
 <?php
 namespace MyPlot;
 
+use MyPlot\subcommand\ClaimSubCommand;
+use MyPlot\subcommand\GenerateSubCommand;
+use MyPlot\subcommand\ListSubCommand;
 use pocketmine\command\PluginCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 use MyPlot\subcommand\SubCommand;
-use MyPlot\subcommand\Claim;
-use MyPlot\subcommand\Generate;
 
 class Commands extends PluginCommand
 {
@@ -19,10 +20,11 @@ class Commands extends PluginCommand
         parent::__construct("plot", $plugin);
         $this->setAliases(["p"]);
         $this->setPermission("myplot.command");
-        $this->setDescription("MyPlot commands");
+        $this->setDescription("Claim and manage your plots");
 
-        $this->loadSubCommand(new Claim($plugin));
-        $this->loadSubCommand(new Generate($plugin));
+        $this->loadSubCommand(new ClaimSubCommand($plugin));
+        $this->loadSubCommand(new GenerateSubCommand($plugin));
+        $this->loadSubCommand(new ListSubCommand($plugin));
     }
 
     private function loadSubCommand(Subcommand $command) {
@@ -51,7 +53,7 @@ class Commands extends PluginCommand
                 $sender->sendMessage("Usage: /p " . $command->getName() . " " . $command->getUsage());
             }
         } else {
-            $sender->sendMessage(TextFormat::RED . "You don't have permission to use this command");
+            $sender->sendMessage(TextFormat::RED . "You do not have permissions to run this command");
         }
         return true;
     }

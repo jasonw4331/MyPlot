@@ -6,7 +6,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Claim implements SubCommand
+class ClaimSubCommand implements SubCommand
 {
     private $plugin;
 
@@ -45,21 +45,21 @@ class Claim implements SubCommand
         $player = $sender->getServer()->getPlayer($sender->getName());
         $plot = $this->plugin->getPlotByPosition($player->getPosition());
         if ($plot === null) {
-            $sender->sendMessage(TextFormat::RED . "You don't stand inside a plot");
+            $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
         }
         if ($plot->owner != "") {
             if ($plot->owner === $sender->getName()) {
                 $sender->sendMessage(TextFormat::RED . "You already own this plot");
             } else {
-                $sender->sendMessage(TextFormat::RED . "This plot is already owned by " . $plot->owner);
+                $sender->sendMessage(TextFormat::RED . "This plot is already claimed by " . $plot->owner);
             }
             return true;
         }
         $plot->owner = $sender->getName();
         $plot->name = $name;
         if ($this->plugin->getProvider()->savePlot($plot)) {
-            $sender->sendMessage(TextFormat::GREEN . "You claimed this plot with id: " . $plot->X . ":" . $plot->Z);
+            $sender->sendMessage(TextFormat::GREEN . "You are now the owner of this plot with id: " . TextFormat::WHITE . $plot->X . ';' . $plot->Z);
         } else {
             $sender->sendMessage(TextFormat::RED . "Something went wrong");
         }

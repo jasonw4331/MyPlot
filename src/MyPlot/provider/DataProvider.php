@@ -26,4 +26,11 @@ interface DataProvider
      * @return Plot|null
      */
     public function getPlot($levelName, $X, $Z);
+
+    /**
+     * @param string $owner
+     * @param string $levelName
+     * @return Plot[]
+     */
+    public function getPlotsByOwner($owner, $levelName = "");
 }
