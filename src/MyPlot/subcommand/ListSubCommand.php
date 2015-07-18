@@ -16,7 +16,7 @@ class ListSubCommand implements SubCommand
     }
 
     public function canUse(CommandSender $sender) {
-        return ($sender instanceof Player);
+        return ($sender instanceof Player) and $sender->hasPermission("myplot.command.list");
     }
 
     public function getUsage() {

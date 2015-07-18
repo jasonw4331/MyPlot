@@ -15,7 +15,7 @@ class RemoveHelperSubCommand implements SubCommand
     }
 
     public function canUse(CommandSender $sender) {
-        return ($sender instanceof Player);
+        return ($sender instanceof Player) and $sender->hasPermission("myplot.command.removehelper");
     }
 
     public function getUsage() {

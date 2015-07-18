@@ -9,3 +9,22 @@ permissions:
   myplot.command:
     description: Allows users to use myplot features
     default: true
+    children:
+      myplot.command.claim:
+        description: Gives the claim command
+        default: true
+      myplot.command.info:
+        description: Gives the info command
+        default: true
+      myplot.command.list:
+        description: Gives the list command
+        default: true
+      myplot.command.generate:
+        description: Gives the generate command
+        default: op
+      myplot.command.addhelper:
+        description: Gives the addhelper command
+        default: true
+      myplot.command.removehelper:
+        description: Gives the removehelper command
+        default: true

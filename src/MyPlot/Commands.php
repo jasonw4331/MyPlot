@@ -71,10 +71,12 @@ class Commands extends PluginCommand
     private function sendHelp(CommandSender $sender) {
         $sender->sendMessage("===========[MyPlot commands]===========");
         foreach ($this->commandObjects as $command) {
-            $sender->sendMessage(
-                TextFormat::DARK_GREEN . "/p " . $command->getName() . " " . $command->getUsage() . ": " .
-                TextFormat::WHITE . $command->getDescription()
-            );
+            if ($command->canUse($sender)) {
+                $sender->sendMessage(
+                    TextFormat::DARK_GREEN . "/p " . $command->getName() . " " . $command->getUsage() . ": " .
+                    TextFormat::WHITE . $command->getDescription()
+                );
+            }
         }
     }
 }

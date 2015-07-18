@@ -15,7 +15,7 @@ class AddHelperSubCommand implements SubCommand
     }
 
     public function canUse(CommandSender $sender) {
-        return ($sender instanceof Player);
+        return ($sender instanceof Player) and $sender->hasPermission("myplot.command.addhelper");
     }
 
     public function getUsage() {

@@ -15,7 +15,7 @@ class GenerateSubCommand implements SubCommand
     }
 
     public function canUse(CommandSender $sender) {
-        return (($sender instanceof Player) === false) or $sender->isOp();
+        return $sender->hasPermission("myplot.command.generate");
     }
 
     public function getUsage() {
