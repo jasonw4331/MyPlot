@@ -287,32 +287,33 @@ class MyPlot extends PluginBase implements Listener
     }
 
     public function onBlockBreak(BlockBreakEvent $event) {
-        $player = $event->getPlayer();
-        $levelName = $player->getLevel()->getName();
-        if (isset($this->levels[$levelName])) {
-            $plot = $this->getPlotByPosition($event->getBlock());
-            if ($plot !== null) {
-                $username = $player->getName();
-                if (!($plot->owner == $username or $plot->isHelper($username))) {
-                    $event->setCancelled(true);
-                }
+        $levelName = $event->getPlayer()->getLevel()->getName();
+        if (!isset($this->levels[$levelName])) {
+            return;
+        }
+        $plot = $this->getPlotByPosition($event->getBlock());
+        if ($plot !== null) {
+            $username = $event->getPlayer()->getName();
+            if ($plot->owner == $username or $plot->isHelper($username)) {
+                return;
             }
         }
+        $event->setCancelled(true);
     }
 
     public function onBlockPlace(BlockPlaceEvent $event) {
-        $player = $event->getPlayer();
-        $levelName = $player->getLevel()->getName();
-        if (isset($this->levels[$levelName])) {
-            $plot = $this->getPlotByPosition($event->getBlock());
-            if ($plot !== null) {
-                $username = $player->getName();
-                if (!($plot->owner == $username or $plot->isHelper($username))) {
-                    $event->setCancelled(true);
-
-                }
+        $levelName = $event->getPlayer()->getLevel()->getName();
+        if (!isset($this->levels[$levelName])) {
+            return;
+        }
+        $plot = $this->getPlotByPosition($event->getBlock());
+        if ($plot !== null) {
+            $username = $event->getPlayer()->getName();
+            if ($plot->owner == $username or $plot->isHelper($username)) {
+                return;
             }
         }
+        $event->setCancelled(true);
     }
 
     public function onLevelLoad(LevelLoadEvent $event) {
