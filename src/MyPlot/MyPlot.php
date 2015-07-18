@@ -174,7 +174,7 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return bool
      */
-    public function resetPlot(Plot $plot) {
+    public function clearPlot(Plot $plot) {
         if (!isset($this->levels[$plot->levelName])) {
             return false;
         }
@@ -214,6 +214,29 @@ class MyPlot extends PluginBase implements Listener
             }
         }
         return true;
+    }
+
+    /**
+     * Delete the plot data
+     *
+     * @param Plot $plot
+     * @return bool
+     */
+    public function disposePlot(Plot $plot) {
+        return $this->provider->deletePlot($plot);
+    }
+
+    /**
+     * Clear and dispose a plot
+     *
+     * @param Plot $plot
+     * @return bool
+     */
+    public function resetPlot(Plot $plot) {
+        if ($this->clearPlot($plot)) {
+            return $this->disposePlot($plot);
+        }
+        return false;
     }
 
     /**
