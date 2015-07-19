@@ -53,7 +53,6 @@ class AddHelperSubCommand implements SubCommand
             $sender->sendMessage($helper . " was already a helper of this plot");
             return true;
         }
-        var_dump($plot);
         if ($this->plugin->getProvider()->savePlot($plot)) {
             $sender->sendMessage(TextFormat::GREEN . $helper . " is now a helper of this plot");
         } else {
