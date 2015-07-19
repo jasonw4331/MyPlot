@@ -44,9 +44,9 @@ class ClearPlotTask extends PluginTask
                 while ($this->pos->y < 128) {
                     if ($this->pos->y === 0) {
                         $block = $this->bottomBlock;
-                    } elseif ($this->pos->y < ($this->height - 1)) {
+                    } elseif ($this->pos->y < $this->height) {
                         $block = $this->plotFillBlock;
-                    } elseif ($this->pos->y === ($this->height - 1)) {
+                    } elseif ($this->pos->y === $this->height) {
                         $block = $this->plotFloorBlock;
                     } else {
                         $block = Block::get(0);
