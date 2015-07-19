@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot;
 
+use MyPlot\task\ClearPlotTask;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\level\LevelLoadEvent;
@@ -8,6 +9,7 @@ use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
+use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\event\EventPriority;
@@ -168,51 +170,20 @@ class MyPlot extends PluginBase implements Listener
     }
 
     /**
-     *  Reset all the blocks inside a plot
+     * Reset all the blocks inside a plot
      *
      * @api
      * @param Plot $plot
+     * @param Player $issuer
+     * @param int $maxBlocksPerTick
      * @return bool
      */
-    public function clearPlot(Plot $plot) {
+    public function clearPlot(Plot $plot, Player $issuer = null, $maxBlocksPerTick = 256) {
         if (!isset($this->levels[$plot->levelName])) {
             return false;
         }
-        $levelData = $this->levels[$plot->levelName];
-
-        $level = $this->getServer()->getLevel($plot->levelName);
-        $pos1 = $pos2 = $this->getPlotPosition($plot);
-        $plotSize = $levelData["PlotSize"];
-        $pos2->x += $plotSize;
-        $pos2->z += $plotSize;
-
-        $height = $levelData["GroundHeight"];
-        $bottomBlock = $levelData["BottomBlock"];
-        $plotFillBlock = $levelData["PlotFillBlock"];
-        $plotFloorBlock = $levelData["PlotFloorBlock"];
-        $air = Block::get(0);
-        $pos = new Position(0, 0, 0, $pos1->level);
-        for ($x = $pos1->x; $x < $pos2->x; $x++) {
-            $pos->x = $x;
-            for ($z = $pos1->z; $z < $pos2->z; $z++) {
-                $pos->z = $z;
-                for ($y = 0; $y < 128; $y++) {
-                    $pos->y = $y;
-                    if ($y === 0) {
-                        $block = $bottomBlock;
-                    } elseif ($y < ($height - 1)) {
-                        $block = $plotFillBlock;
-                    } elseif ($y === ($height - 1)) {
-                        $block = $plotFloorBlock;
-                    } else {
-                        $block = $air;
-                    }
-                    if ($level->setBlock($pos, $block, false, false) === false) {
-                        return false;
-                    }
-                }
-            }
-        }
+        $task = new ClearPlotTask($this, $plot, $issuer, $maxBlocksPerTick);
+        $task->onRun(0);
         return true;
     }
 
@@ -356,13 +327,16 @@ class MyPlot extends PluginBase implements Listener
             if ($settings === false) {
                 return;
             }
-            $requiredKeys = [
-                "RoadBlock", "WallBlock", "PlotFloorBlock", "PlotFillBlock",
-                "BottomBlock", "RoadWidth", "PlotSize", "GroundHeight"
+            $this->levels[$event->getLevel()->getName()] = [
+                "RoadBlock" => $this->parseBlock($settings, "RoadBlock", new Block(5)),
+                "WallBlock" => $this->parseBlock($settings, "WallBlock", new Block(44)),
+                "PlotFloorBlock" => $this->parseBlock($settings, "PlotFloorBlock", new Block(2)),
+                "PlotFillBlock" => $this->parseBlock($settings, "PlotFillBlock", new Block(3)),
+                "BottomBlock" => $this->parseBlock($settings, "BottomBlock", new Block(7)),
+                "RoadWidth" => $this->parseNumber($settings, "RoadWidth", 7),
+                "PlotSize" => $this->parseNumber($settings, "PlotSize", 22),
+                "GroundHeight" => $this->parseNumber($settings, "GroundHeight", 64),
             ];
-            if (count(array_intersect_key(array_flip($requiredKeys), $settings)) === count($requiredKeys)) {
-                $this->levels[$event->getLevel()->getName()] = $settings;
-            }
         }
     }
 
@@ -370,6 +344,33 @@ class MyPlot extends PluginBase implements Listener
         $levelName = $event->getLevel()->getName();
         if (isset($this->levels[$levelName])) {
             unset($this->levels[$levelName]);
+        }
+    }
+
+    private function parseBlock($array, $key, $default) {
+        if (isset($array[$key])) {
+            $id = $array[$key];
+            if (is_numeric($id)) {
+                $block = new Block($id);
+            } else {
+                $split = explode(":", $id);
+                if (count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
+                    $block = new Block($split[0], $split[1]);
+                } else {
+                    $block = $default;
+                }
+            }
+        } else {
+            $block = $default;
+        }
+        return $block;
+    }
+
+    private function parseNumber($array, $key, $default) {
+        if (isset($array[$key]) and is_numeric($array[$key])) {
+            return $array[$key];
+        } else {
+            return $default;
         }
     }
 }

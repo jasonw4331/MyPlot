@@ -31,3 +31,6 @@ permissions:
       myplot.command.auto:
         description: Gives the auto command
         default: true
+      myplot.command.clear:
+        description: Give the clear command
+        default: true
