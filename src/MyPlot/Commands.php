@@ -12,6 +12,7 @@ use pocketmine\utils\TextFormat;
 use MyPlot\subcommand\SubCommand;
 use pocketmine\Player;
 use MyPlot\subcommand\RemoveHelperSubCommand;
+use MyPlot\subcommand\AutoSubCommand;
 
 class Commands extends PluginCommand
 {
@@ -32,6 +33,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new InfoSubCommand($plugin));
         $this->loadSubCommand(new AddHelperSubCommand($plugin));
         $this->loadSubCommand(new RemoveHelperSubCommand($plugin));
+        $this->loadSubCommand(new AutoSubCommand($plugin));
     }
 
     private function loadSubCommand(Subcommand $command) {

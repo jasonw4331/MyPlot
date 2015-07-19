@@ -15,7 +15,8 @@ class SQLiteDataProvider implements DataProvider
 
     /** @var SQLite3Stmt */
     private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
-            $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel;
+            $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
+            $sqlGetExistingXZ;
 
     public function __construct(MyPlot $plugin) {
         $this->plugin = $plugin;
@@ -45,6 +46,13 @@ class SQLiteDataProvider implements DataProvider
         $this->sqlGetPlotsByOwner = $this->db->prepare("SELECT * FROM plots WHERE owner = :owner");
         $this->sqlGetPlotsByOwnerAndLevel = $this->db->prepare(
             "SELECT * FROM plots WHERE owner = :owner AND level = :level"
+        );
+        $this->sqlGetExistingXZ = $this->db->prepare(
+            "SELECT X, Z FROM plots WHERE (
+                level = :level
+                AND abs(X) >= :min AND abs(X) <= :max
+                AND abs(Z) >= :min AND abs(Z) <= :max
+            )"
         );
     }
 
@@ -128,5 +136,29 @@ class SQLiteDataProvider implements DataProvider
                                 (string) $val["owner"], $helpers, $val["id"]);
         }
         return $plots;
+    }
+
+    public function getNextFreePlot($levelName, $limitXZ = 20) {
+        $this->sqlGetExistingXZ->bindValue(":level", $levelName, SQLITE3_TEXT);
+        for ($i = 1; $i < 20; $i++) {
+            $this->sqlGetExistingXZ->bindValue(":min", $i - 1, SQLITE3_INTEGER);
+            $this->sqlGetExistingXZ->bindValue(":max", $i, SQLITE3_INTEGER);
+            $result = $this->sqlGetExistingXZ->execute();
+            $plots = [];
+            while ($val = $result->fetchArray(SQLITE3_ASSOC)) {
+                $plots[$val["X"]][$val["Z"]] = true;
+            }
+            if (empty($plots)) {
+                continue;
+            }
+            for ($X = -$i; $X <= $i; $X++) {
+                for ($Z = -$i; $Z <= $i; $Z++) {
+                    if (!isset($plots[$X][$Z])) {
+                        return new Plot($levelName, $X, $Z);
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

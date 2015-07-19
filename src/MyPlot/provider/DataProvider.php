@@ -33,4 +33,10 @@ interface DataProvider
      * @return Plot[]
      */
     public function getPlotsByOwner($owner, $levelName = "");
+
+    /**
+     * @param string $levelName
+     * @return Plot|null
+     */
+    public function getNextFreePlot($levelName);
 }

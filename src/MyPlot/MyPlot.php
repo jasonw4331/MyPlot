@@ -19,7 +19,7 @@ use pocketmine\utils\TextFormat;
 
 class MyPlot extends PluginBase implements Listener
 {
-    private $levels;
+    private $levels = array();
 
     /** @var DataProvider */
     private $provider;
@@ -145,7 +145,7 @@ class MyPlot extends PluginBase implements Listener
         } else {
             $z = $totalSize * $plot->Z;
         }
-        $level = $this->getServer()->getLevel($plot->levelName);
+        $level = $this->getServer()->getLevelByName($plot->levelName);
         return new Position($x, $levelData["GroundHeight"], $z, $level);
     }
 
@@ -268,6 +268,13 @@ class MyPlot extends PluginBase implements Listener
             }
         }
         return true;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getPlotLevels() {
+        return array_keys($this->levels);
     }
 
 

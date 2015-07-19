@@ -28,3 +28,6 @@ permissions:
       myplot.command.removehelper:
         description: Gives the removehelper command
         default: true
+      myplot.command.auto:
+        description: Gives the auto command
+        default: true
