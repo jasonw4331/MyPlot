@@ -204,8 +204,8 @@ class MyPlot extends PluginBase implements Listener
      * @return bool
      */
     public function resetPlot(Plot $plot) {
-        if ($this->clearPlot($plot)) {
-            return $this->disposePlot($plot);
+        if ($this->disposePlot($plot)) {
+            return $this->clearPlot($plot);
         }
         return false;
     }

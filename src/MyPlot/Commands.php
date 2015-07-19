@@ -8,6 +8,7 @@ use MyPlot\subcommand\DisposeSubCommand;
 use MyPlot\subcommand\GenerateSubCommand;
 use MyPlot\subcommand\InfoSubCommand;
 use MyPlot\subcommand\ListSubCommand;
+use MyPlot\subcommand\ResetSubCommand;
 use pocketmine\command\PluginCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
@@ -38,6 +39,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new AutoSubCommand($plugin));
         $this->loadSubCommand(new ClearSubCommand($plugin));
         $this->loadSubCommand(new DisposeSubCommand($plugin));
+        $this->loadSubCommand(new ResetSubCommand($plugin));
     }
 
     private function loadSubCommand(Subcommand $command) {

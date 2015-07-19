@@ -37,3 +37,6 @@ permissions:
       myplot.command.dispose:
         description: Give the dispose command
         default: true
+      myplot.command.reset:
+        description: Give the reset command
+        default: true
