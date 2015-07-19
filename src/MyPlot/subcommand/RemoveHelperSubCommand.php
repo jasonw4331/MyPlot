@@ -53,7 +53,6 @@ class RemoveHelperSubCommand implements SubCommand
             $sender->sendMessage($helper . " was never a helper of this plot.");
             return true;
         }
-        var_dump($plot);
         if ($this->plugin->getProvider()->savePlot($plot)) {
             $sender->sendMessage(TextFormat::GREEN . $helper . " has been removed.");
         } else {
