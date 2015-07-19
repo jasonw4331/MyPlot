@@ -4,6 +4,7 @@ namespace MyPlot;
 use MyPlot\subcommand\AddHelperSubCommand;
 use MyPlot\subcommand\ClaimSubCommand;
 use MyPlot\subcommand\ClearSubCommand;
+use MyPlot\subcommand\DisposeSubCommand;
 use MyPlot\subcommand\GenerateSubCommand;
 use MyPlot\subcommand\InfoSubCommand;
 use MyPlot\subcommand\ListSubCommand;
@@ -36,6 +37,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new RemoveHelperSubCommand($plugin));
         $this->loadSubCommand(new AutoSubCommand($plugin));
         $this->loadSubCommand(new ClearSubCommand($plugin));
+        $this->loadSubCommand(new DisposeSubCommand($plugin));
     }
 
     private function loadSubCommand(Subcommand $command) {

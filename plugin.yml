@@ -34,3 +34,6 @@ permissions:
       myplot.command.clear:
         description: Give the clear command
         default: true
+      myplot.command.dispose:
+        description: Give the dispose command
+        default: true
