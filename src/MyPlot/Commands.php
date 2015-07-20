@@ -16,6 +16,7 @@ use MyPlot\subcommand\SubCommand;
 use pocketmine\Player;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
+use MyPlot\subcommand\BiomeSubCommand;
 
 class Commands extends PluginCommand
 {
@@ -40,6 +41,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new ClearSubCommand($plugin));
         $this->loadSubCommand(new DisposeSubCommand($plugin));
         $this->loadSubCommand(new ResetSubCommand($plugin));
+        $this->loadSubCommand(new BiomeSubCommand($plugin));
     }
 
     private function loadSubCommand(Subcommand $command) {
