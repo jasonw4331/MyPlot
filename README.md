@@ -7,20 +7,14 @@ Have you ever seen those PC servers with the PlotMe plugin, and you thought "hey
 
 **COMMANDS:**
 
-Command | Usage |
-------- | ------- |
-/p|Main command for MyPlot
-/p info|Get info on the plot you are standing on
-/p claim|Claim the plot you are standing on
-/p list|List all the plots you own
-/p generate (name)|Generate a plot world
-/p addhelper|Add a helper to your plot
-/p removehelper|Remove a helper from your plot
-
-**PERMISSIONS:**
-
-Only one permission:
-
------> **myplot.command** <-----
-
-It is op-only by default, but that can be changed by a permission plugin (Like PurePerms)!
+Command | Usage | Permissions |
+------- | ------- | ------- |
+/p|Main command for MyPlot|myplot.command
+/p info|Get info on the plot you are standing on|myplot.command.info
+/p claim|Claim the plot you are standing on|myplot.command.claim
+/p list|List all the plots you own|myplot.command.list
+/p generate (name)|Generate a plot world|myplot.command.generate (OP)
+/p addhelper|Add a helper to your plot|myplot.command.addhelper
+/p removehelper|Remove a helper from your plot|myplot.command.removehelper
+/p reset|Reset your plot|myplot.reset
+/p biome|Set your plots biome|myplot.biome
