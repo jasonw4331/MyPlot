@@ -16,5 +16,5 @@ Command | Usage | Permissions |
 /p generate (name)|Generate a plot world|myplot.command.generate (OP)
 /p addhelper|Add a helper to your plot|myplot.command.addhelper
 /p removehelper|Remove a helper from your plot|myplot.command.removehelper
-/p reset|Reset your plot|myplot.reset
-/p biome|Set your plots biome|myplot.biome
+/p reset|Reset your plot|myplot.command.reset
+/p biome|Set your plots biome|myplot.command.biome
