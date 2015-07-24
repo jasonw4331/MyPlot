@@ -49,6 +49,7 @@ class InfoSubCommand implements SubCommand
         $sender->sendMessage(TextFormat::DARK_GREEN. "Owner: " . TextFormat::WHITE . $plot->owner);
         $helpers = implode(", ", $plot->helpers);
         $sender->sendMessage(TextFormat::DARK_GREEN. "Helpers: " . TextFormat::WHITE . $helpers);
+        $sender->sendMessage(TextFormat::DARK_GREEN. "Biome: " . TextFormat::WHITE . $plot->biome);
         return true;
     }
 }

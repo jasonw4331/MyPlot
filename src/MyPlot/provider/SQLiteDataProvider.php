@@ -24,20 +24,20 @@ class SQLiteDataProvider implements DataProvider
         $this->db->exec(
             "CREATE TABLE IF NOT EXISTS plots
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
-             owner TEXT, helpers TEXT)"
+             owner TEXT, helpers TEXT, biome TEXT)"
         );
         //$this->db->exec("CREATE TABLE IF NOT EXISTS comments (plotID INT, player TEXT, comment TEXT)");
 
         $this->sqlGetPlot = $this->db->prepare(
-            "SELECT id, name, owner, helpers FROM plots WHERE level = :level AND X = :X AND Z = :Z"
+            "SELECT id, name, owner, helpers, biome FROM plots WHERE level = :level AND X = :X AND Z = :Z"
         );
         $this->sqlSavePlot = $this->db->prepare(
-            "INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers) VALUES
+            "INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, biome) VALUES
             ((select id from plots where level = :level AND X = :X AND Z = :Z),
-             :level, :X, :Z, :name, :owner, :helpers);"
+             :level, :X, :Z, :name, :owner, :helpers, :biome);"
         );
         $this->sqlSavePlotById = $this->db->prepare(
-            "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, name = :name WHERE id = :id"
+            "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, name = :name, biome = :biome WHERE id = :id"
         );
         $this->sqlRemovePlot = $this->db->prepare(
             "DELETE FROM plots WHERE level = :level AND X = :X AND Z = :Z"
@@ -75,6 +75,7 @@ class SQLiteDataProvider implements DataProvider
         $stmt->bindValue(":name", $plot->name, SQLITE3_TEXT);
         $stmt->bindValue(":owner", $plot->owner, SQLITE3_TEXT);
         $stmt->bindValue(":helpers", $helpers, SQLITE3_TEXT);
+        $stmt->bindValue(":biome", $plot->biome, SQLITE3_TEXT);
 
         $result = $this->sqlSavePlot->execute();
         if ($result === false) {
@@ -115,7 +116,7 @@ class SQLiteDataProvider implements DataProvider
                 $helpers = explode(",", (string) $val["helpers"]);
             }
             return new Plot($levelName, $X, $Z, (string) $val["name"], (string) $val["owner"],
-                            $helpers, (int) $val["id"]);
+                            $helpers, (string) $val["biome"], (int) $val["id"]);
         }
         return null;
     }
@@ -132,8 +133,8 @@ class SQLiteDataProvider implements DataProvider
         $result = $stmt->execute();
         while ($val = $result->fetchArray(SQLITE3_ASSOC)) {
             $helpers = explode(",", (string) $val["helpers"]);
-            $plots[] = new Plot($val["level"], $val["X"], $val["Z"], (string) $val["name"],
-                                (string) $val["owner"], $helpers, $val["id"]);
+            $plots[] = new Plot($levelName, (int) $val["X"], (int) $val["Z"], (string) $val["name"],
+                (string) $val["owner"], $helpers, (string) $val["biome"], (int) $val["id"]);
         }
         return $plots;
     }

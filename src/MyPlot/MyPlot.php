@@ -9,7 +9,6 @@ use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
-use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\event\EventPriority;
@@ -18,6 +17,8 @@ use pocketmine\Player;
 use pocketmine\block\Block;
 use MyPlot\provider\DataProvider;
 use pocketmine\utils\TextFormat;
+use pocketmine\level\Level;
+use pocketmine\network\Network;
 
 class MyPlot extends PluginBase implements Listener
 {
@@ -222,15 +223,19 @@ class MyPlot extends PluginBase implements Listener
         }
         $levelData = $this->levels[$plot->levelName];
 
-        $level = $this->getServer()->getLevel($plot->levelName);
-        $pos1 = $pos2 = $this->getPlotPosition($plot);
+        $level = $this->getServer()->getLevelByName($plot->levelName);
+        $pos = $this->getPlotPosition($plot);
         $plotSize = $levelData["PlotSize"];
-        $pos2->x += $plotSize;
-        $pos2->z += $plotSize;
+        $xMax = $pos->x + $plotSize;
+        $zMax = $pos->z + $plotSize;
 
-        for ($x = $pos1->x; $x < $pos2->x; $x++) {
-            for ($z = $pos1->z; $z < $pos2->z; $z++) {
-                $level->setBiomeId($x, $z, $biome->getId());
+        $chunkIndexes = [];
+        for ($x = $pos->x; $x < $xMax; $x++) {
+            for ($z = $pos->z; $z < $zMax; $z++) {
+                $index = Level::chunkHash($x >> 4, $z >> 4);
+                if (!in_array($index, $chunkIndexes)) {
+                    $chunkIndexes[] = $index;
+                }
                 $color = $biome->getColor();
                 $R = $color >> 16;
                 $G = ($color >> 8) & 0xff;
@@ -238,6 +243,17 @@ class MyPlot extends PluginBase implements Listener
                 $level->setBiomeColor($x, $z, $R, $G, $B);
             }
         }
+
+        foreach ($chunkIndexes as $index) {
+            Level::getXZ($index, $X, $Z);
+            $chunk = $level->getChunk($X, $Z);
+            foreach ($level->getChunkPlayers($X, $Z) as $player) {
+                $player->onChunkChanged($chunk);
+            }
+        }
+
+        $plot->biome = $biome->getName();
+        $this->provider->savePlot($plot);
         return true;
     }
 

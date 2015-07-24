@@ -5,10 +5,24 @@ use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\level\generator\biome\Biome;
 
 class BiomeSubCommand implements SubCommand
 {
     private $plugin;
+    private $biomes = [
+        "PLAINS" => Biome::PLAINS,
+        "DESERT" => Biome::DESERT,
+        "MOUNTAINS" => Biome::MOUNTAINS,
+        "FOREST" => Biome::FOREST,
+        "TAIGA" => Biome::TAIGA,
+        "SWAMP" => Biome::SWAMP,
+        "OCEAN" => Biome::OCEAN,
+        "RIVER" => Biome::RIVER,
+        "ICE_PLAINS" => Biome::ICE_PLAINS,
+        "SMALL_MOUNTAINS" => Biome::SMALL_MOUNTAINS,
+        "BIRCH_FOREST" => Biome::BIRCH_FOREST,
+    ];
 
     public function __construct(MyPlot $plugin) {
         $this->plugin = $plugin;
@@ -19,7 +33,7 @@ class BiomeSubCommand implements SubCommand
     }
 
     public function getUsage() {
-        return "/p biome <biome>";
+        return "<biome>";
     }
 
     public function getName() {
@@ -35,11 +49,11 @@ class BiomeSubCommand implements SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (count($args) !==1) {
+        if (count($args) !== 1) {
             return false;
         }
         $player = $sender->getServer()->getPlayer($sender->getName());
-        $biome = $args[0];
+        $biome = strtoupper($args[0]);
         $plot = $this->plugin->getPlotByPosition($player->getPosition());
         if ($plot === null) {
             $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
@@ -49,6 +63,13 @@ class BiomeSubCommand implements SubCommand
             $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
             return true;
         }
+        if (!isset($this->biomes[$biome])) {
+            $sender->sendMessage(TextFormat::RED . "That biome doesn't exist");
+            $biomes = implode(", ", array_keys($this->biomes));
+            $sender->sendMessage(TextFormat::RED . "The possible biomes are: " . $biomes);
+            return true;
+        }
+        $biome = Biome::getBiome($this->biomes[$biome]);
         if ($this->plugin->setPlotBiome($plot, $biome)) {
             $sender->sendMessage(TextFormat::GREEN . "Changed the plot biome");
         } else {

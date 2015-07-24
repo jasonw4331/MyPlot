@@ -3,15 +3,26 @@ namespace MyPlot;
 
 class Plot
 {
-    public $levelName, $X, $Z, $name, $owner, $helpers, $id;
+    public $levelName, $X, $Z, $name, $owner, $helpers, $biome, $id;
 
-    public function __construct($levelName, $X, $Z, $name = "", $owner = "", $helpers = [], $id = -1) {
+    /**
+     * @param string $levelName
+     * @param int $X
+     * @param int $Z
+     * @param string $name
+     * @param string $owner
+     * @param array $helpers
+     * @param string $biome
+     * @param int $id
+     */
+    public function __construct($levelName, $X, $Z, $name = "", $owner = "", $helpers = [], $biome = "PLAINS", $id = -1) {
         $this->levelName = $levelName;
         $this->X = $X;
         $this->Z = $Z;
         $this->name = $name;
         $this->owner = $owner;
         $this->helpers = $helpers;
+        $this->biome = $biome;
         $this->id = $id;
     }
 
