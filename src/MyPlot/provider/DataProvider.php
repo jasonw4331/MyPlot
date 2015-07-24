@@ -36,7 +36,8 @@ interface DataProvider
 
     /**
      * @param string $levelName
+     * @param int $limitXZ
      * @return Plot|null
      */
-    public function getNextFreePlot($levelName);
+    public function getNextFreePlot($levelName, $limitXZ = 20);
 }

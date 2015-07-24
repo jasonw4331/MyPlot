@@ -141,16 +141,13 @@ class SQLiteDataProvider implements DataProvider
 
     public function getNextFreePlot($levelName, $limitXZ = 20) {
         $this->sqlGetExistingXZ->bindValue(":level", $levelName, SQLITE3_TEXT);
-        for ($i = 1; $i < 20; $i++) {
+        for ($i = 1; $i < $limitXZ; $i++) {
             $this->sqlGetExistingXZ->bindValue(":min", $i - 1, SQLITE3_INTEGER);
             $this->sqlGetExistingXZ->bindValue(":max", $i, SQLITE3_INTEGER);
             $result = $this->sqlGetExistingXZ->execute();
             $plots = [];
             while ($val = $result->fetchArray(SQLITE3_ASSOC)) {
                 $plots[$val["X"]][$val["Z"]] = true;
-            }
-            if (empty($plots)) {
-                continue;
             }
             for ($X = -$i; $X <= $i; $X++) {
                 for ($Z = -$i; $Z <= $i; $Z++) {
