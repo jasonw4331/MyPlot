@@ -138,16 +138,8 @@ class MyPlot extends PluginBase implements Listener
         $plotSize = $levelData["PlotSize"];
         $roadWidth = $levelData["RoadWidth"];
         $totalSize = $plotSize + $roadWidth;
-        if ($plot->X < 0) {
-            $x = $totalSize * $plot->X + $roadWidth;
-        } else {
-            $x = $totalSize * $plot->X;
-        }
-        if ($plot->Z < 0) {
-            $z = $totalSize * $plot->Z + $roadWidth;
-        } else {
-            $z = $totalSize * $plot->Z;
-        }
+        $x = $totalSize * $plot->X;
+        $z = $totalSize * $plot->Z;
         $level = $this->getServer()->getLevelByName($plot->levelName);
         return new Position($x, $levelData["GroundHeight"], $z, $level);
     }
