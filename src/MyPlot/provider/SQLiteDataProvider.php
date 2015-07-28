@@ -133,7 +133,7 @@ class SQLiteDataProvider implements DataProvider
         $result = $stmt->execute();
         while ($val = $result->fetchArray(SQLITE3_ASSOC)) {
             $helpers = explode(",", (string) $val["helpers"]);
-            $plots[] = new Plot($levelName, (int) $val["X"], (int) $val["Z"], (string) $val["name"],
+            $plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"],
                 (string) $val["owner"], $helpers, (string) $val["biome"], (int) $val["id"]);
         }
         return $plots;
