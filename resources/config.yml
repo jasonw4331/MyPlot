@@ -1,8 +1,10 @@
 MaxPlotsPerPlayer: 5
 DataProvider: 'sqlite'
+UseEconomy: false
 
 DefaultWorld:
   MaxPlotsPerPlayer: 5
+  ClaimPrice: 0
   RoadBlock: '5'
   RoadWidth: 7
   WallBlock: '44'

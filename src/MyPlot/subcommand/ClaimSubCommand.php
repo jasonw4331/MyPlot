@@ -56,7 +56,8 @@ class ClaimSubCommand implements SubCommand
             }
             return true;
         }
-        $maxPlotsInLevel = $this->plugin->getLevelSettings($plot->levelName)->maxPlotsPerPlayer;
+        $plotLevel = $this->plugin->getLevelSettings($plot->levelName);
+        $maxPlotsInLevel = $plotLevel->maxPlotsPerPlayer;
         $maxPlots = $this->plugin->getConfig()->get("MaxPlotsPerPlayer");
         $plotsOfPlayer = $this->plugin->getProvider()->getPlotsByOwner($player->getName());
         if ($maxPlotsInLevel >= 0 and count($plotsOfPlayer) >= $maxPlotsInLevel) {
@@ -64,6 +65,12 @@ class ClaimSubCommand implements SubCommand
             return true;
         } elseif ($maxPlots >= 0 and count($plotsOfPlayer) >= $maxPlots) {
             $sender->sendMessage(TextFormat::RED . "You reached the limit of $maxPlots plots per player");
+            return true;
+        }
+
+        $economy = $this->plugin->getEconomyProvider();
+        if ($economy !== null and !$economy->reduceMoney($player, $plotLevel->claimPrice)) {
+            $sender->sendMessage(TextFormat::RED . "You don't have enough money to claim this plot");
             return true;
         }
 

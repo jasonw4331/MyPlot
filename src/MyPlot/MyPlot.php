@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot;
 
+use MyPlot\provider\EconomySProvider;
 use MyPlot\task\ClearPlotTask;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -19,14 +20,16 @@ use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use pocketmine\level\Level;
 use MyPlot\provider\SQLiteDataProvider;
+use MyPlot\provider\EconomyProvider;
 
 class MyPlot extends PluginBase implements Listener
 {
     /** @var PlotLevelSettings[] */
     private $levels = [];
-
     /** @var DataProvider */
-    private $provider;
+    private $dataProvider;
+    /** @var EconomyProvider */
+    private $economyProvider;
 
 
     /**
@@ -36,7 +39,17 @@ class MyPlot extends PluginBase implements Listener
      * @return DataProvider
      */
     public function getProvider() {
-        return $this->provider;
+        return $this->dataProvider;
+    }
+
+    /**
+     * Returns the EconomyProvider that is being used
+     *
+     * @api
+     * @return EconomyProvider
+     */
+    public function getEconomyProvider() {
+        return $this->economyProvider;
     }
 
     /**
@@ -70,6 +83,7 @@ class MyPlot extends PluginBase implements Listener
      *
      * @api
      * @param string $levelName
+     * @param array $settings
      * @return bool
      */
     public function generateLevel($levelName, $settings = []) {
@@ -126,7 +140,7 @@ class MyPlot extends PluginBase implements Listener
             return null;
         }
 
-        $plot = $this->provider->getPlot($levelName, $X, $Z);
+        $plot = $this->dataProvider->getPlot($levelName, $X, $Z);
         if ($plot === null) {
             $plot = new Plot($levelName, $X, $Z);
         }
@@ -201,7 +215,7 @@ class MyPlot extends PluginBase implements Listener
      * @return bool
      */
     public function disposePlot(Plot $plot) {
-        return $this->provider->deletePlot($plot);
+        return $this->dataProvider->deletePlot($plot);
     }
 
     /**
@@ -261,7 +275,7 @@ class MyPlot extends PluginBase implements Listener
         }
 
         $plot->biome = $biome->getName();
-        $this->provider->savePlot($plot);
+        $this->dataProvider->savePlot($plot);
         return true;
     }
 
@@ -304,15 +318,25 @@ class MyPlot extends PluginBase implements Listener
 
         switch (strtolower($this->getConfig()->get("DataProvider"))) {
             case "sqlite":
-                $this->provider = new SQLiteDataProvider($this);
+                $this->dataProvider = new SQLiteDataProvider($this);
                 break;
             default:
-                $this->provider = new SQLiteDataProvider($this);
+                $this->dataProvider = new SQLiteDataProvider($this);
+        }
+
+        if ($this->getConfig()->get("UseEconomy") == true) {
+            if ($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") !== null) {
+                $this->economyProvider = new EconomySProvider();
+            } else {
+                $this->economyProvider = null;
+            }
+        } else {
+            $this->economyProvider = null;
         }
     }
 
     public function onDisable() {
-        $this->provider->close();
+        $this->dataProvider->close();
         $this->getLogger()->info(TextFormat::GREEN."Saving plots");
         $this->getLogger()->info(TextFormat::BLUE."Disabled the plot framework!");
     }
@@ -361,6 +385,7 @@ class MyPlot extends PluginBase implements Listener
             $filePath = $this->getDataFolder() . "worlds/" . $levelName . ".yml";
             $default = [
                 "MaxPlotsPerPlayer" => $this->getConfig()->getNested("DefaultWorld.MaxPlotsPerPlayer"),
+                "ClaimPrice" => $this->getConfig()->getNested("DefaultWorld.ClaimPrice"),
             ];
             $config = new Config($filePath, Config::YAML, $default);
             foreach (array_keys($default) as $key) {
