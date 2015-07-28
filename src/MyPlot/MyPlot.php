@@ -343,7 +343,7 @@ class MyPlot extends PluginBase implements Listener
             $levelName = $event->getLevel()->getName();
             $filePath = $this->getDataFolder() . "worlds/" . $levelName . ".yml";
             $default = [
-                "MaxPlotsPerPlayer" => $this->getConfig()->get("MaxPlotsPerPlayer"),
+                "MaxPlotsPerPlayer" => $this->getConfig()->getNested("DefaultWorld.MaxPlotsPerPlayer"),
             ];
             $config = new Config($filePath, Config::YAML, $default);
             foreach (array_keys($default) as $key) {
