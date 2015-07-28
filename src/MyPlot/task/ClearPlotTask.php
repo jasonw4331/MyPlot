@@ -4,6 +4,7 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
+use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
@@ -19,16 +20,16 @@ class ClearPlotTask extends PluginTask
         $this->plotBeginPos = $plugin->getPlotPosition($plot);
         $this->level = $this->plotBeginPos->getLevel();
 
-        $plotLevel = $plugin->getLevelSettings($plot->levelName);
+        $levelData = $plugin->getLevelOptions($plot->levelName);
 
-        $plotSize = $plotLevel->plotSize;
+        $plotSize = $levelData["PlotSize"];
         $this->xMax = $this->plotBeginPos->x + $plotSize;
         $this->zMax = $this->plotBeginPos->z + $plotSize;
 
-        $this->height = $plotLevel->groundHeight;
-        $this->bottomBlock = $plotLevel->bottomBlock;
-        $this->plotFillBlock = $plotLevel->plotFillBlock;
-        $this->plotFloorBlock = $plotLevel->plotFloorBlock;
+        $this->height = $levelData["GroundHeight"];
+        $this->bottomBlock = $levelData["BottomBlock"];
+        $this->plotFillBlock = $levelData["PlotFillBlock"];
+        $this->plotFloorBlock = $levelData["PlotFloorBlock"];
 
         $this->maxBlocksPerTick = $maxBlocksPerTick;
         $this->issuer = $issuer;

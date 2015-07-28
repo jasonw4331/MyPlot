@@ -43,6 +43,3 @@ permissions:
       myplot.command.biome:
         description: Give the biome command
         default: true
-      myplot.command.home:
-        description: Gives the home command
-        default: true
