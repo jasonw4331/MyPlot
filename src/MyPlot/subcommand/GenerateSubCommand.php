@@ -44,7 +44,7 @@ class GenerateSubCommand implements SubCommand
             return true;
         }
         if ($this->plugin->generateLevel($levelName)) {
-            $sender->sendMessage(TextFormat::GREEN . "Successfully generated a new plot world: " . $levelName);
+            $sender->sendMessage(TextFormat::GREEN . "Successfully generated a new plot world " . TextFormat::WHITE . $levelName);
         } else {
             $sender->sendMessage(TextFormat::RED . "The world could not be generated");
         }

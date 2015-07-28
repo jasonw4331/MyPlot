@@ -70,7 +70,7 @@ class ClaimSubCommand implements SubCommand
         $plot->owner = $sender->getName();
         $plot->name = $name;
         if ($this->plugin->getProvider()->savePlot($plot)) {
-            $sender->sendMessage(TextFormat::GREEN . "You are now the owner of this plot with id: " . TextFormat::WHITE . $plot->X . ';' . $plot->Z);
+            $sender->sendMessage(TextFormat::GREEN . "You are now the owner of " . TextFormat::WHITE . $plot);
         } else {
             $sender->sendMessage(TextFormat::RED . "Something went wrong");
         }

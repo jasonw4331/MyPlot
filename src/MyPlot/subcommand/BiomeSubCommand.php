@@ -66,7 +66,7 @@ class BiomeSubCommand implements SubCommand
         if (!isset($this->biomes[$biome])) {
             $sender->sendMessage(TextFormat::RED . "That biome doesn't exist");
             $biomes = implode(", ", array_keys($this->biomes));
-            $sender->sendMessage(TextFormat::RED . "The possible biomes are: " . $biomes);
+            $sender->sendMessage(TextFormat::RED . "The possible biomes are: $biomes");
             return true;
         }
         $biome = Biome::getBiome($this->biomes[$biome]);

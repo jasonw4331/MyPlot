@@ -44,7 +44,7 @@ class InfoSubCommand implements SubCommand
             $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
         }
-        $sender->sendMessage("Info about plot " . TextFormat::DARK_GREEN . $plot->X . ";" . $plot->Z . " :");
+        $sender->sendMessage(TextFormat::DARK_GREEN . "Info about " . TextFormat::WHITE . $plot);
         $sender->sendMessage(TextFormat::DARK_GREEN. "Name: " . TextFormat::WHITE . $plot->name);
         $sender->sendMessage(TextFormat::DARK_GREEN. "Owner: " . TextFormat::WHITE . $plot->owner);
         $helpers = implode(", ", $plot->helpers);

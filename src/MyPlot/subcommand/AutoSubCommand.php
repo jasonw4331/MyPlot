@@ -49,9 +49,8 @@ class AutoSubCommand implements SubCommand
             foreach($plotLevels as $levelName) {
                 if ($plot = $this->plugin->getProvider()->getNextFreePlot($levelName)) {
                     $this->plugin->teleportPlayerToPlot($player, $plot);
-                    $sender->sendMessage(TextFormat::GREEN . "Teleported to free plot with id: "
-                                        . TextFormat::WHITE . $plot->X . ';' . $plot->Z
-                                        . TextFormat::GREEN . " in world: " . TextFormat::WHITE . $levelName);
+                    $sender->sendMessage(TextFormat::GREEN . "Teleported to " . TextFormat::WHITE . $plot
+                        . TextFormat::GREEN . " in world " . TextFormat::WHITE . $levelName);
                     return true;
                 }
             }
@@ -60,7 +59,7 @@ class AutoSubCommand implements SubCommand
         }
         if (($plot = $this->plugin->getProvider()->getNextFreePlot($levelName)) !== null) {
             $player->teleport($this->plugin->getPlotPosition($plot));
-            $sender->sendMessage(TextFormat::GREEN . "Teleported to free plot with id: " . TextFormat::WHITE . $plot->X . ';' . $plot->Z);
+            $sender->sendMessage(TextFormat::GREEN . "Teleported to " . TextFormat::WHITE . $plot);
         } else {
             $sender->sendMessage(TextFormat::RED . "No free plots found in this world");
         }

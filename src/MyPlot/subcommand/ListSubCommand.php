@@ -54,10 +54,10 @@ class ListSubCommand implements SubCommand
         $sender->sendMessage("Plots you own:");
         for ($i = 0; $i < count($plots); $i++) {
             $plot = $plots[$i];
-            $message = TextFormat::DARK_GREEN . ($i + 1) . ") " . TextFormat::WHITE;
-            $message .= $levelName . " " . $plot->X . ";" . $plot->Z;
+            $message = TextFormat::DARK_GREEN . ($i + 1) . ") ";
+            $message .= TextFormat::WHITE . $levelName . ": " . $plot->X . ";" . $plot->Z;
             if ($plot->name !== "") {
-                $message .= " = " . $plot->name;
+                $message .= " aka " . $plot->name;
             }
             $sender->sendMessage($message);
         }

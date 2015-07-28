@@ -58,4 +58,8 @@ class Plot
         unset($this->helpers[$key]);
         return true;
     }
+
+    public function __toString() {
+        return "Plot(" . $this->X . ";" . $this->Z . ")";
+    }
 }
