@@ -41,7 +41,7 @@ class AutoSubCommand implements SubCommand
         $player = $sender->getServer()->getPlayer($sender->getName());
         $levelName = $player->getLevel()->getName();
         if (!$this->plugin->isLevelLoaded($levelName)) {
-            $plotLevels = $this->plugin->getPlotLevels();
+            $plotLevels = array_keys($this->plugin->getPlotLevels());
             if (empty($plotLevels)) {
                 $sender->sendMessage(TextFormat::RED . "No plot worlds loaded");
                 return true;

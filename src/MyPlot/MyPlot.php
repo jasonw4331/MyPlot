@@ -30,6 +30,8 @@ class MyPlot extends PluginBase implements Listener
 
 
     /**
+     * Returns the DataProvider that is being used
+     *
      * @api
      * @return DataProvider
      */
@@ -38,6 +40,8 @@ class MyPlot extends PluginBase implements Listener
     }
 
     /**
+     * Returns a PlotLevelSettings object which contains all the settings of a level
+     *
      * @api
      * @param string $levelName
      * @return PlotLevelSettings|null
@@ -51,6 +55,8 @@ class MyPlot extends PluginBase implements Listener
     }
 
     /**
+     * Checks if a plot level is loaded
+     *
      * @api
      * @param string $levelName
      * @return bool
@@ -60,6 +66,8 @@ class MyPlot extends PluginBase implements Listener
     }
 
     /**
+     * Generate a new plot level with optional settings
+     *
      * @api
      * @param string $levelName
      * @return bool
@@ -78,6 +86,8 @@ class MyPlot extends PluginBase implements Listener
     }
 
     /**
+     * Finds the plot at a certain position or null if there is no plot at that position
+     *
      * @api
      * @param Position $position
      * @return Plot|null
@@ -146,6 +156,8 @@ class MyPlot extends PluginBase implements Listener
     }
 
     /**
+     * Teleport a player to a plot
+     *
      * @api
      * @param Player $player
      * @param Plot $plot
@@ -206,6 +218,8 @@ class MyPlot extends PluginBase implements Listener
     }
 
     /**
+     * Changes the biome of a plot
+     *
      * @api
      * @param Plot $plot
      * @param Biome $biome
@@ -252,10 +266,13 @@ class MyPlot extends PluginBase implements Listener
     }
 
     /**
+     * Returns the PlotLevelSettings of all the loaded levels
+     *
+     * @api
      * @return string[]
      */
     public function getPlotLevels() {
-        return array_keys($this->levels);
+        return $this->levels;
     }
 
 
