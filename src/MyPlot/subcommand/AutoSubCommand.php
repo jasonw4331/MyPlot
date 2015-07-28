@@ -41,20 +41,7 @@ class AutoSubCommand implements SubCommand
         $player = $sender->getServer()->getPlayer($sender->getName());
         $levelName = $player->getLevel()->getName();
         if (!$this->plugin->isLevelLoaded($levelName)) {
-            $plotLevels = array_keys($this->plugin->getPlotLevels());
-            if (empty($plotLevels)) {
-                $sender->sendMessage(TextFormat::RED . "No plot worlds loaded");
-                return true;
-            }
-            foreach($plotLevels as $levelName) {
-                if ($plot = $this->plugin->getProvider()->getNextFreePlot($levelName)) {
-                    $this->plugin->teleportPlayerToPlot($player, $plot);
-                    $sender->sendMessage(TextFormat::GREEN . "Teleported to " . TextFormat::WHITE . $plot
-                        . TextFormat::GREEN . " in world " . TextFormat::WHITE . $levelName);
-                    return true;
-                }
-            }
-            $sender->sendMessage(TextFormat::RED . "No free plots found");
+            $sender->sendMessage(TextFormat::RED . "You are not inside a plot world");
             return true;
         }
         if (($plot = $this->plugin->getProvider()->getNextFreePlot($levelName)) !== null) {
