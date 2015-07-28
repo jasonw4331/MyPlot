@@ -5,7 +5,7 @@ load: STARTUP
 api: 1.0.0
 author: Wies and Exxarion
 description: Plot and protection plugin
-softdepend: [EconomyAPI]
+softdepend: [EconomyAPI, PocketMoney]
 
 permissions:
   myplot.command:

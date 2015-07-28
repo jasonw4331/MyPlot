@@ -2,6 +2,7 @@
 namespace MyPlot;
 
 use MyPlot\provider\EconomySProvider;
+use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\task\ClearPlotTask;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -339,6 +340,8 @@ class MyPlot extends PluginBase implements Listener
         if ($this->getConfig()->get("UseEconomy") == true) {
             if ($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") !== null) {
                 $this->economyProvider = new EconomySProvider();
+            } elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
+                $this->economyProvider = new PocketMoneyProvider($plugin);
             } else {
                 $this->economyProvider = null;
             }
