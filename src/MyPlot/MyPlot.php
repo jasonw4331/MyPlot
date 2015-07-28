@@ -24,12 +24,22 @@ use MyPlot\provider\EconomyProvider;
 
 class MyPlot extends PluginBase implements Listener
 {
+    /** @var MyPlot */
+    private static $instance;
     /** @var PlotLevelSettings[] */
     private $levels = [];
     /** @var DataProvider */
     private $dataProvider;
     /** @var EconomyProvider */
     private $economyProvider;
+
+    /**
+     * @api
+     * @return MyPlot
+     */
+    public static function getInstance(){
+        return self::$instance;
+    }
 
 
     /**
@@ -294,6 +304,8 @@ class MyPlot extends PluginBase implements Listener
 
 
     public function onEnable() {
+        self::$instance = $this;
+
         $folder = $this->getDataFolder();
         if (!is_dir($folder)) {
             mkdir($folder);
