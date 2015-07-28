@@ -6,16 +6,13 @@ use pocketmine\Player;
 
 class EconomySProvider implements EconomyProvider
 {
-    public function addMoney(Player $player, $amount) {
-        if (EconomyAPI::getInstance()->addMoney($player, $amount, true) === EconomyAPI::RET_SUCCESS) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public function reduceMoney(Player $player, $amount) {
-        if (EconomyAPI::getInstance()->reduceMoney($player, $amount, true) === EconomyAPI::RET_SUCCESS) {
+        if ($amount < 0) {
+            $ret = EconomyAPI::getInstance()->addMoney($player, -$amount, true);
+        } else {
+            $ret = EconomyAPI::getInstance()->reduceMoney($player, $amount, true);
+        }
+        if ($ret === EconomyAPI::RET_SUCCESS) {
             return true;
         } else {
             return false;

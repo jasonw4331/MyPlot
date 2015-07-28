@@ -48,6 +48,14 @@ class DisposeSubCommand implements SubCommand
             $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
             return true;
         }
+
+        $economy = $this->plugin->getEconomyProvider();
+        $price = $this->plugin->getLevelSettings($plot->levelName)->disposePrice;
+        if ($economy !== null and !$economy->reduceMoney($player, $price)) {
+            $sender->sendMessage(TextFormat::RED . "You don't have enough money to dispose this plot");
+            return true;
+        }
+
         if ($this->plugin->disposePlot($plot)) {
             $sender->sendMessage(TextFormat::GREEN . "Plot disposed");
         } else {

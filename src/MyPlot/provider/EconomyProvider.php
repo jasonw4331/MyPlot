@@ -10,12 +10,5 @@ interface EconomyProvider
      * @param int $amount
      * @return bool
      */
-    public function addMoney(Player $player, $amount);
-
-    /**
-     * @param Player $player
-     * @param int $amount
-     * @return bool
-     */
     public function reduceMoney(Player $player, $amount);
 }
