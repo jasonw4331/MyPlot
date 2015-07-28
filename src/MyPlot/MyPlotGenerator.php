@@ -14,11 +14,13 @@ class MyPlotGenerator extends Generator
     /** @var Level */
     private $level;
 
+    /** @var string[] */
     private $settings;
 
     /** @var Block */
     public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
 
+    /** @var int */
     public $roadWidth, $plotSize, $groundHeight;
 
     public function __construct(array $settings = []) {
@@ -52,7 +54,7 @@ class MyPlotGenerator extends Generator
         ]);
     }
 
-    private function parseBlock($array, $key, $default) {
+    private function parseBlock(&$array, $key, $default) {
         if (isset($array[$key])) {
             $id = $array[$key];
             if (is_numeric($id)) {
@@ -71,7 +73,7 @@ class MyPlotGenerator extends Generator
         return $block;
     }
 
-    private function parseNumber($array, $key, $default) {
+    private function parseNumber(&$array, $key, $default) {
         if (isset($array[$key]) and is_numeric($array[$key])) {
             return $array[$key];
         } else {

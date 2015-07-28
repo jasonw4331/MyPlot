@@ -14,15 +14,16 @@ use pocketmine\level\generator\Generator;
 use pocketmine\event\EventPriority;
 use pocketmine\plugin\MethodEventExecutor;
 use pocketmine\Player;
-use pocketmine\block\Block;
 use MyPlot\provider\DataProvider;
+use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use pocketmine\level\Level;
-use pocketmine\network\Network;
+use MyPlot\provider\SQLiteDataProvider;
 
 class MyPlot extends PluginBase implements Listener
 {
-    private $levels = array();
+    /** @var PlotLevelSettings[] */
+    private $levels = [];
 
     /** @var DataProvider */
     private $provider;
@@ -39,13 +40,13 @@ class MyPlot extends PluginBase implements Listener
     /**
      * @api
      * @param string $levelName
-     * @return array
+     * @return PlotLevelSettings|null
      */
-    public function getLevelOptions($levelName) {
+    public function getLevelSettings($levelName) {
         if (isset($this->levels[$levelName])) {
             return $this->levels[$levelName];
         } else {
-            return [];
+            return null;
         }
     }
 
@@ -63,17 +64,17 @@ class MyPlot extends PluginBase implements Listener
      * @param string $levelName
      * @return bool
      */
-    public function generateLevel($levelName, $options = []) {
+    public function generateLevel($levelName, $settings = []) {
         if ($this->getServer()->isLevelGenerated($levelName) === true) {
             return false;
         }
-        if (count($options) === 0) {
-            $options = $this->getConfig()->get("default_generator");
+        if (empty($settings)) {
+            $settings = $this->getConfig()->get("DefaultWorld");
         }
-        $options = [
-            "preset" => json_encode($options)
+        $settings = [
+            "preset" => json_encode($settings)
         ];
-        return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $options);
+        return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $settings);
     }
 
     /**
@@ -86,13 +87,13 @@ class MyPlot extends PluginBase implements Listener
         $z = $position->z;
         $levelName = $position->level->getName();
 
-        if (!isset($this->levels[$levelName])) {
+        $plotLevel = $this->getLevelSettings($levelName);
+        if ($plotLevel === null) {
             return null;
         }
-        $levelData = $this->levels[$levelName];
 
-        $plotSize = $levelData["PlotSize"];
-        $roadWidth = $levelData["RoadWidth"];
+        $plotSize = $plotLevel->plotSize;
+        $roadWidth = $plotLevel->roadWidth;
         $totalSize = $plotSize + $roadWidth;
 
         if ($x >= 0) {
@@ -130,18 +131,18 @@ class MyPlot extends PluginBase implements Listener
      * @return Position|null
      */
     public function getPlotPosition(Plot $plot) {
-        if (isset($this->levels[$plot->levelName]) === false) {
+        $plotLevel = $this->getLevelSettings($plot->levelName);
+        if ($plotLevel === null) {
             return null;
         }
-        $levelData = $this->levels[$plot->levelName];
 
-        $plotSize = $levelData["PlotSize"];
-        $roadWidth = $levelData["RoadWidth"];
+        $plotSize = $plotLevel->plotSize;
+        $roadWidth = $plotLevel->roadWidth;
         $totalSize = $plotSize + $roadWidth;
         $x = $totalSize * $plot->X;
         $z = $totalSize * $plot->Z;
         $level = $this->getServer()->getLevelByName($plot->levelName);
-        return new Position($x, $levelData["GroundHeight"], $z, $level);
+        return new Position($x, $plotLevel->groundHeight, $z, $level);
     }
 
     /**
@@ -151,11 +152,12 @@ class MyPlot extends PluginBase implements Listener
      * @return bool
      */
     public function teleportPlayerToPlot(Player $player, Plot $plot) {
-        if (!isset($this->levels[$plot->levelName])) {
+        $plotLevel = $this->getLevelSettings($plot->levelName);
+        if ($plotLevel === null) {
             return false;
         }
         $pos = $this->getPlotPosition($plot);
-        $plotSize = $this->levels[$plot->levelName]["PlotSize"];
+        $plotSize = $plotLevel->plotSize;
         $pos->x += floor($plotSize / 2);
         $pos->z += floor($plotSize / 2);
         $player->teleport($pos);
@@ -172,7 +174,7 @@ class MyPlot extends PluginBase implements Listener
      * @return bool
      */
     public function clearPlot(Plot $plot, Player $issuer = null, $maxBlocksPerTick = 256) {
-        if (!isset($this->levels[$plot->levelName])) {
+        if (!$this->isLevelLoaded($plot->levelName)) {
             return false;
         }
         $task = new ClearPlotTask($this, $plot, $issuer, $maxBlocksPerTick);
@@ -210,14 +212,14 @@ class MyPlot extends PluginBase implements Listener
      * @return bool
      */
     public function setPlotBiome(Plot $plot, Biome $biome) {
-        if (!isset($this->levels[$plot->levelName])) {
+        $plotLevel = $this->getLevelSettings($plot->levelName);
+        if ($plotLevel === null) {
             return false;
         }
-        $levelData = $this->levels[$plot->levelName];
 
         $level = $this->getServer()->getLevelByName($plot->levelName);
         $pos = $this->getPlotPosition($plot);
-        $plotSize = $levelData["PlotSize"];
+        $plotSize = $plotLevel->plotSize;
         $xMax = $pos->x + $plotSize;
         $zMax = $pos->z + $plotSize;
 
@@ -265,6 +267,9 @@ class MyPlot extends PluginBase implements Listener
         if (!is_dir($folder)) {
             mkdir($folder);
         }
+        if (!is_dir($folder . "worlds")) {
+            mkdir($folder . "worlds");
+        }
 
         Generator::addGenerator(MyPlotGenerator::class, "myplot");
 
@@ -280,12 +285,12 @@ class MyPlot extends PluginBase implements Listener
         $pluginManager->registerEvent("pocketmine\\event\\level\\LevelUnloadEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onLevelUnload"), $this, false);
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
 
-        switch (strtolower($this->getConfig()->get("data_provider"))) {
+        switch (strtolower($this->getConfig()->get("DataProvider"))) {
             case "sqlite":
-                $this->provider = new provider\SQLiteDataProvider($this);
+                $this->provider = new SQLiteDataProvider($this);
                 break;
             default:
-                $this->provider = new provider\SQLiteDataProvider($this);
+                $this->provider = new SQLiteDataProvider($this);
         }
     }
 
@@ -335,16 +340,16 @@ class MyPlot extends PluginBase implements Listener
             if ($settings === false) {
                 return;
             }
-            $this->levels[$event->getLevel()->getName()] = [
-                "RoadBlock" => $this->parseBlock($settings, "RoadBlock", new Block(5)),
-                "WallBlock" => $this->parseBlock($settings, "WallBlock", new Block(44)),
-                "PlotFloorBlock" => $this->parseBlock($settings, "PlotFloorBlock", new Block(2)),
-                "PlotFillBlock" => $this->parseBlock($settings, "PlotFillBlock", new Block(3)),
-                "BottomBlock" => $this->parseBlock($settings, "BottomBlock", new Block(7)),
-                "RoadWidth" => $this->parseNumber($settings, "RoadWidth", 7),
-                "PlotSize" => $this->parseNumber($settings, "PlotSize", 22),
-                "GroundHeight" => $this->parseNumber($settings, "GroundHeight", 64),
+            $levelName = $event->getLevel()->getName();
+            $filePath = $this->getDataFolder() . "worlds/" . $levelName . ".yml";
+            $default = [
+                "MaxPlotsPerPlayer" => $this->getConfig()->get("MaxPlotsPerPlayer"),
             ];
+            $config = new Config($filePath, Config::YAML, $default);
+            foreach (array_keys($default) as $key) {
+                $settings[$key] = $config->get($key);
+            }
+            $this->levels[$levelName] = new PlotLevelSettings($levelName, $settings);
         }
     }
 
@@ -352,33 +357,6 @@ class MyPlot extends PluginBase implements Listener
         $levelName = $event->getLevel()->getName();
         if (isset($this->levels[$levelName])) {
             unset($this->levels[$levelName]);
-        }
-    }
-
-    private function parseBlock($array, $key, $default) {
-        if (isset($array[$key])) {
-            $id = $array[$key];
-            if (is_numeric($id)) {
-                $block = new Block($id);
-            } else {
-                $split = explode(":", $id);
-                if (count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
-                    $block = new Block($split[0], $split[1]);
-                } else {
-                    $block = $default;
-                }
-            }
-        } else {
-            $block = $default;
-        }
-        return $block;
-    }
-
-    private function parseNumber($array, $key, $default) {
-        if (isset($array[$key]) and is_numeric($array[$key])) {
-            return $array[$key];
-        } else {
-            return $default;
         }
     }
 }

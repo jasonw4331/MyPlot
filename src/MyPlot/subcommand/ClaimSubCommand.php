@@ -56,6 +56,17 @@ class ClaimSubCommand implements SubCommand
             }
             return true;
         }
+        $maxPlotsInLevel = $this->plugin->getLevelSettings($plot->levelName)->maxPlotsPerPlayer;
+        $maxPlots = $this->plugin->getConfig()->get("MaxPlotsPerPlayer");
+        $plotsOfPlayer = $this->plugin->getProvider()->getPlotsByOwner($player->getName());
+        if ($maxPlotsInLevel >= 0 and count($plotsOfPlayer) >= $maxPlotsInLevel) {
+            $sender->sendMessage(TextFormat::RED . "You reached the limit of $maxPlotsInLevel plots per player in this world");
+            return true;
+        } elseif ($maxPlots >= 0 and count($plotsOfPlayer) >= $maxPlots) {
+            $sender->sendMessage(TextFormat::RED . "You reached the limit of $maxPlots plots per player");
+            return true;
+        }
+
         $plot->owner = $sender->getName();
         $plot->name = $name;
         if ($this->plugin->getProvider()->savePlot($plot)) {

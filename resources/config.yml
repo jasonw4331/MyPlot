@@ -1,6 +1,8 @@
-data_provider: 'sqlite'
+MaxPlotsPerPlayer: 5
+DataProvider: 'sqlite'
 
-default_generator:
+DefaultWorld:
+  MaxPlotsPerPlayer: 5
   RoadBlock: '5'
   RoadWidth: 7
   WallBlock: '44'
