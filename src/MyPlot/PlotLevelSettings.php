@@ -9,7 +9,8 @@ class PlotLevelSettings
     /** @var Block */
     public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
     /** @var int */
-    public $roadWidth, $plotSize, $groundHeight, $maxPlotsPerPlayer, $claimPrice, $disposePrice;
+    public $roadWidth, $plotSize, $groundHeight, $maxPlotsPerPlayer, $claimPrice, $clearPrice,
+            $disposePrice, $resetPrice;
 
     public function __construct($name, $settings = []) {
         $this->name = $name;
@@ -24,7 +25,9 @@ class PlotLevelSettings
             $this->groundHeight = self::parseNumber($settings, "GroundHeight", 64);
             $this->maxPlotsPerPlayer = self::parseNumber($settings, "MaxPlotsPerPlayer", 5);
             $this->claimPrice = self::parseNumber($settings, "ClaimPrice", 0);
+            $this->clearPrice = self::parseNumber($settings, "ClearPrice", 0);
             $this->disposePrice = self::parseNumber($settings, "DisposePrice", 0);
+            $this->resetPrice = self::parseNumber($settings, "ResetPrice", 0);
         }
     }
 

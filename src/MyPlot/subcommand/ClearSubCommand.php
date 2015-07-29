@@ -48,6 +48,14 @@ class ClearSubCommand implements SubCommand
             $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
             return true;
         }
+
+        $economy = $this->plugin->getEconomyProvider();
+        $price = $this->plugin->getLevelSettings($plot->levelName)->clearPrice;
+        if ($economy !== null and !$economy->reduceMoney($player, $price)) {
+            $sender->sendMessage(TextFormat::RED . "You don't have enough money to clear this plot");
+            return true;
+        }
+
         if ($this->plugin->clearPlot($plot, $player)) {
             $sender->sendMessage("Plot is being cleared...");
         } else {

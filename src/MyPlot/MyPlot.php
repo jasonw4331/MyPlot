@@ -401,7 +401,9 @@ class MyPlot extends PluginBase implements Listener
             $default = [
                 "MaxPlotsPerPlayer" => $this->getConfig()->getNested("DefaultWorld.MaxPlotsPerPlayer"),
                 "ClaimPrice" => $this->getConfig()->getNested("DefaultWorld.ClaimPrice"),
+                "ClearPrice" => $this->getConfig()->getNested("DefaultWorld.ClearPrice"),
                 "DisposePrice" => $this->getConfig()->getNested("DefaultWorld.DisposePrice"),
+                "ResetPrice" => $this->getConfig()->getNested("DefaultWorld.ResetPrice"),
             ];
             $config = new Config($filePath, Config::YAML, $default);
             foreach (array_keys($default) as $key) {
