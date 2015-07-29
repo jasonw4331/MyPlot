@@ -45,7 +45,7 @@ class AutoSubCommand implements SubCommand
             return true;
         }
         if (($plot = $this->plugin->getProvider()->getNextFreePlot($levelName)) !== null) {
-            $player->teleport($this->plugin->getPlotPosition($plot));
+            $this->plugin->teleportPlayerToPlot($player, $plot);
             $sender->sendMessage(TextFormat::GREEN . "Teleported to " . TextFormat::WHITE . $plot);
         } else {
             $sender->sendMessage(TextFormat::RED . "No free plots found in this world");
