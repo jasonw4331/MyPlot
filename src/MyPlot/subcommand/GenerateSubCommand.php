@@ -1,19 +1,12 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class GenerateSubCommand implements SubCommand
+class GenerateSubCommand extends SubCommand
 {
-    private $plugin;
-
-    public function __construct(MyPlot $plugin) {
-        $this->plugin = $plugin;
-    }
-
     public function canUse(CommandSender $sender) {
         return $sender->hasPermission("myplot.command.generate");
     }
@@ -43,7 +36,7 @@ class GenerateSubCommand implements SubCommand
             $sender->sendMessage(TextFormat::RED . "A world with that name already exists");
             return true;
         }
-        if ($this->plugin->generateLevel($levelName)) {
+        if ($this->getPlugin()->generateLevel($levelName)) {
             $sender->sendMessage(TextFormat::GREEN . "Successfully generated a new plot world " . TextFormat::WHITE . $levelName);
         } else {
             $sender->sendMessage(TextFormat::RED . "The world could not be generated");

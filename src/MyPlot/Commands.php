@@ -56,23 +56,20 @@ class Commands extends PluginCommand
     }
 
     public function execute(CommandSender $sender, $alias, array $args) {
-        if (isset($args[0]) === false) {
-            $this->sendHelp($sender);
-            return true;
+        if (!isset($args[0])) {
+            return $this->sendHelp($sender);
         }
         $subCommand = strtolower(array_shift($args));
-        if (isset($this->subCommands[$subCommand]) === false) {
-            $this->sendHelp($sender);
-            return true;
+        if (!isset($this->subCommands[$subCommand])) {
+            return $this->sendHelp($sender);
         }
-        $commandId = $this->subCommands[$subCommand];
-        $command = $this->commandObjects[$commandId];
+        $command = $this->commandObjects[$this->subCommands[$subCommand]];
         $canUse = $command->canUse($sender);
-        if ($sender->hasPermission("myplot.command") and $canUse) {
-            if ($command->execute($sender, $args) === false) {
+        if ($canUse) {
+            if (!$command->execute($sender, $args)) {
                 $sender->sendMessage(TextFormat::YELLOW."Usage: /p " . $command->getName() . " " . $command->getUsage());
             }
-        } elseif ($canUse === false and !($sender instanceof Player)) {
+        } elseif (!($sender instanceof Player)) {
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
         } else {
             $sender->sendMessage(TextFormat::RED . "You do not have permissions to run this command");
@@ -90,5 +87,6 @@ class Commands extends PluginCommand
                 );
             }
         }
+        return true;
     }
 }

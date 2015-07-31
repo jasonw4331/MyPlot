@@ -1,19 +1,12 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class ClaimSubCommand implements SubCommand
+class ClaimSubCommand extends SubCommand
 {
-    private $plugin;
-
-    public function __construct(MyPlot $plugin) {
-        $this->plugin = $plugin;
-    }
-
     public function canUse(CommandSender $sender) {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.claim");
     }
@@ -43,7 +36,7 @@ class ClaimSubCommand implements SubCommand
             $name = $args[0];
         }
         $player = $sender->getServer()->getPlayer($sender->getName());
-        $plot = $this->plugin->getPlotByPosition($player->getPosition());
+        $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
             $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
@@ -56,10 +49,10 @@ class ClaimSubCommand implements SubCommand
             }
             return true;
         }
-        $plotLevel = $this->plugin->getLevelSettings($plot->levelName);
+        $plotLevel = $this->getPlugin()->getLevelSettings($plot->levelName);
         $maxPlotsInLevel = $plotLevel->maxPlotsPerPlayer;
-        $maxPlots = $this->plugin->getConfig()->get("MaxPlotsPerPlayer");
-        $plotsOfPlayer = $this->plugin->getProvider()->getPlotsByOwner($player->getName());
+        $maxPlots = $this->getPlugin()->getConfig()->get("MaxPlotsPerPlayer");
+        $plotsOfPlayer = $this->getPlugin()->getProvider()->getPlotsByOwner($player->getName());
         if ($maxPlotsInLevel >= 0 and count($plotsOfPlayer) >= $maxPlotsInLevel) {
             $sender->sendMessage(TextFormat::RED . "You reached the limit of $maxPlotsInLevel plots per player in this world");
             return true;
@@ -68,7 +61,7 @@ class ClaimSubCommand implements SubCommand
             return true;
         }
 
-        $economy = $this->plugin->getEconomyProvider();
+        $economy = $this->getPlugin()->getEconomyProvider();
         if ($economy !== null and !$economy->reduceMoney($player, $plotLevel->claimPrice)) {
             $sender->sendMessage(TextFormat::RED . "You don't have enough money to claim this plot");
             return true;
@@ -76,7 +69,7 @@ class ClaimSubCommand implements SubCommand
 
         $plot->owner = $sender->getName();
         $plot->name = $name;
-        if ($this->plugin->getProvider()->savePlot($plot)) {
+        if ($this->getPlugin()->getProvider()->savePlot($plot)) {
             $sender->sendMessage(TextFormat::GREEN . "You are now the owner of " . TextFormat::WHITE . $plot);
         } else {
             $sender->sendMessage(TextFormat::RED . "Something went wrong");

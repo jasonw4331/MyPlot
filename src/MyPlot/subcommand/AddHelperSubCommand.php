@@ -1,19 +1,12 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class AddHelperSubCommand implements SubCommand
+class AddHelperSubCommand extends  SubCommand
 {
-    private $plugin;
-
-    public function __construct(MyPlot $plugin) {
-        $this->plugin = $plugin;
-    }
-
     public function canUse(CommandSender $sender) {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.addhelper");
     }
@@ -40,7 +33,7 @@ class AddHelperSubCommand implements SubCommand
         }
         $helper = $args[0];
         $player = $sender->getServer()->getPlayer($sender->getName());
-        $plot = $this->plugin->getPlotByPosition($player->getPosition());
+        $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
             $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
@@ -53,7 +46,7 @@ class AddHelperSubCommand implements SubCommand
             $sender->sendMessage($helper . " was already a helper of this plot");
             return true;
         }
-        if ($this->plugin->getProvider()->savePlot($plot)) {
+        if ($this->getPlugin()->getProvider()->savePlot($plot)) {
             $sender->sendMessage(TextFormat::GREEN . $helper . " is now a helper of this plot");
         } else {
             $sender->sendMessage(TextFormat::RED . "Helper could not be added");

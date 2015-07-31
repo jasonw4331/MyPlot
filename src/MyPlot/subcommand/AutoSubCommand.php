@@ -1,19 +1,12 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class AutoSubCommand implements SubCommand
+class AutoSubCommand extends SubCommand
 {
-    private $plugin;
-
-    public function __construct(MyPlot $plugin) {
-        $this->plugin = $plugin;
-    }
-
     public function canUse(CommandSender $sender) {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.auto");
     }
@@ -40,12 +33,12 @@ class AutoSubCommand implements SubCommand
         }
         $player = $sender->getServer()->getPlayer($sender->getName());
         $levelName = $player->getLevel()->getName();
-        if (!$this->plugin->isLevelLoaded($levelName)) {
+        if (!$this->getPlugin()->isLevelLoaded($levelName)) {
             $sender->sendMessage(TextFormat::RED . "You are not inside a plot world");
             return true;
         }
-        if (($plot = $this->plugin->getProvider()->getNextFreePlot($levelName)) !== null) {
-            $this->plugin->teleportPlayerToPlot($player, $plot);
+        if (($plot = $this->getPlugin()->getProvider()->getNextFreePlot($levelName)) !== null) {
+            $this->getPlugin()->teleportPlayerToPlot($player, $plot);
             $sender->sendMessage(TextFormat::GREEN . "Teleported to " . TextFormat::WHITE . $plot);
         } else {
             $sender->sendMessage(TextFormat::RED . "No free plots found in this world");

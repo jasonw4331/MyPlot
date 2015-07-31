@@ -1,19 +1,12 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class ClearSubCommand implements SubCommand
+class ClearSubCommand extends SubCommand
 {
-    private $plugin;
-
-    public function __construct(MyPlot $plugin) {
-        $this->plugin = $plugin;
-    }
-
     public function canUse(CommandSender $sender) {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.clear");
     }
@@ -39,7 +32,7 @@ class ClearSubCommand implements SubCommand
             return false;
         }
         $player = $sender->getServer()->getPlayer($sender->getName());
-        $plot = $this->plugin->getPlotByPosition($player->getPosition());
+        $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
             $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
@@ -49,14 +42,14 @@ class ClearSubCommand implements SubCommand
             return true;
         }
 
-        $economy = $this->plugin->getEconomyProvider();
-        $price = $this->plugin->getLevelSettings($plot->levelName)->clearPrice;
+        $economy = $this->getPlugin()->getEconomyProvider();
+        $price = $this->getPlugin()->getLevelSettings($plot->levelName)->clearPrice;
         if ($economy !== null and !$economy->reduceMoney($player, $price)) {
             $sender->sendMessage(TextFormat::RED . "You don't have enough money to clear this plot");
             return true;
         }
 
-        if ($this->plugin->clearPlot($plot, $player)) {
+        if ($this->getPlugin()->clearPlot($plot, $player)) {
             $sender->sendMessage("Plot is being cleared...");
         } else {
             $sender->sendMessage(TextFormat::RED . "Could not clear this plot");

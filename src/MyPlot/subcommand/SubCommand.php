@@ -1,40 +1,58 @@
 <?php
 namespace MyPlot\subcommand;
 
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 
-interface SubCommand
+abstract class SubCommand
 {
+    /** @var MyPlot */
+    private $plugin;
+
+    /**
+     * @param MyPlot $plugin
+     */
+    public function __construct(MyPlot $plugin){
+        $this->plugin = $plugin;
+    }
+
+    /**
+     * @return MyPlot
+     */
+    public final function getPlugin(){
+        return $this->getPlugin();
+    }
+
     /**
      * @param CommandSender $sender
      * @return bool
      */
-    public function canUse(CommandSender $sender);
+    public abstract function canUse(CommandSender $sender);
 
     /**
      * @return string
      */
-    public function getUsage();
+    public abstract function getUsage();
 
     /**
      * @return string
      */
-    public function getName();
+    public abstract function getName();
 
     /**
      * @return string
      */
-    public function getDescription();
+    public abstract function getDescription();
 
     /**
      * @return string[]
      */
-    public function getAliases();
+    public abstract function getAliases();
 
     /**
      * @param CommandSender $sender
      * @param string[] $args
      * @return bool
      */
-    public function execute(CommandSender $sender, array $args);
+    public abstract function execute(CommandSender $sender, array $args);
 }
