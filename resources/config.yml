@@ -1,18 +1,53 @@
-MaxPlotsPerPlayer: 5
-DataProvider: 'sqlite'
-UseEconomy: false
+#                                                                     
+#    .__                                                      .__     
+#  __|  |___   ______   ______   ______   ______   ______   __|  |___ 
+# /__    __/  /_____/  /_____/  /_____/  /_____/  /_____/  /__    __/ 
+#    |__|                                                     |__|    
+#                                                                     
+#            _____         __________.__          __                  
+#  ______   /     \ ___.__.\______   \  |   _____/  |_   ______       
+# /_____/  /  \ /  <   |  | |     ___/  |  /  _ \   __\ /_____/       
+# /_____/ /    Y    \___  | |    |   |  |_(  <_> )  |   /_____/       
+#         \____|__  / ____| |____|   |____/\____/|__|                 
+#                 \/\/                                                
+#                                                                     
+#    .__                                                      .__     
+#  __|  |___   ______   ______   ______   ______   ______   __|  |___ 
+# /__    __/  /_____/  /_____/  /_____/  /_____/  /_____/  /__    __/ 
+#    |__|                                                     |__|    
+#                                                                     
+#
+MaxPlotsPerPlayer: 5 
+#The maximum amount of plots one can have
+DataProvider: 'sqlite' 
+#The data provider where plot data is stored. Do not mess with this if you do not know how it works.
+UseEconomy: false 
+#Use an economy plugin to add prices to things like claiming (Below)
 
-DefaultWorld:
-  MaxPlotsPerPlayer: 5
-  ClaimPrice: 0
-  ClearPrice: 0
-  DisposePrice: 0
-  ResetPrice: 0
-  RoadBlock: '5'
+DefaultWorld: #The name of the plot world.
+  MaxPlotsPerPlayer: 5 
+  #The maximum amount of plots that one can own
+  ClaimPrice: 0 
+  #How much it costs to claim a plot (Economy must be set to 'true')
+  ClearPrice: 0 
+  #How much it costs to clear a plot (Economy must be set to 'true')
+  DisposePrice: 0 
+  #How much it costs to dispose a plot (Economy must be set to 'true')
+  ResetPrice: 0 
+  #How much it costs to reset a plot (Economy must be set to 'true)
+  RoadBlock: '5' 
+  #The block that the road is made of (Default is Oak Planks)
   RoadWidth: 7
+  #The width of the road
   WallBlock: '44'
+  #The block that plot walls are made of (Default is Stone Slabs)
   PlotFloorBlock: '2'
+  #The block used as the plot floor (Default is Grass)
   PlotFillBlock: '3'
+  #The block that fills the rest of the plot (Default is Dirt)
   PlotSize: 22
+  #How large a plot is
   GroundHeight: 64
+  #How high a plot is
   BottomBlock: '7'
+  #The block at the way bottom (Default is Bedrock)
