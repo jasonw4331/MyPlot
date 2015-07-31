@@ -24,7 +24,7 @@ DataProvider: 'sqlite'
 UseEconomy: false 
 #Use an economy plugin to add prices to things like claiming (Below)
 
-DefaultWorld: #The name of the plot world.
+DefaultWorld:
   MaxPlotsPerPlayer: 5 
   #The maximum amount of plots that one can own
   ClaimPrice: 0 
