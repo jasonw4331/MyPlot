@@ -73,9 +73,8 @@ class MyPlot extends PluginBase implements Listener
     public function getLevelSettings($levelName) {
         if (isset($this->levels[$levelName])) {
             return $this->levels[$levelName];
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -332,10 +331,9 @@ class MyPlot extends PluginBase implements Listener
 
         switch (strtolower($this->getConfig()->get("DataProvider"))) {
             case "sqlite":
-                $this->dataProvider = new SQLiteDataProvider($this);
-                break;
             default:
                 $this->dataProvider = new SQLiteDataProvider($this);
+                break;
         }
 
         if ($this->getConfig()->get("UseEconomy") == true) {
