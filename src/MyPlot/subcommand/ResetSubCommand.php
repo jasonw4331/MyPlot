@@ -37,7 +37,7 @@ class ResetSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
         }
-        if ($plot->owner !== $sender->getName()) {
+        if ($plot->owner !== $sender->getName() or !$sender->isOP()) {
             $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
             return true;
         }
