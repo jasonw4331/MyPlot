@@ -1,20 +1,13 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use MyPlot\Plot;
 
-class ListSubCommand implements SubCommand
+class ListSubCommand extends SubCommand
 {
-    private $plugin;
-
-    public function __construct(MyPlot $plugin) {
-        $this->plugin = $plugin;
-    }
-
     public function canUse(CommandSender $sender) {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.list");
     }
@@ -41,7 +34,7 @@ class ListSubCommand implements SubCommand
         }
         $player = $sender->getServer()->getPlayer($sender->getName());
         $levelName = $player->getLevel()->getName();
-        $plots = $this->plugin->getProvider()->getPlotsByOwner($sender->getName());
+        $plots = $this->getPlugin()->getProvider()->getPlotsByOwner($sender->getName());
         usort($plots, function($plot1, $plot2) {
             /** @var Plot $plot1 */
             /** @var Plot $plot2 */

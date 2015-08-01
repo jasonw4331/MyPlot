@@ -1,19 +1,12 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class HomeSubCommand implements SubCommand
+class HomeSubCommand extends SubCommand
 {
-    private $plugin;
-
-    public function __construct(MyPlot $plugin) {
-        $this->plugin = $plugin;
-    }
-
     public function canUse(CommandSender $sender) {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.home");
     }
@@ -42,7 +35,7 @@ class HomeSubCommand implements SubCommand
         } else {
             return false;
         }
-        $plots = $this->plugin->getProvider()->getPlotsByOwner($sender->getName());
+        $plots = $this->getPlugin()->getProvider()->getPlotsByOwner($sender->getName());
         if (empty($plots)) {
             $sender->sendMessage(TextFormat::RED . "You don't have any plots");
             return true;
@@ -51,9 +44,9 @@ class HomeSubCommand implements SubCommand
             $sender->sendMessage(TextFormat::RED . "You don't have a plot with home number $plotNumber");
             return true;
         }
-        $player = $this->plugin->getServer()->getPlayer($sender->getName());
+        $player = $this->getPlugin()->getServer()->getPlayer($sender->getName());
         $plot = $plots[$plotNumber - 1];
-        if ($this->plugin->teleportPlayerToPlot($player, $plot)) {
+        if ($this->getPlugin()->teleportPlayerToPlot($player, $plot)) {
             $sender->sendMessage(TextFormat::GREEN . "Teleported to " . TextFormat::WHITE . $plot);
         } else {
             $sender->sendMessage(TextFormat::GREEN . "Could not teleport because plot world " . $plot->levelName . " is not loaded");

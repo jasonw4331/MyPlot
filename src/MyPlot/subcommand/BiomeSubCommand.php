@@ -1,15 +1,13 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\level\generator\biome\Biome;
 
-class BiomeSubCommand implements SubCommand
+class BiomeSubCommand extends SubCommand
 {
-    private $plugin;
     private $biomes = [
         "PLAINS" => Biome::PLAINS,
         "DESERT" => Biome::DESERT,
@@ -23,10 +21,6 @@ class BiomeSubCommand implements SubCommand
         "SMALL_MOUNTAINS" => Biome::SMALL_MOUNTAINS,
         "BIRCH_FOREST" => Biome::BIRCH_FOREST,
     ];
-
-    public function __construct(MyPlot $plugin) {
-        $this->plugin = $plugin;
-    }
 
     public function canUse(CommandSender $sender) {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.biome");
@@ -54,7 +48,7 @@ class BiomeSubCommand implements SubCommand
         }
         $player = $sender->getServer()->getPlayer($sender->getName());
         $biome = strtoupper($args[0]);
-        $plot = $this->plugin->getPlotByPosition($player->getPosition());
+        $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
             $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
@@ -70,7 +64,7 @@ class BiomeSubCommand implements SubCommand
             return true;
         }
         $biome = Biome::getBiome($this->biomes[$biome]);
-        if ($this->plugin->setPlotBiome($plot, $biome)) {
+        if ($this->getPlugin()->setPlotBiome($plot, $biome)) {
             $sender->sendMessage(TextFormat::GREEN . "Changed the plot biome");
         } else {
             $sender->sendMessage(TextFormat::RED . "Could not change the plot biome");
