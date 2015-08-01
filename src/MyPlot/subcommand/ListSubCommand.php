@@ -35,11 +35,6 @@ class ListSubCommand extends SubCommand
         $player = $sender->getServer()->getPlayer($sender->getName());
         $levelName = $player->getLevel()->getName();
         $plots = $this->getPlugin()->getProvider()->getPlotsByOwner($sender->getName());
-        usort($plots, function($plot1, $plot2) {
-            /** @var Plot $plot1 */
-            /** @var Plot $plot2 */
-            return strcmp($plot1->levelName, $plot2->levelName);
-        });
         if (empty($plots)) {
             $sender->sendMessage("You do not own any plots");
             return true;
