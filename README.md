@@ -5,6 +5,10 @@ MyPlot
 
 Have you ever seen those PC servers with the PlotMe plugin, and you thought "hey, why can't i have plots in my Pocketmine server?" Well, now you can with **MyPlot** for Pocketmine-MP!
 
+We have just setup a public demo server
+IP: 188.166.9.45
+Port: 19132
+
 **COMMANDS:**
 
 Command | Usage | Permissions |
