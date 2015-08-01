@@ -20,7 +20,7 @@ abstract class SubCommand
      * @return MyPlot
      */
     public final function getPlugin(){
-        return $this->getPlugin();
+        return $this->plugin;
     }
 
     /**
