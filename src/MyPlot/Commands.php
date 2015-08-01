@@ -48,7 +48,7 @@ class Commands extends PluginCommand
 
     private function loadSubCommand(Subcommand $command) {
         $this->commandObjects[] = $command;
-        $commandId = count($this->commandObjects) + 1;
+        $commandId = count($this->commandObjects) - 1;
         $this->subCommands[$command->getName()] = $commandId;
         foreach ($command->getAliases() as $alias) {
             $this->subCommands[$alias] = $commandId;
