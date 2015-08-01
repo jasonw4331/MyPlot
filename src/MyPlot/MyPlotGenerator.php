@@ -23,6 +23,10 @@ class MyPlotGenerator extends Generator
     /** @var int */
     public $roadWidth, $plotSize, $groundHeight;
 
+    const PLOT = 0;
+    const ROAD = 1;
+    const WALL = 2;
+
     public function __construct(array $settings = []) {
         if (isset($settings["preset"])) {
             $settings = json_decode($settings["preset"], true);
@@ -111,9 +115,9 @@ class MyPlotGenerator extends Generator
                 for ($y = 1; $y < $this->groundHeight; ++$y) {
                     $chunk->setBlock($X, $y, $Z, $this->plotFillBlock->getId(), $this->plotFillBlock->getDamage());
                 }
-                if ($shape[$Z][$X] === 0) {
+                if ($shape[$Z][$X] === self::PLOT) {
                     $chunk->setBlock($X, $this->groundHeight, $Z, $this->plotFloorBlock->getId(), $this->plotFloorBlock->getDamage());
-                } elseif ($shape[$Z][$X] === 1) {
+                } elseif ($shape[$Z][$X] === self::ROAD) {
                     $chunk->setBlock($X, $this->groundHeight, $Z, $this->roadBlock->getId(), $this->roadBlock->getDamage());
                 } else {
                     $chunk->setBlock($X, $this->groundHeight, $Z, $this->roadBlock->getId(), $this->roadBlock->getDamage());
@@ -148,22 +152,22 @@ class MyPlotGenerator extends Generator
                 $Z = 0;
             }
             if ($Z < $this->plotSize) {
-                $typeZ = 0; // plot
+                $typeZ = self::PLOT;
             } elseif ($Z === $this->plotSize or $Z === ($totalSize-1)) {
-                $typeZ = 2; // wall
+                $typeZ = self::WALL;
             } else {
-                $typeZ = 1; // road
+                $typeZ = self::ROAD;
             }
 
             for ($x = 0, $X = $startX; $x < 16; $x++, $X++) {
                 if ($X === $totalSize)
                     $X = 0;
                 if ($X < $this->plotSize) {
-                    $typeX = 0; // plot
+                    $typeX = self::PLOT;
                 } elseif ($X === $this->plotSize or $X === ($totalSize-1)) {
-                    $typeX = 2; // wall
+                    $typeX = self::WALL;
                 } else {
-                    $typeX = 1; // road
+                    $typeX = self::ROAD;
                 }
                 if ($typeX === $typeZ) {
                     $type = $typeX;
@@ -172,7 +176,7 @@ class MyPlotGenerator extends Generator
                 } elseif ($typeZ === 0) {
                     $type = $typeX;
                 } else {
-                    $type = 1;
+                    $type = self::ROAD;
                 }
                 $shape[$z][$x] = $type;
             }
