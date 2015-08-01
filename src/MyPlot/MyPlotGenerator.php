@@ -98,7 +98,7 @@ class MyPlotGenerator extends Generator
     }
 
     public function generateChunk($chunkX, $chunkZ) {
-        $shape = $this->getShape($chunkX*16, $chunkZ*16);
+        $shape = $this->getShape($chunkX << 4, $chunkZ << 4);
         $chunk = $this->level->getChunk($chunkX, $chunkZ);
         $chunk->setGenerated();
         $c = Biome::getBiome(1)->getColor();
@@ -106,22 +106,35 @@ class MyPlotGenerator extends Generator
         $G = ($c >> 8) & 0xff;
         $B = $c & 0xff;
 
+        $bottomBlockId = $this->bottomBlock->getId();
+        $bottomBlockMeta = $this->bottomBlock->getDamage();
+        $plotFillBlockId = $this->plotFillBlock->getId();
+        $plotFillBlockMeta = $this->plotFillBlock->getDamage();
+        $plotFloorBlockId = $this->plotFloorBlock->getId();
+        $plotFloorBlockMeta = $this->plotFloorBlock->getDamage();
+        $roadBlockId = $this->roadBlock->getId();
+        $roadBlockMeta = $this->roadBlock->getDamage();
+        $wallBlockId = $this->wallBlock->getId();
+        $wallBlockMeta = $this->wallBlock->getDamage();
+        $groundHeight = $this->groundHeight;
+
         for ($Z = 0; $Z < 16; ++$Z) {
             for ($X = 0; $X < 16; ++$X) {
                 $chunk->setBiomeId($X, $Z, 1);
                 $chunk->setBiomeColor($X, $Z, $R, $G, $B);
 
-                $chunk->setBlock($X, 0, $Z, $this->bottomBlock->getId(), $this->bottomBlock->getDamage());
-                for ($y = 1; $y < $this->groundHeight; ++$y) {
-                    $chunk->setBlock($X, $y, $Z, $this->plotFillBlock->getId(), $this->plotFillBlock->getDamage());
+                $chunk->setBlock($X, 0, $Z, $bottomBlockId, $bottomBlockMeta);
+                for ($y = 1; $y < $groundHeight; ++$y) {
+                    $chunk->setBlock($X, $y, $Z, $plotFillBlockId, $plotFillBlockMeta);
                 }
-                if ($shape[$Z][$X] === self::PLOT) {
-                    $chunk->setBlock($X, $this->groundHeight, $Z, $this->plotFloorBlock->getId(), $this->plotFloorBlock->getDamage());
-                } elseif ($shape[$Z][$X] === self::ROAD) {
-                    $chunk->setBlock($X, $this->groundHeight, $Z, $this->roadBlock->getId(), $this->roadBlock->getDamage());
+                $type = $shape[($Z << 4) | $X];
+                if ($type === self::PLOT) {
+                    $chunk->setBlock($X, $groundHeight, $Z, $plotFloorBlockId, $plotFloorBlockMeta);
+                } elseif ($type === self::ROAD) {
+                    $chunk->setBlock($X, $groundHeight, $Z, $roadBlockId, $roadBlockMeta);
                 } else {
-                    $chunk->setBlock($X, $this->groundHeight, $Z, $this->roadBlock->getId(), $this->roadBlock->getDamage());
-                    $chunk->setBlock($X, $this->groundHeight + 1, $Z, $this->wallBlock->getId(), $this->wallBlock->getDamage());
+                    $chunk->setBlock($X, $groundHeight, $Z, $roadBlockId, $roadBlockMeta);
+                    $chunk->setBlock($X, $groundHeight + 1, $Z, $wallBlockId, $wallBlockMeta);
                 }
             }
         }
@@ -145,7 +158,7 @@ class MyPlotGenerator extends Generator
         }
 
         $startX = $X;
-        $shape = array();
+        $shape = new \SplFixedArray(256);
 
         for ($z = 0; $z < 16; $z++, $Z++) {
             if ($Z === $totalSize) {
@@ -171,14 +184,14 @@ class MyPlotGenerator extends Generator
                 }
                 if ($typeX === $typeZ) {
                     $type = $typeX;
-                } elseif ($typeX === 0) {
+                } elseif ($typeX === self::PLOT) {
                     $type = $typeZ;
-                } elseif ($typeZ === 0) {
+                } elseif ($typeZ === self::PLOT) {
                     $type = $typeX;
                 } else {
                     $type = self::ROAD;
                 }
-                $shape[$z][$x] = $type;
+                $shape[($z << 4)| $x] = $type;
             }
         }
         return $shape;
