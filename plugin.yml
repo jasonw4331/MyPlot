@@ -34,17 +34,20 @@ permissions:
         description: Gives the auto command
         default: true
       myplot.command.clear:
-        description: Give the clear command
+        description: Gives the clear command
         default: true
       myplot.command.dispose:
-        description: Give the dispose command
+        description: Gives the dispose command
         default: true
       myplot.command.reset:
-        description: Give the reset command
+        description: Gives the reset command
         default: true
       myplot.command.biome:
-        description: Give the biome command
+        description: Gives the biome command
         default: true
       myplot.command.home:
         description: Gives the home command
         default: true
+      myplot.command.admin
+        description: Gives the admin command
+        default: op
