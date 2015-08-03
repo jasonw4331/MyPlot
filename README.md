@@ -27,3 +27,4 @@ Command | Usage | Permissions |
 /p dispose|Dispose the plot you are standing on|myplot.command.dispose
 /p reset|Clear and dispose the plot you are standing on|myplot.command.reset
 /p home [number]|Teleport to one of your plots|myplot.command.home
+/p admin \<parameters\>|Administer plots (WIP)|myplot.command.admin (OP)
