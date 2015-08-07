@@ -28,7 +28,7 @@ class AdminSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (!empty($args)) {
+       if (count($args) !== 1) {
             return false;
         }
         $player = $sender->getServer()->getPlayer($sender->getName());
@@ -38,14 +38,14 @@ class AdminSubCommand extends SubCommand
             return true;
         }
 
-        if ($args == "reset") {
+        if ($args[0] === "reset") {
           if ($this->getPlugin()->resetPlot($plot)) {
               $sender->sendMessage(TextFormat::GREEN . "Plot reset");
           } else {
               $sender->sendMessage(TextFormat::RED . "Could not reset this plot");
           }
         }
-        if ($args == "help") {
+        if ($args[0] === "help") {
          $sender->sendMessage(TextFormat::YELLOW . "===[MyPlot Admin]===");
          $sender->sendMessage(TextFormat::AQUA . "/p admin reset : ".TextFormat::WHITE."Reset your plot");
          $sender->sendMessage(TextFormat::AQUA . "/p admin help : ".TextFormat::WHITE."Pull up this help menu");
