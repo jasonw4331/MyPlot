@@ -38,7 +38,7 @@ class RemoveHelperSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
         }
-        if ($plot->owner !== $sender->getName()) {
+        if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.removehelper")) {
             $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
             return true;
         }

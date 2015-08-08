@@ -356,31 +356,37 @@ class MyPlot extends PluginBase implements Listener
     }
 
     public function onBlockBreak(BlockBreakEvent $event) {
-        $levelName = $event->getPlayer()->getLevel()->getName();
+        $player = $event->getPlayer();
+        $levelName = $player->getLevel()->getName();
         if (!isset($this->levels[$levelName])) {
             return;
         }
         $plot = $this->getPlotByPosition($event->getBlock());
         if ($plot !== null) {
             $username = $event->getPlayer()->getName();
-            if ($plot->owner == $username or $plot->isHelper($username)) {
+            if ($plot->owner == $username or $plot->isHelper($username) or $player->hasPermission("myplot.admin.build.plot")) {
                 return;
             }
+        } elseif ($player->hasPermission("myplot.admin.build.road")) {
+            return;
         }
         $event->setCancelled(true);
     }
 
     public function onBlockPlace(BlockPlaceEvent $event) {
-        $levelName = $event->getPlayer()->getLevel()->getName();
+        $player = $event->getPlayer();
+        $levelName = $player->getLevel()->getName();
         if (!isset($this->levels[$levelName])) {
             return;
         }
         $plot = $this->getPlotByPosition($event->getBlock());
         if ($plot !== null) {
             $username = $event->getPlayer()->getName();
-            if ($plot->owner == $username or $plot->isHelper($username)) {
+            if ($plot->owner == $username or $plot->isHelper($username) or $player->hasPermission("myplot.admin.build.plot")) {
                 return;
             }
+        } elseif ($player->hasPermission("myplot.admin.build.road")) {
+            return;
         }
         $event->setCancelled(true);
     }

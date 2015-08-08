@@ -48,6 +48,32 @@ permissions:
       myplot.command.home:
         description: Gives the home command
         default: true
-      myplot.command.admin
-        description: Gives the admin command
+  myplot.admin:
+    description: Grant administrator powers
+    default: op
+    children:
+      myplot.admin.clear:
+        description: Allow clear command on every plot
         default: op
+      myplot.admin.dispose:
+        description: Allow dispose command on every plot
+        default: op
+      myplot.admin.reset:
+        description: Allow reset command on every plot
+        default: op
+      myplot.admin.addhelper:
+        description: Allow addhelper command on every plot
+        default: op
+      myplot.admin.removehelper:
+        description: Allow removehelper command on every plot
+        default: op
+      myplot.admin.build:
+        description: Allow player to build outside his own plots
+        default: op
+        children:
+          myplot.admin.build.plot:
+            description: Allow player to build on all plots
+            default: op
+          myplot.admin.build.road:
+            description: Allow player to build on the road
+            default: op

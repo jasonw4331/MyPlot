@@ -5,7 +5,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class AddHelperSubCommand extends  SubCommand
+class AddHelperSubCommand extends SubCommand
 {
     public function canUse(CommandSender $sender) {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.addhelper");
@@ -38,7 +38,7 @@ class AddHelperSubCommand extends  SubCommand
             $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
         }
-        if ($plot->owner !== $sender->getName()) {
+        if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.addhelper")) {
             $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
             return true;
         }

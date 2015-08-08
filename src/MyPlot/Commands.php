@@ -18,7 +18,6 @@ use pocketmine\Player;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
 use MyPlot\subcommand\BiomeSubCommand;
-use MyPlot\subcommand\AdminSubCommand;
 
 class Commands extends PluginCommand
 {
@@ -45,7 +44,6 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new ResetSubCommand($plugin));
         $this->loadSubCommand(new BiomeSubCommand($plugin));
         $this->loadSubCommand(new HomeSubCommand($plugin));
-        $this->loadSubCommand(new AdminSubCommand($plugin));
     }
 
     private function loadSubCommand(Subcommand $command) {
