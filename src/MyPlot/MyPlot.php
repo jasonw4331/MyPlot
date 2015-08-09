@@ -5,7 +5,9 @@ use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\task\ClearPlotTask;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
@@ -322,11 +324,7 @@ class MyPlot extends PluginBase implements Listener
         $this->getLogger()->info(TextFormat::GREEN."Loading the Plot Framework!");
         $this->getLogger()->warning(TextFormat::YELLOW."It seems that you are running the development build of MyPlot! Thats cool, but it CAN be very, very buggy! Just be careful when using this plugin and report any issues to".TextFormat::GOLD." http://github.com/wiez/MyPlot/issues");
 
-        $pluginManager = $this->getServer()->getPluginManager();
-        $pluginManager->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onBlockBreak"), $this, false);
-        $pluginManager->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onBlockPlace"), $this, false);
-        $pluginManager->registerEvent("pocketmine\\event\\level\\LevelLoadEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onLevelLoad"), $this, false);
-        $pluginManager->registerEvent("pocketmine\\event\\level\\LevelUnloadEvent", $this, EventPriority::HIGH, new MethodEventExecutor("onLevelUnload"), $this, false);
+        $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
 
         switch (strtolower($this->getConfig()->get("DataProvider"))) {
@@ -349,79 +347,21 @@ class MyPlot extends PluginBase implements Listener
         }
     }
 
+    public function addLevelSettings($levelName, PlotLevelSettings $settings) {
+        $this->levels[$levelName] = $settings;
+    }
+
+    public function unloadLevelSettings($levelName) {
+        if (isset($this->levels[$levelName])) {
+            unset($this->levels[$levelName]);
+            return true;
+        }
+        return false;
+    }
+
     public function onDisable() {
         $this->dataProvider->close();
         $this->getLogger()->info(TextFormat::GREEN."Saving plots");
         $this->getLogger()->info(TextFormat::BLUE."Disabled the plot framework!");
-    }
-
-    public function onBlockBreak(BlockBreakEvent $event) {
-        $player = $event->getPlayer();
-        $levelName = $player->getLevel()->getName();
-        if (!isset($this->levels[$levelName])) {
-            return;
-        }
-        $plot = $this->getPlotByPosition($event->getBlock());
-        if ($plot !== null) {
-            $username = $event->getPlayer()->getName();
-            if ($plot->owner == $username or $plot->isHelper($username) or $player->hasPermission("myplot.admin.build.plot")) {
-                return;
-            }
-        } elseif ($player->hasPermission("myplot.admin.build.road")) {
-            return;
-        }
-        $event->setCancelled(true);
-    }
-
-    public function onBlockPlace(BlockPlaceEvent $event) {
-        $player = $event->getPlayer();
-        $levelName = $player->getLevel()->getName();
-        if (!isset($this->levels[$levelName])) {
-            return;
-        }
-        $plot = $this->getPlotByPosition($event->getBlock());
-        if ($plot !== null) {
-            $username = $event->getPlayer()->getName();
-            if ($plot->owner == $username or $plot->isHelper($username) or $player->hasPermission("myplot.admin.build.plot")) {
-                return;
-            }
-        } elseif ($player->hasPermission("myplot.admin.build.road")) {
-            return;
-        }
-        $event->setCancelled(true);
-    }
-
-    public function onLevelLoad(LevelLoadEvent $event) {
-        if ($event->getLevel()->getProvider()->getGenerator() === "myplot") {
-            $settings = $event->getLevel()->getProvider()->getGeneratorOptions();
-            if (isset($settings["preset"]) === false or $settings["preset"] === "") {
-                return;
-            }
-            $settings = json_decode($settings["preset"], true);
-            if ($settings === false) {
-                return;
-            }
-            $levelName = $event->getLevel()->getName();
-            $filePath = $this->getDataFolder() . "worlds/" . $levelName . ".yml";
-            $default = [
-                "MaxPlotsPerPlayer" => $this->getConfig()->getNested("DefaultWorld.MaxPlotsPerPlayer"),
-                "ClaimPrice" => $this->getConfig()->getNested("DefaultWorld.ClaimPrice"),
-                "ClearPrice" => $this->getConfig()->getNested("DefaultWorld.ClearPrice"),
-                "DisposePrice" => $this->getConfig()->getNested("DefaultWorld.DisposePrice"),
-                "ResetPrice" => $this->getConfig()->getNested("DefaultWorld.ResetPrice"),
-            ];
-            $config = new Config($filePath, Config::YAML, $default);
-            foreach (array_keys($default) as $key) {
-                $settings[$key] = $config->get($key);
-            }
-            $this->levels[$levelName] = new PlotLevelSettings($levelName, $settings);
-        }
-    }
-
-    public function onLevelUnload(LevelUnloadEvent $event) {
-        $levelName = $event->getLevel()->getName();
-        if (isset($this->levels[$levelName])) {
-            unset($this->levels[$levelName]);
-        }
     }
 }
