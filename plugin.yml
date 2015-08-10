@@ -48,6 +48,9 @@ permissions:
       myplot.command.home:
         description: Gives the home command
         default: true
+      myplot.command.name
+        description: Gives the name command
+        default: true
   myplot.admin:
     description: Grant administrator powers
     default: op
@@ -76,4 +79,7 @@ permissions:
             default: op
           myplot.admin.build.road:
             description: Allow player to build on the road
+            default: op
+      myplot.admin.name
+        description: Allows admins to change the name of every plot
             default: op
