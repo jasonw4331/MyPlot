@@ -46,7 +46,8 @@ class NameSubCommand extends SubCommand
         $name = $args[0];
         $plot->name = $name;
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
-            $sender->sendMessage(TextFormat::GREEN . "Changed the plot name to " . TextFormat::WHITE . $plot . TextFormat::GREEN ." Successfully!");
+            $sender->sendMessage(TextFormat::GREEN . "Changed the name of " . TextFormat::WHITE . $plot .
+                                 TextFormat::GREEN . " to " . TextFormat::WHITE . $name);
         } else {
             $sender->sendMessage(TextFormat::RED . "Could not change the name.");
         }
