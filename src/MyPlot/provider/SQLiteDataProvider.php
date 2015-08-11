@@ -78,7 +78,7 @@ class SQLiteDataProvider implements DataProvider
         $stmt->bindValue(":owner", $plot->owner, SQLITE3_TEXT);
         $stmt->bindValue(":helpers", $helpers, SQLITE3_TEXT);
         $stmt->bindValue(":biome", $plot->biome, SQLITE3_TEXT);
-
+        $stmt->reset();
         $result = $this->sqlSavePlot->execute();
         if ($result === false) {
             return false;
@@ -97,7 +97,7 @@ class SQLiteDataProvider implements DataProvider
             $stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
             $stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
         }
-
+        $stmt->reset();
         $result = $stmt->execute();
         if ($result === false) {
             return false;
@@ -110,6 +110,7 @@ class SQLiteDataProvider implements DataProvider
         $this->sqlGetPlot->bindValue(":level", $levelName, SQLITE3_TEXT);
         $this->sqlGetPlot->bindValue(":X", $X, SQLITE3_INTEGER);
         $this->sqlGetPlot->bindValue(":Z", $Z, SQLITE3_INTEGER);
+        $this->sqlGetPlot->reset();
         $result = $this->sqlGetPlot->execute();
         if ($val = $result->fetchArray(SQLITE3_ASSOC)) {
             if ($val["helpers"] === null or $val["helpers"] === "") {
@@ -132,6 +133,7 @@ class SQLiteDataProvider implements DataProvider
         }
         $stmt->bindValue(":owner", $owner, SQLITE3_TEXT);
         $plots = [];
+        $stmt->reset();
         $result = $stmt->execute();
         while ($val = $result->fetchArray(SQLITE3_ASSOC)) {
             $helpers = explode(",", (string)$val["helpers"]);
