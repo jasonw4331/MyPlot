@@ -50,8 +50,10 @@ class SQLiteDataProvider implements DataProvider
         $this->sqlGetExistingXZ = $this->db->prepare(
             "SELECT X, Z FROM plots WHERE (
                 level = :level
-                AND abs(X) >= :min AND abs(X) <= :max
-                AND abs(Z) >= :min AND abs(Z) <= :max
+                AND (
+                    (abs(X) == :number AND abs(Z) <= :number) OR
+                    (abs(Z) == :number AND abs(X) <= :number)
+                )
             )"
         );
     }
@@ -67,10 +69,10 @@ class SQLiteDataProvider implements DataProvider
         //    $stmt = $this->sqlSavePlotById;
         //    $stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
         //} else {
-            $stmt = $this->sqlSavePlot;
-            $stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
-            $stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
-            $stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
+        $stmt = $this->sqlSavePlot;
+        $stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
+        $stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
+        $stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
         //}
         $stmt->bindValue(":name", $plot->name, SQLITE3_TEXT);
         $stmt->bindValue(":owner", $plot->owner, SQLITE3_TEXT);
@@ -113,10 +115,10 @@ class SQLiteDataProvider implements DataProvider
             if ($val["helpers"] === null or $val["helpers"] === "") {
                 $helpers = [];
             } else {
-                $helpers = explode(",", (string) $val["helpers"]);
+                $helpers = explode(",", (string)$val["helpers"]);
             }
-            return new Plot($levelName, $X, $Z, (string) $val["name"], (string) $val["owner"],
-                            $helpers, (string) $val["biome"], (int) $val["id"]);
+            return new Plot($levelName, $X, $Z, (string)$val["name"], (string)$val["owner"],
+                $helpers, (string)$val["biome"], (int)$val["id"]);
         }
         return null;
     }
@@ -132,11 +134,11 @@ class SQLiteDataProvider implements DataProvider
         $plots = [];
         $result = $stmt->execute();
         while ($val = $result->fetchArray(SQLITE3_ASSOC)) {
-            $helpers = explode(",", (string) $val["helpers"]);
-            $plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"],
-                (string) $val["owner"], $helpers, (string) $val["biome"], (int) $val["id"]);
+            $helpers = explode(",", (string)$val["helpers"]);
+            $plots[] = new Plot((string)$val["level"], (int)$val["X"], (int)$val["Z"], (string)$val["name"],
+                (string)$val["owner"], $helpers, (string)$val["biome"], (int)$val["id"]);
         }
-        usort($plots, function($plot1, $plot2) {
+        usort($plots, function ($plot1, $plot2) {
             /** @var Plot $plot1 */
             /** @var Plot $plot2 */
             return strcmp($plot1->levelName, $plot2->levelName);
@@ -146,21 +148,51 @@ class SQLiteDataProvider implements DataProvider
 
     public function getNextFreePlot($levelName, $limitXZ = 20) {
         $this->sqlGetExistingXZ->bindValue(":level", $levelName, SQLITE3_TEXT);
-        for ($i = 1; $i < $limitXZ; $i++) {
-            $this->sqlGetExistingXZ->bindValue(":min", $i - 1, SQLITE3_INTEGER);
-            $this->sqlGetExistingXZ->bindValue(":max", $i, SQLITE3_INTEGER);
+        $i = 0;
+        $this->sqlGetExistingXZ->bindParam(":number", $i, SQLITE3_INTEGER);
+        for (; $i < $limitXZ; $i++) {
+            $this->sqlGetExistingXZ->reset();
             $result = $this->sqlGetExistingXZ->execute();
             $plots = [];
-            while ($val = $result->fetchArray(SQLITE3_ASSOC)) {
-                $plots[$val["X"]][$val["Z"]] = true;
+            while ($val = $result->fetchArray(SQLITE3_NUM)) {
+                $plots[$val[0]][$val[1]] = true;
             }
-            for ($X = -$i; $X <= $i; $X++) {
-                for ($Z = -$i; $Z <= $i; $Z++) {
-                    if (!isset($plots[$X][$Z])) {
-                        return new Plot($levelName, $X, $Z);
-                    }
+            if (count($plots) === max(1, 8 * $i)) {
+                continue;
+            }
+
+            if ($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
+                list($X, $Z) = $ret;
+                return new Plot($levelName, $X, $Z);
+            }
+            for ($a = 1; $a < $i; $a++) {
+                if ($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
+                    list($X, $Z) = $ret;
+                    return new Plot($levelName, $X, $Z);
                 }
             }
+            if ($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
+                list($X, $Z) = $ret;
+                return new Plot($levelName, $X, $Z);
+            }
+        }
+        return null;
+    }
+
+    private static function findEmptyPlotSquared($a, $b, &$plots) {
+        if (!isset($plots[$a][$b])) return array($a, $b);
+        if (!isset($plots[$b][$a])) return array($b, $a);
+        if ($a !== 0) {
+            if (!isset($plots[-$a][$b])) return array(-$a, $b);
+            if (!isset($plots[$b][-$a])) return array($b, -$a);
+        }
+        if ($b !== 0) {
+            if (!isset($plots[-$b][$a])) return array(-$b, $a);
+            if (!isset($plots[$a][-$b])) return array($a, -$b);
+        }
+        if ($a | $b === 0) {
+            if (!isset($plots[-$a][-$b])) return array(-$a, -$b);
+            if (!isset($plots[-$b][-$a])) return array(-$b, -$a);
         }
         return null;
     }
