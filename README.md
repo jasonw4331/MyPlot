@@ -10,8 +10,7 @@ Want to try MyPlot before you install it on your server? Check it out on our dem
 IP: 188.166.9.45</br>
 Port: 19132</br>
 </br>
-</br>
-You can also try out A+Craft MCPE - The official MyPlot server!</br>
+You can also try out A+Craft MCPE</br>
 IP: play.aplus-craft.tk</br>
 Port: 35557</br>
 </br>
