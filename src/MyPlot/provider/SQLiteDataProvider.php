@@ -37,7 +37,7 @@ class SQLiteDataProvider implements DataProvider
              :level, :X, :Z, :name, :owner, :helpers, :biome);"
         );
         $this->sqlSavePlotById = $this->db->prepare(
-            "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, name = :name, biome = :biome WHERE id = :id"
+            "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, biome = :biome WHERE id = :id"
         );
         $this->sqlRemovePlot = $this->db->prepare(
             "DELETE FROM plots WHERE level = :level AND X = :X AND Z = :Z"
@@ -64,22 +64,21 @@ class SQLiteDataProvider implements DataProvider
 
     public function savePlot(Plot $plot) {
         $helpers = implode(",", $plot->helpers);
-        // Need to be fixed
-        //if ($plot->id >= 0) {
-        //    $stmt = $this->sqlSavePlotById;
-        //    $stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
-        //} else {
-        $stmt = $this->sqlSavePlot;
-        $stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
-        $stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
-        $stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
-        //}
+        if ($plot->id >= 0) {
+            $stmt = $this->sqlSavePlotById;
+            $stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
+        } else {
+            $stmt = $this->sqlSavePlot;
+            $stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
+            $stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
+            $stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
+        }
         $stmt->bindValue(":name", $plot->name, SQLITE3_TEXT);
         $stmt->bindValue(":owner", $plot->owner, SQLITE3_TEXT);
         $stmt->bindValue(":helpers", $helpers, SQLITE3_TEXT);
         $stmt->bindValue(":biome", $plot->biome, SQLITE3_TEXT);
         $stmt->reset();
-        $result = $this->sqlSavePlot->execute();
+        $result = $stmt->execute();
         if ($result === false) {
             return false;
         } else {
