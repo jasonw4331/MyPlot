@@ -44,7 +44,6 @@ class MyPlot extends PluginBase implements Listener
         return self::$instance;
     }
 
-
     /**
      * Returns the DataProvider that is being used
      *
@@ -109,6 +108,41 @@ class MyPlot extends PluginBase implements Listener
             "preset" => json_encode($settings)
         ];
         return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $settings);
+    }
+
+    /**
+     * Saves provided plot if changed
+     *
+     * @api
+     * @param Plot $plot
+     * @return bool
+     */
+    public function savePlot(Plot $plot) {
+        return $this->dataProvider->savePlot($plot);
+    }
+
+    /**
+     * Get all the plots a player owns (in a certain level if $levelName is provided)
+     *
+     * @api
+     * @param string $username
+     * @param string $levelName
+     * @return Plot[]
+     */
+    public function getPlotsOfPlayer($username, $levelName = "") {
+        return $this->dataProvider->getPlotsByOwner($username, $levelName);
+    }
+
+    /**
+     * Get the next free plot in a level
+     *
+     * @api
+     * @param string $levelName
+     * @param int $limitXZ
+     * @return Plot|null
+     */
+    public function getNextFreePlot($levelName, $limitXZ = 20) {
+        return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
     }
 
     /**
