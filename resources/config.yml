@@ -23,6 +23,7 @@ DataProvider: 'sqlite'
 #The data provider where plot data is stored. Do not mess with this if you do not know how it works.
 UseEconomy: false 
 #Use an economy plugin to add prices to things like claiming (Below)
+PlotCacheSize: 100
 
 DefaultWorld:
   MaxPlotsPerPlayer: 5 

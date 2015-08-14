@@ -6,10 +6,8 @@ use MyPlot\Plot;
 use SQLite3;
 use SQLite3Stmt;
 
-class SQLiteDataProvider implements DataProvider
+class SQLiteDataProvider extends DataProvider
 {
-    private $plugin;
-
     /** @var SQLite3 */
     private $db;
 
@@ -18,15 +16,15 @@ class SQLiteDataProvider implements DataProvider
             $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
             $sqlGetExistingXZ;
 
-    public function __construct(MyPlot $plugin) {
-        $this->plugin = $plugin;
-        $this->db = new SQLite3($plugin->getDataFolder() . "plots.db");
+    public function __construct(MyPlot $plugin, $cacheSize = 0) {
+        parent::__construct($plugin, $cacheSize);
+
+        $this->db = new SQLite3($this->plugin->getDataFolder() . "plots.db");
         $this->db->exec(
             "CREATE TABLE IF NOT EXISTS plots
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
              owner TEXT, helpers TEXT, biome TEXT)"
         );
-        //$this->db->exec("CREATE TABLE IF NOT EXISTS comments (plotID INT, player TEXT, comment TEXT)");
 
         $this->sqlGetPlot = $this->db->prepare(
             "SELECT id, name, owner, helpers, biome FROM plots WHERE level = :level AND X = :X AND Z = :Z"
@@ -81,9 +79,9 @@ class SQLiteDataProvider implements DataProvider
         $result = $stmt->execute();
         if ($result === false) {
             return false;
-        } else {
-            return true;
         }
+        $this->cachePlot($plot);
+        return true;
     }
 
     public function deletePlot(Plot $plot) {
@@ -100,12 +98,16 @@ class SQLiteDataProvider implements DataProvider
         $result = $stmt->execute();
         if ($result === false) {
             return false;
-        } else {
-            return true;
         }
+        $plot = new Plot($plot->levelName, $plot->X, $plot->Z);
+        $this->cachePlot($plot);
+        return true;
     }
 
     public function getPlot($levelName, $X, $Z) {
+        if ($plot = $this->getPlotFromCache($levelName, $X, $Z)) {
+            return $plot;
+        }
         $this->sqlGetPlot->bindValue(":level", $levelName, SQLITE3_TEXT);
         $this->sqlGetPlot->bindValue(":X", $X, SQLITE3_INTEGER);
         $this->sqlGetPlot->bindValue(":Z", $Z, SQLITE3_INTEGER);
@@ -117,10 +119,13 @@ class SQLiteDataProvider implements DataProvider
             } else {
                 $helpers = explode(",", (string)$val["helpers"]);
             }
-            return new Plot($levelName, $X, $Z, (string)$val["name"], (string)$val["owner"],
+            $plot = new Plot($levelName, $X, $Z, (string)$val["name"], (string)$val["owner"],
                 $helpers, (string)$val["biome"], (int)$val["id"]);
+        } else {
+            $plot = new Plot($levelName, $X, $Z);
         }
-        return null;
+        $this->cachePlot($plot);
+        return $plot;
     }
 
     public function getPlotsByOwner($owner, $levelName = "") {
@@ -164,17 +169,23 @@ class SQLiteDataProvider implements DataProvider
 
             if ($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
                 list($X, $Z) = $ret;
-                return new Plot($levelName, $X, $Z);
+                $plot = new Plot($levelName, $X, $Z);
+                $this->cachePlot($plot);
+                return $plot;
             }
             for ($a = 1; $a < $i; $a++) {
                 if ($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
                     list($X, $Z) = $ret;
-                    return new Plot($levelName, $X, $Z);
+                    $plot = new Plot($levelName, $X, $Z);
+                    $this->cachePlot($plot);
+                    return $plot;
                 }
             }
             if ($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
                 list($X, $Z) = $ret;
-                return new Plot($levelName, $X, $Z);
+                $plot = new Plot($levelName, $X, $Z);
+                $this->cachePlot($plot);
+                return $plot;
             }
         }
         return null;

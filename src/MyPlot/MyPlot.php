@@ -186,11 +186,7 @@ class MyPlot extends PluginBase implements Listener
             return null;
         }
 
-        $plot = $this->dataProvider->getPlot($levelName, $X, $Z);
-        if ($plot === null) {
-            $plot = new Plot($levelName, $X, $Z);
-        }
-        return $plot;
+        return $this->dataProvider->getPlot($levelName, $X, $Z);
     }
 
     /**
@@ -361,10 +357,11 @@ class MyPlot extends PluginBase implements Listener
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
 
+        $cacheSize = $this->getConfig()->get("PlotCacheSize");
         switch (strtolower($this->getConfig()->get("DataProvider"))) {
             case "sqlite":
             default:
-                $this->dataProvider = new SQLiteDataProvider($this);
+                $this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
                 break;
         }
 
