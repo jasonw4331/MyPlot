@@ -47,11 +47,11 @@ class MyPlotGenerator extends Generator
 
         $this->settings = [];
         $this->settings["preset"] = json_encode([
-            "RoadBlock" => $this->roadBlock->getId() . (($meta = $this->roadBlock->getDamage()) ? '' : ':'.$meta),
-            "WallBlock" => $this->wallBlock->getId() . (($meta = $this->wallBlock->getDamage()) ? '' : ':'.$meta),
-            "PlotFloorBlock" => $this->plotFloorBlock->getId() . (($meta = $this->plotFloorBlock->getDamage()) ? '' : ':'.$meta),
-            "PlotFillBlock" => $this->plotFillBlock->getId() . (($meta =$this->plotFillBlock->getDamage()) ? '' : ':'.$meta),
-            "BottomBlock" => $this->bottomBlock->getId() . (($meta = $this->bottomBlock->getDamage()) ? '' : ':'.$meta),
+            "RoadBlock" => $this->roadBlock->getId() . (($meta = $this->roadBlock->getDamage()) === 0 ? '' : ':'.$meta),
+            "WallBlock" => $this->wallBlock->getId() . (($meta = $this->wallBlock->getDamage()) === 0 ? '' : ':'.$meta),
+            "PlotFloorBlock" => $this->plotFloorBlock->getId() . (($meta = $this->plotFloorBlock->getDamage()) === 0 ? '' : ':'.$meta),
+            "PlotFillBlock" => $this->plotFillBlock->getId() . (($meta =$this->plotFillBlock->getDamage()) === 0 ? '' : ':'.$meta),
+            "BottomBlock" => $this->bottomBlock->getId() . (($meta = $this->bottomBlock->getDamage()) === 0 ? '' : ':'.$meta),
             "RoadWidth" => $this->roadWidth,
             "PlotSize" => $this->plotSize,
             "GroundHeight" => $this->groundHeight,
