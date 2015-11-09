@@ -1,0 +1,12 @@
+language: "en"
+
+# Messages for commands
+
+#Add helper
+
+addhelper-usage: "/p addhelper <playername>"
+addhelper-notinplot: "You are not standing inside a plot"
+addhelper-notowner: "You are not the owner of this plot"
+addhelper-alreadyone: " is already a helper of this plot"
+addhelper-success: " is now a helper of this plot"
+addhelper-error: "Could not add helper"
