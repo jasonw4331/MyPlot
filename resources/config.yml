@@ -17,38 +17,51 @@
 #    |__|                                                     |__|    
 #                                                                     
 #
-MaxPlotsPerPlayer: 5 
-#The maximum amount of plots one can have
-DataProvider: 'sqlite' 
-#The data provider where plot data is stored. Do not mess with this if you do not know how it works.
-UseEconomy: false 
-#Use an economy plugin to add prices to things like claiming (Below)
+
+# The maximum amount of plots one can have globally.
+MaxPlotsPerPlayer: 5
+
+# The data provider where plot data is stored.
+# There is currently only one data provider: sqlite.
+DataProvider: 'sqlite'
+
+# Use an economy plugin to add prices to things like claiming.
+UseEconomy: false
+
+# Amount of plots to be cached.
+# Increasing this number might improve performance, but also increase memory usage.
 PlotCacheSize: 100
 
+
+# These settings will be used when creating a new world.
 DefaultWorld:
-  MaxPlotsPerPlayer: 5 
-  #The maximum amount of plots that one can own
-  ClaimPrice: 0 
-  #How much it costs to claim a plot (Economy must be set to 'true')
-  ClearPrice: 0 
-  #How much it costs to clear a plot (Economy must be set to 'true')
-  DisposePrice: 0 
-  #How much it costs to dispose a plot (Economy must be set to 'true')
-  ResetPrice: 0 
-  #How much it costs to reset a plot (Economy must be set to 'true)
-  RoadBlock: '5' 
-  #The block that the road is made of (Default is Oak Planks)
-  RoadWidth: 7
-  #The width of the road
-  WallBlock: '44'
-  #The block that plot walls are made of (Default is Stone Slabs)
-  PlotFloorBlock: '2'
-  #The block used as the plot floor (Default is Grass)
-  PlotFillBlock: '3'
-  #The block that fills the rest of the plot (Default is Dirt)
+
+  # The maximum amount of plots that one have in this world.
+  MaxPlotsPerPlayer: 2
+
+  # How much it costs to claim a plot (Economy must be set to 'true')
+  ClaimPrice: 50
+  # How much it costs to clear a plot (Economy must be set to 'true')
+  ClearPrice: 0
+  # How much it costs to dispose a plot (Economy must be set to 'true')
+  DisposePrice: -50
+  # How much it costs to reset a plot (Economy must be set to 'true')
+  ResetPrice: -50
+
+  # The size of a plot
   PlotSize: 22
-  #How large a plot is
+  # The height of a plot
   GroundHeight: 64
-  #How high a plot is
+  # The width of the road
+  RoadWidth: 7
+
+  # The block that the road is made of (Default is Oak Planks)
+  RoadBlock: '5'
+  # The block that plot walls are made of (Default is Stone Slabs)
+  WallBlock: '44'
+  # The block used as the plot floor (Default is Grass)
+  PlotFloorBlock: '2'
+  # The block that fills the rest of the plot (Default is Dirt)
+  PlotFillBlock: '3'
+  # The block at the bottom (Default is Bedrock)
   BottomBlock: '7'
-  #The block at the way bottom (Default is Bedrock)
