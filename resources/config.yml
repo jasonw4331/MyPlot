@@ -18,6 +18,14 @@
 #                                                                     
 #
 
+####################################################################
+
+
+# The language that should be used in MyPlot
+# Available languages: en
+# !== LANGUAGE SYSTEM UNFINISHED. THIS OPTION WILL NOT WORK, AS OF NOW. ==!
+language: en
+
 # The maximum amount of plots one can have globally.
 MaxPlotsPerPlayer: 5
 
@@ -25,7 +33,10 @@ MaxPlotsPerPlayer: 5
 # There is currently only one data provider: sqlite.
 DataProvider: 'sqlite'
 
-# Use an economy plugin to add prices to things like claiming.
+# Use an economy with MyPlot. This will allow for plot pricing such as claiming, clearing, etc.
+# Currently supported economy plugins: Economy$, PocketMoney
+# MyPlot will use any economy plugin found on the server.
+# Be sure not to use more than 1 economy plugin!
 UseEconomy: false
 
 # Amount of plots to be cached.
