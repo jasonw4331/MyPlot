@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\subcommand;
 
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -24,7 +25,7 @@ class AddHelperSubCommand extends SubCommand
     }
 
     public function getAliases() {
-        return [$this->plugin->getMessage("messages.addhelper-alias")];
+        return ["$this->plugin->getMessage("messages.addhelper-alias")"];
     }
 
     public function execute(CommandSender $sender, array $args) {
