@@ -254,6 +254,11 @@ class MyPlot extends PluginBase implements Listener
         return true;
     }
 
+    public function getMessage($node, ...$vars)
+    {
+        return $this->msgs->getMessage($node, ...$vars);
+    }
+
     /**
      * Delete the plot data
      *
