@@ -20,11 +20,11 @@ class AddHelperSubCommand extends SubCommand
     }
 
     public function getDescription() {
-        return "Add a helper to your plot";
+        return $this->plugin->getMessage("messages.addhelper-desc");
     }
 
     public function getAliases() {
-        return ["addh"];
+        return [$this->plugin->getMessage("messages.addhelper-alias")];
     }
 
     public function execute(CommandSender $sender, array $args) {
@@ -35,21 +35,21 @@ class AddHelperSubCommand extends SubCommand
         $player = $sender->getServer()->getPlayer($sender->getName());
         $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
-            $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
+            $sender->sendMessage(TextFormat::RED . $this->plugin->getMessage("messages.addhelper-notinplot"));
             return true;
         }
         if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.addhelper")) {
-            $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
+            $sender->sendMessage(TextFormat::RED . $this->plugin->getMessage("messages.addhelper-notowner"));
             return true;
         }
         if (!$plot->addHelper($helper)) {
-            $sender->sendMessage($helper . " was already a helper of this plot");
+            $sender->sendMessage($helper . $this->plugin->getMessage("messages.addhelper-alreadyone"));
             return true;
         }
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
-            $sender->sendMessage(TextFormat::GREEN . $helper . " is now a helper of this plot");
+            $sender->sendMessage(TextFormat::GREEN . $helper . $this->plugin->getMessage("messages.addhelper-success"));
         } else {
-            $sender->sendMessage(TextFormat::RED . "Helper could not be added");
+            $sender->sendMessage(TextFormat::RED . $this->plugin->getMessage("messages.addhelper-error"));
         }
         return true;
     }
