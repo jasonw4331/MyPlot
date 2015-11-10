@@ -35,6 +35,9 @@ class MyPlot extends PluginBase implements Listener
     private $dataProvider;
     /** @var EconomyProvider */
     private $economyProvider;
+    private $msgs;
+
+    $this->msgs = new LangMsgs($this)
 
     /**
      * @api
