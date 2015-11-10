@@ -3,19 +3,21 @@ MyPlot
 
 **Create, manage, and build in protected plots! Keep your builds safe from griefers!**
 
-Have you ever seen those PC servers with the PlotMe plugin, and you thought "hey, why can't i have plots in my Pocketmine server?" Well, now you can with **MyPlot** for Pocketmine-MP!
+Have you ever seen those PC servers with the PlotMe plugin, and you thought "hey, why can't i have plots in my Pocketmine server?" Well, now you can with **MyPlot** for Pocketmine-MP! Easy to set up, and simple to use!
 </br>
 </br>
-Want to try MyPlot before you install it on your server? Check it out:
+Want to try MyPlot before you install it on your server? Check it out these awesome servers that use the plot system:
 
-A+Craft MCPE</br>
+</br>
+A+Craft MCPE (Official MyPlot Server)</br>
 IP: play.aplus-craft.tk</br>
 Port: 35557</br>
 </br>
 </br>
+</br>
 MinePocket</br>
 plots.Minepocket.com:19162</br>
-http://MinePocket.com</br>
+http://minepocket.com</br>
 </br>
 </br>
 </br>
@@ -37,4 +39,10 @@ Command | Usage | Permissions |
 /p dispose|Dispose the plot you are standing on|myplot.command.dispose
 /p reset|Clear and dispose the plot you are standing on|myplot.command.reset
 /p home [number]|Teleport to one of your plots|myplot.command.home
-/p name \<name\>|Change the name of your plot|myplot.command.name (OP)
+/p name \<name\>|Change the name of your plot|myplot.command.name
+
+
+**Plugin created by Wiez and Exxarion**
+
+
+Want to help create language resource packs? Well, you can! If you know a language that is not created yet, you can create a new language pack by opening a pull request!
