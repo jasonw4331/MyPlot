@@ -1,7 +1,6 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -21,11 +20,11 @@ class AddHelperSubCommand extends SubCommand
     }
 
     public function getDescription() {
-        return $this->plugin->getMessage("messages.addhelper-desc");
+        return "Add a helper to your plot";
     }
 
     public function getAliases() {
-        return ["$this->plugin->getMessage("messages.addhelper-alias")"];
+        return ["addh"];
     }
 
     public function execute(CommandSender $sender, array $args) {
@@ -36,21 +35,21 @@ class AddHelperSubCommand extends SubCommand
         $player = $sender->getServer()->getPlayer($sender->getName());
         $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
-            $sender->sendMessage(TextFormat::RED . $this->plugin->getMessage("messages.addhelper-notinplot"));
+            $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
             return true;
         }
         if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.addhelper")) {
-            $sender->sendMessage(TextFormat::RED . $this->plugin->getMessage("messages.addhelper-notowner"));
+            $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
             return true;
         }
         if (!$plot->addHelper($helper)) {
-            $sender->sendMessage($helper . $this->plugin->getMessage("messages.addhelper-alreadyone"));
+            $sender->sendMessage($helper . " was already a helper of this plot");
             return true;
         }
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
-            $sender->sendMessage(TextFormat::GREEN . $helper . $this->plugin->getMessage("messages.addhelper-success"));
+            $sender->sendMessage(TextFormat::GREEN . $helper . " is now a helper of this plot");
         } else {
-            $sender->sendMessage(TextFormat::RED . $this->plugin->getMessage("messages.addhelper-error"));
+            $sender->sendMessage(TextFormat::RED . "Helper could not be added");
         }
         return true;
     }
