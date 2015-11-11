@@ -29,15 +29,22 @@ class MyPlot extends PluginBase implements Listener
 {
     /** @var MyPlot */
     private static $instance;
+
     /** @var PlotLevelSettings[] */
     private $levels = [];
+
     /** @var DataProvider */
     private $dataProvider;
+
     /** @var EconomyProvider */
     private $economyProvider;
+
     private $msgs;
 
-    $this->msgs = new LangMsgs($this);
+
+    public function onLoad() {
+    	   $this->msgs = new LangMsgs($this);
+    }
 
     /**
      * @api
@@ -254,9 +261,9 @@ class MyPlot extends PluginBase implements Listener
         return true;
     }
 
-    public function getMessage($node, ...$vars)
+    public function getMessage($node, $vars)
     {
-        return $this->msgs->getMessage($node, ...$vars);
+        return $this->msgs->getMessage($node, $vars);
     }
 
     /**
@@ -402,5 +409,19 @@ class MyPlot extends PluginBase implements Listener
         $this->dataProvider->close();
         $this->getLogger()->info(TextFormat::GREEN."Saving plots");
         $this->getLogger()->info(TextFormat::BLUE."Disabled the plot framework!");
+    }
+
+ public function getConfigValue($key)
+    {
+        $value = $this->getConfig()->getNested($key);
+
+        if($value === null)
+        {
+            $this->getLogger()->warning($this->getMessage("Something went wrong with MyPlot config fetching...", $key));
+
+            return null;
+        }
+
+        return $value;
     }
 }
