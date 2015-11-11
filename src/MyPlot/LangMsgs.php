@@ -8,7 +8,7 @@ class LangMsgs
 {
 
     private $language, $msgs;
-    private $lnglst [];
+    private $lnglst = [];
     
     public function __construct(MyPlot $plugin)
     {
@@ -31,7 +31,7 @@ class LangMsgs
         $this->lngList = $result;
     }
 
-    public function getMessage($node, ...$vars)
+    public function getMessage($node, $vars)
     {
         $msg = $this->msgs->getNested($node);
         
@@ -53,9 +53,9 @@ class LangMsgs
     }
 
 
-    public function loadMessages()
+    public function loadMsgs()
     {       
-        $defaultRes = "en"
+        $defaultRes = $this->plugin->getConfigValue("language");
         
         foreach($this->lngList as $resName)
         {
