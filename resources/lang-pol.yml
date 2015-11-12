@@ -1,0 +1,128 @@
+language: "pol"
+
+#Polski zestaw wiadomości (pol) wykonany przez Jelly9912
+
+#############################
+
+# Wiadomości dla komend
+
+#############################
+
+messages:
+   # Dodanie współwłaściciela
+   
+   addhelper-desc: "Dodanie współwłaściciela do działki"
+   addhelper-alias: addh
+   addhelper-usage: "/p addhelper <gracz>"
+   addhelper-notinplot: "Musisz stanąć na swojej działce"
+   addhelper-notowner: "Nie jesteś właścicielem tej działki"
+   addhelper-alreadyone: " jest już współwłaścicielem"
+   addhelper-success: " jest teraz współwłaścicielem"
+   addhelper-error: "Błąd podczas przetwarzania komendy"
+
+   # Usunięcie współwłaściciela
+
+   removehelper-desc: "Usunięcie współwłaściciela z działki"
+   removehelper-alias: delh
+   removehelper-notinplot: "Musisz stanąć na swojej działce"
+   removehelper-notowner: "Nie jesteś właścicielem tej działki"
+   removehelper-notone: " nie jest współwłaścicielem"
+   removehelper-success: " został usunięty z działki"
+   removehelper-error: "Błąd podczas przetwarzania komendy"
+
+   # Zabezpieczenie działki
+
+   claim-desc: "Zabezpieczenie działki"
+   claim-alias: c
+   claim-notinplot: "Musisz stanąć na działce"
+   claim-notowner: "Nie jesteś właścicielem tej działki"
+   claim-already: "Ta działka należy do: "
+   claim-max: "Przekroczyłeś ilość działek: "
+   claim-money: "Nie masz tyle pieniędzy"
+   claim-success: "Działka zabezpieczona"
+   claim-error: "Błąd podczas przetwarzania komendy"
+
+   # Teleportacja do wolnej działki
+
+   auto-desc: "Teleportacja do wolnej działki"
+   auto-alias: a
+   auto-notinworld: "Nie jesteś na świecie z działkami"
+   auto-success: "Teleportowano do działki numer:  "
+   auto-error: "Brak działek"
+
+   # Opuszczenie działki
+
+   dispose-desc: "Opuszczenie działki, na której stoisz"
+   dispose-alias: d
+   dispose-notinplot: "Musisz stanąć na swojej działce"
+   dispose-notowner: "Nie jesteś właścicielem tej działki"
+   dispose-money: "Nie masz tyle pieniędzy"
+   dispose-success: "Opuszczono działkę"
+   dispose-error: "Błąd podczas przerwarzania komendy"
+
+   # Opuszczenie i wyczyszczenie działki (reset)
+
+   reset-desc: "Opuszczenie i wyczyszczenie działki"
+   reset-alias: r
+   reset-notinplot: "Musisz stanąć na swojej działce"
+   reset-notowner: "Nie jesteś właścicielem tej działki"
+   reset-money: "Nie masz tyle pieniędzy"
+   reset-success: "Działka zresetowana"
+   reset-error: "Błąd podczas przerwarzania komendy"
+
+   # Czyszczenie
+
+   clear-desc: "Wyczyszczenie działki"
+   clear-alias: cl
+   clear-notinplot: "Musisz stanąć na swojej działce"
+   clear-notowner: "Nie jesteś właścicielem tej działki"
+   clear-money: "Nie masz tyle pieniędzy"
+   clear-success: "Działka wyczyszczona"
+   clear-error: "Błąd podczas przerwarzania komendy"
+
+   # Biom
+
+   biome-desc: "Zmiana biomu na działce"
+   biome-alias: a
+   biome-notinplot: "Musisz stanąć na swojej działce"
+   biome-notowner: "Nie jesteś właścicielem tej działki"
+   biome-success: "Biom zmieniony"
+   biome-invalid: "Taki biom nie istnieje"
+   biome-possible: "Lista biomów: "
+   biome-error: "Błąd podczas przerwarzania komendy"
+
+   # Nazwa
+
+   name-desc: "Zmiana nazwy działki"
+   name-alias: n
+   name-notinplot: "Musisz stanąć na swojej działce"
+   name-notowner: "Nie jesteś właścicielem tej działki"
+   name-success: "Zmieniono nazwę na: "
+   name-error: "Błąd podczas przerwarzania komendy"
+
+   # Powrót do działki
+
+   home-desc: "Teleportacja na działkę"
+   home-alias: h
+   home-noplots: "Nie posiadasz żadnych działek"
+   home-notexist: "Nie masz działki o numerze: "
+   home-success: "Teleportowanie do działki: "
+   home-error: "Błąd podczas przerwarzania komendy"
+
+   # Info
+
+   info-desc: "Informacje dotyczące działki"
+   info-alias: i
+   info-notinplot: "Musisz stanąć na działce"
+   info-about: "Informacje: "
+   info-name: "Nazwa działki: "
+   info-owner: "Właściciel: "
+   info-helpers: "Wspówłaściciel: "
+   info-biome: "Biom działki: "
+
+   # Lista
+
+   list-desc: "Lista Twoich działek"
+   list-alias: l
+   list-noplots: "Nie posiadasz żadnych działek"
+   list-plots: "Twoje działki: "
