@@ -1,0 +1,128 @@
+language: "it"
+
+#Italian language pack created by AryToNeX
+#Follow him on Twitter: @AryToNeX :D
+
+#############################
+
+# Messages for commands
+
+#############################
+
+messages:
+   # Add helper
+   addhelper-desc: "Aggiungi un aiutante in un lotto"
+   addhelper-alias: addh
+   addhelper-usage: "/p addhelper <nome giocatore>"
+   addhelper-notinplot: "Non sei dentro un lotto"
+   addhelper-notowner: "Non sei il proprietario di questo lotto"
+   addhelper-alreadyone: " e già un aiutante di questo lotto"
+   addhelper-success: " è adesso un aiutante di questo lotto"
+   addhelper-error: "Impossibile aggiungere un aiutante"
+
+   # Remove Helper
+
+   removehelper-desc: "Rimuovi un aiutante da un lotto"
+   removehelper-alias: delh
+   removehelper-notinplot: "Non sei dentro un lotto"
+   removehelper-notowner: "Non sei il proprietario di questo lotto"
+   removehelper-notone: " non è un aiutante di questo lotto"
+   removehelper-success: " è stato rimosso dagli aiutanti di questo lotto"
+   removehelper-error: "Impossibile rimuovere un aiutante"
+
+   # Claim
+
+   claim-desc: "Prendi proprietà del lotto su cui sei sopra"
+   claim-alias: c
+   claim-notinplot: "Non sei dentro un lotto"
+   claim-notowner: "Non sei il proprietario di questo lotto"
+   claim-already: "Questo lotto è già stato preso da "
+   claim-max: "Hai già raggiunto il numero massimo di lotti che puoi avere"
+   claim-money: "Non hai abbastanza soldi per comprare questo lotto"
+   claim-success: "Lotto privatizzato"
+   claim-error: "Impossibile privatizzare il lotto"
+
+   # Auto
+
+   auto-desc: "Teletrasporta nel prossimo lotto libero"
+   auto-alias: a
+   auto-notinworld: "Non sei in un mondo lotti"
+   auto-success: "Teletrasportato a "
+   auto-error: "Non sono disponibili lotti aperti qui"
+
+   # Dispose
+
+   dispose-desc: "Dispone il tuo lotto; ciò lo rende privatizzabile da altri"
+   dispose-alias: d
+   dispose-notinplot: "Non sei dentro un lotto"
+   dispose-notowner: "Non sei il proprietario di questo lotto"
+   dispose-money: "Non hai abbastanza soldi per disporre questo lotto"
+   dispose-success: "Lotto disposto"
+   dispose-error: "Impossibile disporre il lotto"
+
+   # Reset
+
+   reset-desc: "Pulisce e dispone il tuo lotto"
+   reset-alias: r
+   reset-notinplot: "Non sei dentro un lotto"
+   reset-notowner: "Non sei il proprietario di questo lotto"
+   reset-money: "Non hai abbastanza soldi per resettare questo lotto"
+   reset-success: "Lotto resettato"
+   reset-error: "Impossibile resettare il lotto"
+
+   # Clear
+
+   clear-desc: "Pulisce il tuo lotto"
+   clear-alias: cl
+   clear-notinplot: "Non sei dentro un lotto"
+   clear-notowner: "Non sei il proprietario di questo lotto"
+   clear-money: "Non hai abbastanza soldi per pulire il lotto"
+   clear-success: "Lotto pulito"
+   clear-error: "Impossibile pulire il lotto"
+
+   # Biome
+
+   biome-desc: "Cambia il bioma del lotto"
+   biome-alias: a
+   biome-notinplot: "Non sei dentro un lotto"
+   biome-notowner: "Non sei il proprietario di questo lotto"
+   biome-success: "Bioma del lotto cambiato"
+   biome-invalid: "Quel bioma non esiste"
+   biome-possible: "I possibili biomi sono: "
+   biome-error: "Impossibile cambiare il bioma del lotto"
+
+   # Name
+
+   name-desc: "Imposta o cambia il nome del lotto"
+   name-alias: n
+   name-notinplot: "Non sei dentro un lotto"
+   name-notowner: "Non sei il proprietario di questo lotto"
+   name-success: "Il nome del lotto è stato cambiato in "
+   name-error: "Impossibile cambiare il nome del lotto"
+
+   # Home
+
+   home-desc: "Vai al tuo lotto"
+   home-alias: h
+   home-noplots: "Non possiedi alcun lotto"
+   home-notexist: "Non possiedi alcun lotto con numero "
+   home-success: "Teletrasportato al tuo lotto "
+   home-error: "Impossibile teletrasportarti nel tuo lotto"
+
+   # Info
+
+   info-desc: "Mostra informazioni su un lotto"
+   info-alias: i
+   info-notinplot: "Non sei dentro un lotto"
+   info-about: "Info su "
+   info-name: "Nome: "
+   info-owner: "Proprietario: "
+   info-helpers: "Aiutanti: "
+   info-biome: "Bioma: "
+
+   # List
+
+   list-desc: "Lista i tuoi lotti"
+   list-alias: l
+   list-noplots: "Non possiedi alcun lotto"
+   list-plots: "Lotti che possiedi"
