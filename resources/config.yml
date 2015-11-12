@@ -22,7 +22,11 @@
 
 
 # The language that should be used in MyPlot
-# Available languages: en
+# Available languages: en, pol
+#
+# English language pack by @Exxarion
+# Polish language pack by @Jelly9912
+#
 # !== LANGUAGE SYSTEM UNFINISHED. THIS OPTION WILL NOT WORK, AS OF NOW. ==!
 language: en
 
