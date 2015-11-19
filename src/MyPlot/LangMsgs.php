@@ -5,6 +5,8 @@ namespace MyPlot;
 use pocketmine\utils\Config;                                                    
 
 class LangMsgs
+
+#File originally created by #664400 for PurePerms. Full credit given to the original creator. This file may be temporary until we can create a new language system.
 {
 
     private $language, $msgs;
