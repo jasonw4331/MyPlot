@@ -14,20 +14,20 @@ messages:
    addhelper-alias: addh
    addhelper-usage: "/p addhelper <playername>"
    addhelper-notinplot: "Bạn đang không đứng trong plot"
-   addhelper-notowner: "Bạn không phải chủ của plot này"
-   addhelper-alreadyone: " đang là helper của plot này rồi"
+   addhelper-notowner: "Bạn không phải là chủ của plot này"
+   addhelper-alreadyone: " hiện đã là helper của plot này rồi"
    addhelper-success: " đã trở thành helper của plot"
-   addhelper-error: "Không thể add helper"
+   addhelper-error: "Không thể thêm helper"
 
    # Remove Helper
 
-   removehelper-desc: "Đuổi player ra khỏi plot"
+   removehelper-desc: "Đuổi người chơi ra khỏi plot"
    removehelper-alias: delh
    removehelper-notinplot: "Bạn đang không đứng trong plot"
    removehelper-notowner: "Bạn không phải là chủ của plot này"
    removehelper-notone: " không phải là helper của plot"
    removehelper-success: " không còn là helper của plot"
-   removehelper-error: "Không để xoá helper"
+   removehelper-error: "Không thể xoá helper"
 
    # Claim
 
@@ -51,7 +51,7 @@ messages:
 
    # Dispose
 
-   dispose-desc: "Từ bỏ plot của bạn để người khác có thể mua"
+   dispose-desc: "Bỏ plot của bạn để người khác có thể mua"
    dispose-alias: d
    dispose-notinplot: "Bạn đang không đứng trong plot"
    dispose-notowner: "Bạn không phải chủ của plot này"
@@ -85,8 +85,8 @@ messages:
    biome-alias: a
    biome-notinplot: "Bạn đang không đứng ở trong plot"
    biome-notowner: "Bạn không phải chủ của plot này"
-   biome-success: "Plot đã được thay đổi hệ sinh thái"
-   biome-invalid: "Không có hệ sinh thái đấy"
+   biome-success: "Plot đã thay đổi hệ sinh thái thành công"
+   biome-invalid: "Không có hệ sinh thái đó"
    biome-possible: "Những hệ sinh thái đang có:  "
    biome-error: "Không thể thay đổi hệ sinh thái"
 
