@@ -1,7 +1,6 @@
 MyPlot
 ======
 
-[![Join the chat at https://gitter.im/wiez/MyPlot](https://badges.gitter.im/wiez/MyPlot.svg)](https://gitter.im/wiez/MyPlot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 **Create, manage, and build in protected plots! Keep your builds safe from griefers!**
 
@@ -42,9 +41,13 @@ Command | Usage | Permissions |
 /p reset|Clear and dispose the plot you are standing on|myplot.command.reset
 /p home [number]|Teleport to one of your plots|myplot.command.home
 /p name \<name\>|Change the name of your plot|myplot.command.name
+/p give \<name\>|Gives your plot to another person|myplot.command.give
 
 
 **Plugin created by Wiez and Exxarion**
 
 
-Want to help create language resource packs? Well, you can! If you know a language that is not created yet, you can create a new language pack by opening a pull request!
+Want to help create language resource packs? Well, you can! If you know a language that is not created yet, you can create a new language pack by opening a pull request! If the language you know is already created, you can help improve it by editing it!
+
+
+[![Join the chat at https://gitter.im/wiez/MyPlot](https://badges.gitter.im/wiez/MyPlot.svg)](https://gitter.im/wiez/MyPlot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
