@@ -28,6 +28,16 @@ class HomeSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("home.notexist", [$plotNumber]));
             return true;
         }
+        
+        usort($plots, function ($plot1, $plot2) {
+            /** @var $plot1 Plot */
+            /** @var $plot2 Plot */
+            if ($plot1->levelName == $plot2->levelName) {
+                return 0;
+            }
+            return ($plot1->levelName < $plot2->levelName) ? -1 : 1;
+        });
+        
         $player = $this->getPlugin()->getServer()->getPlayer($sender->getName());
         $plot = $plots[$plotNumber - 1];
         if ($this->getPlugin()->teleportPlayerToPlot($player, $plot)) {
