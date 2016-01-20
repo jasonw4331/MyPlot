@@ -54,7 +54,7 @@ permissions:
       myplot.command.name:
         description: Gives the name command
         default: true
-      myplot.command.give
+      myplot.command.give:
         description: Gives the give command
         default: true
   myplot.admin:
