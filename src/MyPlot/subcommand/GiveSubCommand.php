@@ -26,19 +26,23 @@ class GiveSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
-        if ($args[1] !instanceof Player) {
+
+        $newOwner = $this->getPlugin()->getServer()->getPlayer($args[1]);
+        if (!($newOwner instanceof Player)) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("give.notonline"));
             return true;
         }
-        
-        $maxPlots = $this->getPlugin()->getConfig()->get("MaxPlotsPerPlayer");
-        $plotsOfPlayer = $this->getPlugin()->getProvider()->getPlotsByOwner($args[1]);
-        if ($maxPlots >= 0 and count($plotsOfPlayer) >= $maxPlots) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
+
+        $maxPlotsGlobal = $this->getPlugin()->getConfig()->get("MaxPlotsPerPlayer");
+        $maxPlotsInLevel = $this->getPlugin()->getLevelSettings($plot->levelName)->maxPlotsPerPlayer;
+        $plotsGlobal = count($this->getPlugin()->getProvider()->getPlotsByOwner($newOwner->getName()));
+        $plotsInLevel = count($this->getPlugin()->getProvider()->getPlotsByOwner($newOwner->getName(), $plot->levelName));
+        if ($maxPlotsGlobal >= $plotsGlobal or $maxPlotsInLevel >= $plotsInLevel) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout"));
             return true;
         }
 
-        $plot->owner = $args[1];
+        $plot->owner = $newOwner->getName();
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
             $sender->sendMessage($this->translateString("give.success"));
         } else {
