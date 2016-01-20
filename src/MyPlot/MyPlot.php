@@ -38,8 +38,7 @@ class MyPlot extends PluginBase implements Listener
      * @api
      * @return MyPlot
      */
-    public static function getInstance()
-    {
+    public static function getInstance() {
         return self::$instance;
     }
 
@@ -47,8 +46,7 @@ class MyPlot extends PluginBase implements Listener
      * @api
      * @return BaseLang
      */
-    public function getLanguage()
-    {
+    public function getLanguage() {
         return $this->baseLang;
     }
 
@@ -58,8 +56,7 @@ class MyPlot extends PluginBase implements Listener
      * @api
      * @return DataProvider
      */
-    public function getProvider()
-    {
+    public function getProvider() {
         return $this->dataProvider;
     }
 
@@ -69,8 +66,7 @@ class MyPlot extends PluginBase implements Listener
      * @api
      * @return EconomyProvider
      */
-    public function getEconomyProvider()
-    {
+    public function getEconomyProvider() {
         return $this->economyProvider;
     }
 
@@ -81,8 +77,7 @@ class MyPlot extends PluginBase implements Listener
      * @param string $levelName
      * @return PlotLevelSettings|null
      */
-    public function getLevelSettings($levelName)
-    {
+    public function getLevelSettings($levelName) {
         if (isset($this->levels[$levelName])) {
             return $this->levels[$levelName];
         }
@@ -96,8 +91,7 @@ class MyPlot extends PluginBase implements Listener
      * @param string $levelName
      * @return bool
      */
-    public function isLevelLoaded($levelName)
-    {
+    public function isLevelLoaded($levelName) {
         return isset($this->levels[$levelName]);
     }
 
@@ -109,8 +103,7 @@ class MyPlot extends PluginBase implements Listener
      * @param array $settings
      * @return bool
      */
-    public function generateLevel($levelName, $settings = [])
-    {
+    public function generateLevel($levelName, $settings = []) {
         if ($this->getServer()->isLevelGenerated($levelName) === true) {
             return false;
         }
@@ -130,8 +123,7 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return bool
      */
-    public function savePlot(Plot $plot)
-    {
+    public function savePlot(Plot $plot) {
         return $this->dataProvider->savePlot($plot);
     }
 
@@ -143,8 +135,7 @@ class MyPlot extends PluginBase implements Listener
      * @param string $levelName
      * @return Plot[]
      */
-    public function getPlotsOfPlayer($username, $levelName = "")
-    {
+    public function getPlotsOfPlayer($username, $levelName = "") {
         return $this->dataProvider->getPlotsByOwner($username, $levelName);
     }
 
@@ -156,8 +147,7 @@ class MyPlot extends PluginBase implements Listener
      * @param int $limitXZ
      * @return Plot|null
      */
-    public function getNextFreePlot($levelName, $limitXZ = 20)
-    {
+    public function getNextFreePlot($levelName, $limitXZ = 20) {
         return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
     }
 
@@ -168,8 +158,7 @@ class MyPlot extends PluginBase implements Listener
      * @param Position $position
      * @return Plot|null
      */
-    public function getPlotByPosition(Position $position)
-    {
+    public function getPlotByPosition(Position $position) {
         $x = $position->x;
         $z = $position->z;
         $levelName = $position->level->getName();
@@ -213,8 +202,7 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return Position|null
      */
-    public function getPlotPosition(Plot $plot)
-    {
+    public function getPlotPosition(Plot $plot) {
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return null;
@@ -237,8 +225,7 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return bool
      */
-    public function teleportPlayerToPlot(Player $player, Plot $plot)
-    {
+    public function teleportPlayerToPlot(Player $player, Plot $plot) {
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return false;
@@ -257,12 +244,10 @@ class MyPlot extends PluginBase implements Listener
      *
      * @api
      * @param Plot $plot
-     * @param Player $issuer
      * @param int $maxBlocksPerTick
      * @return bool
      */
-    public function clearPlot(Plot $plot, $maxBlocksPerTick = 256)
-    {
+    public function clearPlot(Plot $plot, $maxBlocksPerTick = 256) {
         if (!$this->isLevelLoaded($plot->levelName)) {
             return false;
         }
@@ -277,8 +262,7 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return bool
      */
-    public function disposePlot(Plot $plot)
-    {
+    public function disposePlot(Plot $plot) {
         return $this->dataProvider->deletePlot($plot);
     }
 
@@ -288,8 +272,7 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return bool
      */
-    public function resetPlot(Plot $plot)
-    {
+    public function resetPlot(Plot $plot) {
         if ($this->disposePlot($plot)) {
             return $this->clearPlot($plot);
         }
@@ -304,8 +287,7 @@ class MyPlot extends PluginBase implements Listener
      * @param Biome $biome
      * @return bool
      */
-    public function setPlotBiome(Plot $plot, Biome $biome)
-    {
+    public function setPlotBiome(Plot $plot, Biome $biome) {
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return false;
@@ -351,16 +333,14 @@ class MyPlot extends PluginBase implements Listener
      * @api
      * @return string[]
      */
-    public function getPlotLevels()
-    {
+    public function getPlotLevels() {
         return $this->levels;
     }
 
 
     /* -------------------------- Non-API part -------------------------- */
 
-    public function onEnable()
-    {
+    public function onEnable() {
         $this->getLogger()->info("Loading MyPlot");
         self::$instance = $this;
 
@@ -397,13 +377,11 @@ class MyPlot extends PluginBase implements Listener
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
     }
 
-    public function addLevelSettings($levelName, PlotLevelSettings $settings)
-    {
+    public function addLevelSettings($levelName, PlotLevelSettings $settings) {
         $this->levels[$levelName] = $settings;
     }
 
-    public function unloadLevelSettings($levelName)
-    {
+    public function unloadLevelSettings($levelName) {
         if (isset($this->levels[$levelName])) {
             unset($this->levels[$levelName]);
             return true;
@@ -411,8 +389,7 @@ class MyPlot extends PluginBase implements Listener
         return false;
     }
 
-    public function onDisable()
-    {
+    public function onDisable() {
         if ($this->dataProvider !== null) {
             $this->dataProvider->close();
         }
