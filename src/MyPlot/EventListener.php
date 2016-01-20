@@ -76,9 +76,6 @@ class EventListener implements Listener
         if ($this->plugin->isLevelLoaded($levelName)) {
             $event->setCancelled(true);
         }
-        if ($event->getBlock() instanceof Water or $event->getBlock() instanceof Lava) {
-            $event->setCancelled(true);
-        }
     }
 
     public function onExplosion(EntityExplodeEvent $event) {
