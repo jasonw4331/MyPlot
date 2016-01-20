@@ -8,12 +8,15 @@ abstract class SubCommand
 {
     /** @var MyPlot */
     private $plugin;
+    private $name;
 
     /**
      * @param MyPlot $plugin
+     * @param string $name
      */
-    public function __construct(MyPlot $plugin){
+    public function __construct(MyPlot $plugin, $name) {
         $this->plugin = $plugin;
+        $this->name = $name;
     }
 
     /**
@@ -21,6 +24,16 @@ abstract class SubCommand
      */
     public final function getPlugin(){
         return $this->plugin;
+    }
+
+    /**
+     * @param string   $str
+     * @param string[] $params
+     *
+     * @return string
+     */
+    protected function translateString($str, array $params = [], $onlyPrefix = null) {
+        return $this->plugin->getLanguage()->translateString($str, $params, $onlyPrefix);
     }
 
     /**
@@ -32,22 +45,34 @@ abstract class SubCommand
     /**
      * @return string
      */
-    public abstract function getUsage();
+    public final function getUsage() {
+        $usage = $this->getPlugin()->getLanguage()->get($this->name . ".usage");
+        return ($usage == $this->name . ".usage") ? "" : $usage;
+    }
 
     /**
      * @return string
      */
-    public abstract function getName();
+    public final function getName() {
+        $name = $this->getPlugin()->getLanguage()->get($this->name . ".name");
+        return ($name == $this->name . ".name") ? "" : $name;
+    }
 
     /**
      * @return string
      */
-    public abstract function getDescription();
+    public final function getDescription() {
+        $desc = $this->getPlugin()->getLanguage()->get($this->name . ".desc");
+        return ($desc == $this->name . ".desc") ? "" : $desc;
+    }
 
     /**
-     * @return string[]
+     * @return string
      */
-    public abstract function getAliases();
+    public final function getAlias() {
+        $alias = $this->getPlugin()->getLanguage()->get($this->name . ".alias");
+        return ($alias == $this->name . ".alias") ? "" : $alias;
+    }
 
     /**
      * @param CommandSender $sender

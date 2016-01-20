@@ -11,22 +11,6 @@ class ClaimSubCommand extends SubCommand
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.claim");
     }
 
-    public function getUsage() {
-        return "[name]";
-    }
-
-    public function getName() {
-        return "claim";
-    }
-
-    public function getDescription() {
-        return "Claim the plot you're standing on";
-    }
-
-    public function getAliases() {
-        return [];
-    }
-
     public function execute(CommandSender $sender, array $args) {
         if (count($args) > 1) {
             return false;
@@ -38,14 +22,14 @@ class ClaimSubCommand extends SubCommand
         $player = $sender->getServer()->getPlayer($sender->getName());
         $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
-            $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
             return true;
         }
         if ($plot->owner != "") {
             if ($plot->owner === $sender->getName()) {
-                $sender->sendMessage(TextFormat::RED . "You already own this plot");
+                $sender->sendMessage(TextFormat::RED . $this->translateString("claim.yourplot"));
             } else {
-                $sender->sendMessage(TextFormat::RED . "This plot is already claimed by " . $plot->owner);
+                $sender->sendMessage(TextFormat::RED . $this->translateString("claim.alreadyclaimed", [$plot->owner]));
             }
             return true;
         }
@@ -53,26 +37,26 @@ class ClaimSubCommand extends SubCommand
         $maxPlotsInLevel = $plotLevel->maxPlotsPerPlayer;
         $maxPlots = $this->getPlugin()->getConfig()->get("MaxPlotsPerPlayer");
         $plotsOfPlayer = $this->getPlugin()->getProvider()->getPlotsByOwner($player->getName());
-        if ($maxPlotsInLevel >= 0 and count($plotsOfPlayer) >= $maxPlotsInLevel) {
-            $sender->sendMessage(TextFormat::RED . "You reached the limit of $maxPlotsInLevel plots per player in this world");
+        if ($maxPlots >= 0 and count($plotsOfPlayer) >= $maxPlots) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxperplayer", [$maxPlots]));
             return true;
-        } elseif ($maxPlots >= 0 and count($plotsOfPlayer) >= $maxPlots) {
-            $sender->sendMessage(TextFormat::RED . "You reached the limit of $maxPlots plots per player");
+        } elseif ($maxPlotsInLevel >= 0 and count($plotsOfPlayer) >= $maxPlotsInLevel) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxperworld", [$maxPlotsInLevel]));
             return true;
         }
 
         $economy = $this->getPlugin()->getEconomyProvider();
         if ($economy !== null and !$economy->reduceMoney($player, $plotLevel->claimPrice)) {
-            $sender->sendMessage(TextFormat::RED . "You don't have enough money to claim this plot");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("claim.nomoney"));
             return true;
         }
 
         $plot->owner = $sender->getName();
         $plot->name = $name;
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
-            $sender->sendMessage(TextFormat::GREEN . "You are now the owner of " . TextFormat::WHITE . $plot);
+            $sender->sendMessage($this->translateString("claim.success"));
         } else {
-            $sender->sendMessage(TextFormat::RED . "Something went wrong");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }
         return true;
     }

@@ -11,18 +11,6 @@ class InfoSubCommand extends SubCommand
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.info");
     }
 
-    public function getUsage() {
-        return "";
-    }
-
-    public function getName() {
-        return "info";
-    }
-
-    public function getDescription() {
-        return "Get info about the plot you are standing on";
-    }
-
     public function getAliases() {
         return [];
     }
@@ -34,15 +22,15 @@ class InfoSubCommand extends SubCommand
         $player = $sender->getServer()->getPlayer($sender->getName());
         $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
-            $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
             return true;
         }
-        $sender->sendMessage(TextFormat::DARK_GREEN . "Info about " . TextFormat::WHITE . $plot);
-        $sender->sendMessage(TextFormat::DARK_GREEN. "Name: " . TextFormat::WHITE . $plot->name);
-        $sender->sendMessage(TextFormat::DARK_GREEN. "Owner: " . TextFormat::WHITE . $plot->owner);
+        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.about", [TextFormat::WHITE . $plot]));
+        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.plotname", [TextFormat::WHITE . $plot->name]));
+        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.owner", [TextFormat::WHITE . $plot->owner]));
         $helpers = implode(", ", $plot->helpers);
-        $sender->sendMessage(TextFormat::DARK_GREEN. "Helpers: " . TextFormat::WHITE . $helpers);
-        $sender->sendMessage(TextFormat::DARK_GREEN. "Biome: " . TextFormat::WHITE . $plot->biome);
+        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.helpers", [TextFormat::WHITE . $helpers]));
+        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.biome", [TextFormat::WHITE . $plot->biome]));
         return true;
     }
 }

@@ -12,22 +12,6 @@ class ListSubCommand extends SubCommand
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.list");
     }
 
-    public function getUsage() {
-        return "";
-    }
-
-    public function getName() {
-        return "list";
-    }
-
-    public function getDescription() {
-        return "List all the plots you own";
-    }
-
-    public function getAliases() {
-        return [];
-    }
-
     public function execute(CommandSender $sender, array $args) {
         if (!empty($args)) {
             return false;
@@ -36,16 +20,26 @@ class ListSubCommand extends SubCommand
         $levelName = $player->getLevel()->getName();
         $plots = $this->getPlugin()->getProvider()->getPlotsByOwner($sender->getName());
         if (empty($plots)) {
-            $sender->sendMessage("You do not own any plots");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("list.noplots"));
             return true;
         }
-        $sender->sendMessage("Plots you own:");
+        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("list.plots"));
+
+        usort($plots, function ($plot1, $plot2) {
+            /** @var $plot1 Plot */
+            /** @var $plot2 Plot */
+            if ($plot1->levelName == $plot2->levelName) {
+                return 0;
+            }
+            return ($plot1->levelName < $plot2->levelName) ? -1 : 1;
+        });
+
         for ($i = 0; $i < count($plots); $i++) {
             $plot = $plots[$i];
             $message = TextFormat::DARK_GREEN . ($i + 1) . ") ";
-            $message .= TextFormat::WHITE . $levelName . ": " . $plot->X . ";" . $plot->Z;
+            $message .= TextFormat::WHITE . $levelName . " " . $plot;
             if ($plot->name !== "") {
-                $message .= " aka " . $plot->name;
+                $message .= " = " . $plot->name;
             }
             $sender->sendMessage($message);
         }

@@ -11,22 +11,6 @@ class RemoveHelperSubCommand extends SubCommand
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.removehelper");
     }
 
-    public function getUsage() {
-        return "<player>";
-    }
-
-    public function getName() {
-        return "removehelper";
-    }
-
-    public function getDescription() {
-        return "Remove a helper from your plot";
-    }
-
-    public function getAliases() {
-        return ["delh"];
-    }
-
     public function execute(CommandSender $sender, array $args) {
         if (count($args) !== 1) {
             return false;
@@ -35,21 +19,21 @@ class RemoveHelperSubCommand extends SubCommand
         $player = $sender->getServer()->getPlayer($sender->getName());
         $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
-            $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
             return true;
         }
         if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.removehelper")) {
-            $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
         if (!$plot->removeHelper($helper)) {
-            $sender->sendMessage($helper . " was never a helper of this plot.");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("removehelper.notone", [$helper]));
             return true;
         }
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
-            $sender->sendMessage(TextFormat::GREEN . $helper . " has been removed.");
+            $sender->sendMessage($this->translateString("removehelper.success", [$helper]));
         } else {
-            $sender->sendMessage(TextFormat::RED . "Could not remove that player.");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }
         return true;
     }

@@ -4,23 +4,14 @@ namespace MyPlot;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\task\ClearPlotTask;
-use pocketmine\event\block\BlockBreakEvent;
-use pocketmine\event\block\BlockEvent;
-use pocketmine\event\block\BlockPlaceEvent;
-use pocketmine\event\block\BlockUpdateEvent;
-use pocketmine\event\level\LevelLoadEvent;
-use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
+use pocketmine\lang\BaseLang;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
-use pocketmine\event\EventPriority;
-use pocketmine\plugin\MethodEventExecutor;
 use pocketmine\Player;
 use MyPlot\provider\DataProvider;
-use pocketmine\utils\Config;
-use pocketmine\utils\TextFormat;
 use pocketmine\level\Level;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\EconomyProvider;
@@ -34,24 +25,31 @@ class MyPlot extends PluginBase implements Listener
     private $levels = [];
 
     /** @var DataProvider */
-    private $dataProvider;
+    private $dataProvider = null;
 
     /** @var EconomyProvider */
-    private $economyProvider;
+    private $economyProvider = null;
 
-    private $msgs;
+    /** @var BaseLang */
+    private $baseLang = null;
 
-
-    public function onLoad() {
-    	   $this->msgs = new LangMsgs($this);
-    }
 
     /**
      * @api
      * @return MyPlot
      */
-    public static function getInstance(){
+    public static function getInstance()
+    {
         return self::$instance;
+    }
+
+    /**
+     * @api
+     * @return BaseLang
+     */
+    public function getLanguage()
+    {
+        return $this->baseLang;
     }
 
     /**
@@ -60,7 +58,8 @@ class MyPlot extends PluginBase implements Listener
      * @api
      * @return DataProvider
      */
-    public function getProvider() {
+    public function getProvider()
+    {
         return $this->dataProvider;
     }
 
@@ -70,7 +69,8 @@ class MyPlot extends PluginBase implements Listener
      * @api
      * @return EconomyProvider
      */
-    public function getEconomyProvider() {
+    public function getEconomyProvider()
+    {
         return $this->economyProvider;
     }
 
@@ -81,7 +81,8 @@ class MyPlot extends PluginBase implements Listener
      * @param string $levelName
      * @return PlotLevelSettings|null
      */
-    public function getLevelSettings($levelName) {
+    public function getLevelSettings($levelName)
+    {
         if (isset($this->levels[$levelName])) {
             return $this->levels[$levelName];
         }
@@ -95,7 +96,8 @@ class MyPlot extends PluginBase implements Listener
      * @param string $levelName
      * @return bool
      */
-    public function isLevelLoaded($levelName) {
+    public function isLevelLoaded($levelName)
+    {
         return isset($this->levels[$levelName]);
     }
 
@@ -107,7 +109,8 @@ class MyPlot extends PluginBase implements Listener
      * @param array $settings
      * @return bool
      */
-    public function generateLevel($levelName, $settings = []) {
+    public function generateLevel($levelName, $settings = [])
+    {
         if ($this->getServer()->isLevelGenerated($levelName) === true) {
             return false;
         }
@@ -127,7 +130,8 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return bool
      */
-    public function savePlot(Plot $plot) {
+    public function savePlot(Plot $plot)
+    {
         return $this->dataProvider->savePlot($plot);
     }
 
@@ -139,7 +143,8 @@ class MyPlot extends PluginBase implements Listener
      * @param string $levelName
      * @return Plot[]
      */
-    public function getPlotsOfPlayer($username, $levelName = "") {
+    public function getPlotsOfPlayer($username, $levelName = "")
+    {
         return $this->dataProvider->getPlotsByOwner($username, $levelName);
     }
 
@@ -151,7 +156,8 @@ class MyPlot extends PluginBase implements Listener
      * @param int $limitXZ
      * @return Plot|null
      */
-    public function getNextFreePlot($levelName, $limitXZ = 20) {
+    public function getNextFreePlot($levelName, $limitXZ = 20)
+    {
         return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
     }
 
@@ -162,7 +168,8 @@ class MyPlot extends PluginBase implements Listener
      * @param Position $position
      * @return Plot|null
      */
-    public function getPlotByPosition(Position $position) {
+    public function getPlotByPosition(Position $position)
+    {
         $x = $position->x;
         $z = $position->z;
         $levelName = $position->level->getName();
@@ -206,7 +213,8 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return Position|null
      */
-    public function getPlotPosition(Plot $plot) {
+    public function getPlotPosition(Plot $plot)
+    {
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return null;
@@ -229,7 +237,8 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return bool
      */
-    public function teleportPlayerToPlot(Player $player, Plot $plot) {
+    public function teleportPlayerToPlot(Player $player, Plot $plot)
+    {
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return false;
@@ -252,18 +261,14 @@ class MyPlot extends PluginBase implements Listener
      * @param int $maxBlocksPerTick
      * @return bool
      */
-    public function clearPlot(Plot $plot, Player $issuer = null, $maxBlocksPerTick = 256) {
+    public function clearPlot(Plot $plot, $maxBlocksPerTick = 256)
+    {
         if (!$this->isLevelLoaded($plot->levelName)) {
             return false;
         }
-        $task = new ClearPlotTask($this, $plot, $issuer, $maxBlocksPerTick);
+        $task = new ClearPlotTask($this, $plot, $maxBlocksPerTick);
         $task->onRun(0);
         return true;
-    }
-
-    public function getMessage($node, $vars)
-    {
-        return $this->msgs->getMessage($node, $vars);
     }
 
     /**
@@ -272,7 +277,8 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return bool
      */
-    public function disposePlot(Plot $plot) {
+    public function disposePlot(Plot $plot)
+    {
         return $this->dataProvider->deletePlot($plot);
     }
 
@@ -282,7 +288,8 @@ class MyPlot extends PluginBase implements Listener
      * @param Plot $plot
      * @return bool
      */
-    public function resetPlot(Plot $plot) {
+    public function resetPlot(Plot $plot)
+    {
         if ($this->disposePlot($plot)) {
             return $this->clearPlot($plot);
         }
@@ -297,7 +304,8 @@ class MyPlot extends PluginBase implements Listener
      * @param Biome $biome
      * @return bool
      */
-    public function setPlotBiome(Plot $plot, Biome $biome) {
+    public function setPlotBiome(Plot $plot, Biome $biome)
+    {
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return false;
@@ -343,35 +351,31 @@ class MyPlot extends PluginBase implements Listener
      * @api
      * @return string[]
      */
-    public function getPlotLevels() {
+    public function getPlotLevels()
+    {
         return $this->levels;
     }
 
 
     /* -------------------------- Non-API part -------------------------- */
 
-
-    public function onEnable() {
+    public function onEnable()
+    {
+        $this->getLogger()->info("Loading MyPlot");
         self::$instance = $this;
-
-        $folder = $this->getDataFolder();
-        if (!is_dir($folder)) {
-            mkdir($folder);
-        }
-        if (!is_dir($folder . "worlds")) {
-            mkdir($folder . "worlds");
-        }
-
-        Generator::addGenerator(MyPlotGenerator::class, "myplot");
 
         $this->saveDefaultConfig();
         $this->reloadConfig();
-        $this->getLogger()->info(TextFormat::GREEN."Loading the Plot Framework!");
-        $this->getLogger()->warning(TextFormat::YELLOW."It seems that you are running the development build of MyPlot! Thats cool, but it CAN be very, very buggy! Just be careful when using this plugin and report any issues to".TextFormat::GOLD." http://github.com/wiez/MyPlot/issues");
 
-        $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-        $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
+        @mkdir($this->getDataFolder());
+        @mkdir($this->getDataFolder() . "worlds");
 
+        Generator::addGenerator(MyPlotGenerator::class, "myplot");
+
+        $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
+        $this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
+
+        // Initialize DataProvider
         $cacheSize = $this->getConfig()->get("PlotCacheSize");
         switch (strtolower($this->getConfig()->get("DataProvider"))) {
             case "sqlite":
@@ -380,24 +384,26 @@ class MyPlot extends PluginBase implements Listener
                 break;
         }
 
+        // Initialize EconomyProvider
         if ($this->getConfig()->get("UseEconomy") == true) {
             if ($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") !== null) {
                 $this->economyProvider = new EconomySProvider();
             } elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
                 $this->economyProvider = new PocketMoneyProvider($plugin);
-            } else {
-                $this->economyProvider = null;
             }
-        } else {
-            $this->economyProvider = null;
         }
+
+        $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
+        $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
     }
 
-    public function addLevelSettings($levelName, PlotLevelSettings $settings) {
+    public function addLevelSettings($levelName, PlotLevelSettings $settings)
+    {
         $this->levels[$levelName] = $settings;
     }
 
-    public function unloadLevelSettings($levelName) {
+    public function unloadLevelSettings($levelName)
+    {
         if (isset($this->levels[$levelName])) {
             unset($this->levels[$levelName]);
             return true;
@@ -405,23 +411,10 @@ class MyPlot extends PluginBase implements Listener
         return false;
     }
 
-    public function onDisable() {
-        $this->dataProvider->close();
-        $this->getLogger()->info(TextFormat::GREEN."Saving plots");
-        $this->getLogger()->info(TextFormat::BLUE."Disabled the plot framework!");
-    }
-
- public function getConfigValue($key)
+    public function onDisable()
     {
-        $value = $this->getConfig()->getNested($key);
-
-        if($value === null)
-        {
-            $this->getLogger()->warning($this->getMessage("Something went wrong with MyPlot config fetching...", $key));
-
-            return null;
+        if ($this->dataProvider !== null) {
+            $this->dataProvider->close();
         }
-
-        return $value;
     }
 }

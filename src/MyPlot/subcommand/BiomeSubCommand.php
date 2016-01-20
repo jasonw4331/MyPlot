@@ -26,48 +26,36 @@ class BiomeSubCommand extends SubCommand
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.biome");
     }
 
-    public function getUsage() {
-        return "<biome>";
-    }
-
-    public function getName() {
-        return "biome";
-    }
-
-    public function getDescription() {
-        return "Changes your plot's biome";
-    }
-
-    public function getAliases() {
-        return [];
-    }
-
     public function execute(CommandSender $sender, array $args) {
-        if (count($args) !== 1) {
+        if (count($args) === 0) {
+            $biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
+            $sender->sendMessage($this->translateString("biome.possible", [$biomes]));
+            return true;
+        } elseif (count($args) !== 1) {
             return false;
         }
         $player = $sender->getServer()->getPlayer($sender->getName());
         $biome = strtoupper($args[0]);
         $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
-            $sender->sendMessage(TextFormat::RED . "You are not standing inside a plot");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
             return true;
         }
         if ($plot->owner !== $sender->getName()) {
-            $sender->sendMessage(TextFormat::RED . "You are not the owner of this plot");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
         if (!isset($this->biomes[$biome])) {
-            $sender->sendMessage(TextFormat::RED . "That biome doesn't exist");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
             $biomes = implode(", ", array_keys($this->biomes));
-            $sender->sendMessage(TextFormat::RED . "The possible biomes are: $biomes");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
             return true;
         }
         $biome = Biome::getBiome($this->biomes[$biome]);
         if ($this->getPlugin()->setPlotBiome($plot, $biome)) {
-            $sender->sendMessage(TextFormat::GREEN . "Changed the plot biome");
+            $sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
         } else {
-            $sender->sendMessage(TextFormat::RED . "Could not change the plot biome");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }
         return true;
     }

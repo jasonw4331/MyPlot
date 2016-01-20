@@ -6,6 +6,7 @@ use MyPlot\subcommand\ClaimSubCommand;
 use MyPlot\subcommand\ClearSubCommand;
 use MyPlot\subcommand\DisposeSubCommand;
 use MyPlot\subcommand\GenerateSubCommand;
+use MyPlot\subcommand\HelpSubCommand;
 use MyPlot\subcommand\HomeSubCommand;
 use MyPlot\subcommand\InfoSubCommand;
 use MyPlot\subcommand\ListSubCommand;
@@ -14,7 +15,6 @@ use pocketmine\command\PluginCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 use MyPlot\subcommand\SubCommand;
-use pocketmine\Player;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
 use MyPlot\subcommand\BiomeSubCommand;
@@ -22,72 +22,71 @@ use MyPlot\subcommand\NameSubCommand;
 
 class Commands extends PluginCommand
 {
+    /** @var SubCommand[] */
     private $subCommands = [];
 
-    /* @var SubCommand[] */
-    private $commandObjects = [];
+    /** @var SubCommand[]  */
+    private $aliasSubCommands = [];
 
     public function __construct(MyPlot $plugin) {
-        parent::__construct("plot", $plugin);
-        $this->setAliases(["p"]);
+        parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);
         $this->setPermission("myplot.command");
-        $this->setDescription("Claim and manage your plots");
+        $this->setAliases([$plugin->getLanguage()->get("command.alias")]);
+        $this->setDescription($plugin->getLanguage()->get("command.desc"));
 
-        $this->loadSubCommand(new ClaimSubCommand($plugin));
-        $this->loadSubCommand(new GenerateSubCommand($plugin));
-        $this->loadSubCommand(new ListSubCommand($plugin));
-        $this->loadSubCommand(new InfoSubCommand($plugin));
-        $this->loadSubCommand(new AddHelperSubCommand($plugin));
-        $this->loadSubCommand(new RemoveHelperSubCommand($plugin));
-        $this->loadSubCommand(new AutoSubCommand($plugin));
-        $this->loadSubCommand(new ClearSubCommand($plugin));
-        $this->loadSubCommand(new DisposeSubCommand($plugin));
-        $this->loadSubCommand(new ResetSubCommand($plugin));
-        $this->loadSubCommand(new BiomeSubCommand($plugin));
-        $this->loadSubCommand(new HomeSubCommand($plugin));
-        $this->loadSubCommand(new NameSubCommand($plugin));
+        $this->loadSubCommand(new HelpSubCommand($plugin, "help"));
+        $this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
+        $this->loadSubCommand(new GenerateSubCommand($plugin, "generate"));
+        $this->loadSubCommand(new ListSubCommand($plugin, "list"));
+        $this->loadSubCommand(new InfoSubCommand($plugin, "info"));
+        $this->loadSubCommand(new AddHelperSubCommand($plugin, "addhelper"));
+        $this->loadSubCommand(new RemoveHelperSubCommand($plugin, "removehelper"));
+        $this->loadSubCommand(new AutoSubCommand($plugin, "auto"));
+        $this->loadSubCommand(new ClearSubCommand($plugin, "clear"));
+        $this->loadSubCommand(new DisposeSubCommand($plugin, "dispose"));
+        $this->loadSubCommand(new ResetSubCommand($plugin, "reset"));
+        $this->loadSubCommand(new BiomeSubCommand($plugin, "biome"));
+        $this->loadSubCommand(new HomeSubCommand($plugin, "home"));
+        $this->loadSubCommand(new NameSubCommand($plugin, "name"));
+    }
+
+    /**
+     * @return SubCommand[]
+     */
+    public function getCommands() {
+        return $this->subCommands;
     }
 
     private function loadSubCommand(Subcommand $command) {
-        $this->commandObjects[] = $command;
-        $commandId = count($this->commandObjects) - 1;
-        $this->subCommands[$command->getName()] = $commandId;
-        foreach ($command->getAliases() as $alias) {
-            $this->subCommands[$alias] = $commandId;
+        $this->subCommands[$command->getName()] = $command;
+        if ($command->getAlias() != "") {
+            $this->aliasSubCommands[$command->getAlias()] = $command;
         }
     }
 
     public function execute(CommandSender $sender, $alias, array $args) {
         if (!isset($args[0])) {
-            return $this->sendHelp($sender);
+            $sender->sendMessage(MyPlot::getInstance()->getLanguage()->get("command.usage"));
+            return true;
         }
-        $subCommand = strtolower(array_shift($args));
-        if (!isset($this->subCommands[$subCommand])) {
-            return $this->sendHelp($sender);
-        }
-        $command = $this->commandObjects[$this->subCommands[$subCommand]];
-        $canUse = $command->canUse($sender);
-        if ($canUse) {
-            if (!$command->execute($sender, $args)) {
-                $sender->sendMessage(TextFormat::YELLOW."Usage: /p " . $command->getName() . " " . $command->getUsage());
-            }
-        } elseif (!($sender instanceof Player)) {
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
-        } else {
-            $sender->sendMessage(TextFormat::RED . "You do not have permissions to run this command");
-        }
-        return true;
-    }
 
-    private function sendHelp(CommandSender $sender) {
-        $sender->sendMessage("===========[MyPlot commands]===========");
-        foreach ($this->commandObjects as $command) {
-            if ($command->canUse($sender)) {
-                $sender->sendMessage(
-                    TextFormat::DARK_GREEN . "/p " . $command->getName() . " " . $command->getUsage() . ": " .
-                    TextFormat::WHITE . $command->getDescription()
-                );
+        $subCommand = strtolower(array_shift($args));
+        if (isset($this->subCommands[$subCommand])) {
+            $command = $this->subCommands[$subCommand];
+        } elseif (isset($this->aliasSubCommands[$subCommand])) {
+            $command = $this->aliasSubCommands[$subCommand];
+        } else {
+            $sender->sendMessage(TextFormat::RED . MyPlot::getInstance()->getLanguage()->get("command.unknown"));
+            return true;
+        }
+
+        if ($command->canUse($sender)) {
+            if (!$command->execute($sender, $args)) {
+                $usage = MyPlot::getInstance()->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
+                $sender->sendMessage($usage);
             }
+        } else {
+            $sender->sendMessage(TextFormat::RED . MyPlot::getInstance()->getLanguage()->get("command.unknown"));
         }
         return true;
     }

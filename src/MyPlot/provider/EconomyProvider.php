@@ -2,7 +2,6 @@
 namespace MyPlot\provider;
 
 use pocketmine\Player;
-use pocketmine\plugin\PluginBase;
 
 interface EconomyProvider
 {

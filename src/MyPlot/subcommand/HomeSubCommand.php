@@ -11,22 +11,6 @@ class HomeSubCommand extends SubCommand
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.home");
     }
 
-    public function getUsage() {
-        return "[plot number]";
-    }
-
-    public function getName() {
-        return "home";
-    }
-
-    public function getDescription() {
-        return "Teleport to your plot home. Use plot number if multiple homes";
-    }
-
-    public function getAliases() {
-        return ["h"];
-    }
-
     public function execute(CommandSender $sender, array $args) {
         if (empty($args)) {
             $plotNumber = 1;
@@ -37,19 +21,19 @@ class HomeSubCommand extends SubCommand
         }
         $plots = $this->getPlugin()->getProvider()->getPlotsByOwner($sender->getName());
         if (empty($plots)) {
-            $sender->sendMessage(TextFormat::RED . "You don't have any plots");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));
             return true;
         }
         if (!isset($plots[$plotNumber - 1])) {
-            $sender->sendMessage(TextFormat::RED . "You don't have a plot with home number $plotNumber");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("home.notexist", [$plotNumber]));
             return true;
         }
         $player = $this->getPlugin()->getServer()->getPlayer($sender->getName());
         $plot = $plots[$plotNumber - 1];
         if ($this->getPlugin()->teleportPlayerToPlot($player, $plot)) {
-            $sender->sendMessage(TextFormat::GREEN . "Teleported to " . TextFormat::WHITE . $plot);
+            $sender->sendMessage($this->translateString("home.success", [$plot]));
         } else {
-            $sender->sendMessage(TextFormat::GREEN . "Could not teleport because plot world " . $plot->levelName . " is not loaded");
+            $sender->sendMessage(TextFormat::RED . $this->translateString("home.error"));
         }
         return true;
     }

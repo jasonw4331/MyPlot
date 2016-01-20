@@ -60,6 +60,6 @@ class Plot
     }
 
     public function __toString() {
-        return "Plot(" . $this->X . ";" . $this->Z . ")";
+        return "(" . $this->X . ";" . $this->Z . ")";
     }
 }

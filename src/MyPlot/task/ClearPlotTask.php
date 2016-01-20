@@ -5,16 +5,14 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
-use pocketmine\utils\TextFormat;
 
 class ClearPlotTask extends PluginTask
 {
     private $level, $height, $bottomBlock, $plotFillBlock, $plotFloorBlock,
-            $plotBeginPos, $xMax, $zMax, $maxBlocksPerTick, $issuer;
+            $plotBeginPos, $xMax, $zMax, $maxBlocksPerTick, $pos;
 
-    public function __construct(MyPlot $plugin, Plot $plot, Player $issuer = null, $maxBlocksPerTick = 256) {
+    public function __construct(MyPlot $plugin, Plot $plot, $maxBlocksPerTick = 256) {
         parent::__construct($plugin);
         $this->plotBeginPos = $plugin->getPlotPosition($plot);
         $this->level = $this->plotBeginPos->getLevel();
@@ -31,7 +29,6 @@ class ClearPlotTask extends PluginTask
         $this->plotFloorBlock = $plotLevel->plotFloorBlock;
 
         $this->maxBlocksPerTick = $maxBlocksPerTick;
-        $this->issuer = $issuer;
 
         $this->pos = new Vector3($this->plotBeginPos->x, 0, $this->plotBeginPos->z);
     }
@@ -63,9 +60,6 @@ class ClearPlotTask extends PluginTask
             }
             $this->pos->z = $this->plotBeginPos->z;
             $this->pos->x++;
-        }
-        if ($this->issuer !== null) {
-            $this->issuer->sendMessage(TextFormat::GREEN . "Successfully cleared this plot");
         }
     }
 }

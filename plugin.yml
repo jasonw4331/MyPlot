@@ -12,6 +12,9 @@ permissions:
     description: Allows users to use myplot features
     default: op
     children:
+      myplot.command.help:
+        description: Displays all the available commands
+        default: true
       myplot.command.claim:
         description: Gives the claim command
         default: true
