@@ -44,6 +44,9 @@ DefaultWorld:
 
   # The maximum amount of plots that one have in this world.
   MaxPlotsPerPlayer: 2
+  # Restrict entities (e.g. tnt) from moving except falling
+  # This will prevent things like tnt cannons ruining other plots
+  RestrictEntityMovement: true
 
   # How much it costs to claim a plot (Economy must be set to 'true')
   ClaimPrice: 50

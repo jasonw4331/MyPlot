@@ -1,10 +1,10 @@
 <?php
 namespace MyPlot;
 
-use pocketmine\block\Lava;
-use pocketmine\block\Water;
+use pocketmine\Player;
 use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
+use pocketmine\event\entity\EntityMotionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\level\LevelUnloadEvent;
@@ -37,6 +37,7 @@ class EventListener implements Listener
             $config = $this->plugin->getConfig();
             $default = [
                 "MaxPlotsPerPlayer" => $config->getNested("DefaultWorld.MaxPlotsPerPlayer"),
+                "RestrictEntityMovement" => $config->getNested("DefaultWorld.RestrictEntityMovement"),
                 "ClaimPrice" => $config->getNested("DefaultWorld.ClaimPrice"),
                 "ClearPrice" => $config->getNested("DefaultWorld.ClearPrice"),
                 "DisposePrice" => $config->getNested("DefaultWorld.DisposePrice"),
@@ -80,17 +81,9 @@ class EventListener implements Listener
 
     public function onExplosion(EntityExplodeEvent $event) {
         $levelName = $event->getEntity()->getLevel()->getName();
-        if ($this->plugin->isLevelLoaded($levelName)) {
-            $event->setCancelled(true);
-        }
-
-        /* Allow explosions but only break blocks inside the plot the tnt is in.
-         * Disabled due to tnt cannons not being stopped
-
-        $levelName = $event->getEntity()->getLevel()->getName();
-        if (!$this->plugin->isLevelLoaded($levelName)) {
+        if (!$this->plugin->isLevelLoaded($levelName))
             return;
-        }
+
         $plot = $this->plugin->getPlotByPosition($event->getPosition());
         if ($plot === null) {
             $event->setCancelled(true);
@@ -108,7 +101,6 @@ class EventListener implements Listener
             return false;
         });
         $event->setBlockList($blocks);
-        */
     }
 
     /**
@@ -129,5 +121,16 @@ class EventListener implements Listener
             return;
         }
         $event->setCancelled(true);
+    }
+
+    public function onEntityMotion(EntityMotionEvent $event) {
+        $levelName = $event->getEntity()->getLevel()->getName();
+        if (!$this->plugin->isLevelLoaded($levelName))
+            return;
+
+        $settings = $this->plugin->getLevelSettings($levelName);
+        if ($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
+            $event->setCancelled(true);
+        }
     }
 }

@@ -11,6 +11,7 @@ class PlotLevelSettings
     /** @var int */
     public $roadWidth, $plotSize, $groundHeight, $maxPlotsPerPlayer, $claimPrice, $clearPrice,
             $disposePrice, $resetPrice;
+    public $restrictEntityMovement;
 
     public function __construct($name, $settings = []) {
         $this->name = $name;
@@ -28,6 +29,7 @@ class PlotLevelSettings
             $this->clearPrice = self::parseNumber($settings, "ClearPrice", 0);
             $this->disposePrice = self::parseNumber($settings, "DisposePrice", 0);
             $this->resetPrice = self::parseNumber($settings, "ResetPrice", 0);
+            $this->restrictEntityMovement = self::parseBool($settings, "RestrictEntityMovement", true);
         }
     }
 
@@ -52,6 +54,14 @@ class PlotLevelSettings
 
     private static function parseNumber(&$array, $key, $default) {
         if (isset($array[$key]) and is_numeric($array[$key])) {
+            return $array[$key];
+        } else {
+            return $default;
+        }
+    }
+
+    private static function parseBool(&$array, $key, $default) {
+        if (isset($array[$key]) and is_bool($array[$key])) {
             return $array[$key];
         } else {
             return $default;
