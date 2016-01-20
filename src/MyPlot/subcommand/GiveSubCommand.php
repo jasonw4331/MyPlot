@@ -12,7 +12,7 @@ class GiveSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (count($args) > 2) {
+        if (count($args) !== 1) {
             return false;
         }
         
@@ -27,9 +27,12 @@ class GiveSubCommand extends SubCommand
             return true;
         }
 
-        $newOwner = $this->getPlugin()->getServer()->getPlayer($args[1]);
+        $newOwner = $this->getPlugin()->getServer()->getPlayer($args[0]);
         if (!($newOwner instanceof Player)) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("give.notonline"));
+            return true;
+        } elseif ($newOwner === $player) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("give.toself"));
             return true;
         }
 
@@ -44,7 +47,7 @@ class GiveSubCommand extends SubCommand
 
         $plot->owner = $newOwner->getName();
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
-            $sender->sendMessage($this->translateString("give.success"));
+            $sender->sendMessage($this->translateString("give.success", [$newOwner->getName()]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }
