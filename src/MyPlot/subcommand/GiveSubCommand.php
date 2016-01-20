@@ -22,9 +22,8 @@ class GiveSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
             return true;
         }
-        if ($plot->owner != "") {
-            if ($plot->owner === $sender->getName()) {
-                $sender->sendMessage(TextFormat::RED . $this->translateString("give.yourplot"));
+        if ($plot->owner !== $sender->getName()) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
 
