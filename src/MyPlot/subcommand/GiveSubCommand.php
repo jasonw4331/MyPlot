@@ -26,6 +26,16 @@ class GiveSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
+        if ($args[1] !instanceof Player) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("give.notonline"));
+        }
+        
+        $maxPlots = $this->getPlugin()->getConfig()->get("MaxPlotsPerPlayer");
+        $plotsOfPlayer = $this->getPlugin()->getProvider()->getPlotsByOwner($args[1]);
+        if ($maxPlots >= 0 and count($plotsOfPlayer) >= $maxPlots) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
+            return true;
+        }
 
         $plot->owner = $args[1];
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
