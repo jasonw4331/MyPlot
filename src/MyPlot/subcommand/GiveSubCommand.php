@@ -28,6 +28,7 @@ class GiveSubCommand extends SubCommand
         }
         if ($args[1] !instanceof Player) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("give.notonline"));
+            return true;
         }
         
         $maxPlots = $this->getPlugin()->getConfig()->get("MaxPlotsPerPlayer");
