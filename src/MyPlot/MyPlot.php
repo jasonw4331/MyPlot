@@ -4,6 +4,7 @@ namespace MyPlot;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\task\ClearPlotTask;
+use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\Listener;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\generator\biome\Biome;
@@ -373,7 +374,11 @@ class MyPlot extends PluginBase implements Listener
             }
         }
 
-        $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
+        $eventListener = new EventListener($this);
+        $this->getServer()->getPluginManager()->registerEvents($eventListener, $this);
+        foreach($this->getServer()->getLevels() as $level) {
+            $eventListener->onLevelLoad(new LevelLoadEvent($level));
+        }
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
     }
 
