@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot;
 
+use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\Player;
 use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
@@ -12,6 +13,7 @@ use pocketmine\utils\Config;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\utils\TextFormat;
 
 class EventListener implements Listener
 {
@@ -131,6 +133,28 @@ class EventListener implements Listener
         $settings = $this->plugin->getLevelSettings($levelName);
         if ($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
             $event->setCancelled(true);
+        }
+    }
+
+    public function onPlayerMove(PlayerMoveEvent $event) {
+        if (!$this->plugin->getConfig()->get("ShowPlotPopup", true))
+            return;
+
+        $levelName = $event->getPlayer()->getLevel()->getName();
+        if (!$this->plugin->isLevelLoaded($levelName))
+            return;
+
+        $plot = $this->plugin->getPlotByPosition($event->getTo());
+        if ($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
+            $plotName = TextFormat::GREEN . $plot;
+            $popup = $this->plugin->getLanguage()->translateString("popup", [$plotName]);
+            if ($plot->owner != "") {
+                $owner = TextFormat::GREEN . $plot->owner;
+                $ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
+                $popup .= "\n" . TextFormat::WHITE . str_repeat(" ", floor((strlen($popup) - strlen($ownerPopup)) / 2)) . $ownerPopup;
+            }
+            $event->getPlayer()->sendTip($popup);
+
         }
     }
 }
