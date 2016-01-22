@@ -1,6 +1,8 @@
 <?php
 namespace MyPlot;
 
+use pocketmine\utils\TextFormat;
+use MyPlot\subcommand\SubCommand;
 use MyPlot\subcommand\AddHelperSubCommand;
 use MyPlot\subcommand\ClaimSubCommand;
 use MyPlot\subcommand\ClearSubCommand;
@@ -9,12 +11,10 @@ use MyPlot\subcommand\GenerateSubCommand;
 use MyPlot\subcommand\HelpSubCommand;
 use MyPlot\subcommand\HomeSubCommand;
 use MyPlot\subcommand\InfoSubCommand;
-use MyPlot\subcommand\ListSubCommand;
+use MyPlot\subcommand\HomesSubCommand;
 use MyPlot\subcommand\ResetSubCommand;
 use pocketmine\command\PluginCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\utils\TextFormat;
-use MyPlot\subcommand\SubCommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
 use MyPlot\subcommand\BiomeSubCommand;
@@ -38,7 +38,6 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new HelpSubCommand($plugin, "help"));
         $this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
         $this->loadSubCommand(new GenerateSubCommand($plugin, "generate"));
-        $this->loadSubCommand(new ListSubCommand($plugin, "list"));
         $this->loadSubCommand(new InfoSubCommand($plugin, "info"));
         $this->loadSubCommand(new AddHelperSubCommand($plugin, "addhelper"));
         $this->loadSubCommand(new RemoveHelperSubCommand($plugin, "removehelper"));
@@ -48,6 +47,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new ResetSubCommand($plugin, "reset"));
         $this->loadSubCommand(new BiomeSubCommand($plugin, "biome"));
         $this->loadSubCommand(new HomeSubCommand($plugin, "home"));
+        $this->loadSubCommand(new HomesSubCommand($plugin, "homes"));
         $this->loadSubCommand(new NameSubCommand($plugin, "name"));
         $this->loadSubCommand(new GiveSubCommand($plugin, "give"));
     }

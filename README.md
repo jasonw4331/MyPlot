@@ -34,7 +34,6 @@ Command | Usage | Permissions |
 /p|Main command for MyPlot|myplot.command
 /p info|Get info on the plot you are standing on|myplot.command.info
 /p claim|Claim the plot you are standing on|myplot.command.claim
-/p list|List all the plots you own|myplot.command.list
 /p generate \<name\>|Generate a plot world|myplot.command.generate (OP)
 /p addhelper|Add a helper to your plot|myplot.command.addhelper
 /p removehelper|Remove a helper from your plot|myplot.command.removehelper
@@ -45,6 +44,7 @@ Command | Usage | Permissions |
 /p dispose|Dispose the plot you are standing on|myplot.command.dispose
 /p reset|Clear and dispose the plot you are standing on|myplot.command.reset
 /p home [number]|Teleport to one of your plots|myplot.command.home
+/p homes|Shows all the plots you own|myplot.command.homes
 /p name \<name\>|Change the name of your plot|myplot.command.name
 /p give \<name\>|Gives your plot to another person|myplot.command.give
 

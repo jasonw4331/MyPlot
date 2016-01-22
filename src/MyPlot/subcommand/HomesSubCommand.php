@@ -6,10 +6,10 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use MyPlot\Plot;
 
-class ListSubCommand extends SubCommand
+class HomesSubCommand extends SubCommand
 {
     public function canUse(CommandSender $sender) {
-        return ($sender instanceof Player) and $sender->hasPermission("myplot.command.list");
+        return ($sender instanceof Player) and $sender->hasPermission("myplot.command.homes");
     }
 
     public function execute(CommandSender $sender, array $args) {
@@ -20,10 +20,10 @@ class ListSubCommand extends SubCommand
         $levelName = $player->getLevel()->getName();
         $plots = $this->getPlugin()->getProvider()->getPlotsByOwner($sender->getName());
         if (empty($plots)) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("list.noplots"));
+            $sender->sendMessage(TextFormat::RED . $this->translateString("homes.noplots"));
             return true;
         }
-        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("list.plots"));
+        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("homes.header"));
 
         usort($plots, function ($plot1, $plot2) {
             /** @var $plot1 Plot */

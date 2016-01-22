@@ -21,9 +21,6 @@ permissions:
       myplot.command.info:
         description: Gives the info command
         default: true
-      myplot.command.list:
-        description: Gives the list command
-        default: true
       myplot.command.generate:
         description: Gives the generate command
         default: op
@@ -50,6 +47,9 @@ permissions:
         default: true
       myplot.command.home:
         description: Gives the home command
+        default: true
+      myplot.command.homes:
+        description: Gives the homes command
         default: true
       myplot.command.name:
         description: Gives the name command
