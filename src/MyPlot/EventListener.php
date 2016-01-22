@@ -151,10 +151,13 @@ class EventListener implements Listener
             if ($plot->owner != "") {
                 $owner = TextFormat::GREEN . $plot->owner;
                 $ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
-                $popup .= "\n" . TextFormat::WHITE . str_repeat(" ", floor((strlen($popup) - strlen($ownerPopup)) / 2)) . $ownerPopup;
+                $paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
+                $paddingPopup = str_repeat(" ", max(0, -$paddingSize));
+                $paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
+                $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
+                         TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
             }
             $event->getPlayer()->sendTip($popup);
-
         }
     }
 }
