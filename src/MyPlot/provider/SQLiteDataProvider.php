@@ -152,11 +152,11 @@ class SQLiteDataProvider extends DataProvider
         return $plots;
     }
 
-    public function getNextFreePlot($levelName, $limitXZ = 20) {
+    public function getNextFreePlot($levelName, $limitXZ = 0) {
         $this->sqlGetExistingXZ->bindValue(":level", $levelName, SQLITE3_TEXT);
         $i = 0;
         $this->sqlGetExistingXZ->bindParam(":number", $i, SQLITE3_INTEGER);
-        for (; $i < $limitXZ; $i++) {
+        for (; $limitXZ <= 0 or $i < $limitXZ; $i++) {
             $this->sqlGetExistingXZ->reset();
             $result = $this->sqlGetExistingXZ->execute();
             $plots = [];

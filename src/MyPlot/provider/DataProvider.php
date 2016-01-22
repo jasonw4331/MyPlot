@@ -72,7 +72,7 @@ abstract class DataProvider
      * @param int $limitXZ
      * @return Plot|null
      */
-    public abstract function getNextFreePlot($levelName, $limitXZ = 20);
+    public abstract function getNextFreePlot($levelName, $limitXZ = 0);
 
     public abstract function close();
 }

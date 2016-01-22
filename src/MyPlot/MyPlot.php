@@ -148,7 +148,7 @@ class MyPlot extends PluginBase implements Listener
      * @param int $limitXZ
      * @return Plot|null
      */
-    public function getNextFreePlot($levelName, $limitXZ = 20) {
+    public function getNextFreePlot($levelName, $limitXZ = 0) {
         return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
     }
 
