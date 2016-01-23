@@ -48,6 +48,7 @@ class GiveSubCommand extends SubCommand
         $plot->owner = $newOwner->getName();
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
             $sender->sendMessage($this->translateString("give.success", [$newOwner->getName()]));
+            $newOwner->sendMessage($this->translateString("give.received", [$sender->getName(), $plot]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }
