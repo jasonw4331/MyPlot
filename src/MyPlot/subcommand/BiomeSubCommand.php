@@ -15,11 +15,6 @@ class BiomeSubCommand extends SubCommand
         "FOREST" => Biome::FOREST,
         "TAIGA" => Biome::TAIGA,
         "SWAMP" => Biome::SWAMP,
-        "OCEAN" => Biome::OCEAN,
-        "RIVER" => Biome::RIVER,
-        "ICE_PLAINS" => Biome::ICE_PLAINS,
-        "SMALL_MOUNTAINS" => Biome::SMALL_MOUNTAINS,
-        "BIRCH_FOREST" => Biome::BIRCH_FOREST,
     ];
 
     public function canUse(CommandSender $sender) {
