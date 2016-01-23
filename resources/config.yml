@@ -12,12 +12,10 @@
 
 
 # The language that should be used in MyPlot
-# Available languages: eng
+# Available languages: eng, nl
 #
 # English language pack by @Exxarion
-# Polish language pack by @Jelly9912
-# Italian language pack by @AryToNeX
-# Vietnamese language pack by @doducquang and @daany123
+# Dutch language pack by @Wies
 #
 language: eng
 
