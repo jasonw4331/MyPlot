@@ -14,8 +14,6 @@ Have you ever seen those PC servers with the PlotMe plugin, and you thought "hey
 A list of commands and permissions can be found in the [wiki](https://github.com/wiez/MyPlot/wiki)
 </br>
 </br>
-</br>
-</br>
 Want to try MyPlot before you install it on your server? Check it out these awesome servers that use this plugin:
 <br>
 
