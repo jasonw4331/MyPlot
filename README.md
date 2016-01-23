@@ -18,7 +18,7 @@ Want to try MyPlot before you install it on your server? Check it out these awes
 <br>
 
 MinePocket<br>
-plots.minepocket.com:19132<br>
+creative.minepocket.com:19132<br>
 http://minepocket.com<br>
 
 <!---
