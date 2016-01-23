@@ -57,6 +57,9 @@ permissions:
       myplot.command.give:
         description: Gives the give command
         default: true
+      myplot.command.warp:
+        description: Gives the warp command
+        default: true
   myplot.admin:
     description: Grant administrator powers
     default: op
@@ -87,5 +90,8 @@ permissions:
             description: Allow player to build on the road
             default: op
       myplot.admin.name:
-        description: Allows admins to change the name of every plot
+        description: Allows player to change the name of every plot
+        default: op
+      myplot.admin.warp:
+        description: Allow player to warp to unclaimed plots
         default: op
