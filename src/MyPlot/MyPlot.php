@@ -271,11 +271,12 @@ class MyPlot extends PluginBase implements Listener
      * Clear and dispose a plot
      *
      * @param Plot $plot
+     * @param int $maxBlocksPerTick
      * @return bool
      */
-    public function resetPlot(Plot $plot) {
+    public function resetPlot(Plot $plot, $maxBlocksPerTick = 256) {
         if ($this->disposePlot($plot)) {
-            return $this->clearPlot($plot);
+            return $this->clearPlot($plot, $maxBlocksPerTick);
         }
         return false;
     }

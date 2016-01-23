@@ -12,7 +12,8 @@ class GiveSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (count($args) !== 1) {
+        $confirm = (count($args) == 2 and $args[1] == $this->translateString("confirm"));
+        if (count($args) != 1 and !$confirm) {
             return false;
         }
         
@@ -45,12 +46,21 @@ class GiveSubCommand extends SubCommand
             return true;
         }
 
-        $plot->owner = $newOwner->getName();
-        if ($this->getPlugin()->getProvider()->savePlot($plot)) {
-            $sender->sendMessage($this->translateString("give.success", [$newOwner->getName()]));
-            $newOwner->sendMessage($this->translateString("give.received", [$sender->getName(), $plot]));
+        if ($confirm) {
+            $plot->owner = $newOwner->getName();
+            if ($this->getPlugin()->getProvider()->savePlot($plot)) {
+                $plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
+                $oldOwnerName = TextFormat::GREEN . $sender->getName() . TextFormat::WHITE;
+                $newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;
+                $sender->sendMessage($this->translateString("give.success", [$newOwnerName]));
+                $newOwner->sendMessage($this->translateString("give.received", [$oldOwnerName, $plotId]));
+            } else {
+                $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+            }
         } else {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+            $plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
+            $newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;
+            $sender->sendMessage($this->translateString("give.confirm", [$plotId, $newOwnerName]));
         }
         return true;
     }

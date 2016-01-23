@@ -12,9 +12,11 @@ class ResetSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (!empty($args)) {
+        $confirm = (count($args) == 1 and $args[0] == $this->translateString("confirm"));
+        if (count($args) != 0 and !$confirm) {
             return false;
         }
+
         $player = $sender->getServer()->getPlayer($sender->getName());
         $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
         if ($plot === null) {
@@ -26,17 +28,23 @@ class ResetSubCommand extends SubCommand
             return true;
         }
 
-        $economy = $this->getPlugin()->getEconomyProvider();
-        $price = $this->getPlugin()->getLevelSettings($plot->levelName)->resetPrice;
-        if ($economy !== null and !$economy->reduceMoney($player, $price)) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("reset.nomoney"));
-            return true;
-        }
+        if ($confirm) {
+            $economy = $this->getPlugin()->getEconomyProvider();
+            $price = $this->getPlugin()->getLevelSettings($plot->levelName)->resetPrice;
+            if ($economy !== null and !$economy->reduceMoney($player, $price)) {
+                $sender->sendMessage(TextFormat::RED . $this->translateString("reset.nomoney"));
+                return true;
+            }
 
-        if ($this->getPlugin()->resetPlot($plot)) {
-            $sender->sendMessage($this->translateString("reset.success"));
+            $maxBlocksPerTick = $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 256);
+            if ($this->getPlugin()->resetPlot($plot, $maxBlocksPerTick)) {
+                $sender->sendMessage($this->translateString("reset.success"));
+            } else {
+                $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+            }
         } else {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+            $plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
+            $sender->sendMessage($this->translateString("reset.confirm", [$plotId]));
         }
         return true;
     }

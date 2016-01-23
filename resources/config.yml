@@ -41,6 +41,10 @@ PlotCacheSize: 100
 # When a player enters a plot, a popup with basic info will be shown
 ShowPlotPopup: true
 
+# Amount of blocks to reset per tick.
+# Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
+ClearBlocksPerTick: 256
+
 
 # These settings will be used when creating a new world.
 DefaultWorld:
