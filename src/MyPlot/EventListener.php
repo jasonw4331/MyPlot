@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot;
 
+use pocketmine\block\Sapling;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\Player;
 use pocketmine\event\block\BlockUpdateEvent;
@@ -117,7 +118,26 @@ class EventListener implements Listener
         if ($plot !== null) {
             $username = $event->getPlayer()->getName();
             if ($plot->owner == $username or $plot->isHelper($username) or $event->getPlayer()->hasPermission("myplot.admin.build.plot")) {
-                return;
+                if (!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
+                    return;
+
+                /*
+                 * Prevent growing a tree near the edge of a plot
+                 * so the leaves won't go outside the plot
+                 */
+                $block = $event->getBlock();
+                $maxLengthLeaves = (($block->getDamage() & 0x07) == Sapling::SPRUCE) ? 3 : 2;
+                $beginPos = $this->plugin->getPlotPosition($plot);
+                $endPos = clone $beginPos;
+                $beginPos->x += $maxLengthLeaves;
+                $beginPos->z += $maxLengthLeaves;
+                $plotSize = $this->plugin->getLevelSettings($levelName)->plotSize;
+                $endPos->x += $plotSize - $maxLengthLeaves;
+                $endPos->z += $plotSize - $maxLengthLeaves;
+
+                if ($block->x >= $beginPos->x and $block->z >= $beginPos->z and $block->x < $endPos->x and $block->z < $endPos->z) {
+                    return;
+                }
             }
         } elseif ($event->getPlayer()->hasPermission("myplot.admin.build.road")) {
             return;
