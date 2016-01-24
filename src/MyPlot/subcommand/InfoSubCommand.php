@@ -25,12 +25,12 @@ class InfoSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
             return true;
         }
-        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.about", [TextFormat::WHITE . $plot]));
-        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.plotname", [TextFormat::WHITE . $plot->name]));
-        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.owner", [TextFormat::WHITE . $plot->owner]));
+        $sender->sendMessage($this->translateString("info.about", [TextFormat::GREEN . $plot]));
+        $sender->sendMessage($this->translateString("info.owner", [TextFormat::GREEN . $plot->owner]));
+        $sender->sendMessage($this->translateString("info.plotname", [TextFormat::GREEN . $plot->name]));
         $helpers = implode(", ", $plot->helpers);
-        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.helpers", [TextFormat::WHITE . $helpers]));
-        $sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("info.biome", [TextFormat::WHITE . $plot->biome]));
+        $sender->sendMessage($this->translateString("info.helpers", [TextFormat::GREEN . $helpers]));
+        $sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
         return true;
     }
 }
