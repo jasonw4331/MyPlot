@@ -25,6 +25,8 @@ http://minepocket.com<br>
 </br>
 Not working anymore??
 
+CURRENTLY OFFLINE. Should be back soon.
+
 A+Craft MCPE (Official MyPlot Server)</br>
 IP: play.aplus-craft.tk</br>
 Port: 35557</br>
