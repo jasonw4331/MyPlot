@@ -49,13 +49,13 @@ DefaultWorld:
   RestrictEntityMovement: true
 
   # How much it costs to claim a plot (Economy must be set to 'true')
-  ClaimPrice: 50
+  ClaimPrice: 0
   # How much it costs to clear a plot (Economy must be set to 'true')
   ClearPrice: 0
   # How much it costs to dispose a plot (Economy must be set to 'true')
-  DisposePrice: -50
+  DisposePrice: 0
   # How much it costs to reset a plot (Economy must be set to 'true')
-  ResetPrice: -50
+  ResetPrice: 0
 
   # The size of a plot
   PlotSize: 22
