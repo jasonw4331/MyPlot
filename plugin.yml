@@ -102,9 +102,6 @@ permissions:
       myplot.claimplots.2:
         description: Allow player to claim 2 plots
         default: true
-      myplot.claimplots.4:
-        description: Allow player to claim 2 plots
-        default: true
       myplot.claimplots.unlimited:
         description: Allow player to claim unlimited plots
         default: op
