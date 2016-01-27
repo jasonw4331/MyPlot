@@ -37,12 +37,10 @@ class GiveSubCommand extends SubCommand
             return true;
         }
 
-        $maxPlotsGlobal = $this->getPlugin()->getConfig()->get("MaxPlotsPerPlayer");
-        $maxPlotsInLevel = $this->getPlugin()->getLevelSettings($plot->levelName)->maxPlotsPerPlayer;
-        $plotsGlobal = count($this->getPlugin()->getProvider()->getPlotsByOwner($newOwner->getName()));
-        $plotsInLevel = count($this->getPlugin()->getProvider()->getPlotsByOwner($newOwner->getName(), $plot->levelName));
-        if ($maxPlotsGlobal <= $plotsGlobal or $maxPlotsInLevel <= $plotsInLevel) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout"));
+        $maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($newOwner);
+        $plotsOfPlayer = count($this->getPlugin()->getProvider()->getPlotsByOwner($newOwner->getName()));
+        if ($plotsOfPlayer >= $maxPlots) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
             return true;
         }
 

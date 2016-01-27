@@ -39,7 +39,6 @@ class EventListener implements Listener
             $filePath = $this->plugin->getDataFolder() . "worlds/" . $levelName . ".yml";
             $config = $this->plugin->getConfig();
             $default = [
-                "MaxPlotsPerPlayer" => $config->getNested("DefaultWorld.MaxPlotsPerPlayer"),
                 "RestrictEntityMovement" => $config->getNested("DefaultWorld.RestrictEntityMovement"),
                 "ClaimPrice" => $config->getNested("DefaultWorld.ClaimPrice"),
                 "ClearPrice" => $config->getNested("DefaultWorld.ClearPrice"),

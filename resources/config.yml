@@ -19,9 +19,6 @@
 #
 language: eng
 
-# The maximum amount of plots one can have globally.
-MaxPlotsPerPlayer: 5
-
 # The data provider where plot data is stored.
 # There is currently only one data provider: sqlite.
 DataProvider: sqlite
@@ -47,8 +44,6 @@ ClearBlocksPerTick: 256
 # These settings will be used when creating a new world.
 DefaultWorld:
 
-  # The maximum amount of plots that one have in this world.
-  MaxPlotsPerPlayer: 2
   # Restrict entities (e.g. tnt) from moving except falling
   # This will prevent things like tnt cannons ruining other plots
   RestrictEntityMovement: true

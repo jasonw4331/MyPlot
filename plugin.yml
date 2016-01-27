@@ -95,3 +95,16 @@ permissions:
       myplot.admin.warp:
         description: Allow player to warp to unclaimed plots
         default: op
+  myplot.claimplots:
+    description: Allows players to claim X plots
+    default: false
+    children:
+      myplot.claimplots.2:
+        description: Allow player to claim 2 plots
+        default: true
+      myplot.claimplots.4:
+        description: Allow player to claim 2 plots
+        default: true
+      myplot.claimplots.unlimited:
+        description: Allow player to claim unlimited plots
+        default: op

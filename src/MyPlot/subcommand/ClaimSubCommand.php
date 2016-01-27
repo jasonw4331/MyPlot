@@ -33,18 +33,15 @@ class ClaimSubCommand extends SubCommand
             }
             return true;
         }
-        $plotLevel = $this->getPlugin()->getLevelSettings($plot->levelName);
-        $maxPlotsInLevel = $plotLevel->maxPlotsPerPlayer;
-        $maxPlots = $this->getPlugin()->getConfig()->get("MaxPlotsPerPlayer");
-        $plotsOfPlayer = $this->getPlugin()->getProvider()->getPlotsByOwner($player->getName());
-        if ($maxPlots >= 0 and count($plotsOfPlayer) >= $maxPlots) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxperplayer", [$maxPlots]));
-            return true;
-        } elseif ($maxPlotsInLevel >= 0 and count($plotsOfPlayer) >= $maxPlotsInLevel) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxperworld", [$maxPlotsInLevel]));
+
+        $maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($player);
+        $plotsOfPlayer = count($this->getPlugin()->getProvider()->getPlotsByOwner($player->getName()));
+        if ($plotsOfPlayer >= $maxPlots) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxplots", [$maxPlots]));
             return true;
         }
 
+        $plotLevel = $this->getPlugin()->getLevelSettings($plot->levelName);
         $economy = $this->getPlugin()->getEconomyProvider();
         if ($economy !== null and !$economy->reduceMoney($player, $plotLevel->claimPrice)) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("claim.nomoney"));

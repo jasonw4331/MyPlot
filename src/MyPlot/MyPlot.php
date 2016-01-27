@@ -9,6 +9,7 @@ use pocketmine\event\Listener;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
+use pocketmine\permission\Permission;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\Player;
@@ -337,6 +338,37 @@ class MyPlot extends PluginBase implements Listener
      */
     public function getPlotLevels() {
         return $this->levels;
+    }
+
+    /**
+     * Get the maximum number of plots a player can claim
+     *
+     * @param Player $player
+     * @return int
+     */
+    public function getMaxPlotsOfPlayer(Player $player) {
+        if ($player->hasPermission("myplot.claimplots.unlimited"))
+            return PHP_INT_MAX;
+
+        /** @var Permission[] $perms */
+        $perms = array_filter($this->getServer()->getPluginManager()->getPermissions(), function ($name) {
+            return (substr($name, 0, 18) === "myplot.claimplots.");
+        }, ARRAY_FILTER_USE_KEY);
+
+        if (count($perms) == 0)
+            return 0;
+
+        krsort($perms);
+
+        $maxPlots = PHP_INT_MAX;
+        foreach ($perms as $perm) {
+            if ($player->hasPermission($perm->getName())) {
+                $maxPlots = substr($perm->getName(), 18);
+                break;
+            }
+        }
+
+        return is_numeric($maxPlots) ? (int) $maxPlots : PHP_INT_MAX;
     }
 
 
