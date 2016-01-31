@@ -175,6 +175,13 @@ class EventListener implements Listener
                 $paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
                 $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
                          TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+            } else {
+                $ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
+                $paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
+                $paddingPopup = str_repeat(" ", max(0, -$paddingSize));
+                $paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
+                $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
+                         TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
             }
             $event->getPlayer()->sendTip($popup);
         }
