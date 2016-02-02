@@ -351,7 +351,9 @@ class MyPlot extends PluginBase implements Listener
             return PHP_INT_MAX;
 
         /** @var Permission[] $perms */
-        $perms = array_filter($this->getServer()->getPluginManager()->getPermissions(), function ($name) {
+        $perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()),
+                             $player->getEffectivePermissions());
+        $perms = array_filter($perms, function ($name) {
             return (substr($name, 0, 18) === "myplot.claimplots.");
         }, ARRAY_FILTER_USE_KEY);
 
@@ -360,15 +362,14 @@ class MyPlot extends PluginBase implements Listener
 
         krsort($perms);
 
-        $maxPlots = PHP_INT_MAX;
-        foreach ($perms as $perm) {
-            if ($player->hasPermission($perm->getName())) {
-                $maxPlots = substr($perm->getName(), 18);
-                break;
+        foreach ($perms as $name => $perm) {
+            $maxPlots = substr($name, 18);
+            if (is_numeric($maxPlots)) {
+                return $maxPlots;
             }
         }
 
-        return is_numeric($maxPlots) ? (int) $maxPlots : PHP_INT_MAX;
+        return 0;
     }
 
 
