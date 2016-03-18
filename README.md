@@ -17,12 +17,6 @@ A list of commands and permissions can be found in the [wiki](https://github.com
 Want to try MyPlot before you install it on your server? Check it out these awesome servers that use this plugin:
 <br>
 
-</br>
-A+Craft MCPE (Official MyPlot Server)</br>
-IP: play.aplus-craft.tk</br>
-Port: 25578</br>
-</br>
-
 MinePocket<br>
 creative.minepocket.com:19132<br>
 http://minepocket.com<br>
