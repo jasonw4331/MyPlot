@@ -17,6 +17,7 @@
 # English language pack by @Exxarion
 # Dutch language pack by @Wies
 # Vietnamese language pack by @daany123
+# Spanish language pack by @thelucyclub
 #
 language: eng
 
@@ -28,49 +29,49 @@ DataProvider: sqlite
 # Currently supported economy plugins: Economy$, PocketMoney
 # MyPlot will use any economy plugin found on the server.
 # Be sure not to use more than 1 economy plugin!
-UseEconomy: true
+UseEconomy: false
 
 # Amount of plots to be cached.
 # Increasing this number might improve performance, but also increase memory usage.
-PlotCacheSize: 100
+PlotCacheSize: 564
 
 # When a player enters a plot, a popup with basic info will be shown
 ShowPlotPopup: true
 
 # Amount of blocks to reset per tick.
 # Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
-ClearBlocksPerTick: 256
+ClearBlocksPerTick: 986
 
 
 # These settings will be used when creating a new world.
 DefaultWorld:
 
   # Restrict entities (e.g. tnt) from moving except falling
-  # This will prevent things like tnt cannons ruining other plots
+  # This will prevent things like tnt cannons from ruining other plots
   RestrictEntityMovement: true
 
   # How much it costs to claim a plot (Economy must be set to 'true')
-  ClaimPrice: 0
+  ClaimPrice: 100
   # How much it costs to clear a plot (Economy must be set to 'true')
-  ClearPrice: 0
+  ClearPrice: 45
   # How much it costs to dispose a plot (Economy must be set to 'true')
   DisposePrice: 0
   # How much it costs to reset a plot (Economy must be set to 'true')
   ResetPrice: 0
 
   # The size of a plot
-  PlotSize: 22
+  PlotSize: 24
   # The height of a plot
   GroundHeight: 64
   # The width of the road
   RoadWidth: 7
 
   # The block that the road is made of (Default is Oak Planks)
-  RoadBlock: '5:0'
+  RoadBlock: '173:0'
   # The block that plot walls are made of (Default is Stone Slabs)
   WallBlock: '44:0'
   # The block used as the plot floor (Default is Grass)
-  PlotFloorBlock: '2:0'
+  PlotFloorBlock: '1:0'
   # The block that fills the rest of the plot (Default is Dirt)
   PlotFillBlock: '3:0'
   # The block at the bottom (Default is Bedrock)
