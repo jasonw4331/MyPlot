@@ -23,7 +23,9 @@ http://minepocket.com<br>
 
 DiamondRealms PlotBuild<br>
 plots.diamondrealms.tk:19135<br>
-[https://www.drpe.tk/#public-void:4?redirect-from-repo=true](https://www.drpe.tk/)<br>
+<!-- Does not seem to be loading
+[https://www.drpe.tk/](https://www.drpe.tk/)<br> 
+-->
 
 
 
