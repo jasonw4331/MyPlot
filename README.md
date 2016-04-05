@@ -21,6 +21,10 @@ MinePocket<br>
 creative.minepocket.com:19132<br>
 http://minepocket.com<br>
 
+DiamondRealms PlotBuild<br>
+plots.diamondrealms.tk:19135<br>
+[https://www.drpe.tk/#public-void:4?redirect-from-repo=true](https://www.drpe.tk/)<br>
+
 
 
 </br>
