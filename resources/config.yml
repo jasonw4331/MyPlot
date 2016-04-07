@@ -12,13 +12,15 @@
 
 
 # The language that should be used in MyPlot
-# Available languages: eng, nl, vi
+# Available languages: eng, nl, vi, spa, chs, zho
 #
 # English language pack by @Exxarion
 # Dutch language pack by @Wies
 # Vietnamese language pack by @daany123
 # Spanish language pack by @thelucyclub
-#
+# Chinese ( ROC ) pack by @jerryzooyoyo
+# Chinese ( PRC ) pack by @jerryzooyoyo
+
 language: eng
 
 # The data provider where plot data is stored.
