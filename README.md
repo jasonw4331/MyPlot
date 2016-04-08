@@ -22,7 +22,7 @@ creative.minepocket.com:19132<br>
 http://minepocket.com<br>
 
 DiamondRealms PlotBuild<br>
-plots.diamondrealms.tk:19135<br>
+us.diamondrealms.tk:19132<br>
 <!-- Does not seem to be loading
 [https://www.drpe.tk/](https://www.drpe.tk/)<br> 
 -->
