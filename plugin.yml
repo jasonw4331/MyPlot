@@ -2,7 +2,7 @@ name: MyPlot
 main: MyPlot\MyPlot
 version: 1.0
 load: STARTUP
-api: 1.0.0
+api: [1.13.0, 2.0.0]
 author: Wies and Exxarion
 description: Plot and protection plugin
 softdepend: [EconomyAPI, PocketMoney]
@@ -94,6 +94,9 @@ permissions:
         default: op
       myplot.admin.warp:
         description: Allow player to warp to unclaimed plots
+        default: op
+      myplot.admin.biome:
+        description: Allow player to change everybody's plot biome
         default: op
   myplot.claimplots:
     description: Allows players to claim X plots
