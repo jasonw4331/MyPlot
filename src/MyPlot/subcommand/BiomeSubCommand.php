@@ -37,7 +37,7 @@ class BiomeSubCommand extends SubCommand
             return true;
         }
         if ($plot->owner !== $sender->getName()) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+            $sender->sendMessage(TextFormat::RED . $this->translateString("notowner") and !$sender->hasPermission("myplot.admin.biome"));
             return true;
         }
         if (!isset($this->biomes[$biome])) {
