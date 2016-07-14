@@ -1,23 +1,16 @@
 <?php
 namespace MyPlot\subcommand;
 
+use MyPlot\MyPlot;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\utils\TextFormat;
 
 class HelpSubCommand extends SubCommand
 {
     public function canUse(CommandSender $sender) {
         return $sender->hasPermission("myplot.command.help");
-    }
-
-    /**
-     * @return PluginIdentifiableCommand
-     */
-    private function getCommandHandler()
-    {
-        return $this->getPlugin()->getCommand($this->translateString("command.name"));
     }
 
     public function execute(CommandSender $sender, array $args) {
@@ -39,9 +32,12 @@ class HelpSubCommand extends SubCommand
         }
 
         $commands = [];
-        foreach ($this->getCommandHandler()->getCommands() as $command) {
-            if ($command->canUse($sender)) {
-                $commands[$command->getName()] = $command;
+        foreach (MyPlot::getInstance()->getDescription()->getCommands() as $command) {
+            if($command instanceof Command);
+            foreach($sender->getEffectivePermissions() as $permission) {
+                if($command->getPermission() === $permission->getName()) {
+                    $commands[$command->getName()] = $command;
+                }
             }
         }
         ksort($commands, SORT_NATURAL | SORT_FLAG_CASE);
