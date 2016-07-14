@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\subcommand;
 
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;

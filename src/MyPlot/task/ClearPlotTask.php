@@ -52,8 +52,10 @@ class ClearPlotTask extends PluginTask
             $this->pos->z = $this->plotBeginPos->z;
             $this->pos->x++;
         }
-        foreach($level->getEntities() as $entity) {
-            $entity->close();
+        foreach($this->getOwner()->getServer()->getLevels() as $level) {
+            foreach($level->getEntities() as $entity) {
+                $entity->close();
+            }
         }
     }
 }

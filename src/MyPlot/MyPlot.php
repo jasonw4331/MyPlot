@@ -316,11 +316,12 @@ class MyPlot extends PluginBase implements Listener
                 $level->setBiomeColor($x, $z, $R, $G, $B);
             }
         }
-
+        $x = $pos->x;
+        $z = $pos->z;
         foreach ($chunkIndexes as $index) {
-            Level::getXZ($index, $X, $Z);
-            $chunk = $level->getChunk($X, $Z);
-            foreach ($level->getChunkPlayers($X, $Z) as $player) {
+            Level::getXZ($index, $x, $z);
+            $chunk = $level->getChunk($x,$z);
+            foreach ($level->getChunkPlayers($x, $z) as $player) {
                 $player->onChunkChanged($chunk);
             }
         }
@@ -334,7 +335,7 @@ class MyPlot extends PluginBase implements Listener
      * Returns the PlotLevelSettings of all the loaded levels
      *
      * @api
-     * @return string[]
+     * @return array
      */
     public function getPlotLevels() {
         return $this->levels;

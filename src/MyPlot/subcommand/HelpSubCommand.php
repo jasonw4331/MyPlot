@@ -3,6 +3,7 @@ namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
+use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\utils\TextFormat;
 
 class HelpSubCommand extends SubCommand
@@ -12,7 +13,7 @@ class HelpSubCommand extends SubCommand
     }
 
     /**
-     * @return \MyPlot\Commands
+     * @return PluginIdentifiableCommand
      */
     private function getCommandHandler()
     {
