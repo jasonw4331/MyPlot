@@ -1,107 +1,75 @@
 name: MyPlot
+description: "Plots Protection Plugin"
+author: "Wiez, Exxarion, and jasonwynn10"
 main: MyPlot\MyPlot
-version: 1.0
-load: STARTUP
-api: 1.0.0
-author: Wies and Exxarion
-description: Plot and protection plugin
+version: 0.1.9
+api: [1.13.1, 2.0.0]
 softdepend: [EconomyAPI, PocketMoney]
 
 permissions:
-  myplot.command:
-    description: Allows users to use myplot features
-    default: op
-    children:
-      myplot.command.help:
-        description: Displays all the available commands
-        default: true
-      myplot.command.claim:
-        description: Gives the claim command
-        default: true
-      myplot.command.info:
-        description: Gives the info command
-        default: true
-      myplot.command.generate:
-        description: Gives the generate command
-        default: op
-      myplot.command.addhelper:
-        description: Gives the addhelper command
-        default: true
-      myplot.command.removehelper:
-        description: Gives the removehelper command
-        default: true
-      myplot.command.auto:
-        description: Gives the auto command
-        default: true
-      myplot.command.clear:
-        description: Gives the clear command
-        default: true
-      myplot.command.dispose:
-        description: Gives the dispose command
-        default: true
-      myplot.command.reset:
-        description: Gives the reset command
-        default: true
-      myplot.command.biome:
-        description: Gives the biome command
-        default: true
-      myplot.command.home:
-        description: Gives the home command
-        default: true
-      myplot.command.homes:
-        description: Gives the homes command
-        default: true
-      myplot.command.name:
-        description: Gives the name command
-        default: true
-      myplot.command.give:
-        description: Gives the give command
-        default: true
-      myplot.command.warp:
-        description: Gives the warp command
-        default: true
-  myplot.admin:
-    description: Grant administrator powers
-    default: op
-    children:
-      myplot.admin.clear:
-        description: Allow clear command on every plot
-        default: op
-      myplot.admin.dispose:
-        description: Allow dispose command on every plot
-        default: op
-      myplot.admin.reset:
-        description: Allow reset command on every plot
-        default: op
-      myplot.admin.addhelper:
-        description: Allow addhelper command on every plot
-        default: op
-      myplot.admin.removehelper:
-        description: Allow removehelper command on every plot
-        default: op
-      myplot.admin.build:
-        description: Allow player to build outside his own plots
+    myplot.command:
         default: op
         children:
-          myplot.admin.build.plot:
-            description: Allow player to build on all plots
-            default: op
-          myplot.admin.build.road:
-            description: Allow player to build on the road
-            default: op
-      myplot.admin.name:
-        description: Allows player to change the name of every plot
+            myplot.command.help:
+                default: true
+            myplot.command.claim:
+                default: true
+            myplot.command.info:
+                default: true
+            myplot.command.generate:
+                default: op
+            myplot.command.addhelper:
+                default: true
+            myplot.command.removehelper:
+                default: true
+            myplot.command.auto:
+                default: true
+            myplot.command.clear:
+                default: true
+            myplot.command.dispose:
+                default: true
+            myplot.command.reset:
+                default: true
+            myplot.command.biome:
+                default: true
+            myplot.command.home:
+                default: true
+            myplot.command.homes:
+                default: true
+            myplot.command.name:
+                default: true
+            myplot.command.give:
+                default: true
+            myplot.command.warp:
+                default: true
+    myplot.admin:
         default: op
-      myplot.admin.warp:
-        description: Allow player to warp to unclaimed plots
-        default: op
-  myplot.claimplots:
-    description: Allows players to claim X plots
-    default: false
-    children:
-      myplot.claimplots.2:
-        description: Allow player to claim 2 plots
-        default: true
-      myplot.claimplots.unlimited:
-        description: Allow player to claim unlimited plots
-        default: op
+        children:
+            myplot.admin.clear:
+                default: op
+            myplot.admin.dispose:
+                default: op
+            myplot.admin.reset:
+                default: op
+            myplot.admin.addhelper:
+                default: op
+            myplot.admin.removehelper:
+                default: op
+            myplot.admin.build:
+                default: op
+                children:
+                    myplot.admin.build.plot:
+                        default: op
+                    myplot.admin.build.road:
+                        default: op
+            myplot.admin.name:
+                default: op
+            myplot.admin.warp:
+                default: op
+    myplot.claimplots:
+        default: false
+        children:
+            myplot.claimplots.2:
+                default: true
+            myplot.claimplots.unlimited:
+                default: op
