@@ -1,5 +1,5 @@
 # MyPlot
-## **Create, manage, and build in protected plots! Keep your builds safe from griefers!**
+### **Create, manage, and build in protected plots! Keep your builds safe from griefers!**
 ======
 
 <center>
