@@ -144,9 +144,14 @@ class SQLiteDataProvider extends DataProvider
             $plots[] = new Plot((string)$val["level"], (int)$val["X"], (int)$val["Z"], (string)$val["name"],
                 (string)$val["owner"], $helpers, (string)$val["biome"], (int)$val["id"]);
         }
+
+
+        // Remove unloaded plots
+        $plots = array_filter($plots, function($plot) {
+            return MyPlot::getInstance()->isLevelLoaded($plot->levelName);
+        });
+        // Sort plots by level
         usort($plots, function ($plot1, $plot2) {
-            /** @var Plot $plot1 */
-            /** @var Plot $plot2 */
             return strcmp($plot1->levelName, $plot2->levelName);
         });
         return $plots;

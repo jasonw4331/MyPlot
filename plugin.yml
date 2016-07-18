@@ -47,6 +47,8 @@ permissions:
         children:
             myplot.admin.clear:
                 default: op
+            myplot.admin.biome:
+                default: op
             myplot.admin.dispose:
                 default: op
             myplot.admin.reset:

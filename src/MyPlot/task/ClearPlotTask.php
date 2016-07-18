@@ -4,11 +4,15 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
+use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
 class ClearPlotTask extends PluginTask
 {
-    private $level, $height, $bottomBlock, $plotFillBlock, $plotFloorBlock,
-            $plotBeginPos, $xMax, $zMax, $maxBlocksPerTick, $pos;
+    /** @var Plot $plot  */
+    private $plot;
+    /** @var MyPlot $plugin */
+    private $plugin;
+    private $level, $height, $bottomBlock, $plotFillBlock, $plotFloorBlock, $plotBeginPos, $xMax, $zMax, $maxBlocksPerTick, $pos;
     public function __construct(MyPlot $plugin, Plot $plot, $maxBlocksPerTick = 256) {
         parent::__construct($plugin);
         $this->plotBeginPos = $plugin->getPlotPosition($plot);
@@ -23,6 +27,7 @@ class ClearPlotTask extends PluginTask
         $this->plotFloorBlock = $plotLevel->plotFloorBlock;
         $this->maxBlocksPerTick = $maxBlocksPerTick;
         $this->pos = new Vector3($this->plotBeginPos->x, 0, $this->plotBeginPos->z);
+        $this->plugin = $plugin;
     }
     public function onRun($tick) {
         $blocks = 0;
@@ -52,9 +57,15 @@ class ClearPlotTask extends PluginTask
             $this->pos->z = $this->plotBeginPos->z;
             $this->pos->x++;
         }
-        foreach($this->getOwner()->getServer()->getLevels() as $level) {
-            foreach($level->getEntities() as $entity) {
-                $entity->close();
+        foreach($this->level->getEntities() as $entity) {
+            $plot = $this->plugin->getPlotByPosition($entity->getPosition());
+            if($plot != null) {
+                if($plot instanceof $this->plot) {
+                    $entity->close();
+                }
+                if($plot == $this->plot) {
+                    $entity->close();
+                }
             }
         }
     }

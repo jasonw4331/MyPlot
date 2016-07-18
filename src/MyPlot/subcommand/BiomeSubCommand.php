@@ -15,6 +15,9 @@ class BiomeSubCommand extends SubCommand
         "FOREST" => Biome::FOREST,
         "TAIGA" => Biome::TAIGA,
         "SWAMP" => Biome::SWAMP,
+        "NETHER" => Biome::HELL,
+        "HELL" => Biome::HELL,
+        "ICE" => Biome::ICE_PLAINS
     ];
 
     public function canUse(CommandSender $sender) {
@@ -36,7 +39,7 @@ class BiomeSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
             return true;
         }
-        if ($plot->owner !== $sender->getName()) {
+        if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.biome")) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
