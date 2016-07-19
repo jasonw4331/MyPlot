@@ -3,7 +3,7 @@
 ======
 
 <center>
-[![Join the chat at https://gitter.im/wiez/MyPlot](https://badges.gitter.im/wiez/MyPlot.svg)](https://gitter.im/wiez/MyPlot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Gitter](https://badges.gitter.im/jasonwynn10/MyPlot.svg)](https://gitter.im/jasonwynn10/MyPlot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 </center>
 <br>
 <br>
