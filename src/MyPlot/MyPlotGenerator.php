@@ -42,7 +42,7 @@ class MyPlotGenerator extends Generator
         $this->plotFillBlock = $this->parseBlock($settings, "PlotFillBlock", new Block(3));
         $this->bottomBlock = $this->parseBlock($settings, "BottomBlock", new Block(7));
         $this->roadWidth = $this->parseNumber($settings, "RoadWidth", 7);
-        $this->plotSize = $this->parseNumber($settings, "PlotSize", 22);
+        $this->plotSize = $this->parseNumber($settings, "PlotSize", 32);
         $this->groundHeight = $this->parseNumber($settings, "GroundHeight", 64);
 
         $this->settings = [];

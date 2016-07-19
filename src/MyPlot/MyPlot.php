@@ -4,7 +4,6 @@ namespace MyPlot;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\task\ClearPlotTask;
-use MyPlot\task\DoneMarkTask;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\generator\biome\Biome;
@@ -374,14 +373,47 @@ class MyPlot extends PluginBase
         return 0;
     }
 
-    //in case I forget, divide by 2 on the x and z coords between the corners on two edges to find their center
-    //then use the ground height set in the level settings
-    //next return the created Vector
-    // if anyone else is reading this, It's midnight as i'm typing this -Jason
-    
+    /**
+     * Finds the exact center of the plot at ground level
+     *
+     * @param Plot $plot
+     * @return Vector3
+     */
     public function getPlotMid(Plot $plot) {
-        $gh = $this->getPlugin()->getLevelSettings($plot->levelName)->groundHeight;
-        $mid = new Vector3(null,$gh,null);
+        $gh = $this->getLevelSettings($plot->levelName)->groundHeight;
+        $ps = $this->getLevelSettings($plot->levelName)->plotSize;
+        $rw = $this->getLevelSettings($plot->levelName)->roadWidth;
+        $totalSize = $ps + $rw;
+        $x = $plot->X;
+        $z = $plot->Z;
+        if ($x >= 0) {
+            if($h = $ps % 2 == 0) {
+                $X = floor($x / $totalSize) + $h;
+            } else {
+                $X = floor($x / $totalSize) + ($ps / 2) + 0.5;
+            }
+        } else {
+            if($h = $ps % 2 == 0) {
+                $X = ceil(($x - $ps + 1) / $totalSize) - $h;
+            } else {
+                $X = ceil(($x - $ps + 1) / $totalSize) - ($ps / 2) - 0.5;
+            }
+        }
+
+        if ($z >= 0) {
+            if($h = $ps % 2 == 0) {
+                $Z = floor($z / $totalSize) + $h;
+            } else {
+                $Z = floor($z / $totalSize) + ceil($ps / 2) + 0.5;
+            }
+        } else {
+            if($h = $ps % 2 == 0) {
+                $Z = floor($z / $totalSize) - $h;
+            } else {
+                $Z = floor($z / $totalSize) - ceil($ps / 2) - 0.5;
+            }
+        }
+        $mid = new Vector3($X,$gh,$Z);
 
         return $mid;
     }

@@ -16,7 +16,7 @@ class DoneMarkTask extends PluginTask
     }
     public function onRun($tick) {
         $lname = $this->plot->levelName;
-        $plocation = $this->plugin->getPlotMid();
+        $plocation = $this->plugin->getPlotMid($this->plot);
         $this->plugin->getServer()->getLevel($lname)->addParticle(new HappyVillagerParticle($plocation));
     }
 }
