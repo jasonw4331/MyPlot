@@ -22,6 +22,10 @@ permissions:
                 default: true
             myplot.command.removehelper:
                 default: true
+            myplot.command.denyplayer:
+                default: true
+            myplot.command.undenyplayer:
+                default: true
             myplot.command.auto:
                 default: true
             myplot.command.clear:
@@ -42,6 +46,8 @@ permissions:
                 default: true
             myplot.command.warp:
                 default: true
+            myplot.command.done:
+                default: true
     myplot.admin:
         default: op
         children:
@@ -57,6 +63,10 @@ permissions:
                 default: op
             myplot.admin.removehelper:
                 default: op
+            myplot.admin.denyplayer:
+                default: op
+            myplot.admin.undenyplayer:
+                default: op
             myplot.admin.build:
                 default: op
                 children:
@@ -67,6 +77,8 @@ permissions:
             myplot.admin.name:
                 default: op
             myplot.admin.warp:
+                default: op
+            myplot.admin.done:
                 default: op
     myplot.claimplots:
         default: false

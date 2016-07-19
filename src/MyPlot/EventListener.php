@@ -180,10 +180,20 @@ class EventListener implements Listener
                 $paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
                 $paddingPopup = str_repeat(" ", max(0, -$paddingSize));
                 $paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
-                $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
-                         TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+                $paddingDenial = str_repeat(" ", max(0, $paddingSize));
+                $denialPopup = $this->plugin->getLanguage()->translateString("popup.denied");
+                if($plot->isDenied($event->getPlayer()->getName())) {
+                    $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
+                        TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup . "\n" .
+                        TextFormat::RED . $paddingDenial . $denialPopup;
+                    $event->setCancelled(true);
+                } else {
+                    $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
+                        TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+                }
             }
             $event->getPlayer()->sendTip($popup);
+            //$event->getPlayer()->sendPopup($popup);
         }
     }
 }

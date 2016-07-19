@@ -16,6 +16,11 @@ class SQLiteDataProvider extends DataProvider
             $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
             $sqlGetExistingXZ;
 
+    /**
+     * SQLiteDataProvider constructor.
+     * @param MyPlot $plugin
+     * @param int $cacheSize
+     */
     public function __construct(MyPlot $plugin, $cacheSize = 0) {
         parent::__construct($plugin, $cacheSize);
 
@@ -23,19 +28,19 @@ class SQLiteDataProvider extends DataProvider
         $this->db->exec(
             "CREATE TABLE IF NOT EXISTS plots
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
-             owner TEXT, helpers TEXT, biome TEXT)"
+             owner TEXT, helpers TEXT, denied TEXT, biome TEXT)"
         );
 
         $this->sqlGetPlot = $this->db->prepare(
-            "SELECT id, name, owner, helpers, biome FROM plots WHERE level = :level AND X = :X AND Z = :Z"
+            "SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = :level AND X = :X AND Z = :Z"
         );
         $this->sqlSavePlot = $this->db->prepare(
-            "INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, biome) VALUES
+            "INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES
             ((select id from plots where level = :level AND X = :X AND Z = :Z),
-             :level, :X, :Z, :name, :owner, :helpers, :biome);"
+             :level, :X, :Z, :name, :owner, :helpers,:denied, :biome);"
         );
         $this->sqlSavePlotById = $this->db->prepare(
-            "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, biome = :biome WHERE id = :id"
+            "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome WHERE id = :id"
         );
         $this->sqlRemovePlot = $this->db->prepare(
             "DELETE FROM plots WHERE level = :level AND X = :X AND Z = :Z"

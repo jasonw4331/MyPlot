@@ -1,12 +1,15 @@
 <?php
 namespace MyPlot;
 
+use MyPlot\subcommand\DenyPlayerSubCommand;
+use MyPlot\subcommand\UnDenySubCommand;
 use pocketmine\utils\TextFormat;
 use MyPlot\subcommand\SubCommand;
 use MyPlot\subcommand\AddHelperSubCommand;
 use MyPlot\subcommand\ClaimSubCommand;
 use MyPlot\subcommand\ClearSubCommand;
 use MyPlot\subcommand\DisposeSubCommand;
+use MyPlot\subcommand\DoneSubCommand;
 use MyPlot\subcommand\GenerateSubCommand;
 use MyPlot\subcommand\HelpSubCommand;
 use MyPlot\subcommand\HomeSubCommand;
@@ -52,6 +55,9 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new NameSubCommand($plugin, "name"));
         $this->loadSubCommand(new GiveSubCommand($plugin, "give"));
         $this->loadSubCommand(new WarpSubCommand($plugin, "warp"));
+        $this->loadSubCommand(new DenyPlayerSubCommand($plugin, "deny"));
+        $this->loadSubCommand(new UnDenySubCommand($plugin, "undeny"));
+        $this->loadSubCommand(new DoneSubCommand($plugin, "done"));
     }
 
     /**

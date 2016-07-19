@@ -4,11 +4,12 @@ namespace MyPlot;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\task\ClearPlotTask;
+use MyPlot\task\DoneMarkTask;
 use pocketmine\event\level\LevelLoadEvent;
-use pocketmine\event\Listener;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
+use pocketmine\math\Vector3;
 use pocketmine\permission\Permission;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
@@ -18,7 +19,7 @@ use pocketmine\level\Level;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\EconomyProvider;
 
-class MyPlot extends PluginBase implements Listener
+class MyPlot extends PluginBase
 {
     /** @var MyPlot */
     private static $instance;
@@ -371,6 +372,12 @@ class MyPlot extends PluginBase implements Listener
         }
 
         return 0;
+    }
+
+    public function getPlotMid() {
+        $mid = new Vector3();
+
+        return $mid;
     }
 
 

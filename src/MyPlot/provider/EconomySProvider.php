@@ -10,7 +10,7 @@ class EconomySProvider implements EconomyProvider
         if ($amount == 0) {
             return true;
         } elseif ($amount < 0) {
-            $ret = EconomyAPI::getInstance()->addMoney($player, -$amount, true);
+            $ret = EconomyAPI::getInstance()->addMoney($player, $amount, true);
         } else {
             $ret = EconomyAPI::getInstance()->reduceMoney($player, $amount, true);
         }
