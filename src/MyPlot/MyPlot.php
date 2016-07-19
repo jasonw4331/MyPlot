@@ -418,6 +418,17 @@ class MyPlot extends PluginBase
         return $mid;
     }
 
+    /**
+     * Teleports the player to the exact center of the plot
+     *
+     * @param Plot $plot
+     * @return bool
+     */
+    public function teleportMiddle(Plot $plot, Player $player) {
+        $mid = $this->getPlotMid($plot);
+        $player->teleport($mid);
+        return true;
+    }
 
     /* -------------------------- Non-API part -------------------------- */
 

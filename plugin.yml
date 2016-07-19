@@ -48,6 +48,8 @@ permissions:
                 default: true
             myplot.command.done:
                 default: true
+            myplot.command.middle:
+                default: true
     myplot.admin:
         default: op
         children:
@@ -79,6 +81,8 @@ permissions:
             myplot.admin.warp:
                 default: op
             myplot.admin.done:
+                default: op
+            myplot.admin.middle:
                 default: op
     myplot.claimplots:
         default: false

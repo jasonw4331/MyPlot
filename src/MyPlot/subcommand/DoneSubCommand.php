@@ -15,8 +15,8 @@ class DoneSubCommand extends SubCommand
 
     public function execute(CommandSender $sender, array $args) {
         if($sender instanceof Player);
-        if (count($args) !== 0) {
-            return true;
+        if (count($args) != 0) {
+            return false;
         }
         $plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
         if ($plot === null) {

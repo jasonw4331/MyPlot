@@ -3,7 +3,6 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\level\particle\HappyVillagerParticle;
-use pocketmine\math\Vector3;
 use pocketmine\scheduler\PluginTask;
 class DoneMarkTask extends PluginTask
 {
