@@ -374,8 +374,14 @@ class MyPlot extends PluginBase
         return 0;
     }
 
-    public function getPlotMid() {
-        $mid = new Vector3();
+    //in case I forget, divide by 2 on the x and z coords between the corners on two edges to find their center
+    //then use the ground height set in the level settings
+    //next return the created Vector
+    // if anyone else is reading this, It's midnight as i'm typing this -Jason
+    
+    public function getPlotMid(Plot $plot) {
+        $gh = $this->getPlugin()->getLevelSettings($plot->levelName)->groundHeight;
+        $mid = new Vector3(null,$gh,null);
 
         return $mid;
     }
