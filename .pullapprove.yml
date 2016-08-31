@@ -3,8 +3,15 @@ approve_regex: '^(A|a)pproved|\+1'
 reject_regex: '^(R|r)ejected|-1'
 reject_value: -1
 reset_on_push: false
+author_approval: default
 reviewers:
+  name: Owner
+  required: 1
   members:
   - jasonwynn10
+  name: helpers
+  required: 0
+  members:
+  - weiz
   name: pullapprove
-  required: 1
+  required: 0
