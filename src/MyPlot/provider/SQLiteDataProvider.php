@@ -37,7 +37,7 @@ class SQLiteDataProvider extends DataProvider
         $this->sqlSavePlot = $this->db->prepare(
             "INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES
             ((select id from plots where level = :level AND X = :X AND Z = :Z),
-             :level, :X, :Z, :name, :owner, :helpers,:denied, :biome);"
+             :level, :X, :Z, :name, :owner, :helpers, :denied, :biome);"
         );
         $this->sqlSavePlotById = $this->db->prepare(
             "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome WHERE id = :id"
@@ -79,6 +79,7 @@ class SQLiteDataProvider extends DataProvider
         $stmt->bindValue(":name", $plot->name, SQLITE3_TEXT);
         $stmt->bindValue(":owner", $plot->owner, SQLITE3_TEXT);
         $stmt->bindValue(":helpers", $helpers, SQLITE3_TEXT);
+        $stmt->bindValue(":denied", $plot->denied, SQLITE3_TEXT);
         $stmt->bindValue(":biome", $plot->biome, SQLITE3_TEXT);
         $stmt->reset();
         $result = $stmt->execute();
@@ -124,8 +125,13 @@ class SQLiteDataProvider extends DataProvider
             } else {
                 $helpers = explode(",", (string)$val["helpers"]);
             }
+            if ($val["denied"] === null or $val["denied"] === "") {
+                $denied = [];
+            } else {
+                $denied = explode(",", (string)$val["denied"]);
+            }
             $plot = new Plot($levelName, $X, $Z, (string)$val["name"], (string)$val["owner"],
-                $helpers, (string)$val["biome"], (int)$val["id"]);
+                $helpers, $denied, (string)$val["biome"], (int)$val["id"]);
         } else {
             $plot = new Plot($levelName, $X, $Z);
         }
@@ -146,8 +152,9 @@ class SQLiteDataProvider extends DataProvider
         $result = $stmt->execute();
         while ($val = $result->fetchArray(SQLITE3_ASSOC)) {
             $helpers = explode(",", (string)$val["helpers"]);
+            $denied = explode(",", (string)$val["denied"]);
             $plots[] = new Plot((string)$val["level"], (int)$val["X"], (int)$val["Z"], (string)$val["name"],
-                (string)$val["owner"], $helpers, (string)$val["biome"], (int)$val["id"]);
+                (string)$val["owner"], $helpers, $denied, (string)$val["biome"], (int)$val["id"]);
         }
 
 
