@@ -14,10 +14,15 @@ class HelpSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if($args[0]) {
+        if($args[0] == 2) {
             
         }
-        $sender->sendMessage(TextFormat::$this->translateString("help.header", [$pageNumber, 5]));
+        if($args[0] == 3) {
+            
+        }
+        if($args[0] == 3) {
+            
+        }
         $sender->sendMessage(TextFormat::DARK_GREEN.": ".TextFormat::WHITE."");
         
         return true;
