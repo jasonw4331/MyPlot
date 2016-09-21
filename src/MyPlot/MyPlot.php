@@ -348,19 +348,18 @@ class MyPlot extends PluginBase
      * @return int
      */
     public function getMaxPlotsOfPlayer(Player $player) {
-        if ($player->hasPermission("myplot.claimplots.unlimited"))
+        if ($player->hasPermission("myplot.claimplots.unlimited") or $player->hasPermission("myplot.claimplots"))
             return PHP_INT_MAX;
 
         /** @var Permission[] $perms */
         $perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
         foreach($perms as $perm => $key) {
-                for($n=0;$n!=9;$n++) {
-                        if(strpos($perm[$key], $n)) {
-                                //will finish later
-                        }
+            for($n=0;$n!=9;$n++) {
+                if(strpos($perm[$key], $n)) {
+                    return $n;
                 }
+            }
         }
-
         return 0;
     }
 
