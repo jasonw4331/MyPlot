@@ -61,6 +61,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new DenyPlayerSubCommand($plugin, "deny"));
         $this->loadSubCommand(new UnDenySubCommand($plugin, "undeny"));
         $this->loadSubCommand(new DoneSubCommand($plugin, "done"));
+        $this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
     }
 
     /**
