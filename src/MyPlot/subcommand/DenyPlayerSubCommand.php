@@ -17,6 +17,7 @@ class DenyPlayerSubCommand extends SubCommand
             return false;
         }
         $dplayer = $args[0];
+        $dp = $this->getPlugin()->getServer()->getPlayer($dplayer);
         $plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
         if ($plot === null) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
@@ -24,6 +25,11 @@ class DenyPlayerSubCommand extends SubCommand
         }
         if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.denyplayer")) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+            return true;
+        }
+        if($this->getPlugin()->getServer()->getPlayer($dplayer)->hasPermission("myplot.admin.bypassdeny")) {
+            $sender->sendMessage($this->translateString("denyplayer.cannotdeny", [$dplayer]));
+            $dp->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));
             return true;
         }
         if (!$plot->denyPlayer($dplayer)) {
