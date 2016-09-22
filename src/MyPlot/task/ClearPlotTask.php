@@ -1,13 +1,15 @@
 <?php
 namespace MyPlot\task;
-use MyPlot\MyPlot;
-use MyPlot\Plot;
+
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
-class ClearPlotTask extends PluginTask
-{
+
+use MyPlot\MyPlot;
+use MyPlot\Plot;
+
+class ClearPlotTask extends PluginTask {
     /** @var Plot $plot  */
     private $plot;
     /** @var MyPlot $plugin */
@@ -60,11 +62,10 @@ class ClearPlotTask extends PluginTask
         foreach($this->level->getEntities() as $entity) {
             $plot = $this->plugin->getPlotByPosition($entity->getPosition());
             if($plot != null) {
-                if($plot instanceof $this->plot) {
-                    $entity->close();
-                }
-                if($plot == $this->plot) {
-                    $entity->close();
+                if($plot === $this->plot) {
+                    if(!$entity instanceof Player) {
+                        $entity->close();
+                    }
                 }
             }
         }
