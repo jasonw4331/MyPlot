@@ -36,6 +36,8 @@ permissions:
                 default: true
             myplot.command.biome:
                 default: true
+            myplot.command.biomes:
+                default: true
             myplot.command.home:
                 default: true
             myplot.command.homes:
@@ -57,6 +59,8 @@ permissions:
                 default: op
             myplot.admin.biome:
                 default: op
+            myplot.admin.biomes:
+                defualt: op
             myplot.admin.dispose:
                 default: op
             myplot.admin.reset:
