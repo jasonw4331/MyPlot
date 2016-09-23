@@ -25,15 +25,24 @@ class ListSubCommand extends SubCOmmand {
             }else{
                 $plots = $this->getPlugin()->getPlotsByOwner($sender->getName());
                 foreach($plots as $plot) {
-                    $plot->
+                    $name = $plot->name;
+                    $x = $plot->X;
+                    $z = $plot->Z;
+                    
+                    $this->translateString("list.found", [$name, $x, $z]));
                 }
             }
         }elseif($sender->hasPermission("myplot.command.list")) {
             $this->translateString("list.header"));
             $plots = $this->getPlugin()->getPlotsByOwner($sender->getName
             foreach($plots as $plot) {
-                $plot->
+                $name = $plot->name;
+                $x = $plot->X;
+                $z = $plot->Z;
+                
+                $this->translateString("list.found", [$name, $x, $z]));
             }
         }
+        return true;
     }
 }
