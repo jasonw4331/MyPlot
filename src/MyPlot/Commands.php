@@ -15,6 +15,7 @@ use MyPlot\subcommand\GenerateSubCommand;
 use MyPlot\subcommand\HelpSubCommand;
 use MyPlot\subcommand\HomeSubCommand;
 use MyPlot\subcommand\InfoSubCommand;
+use MyPlot\subcommand\ListSubCommand;
 use MyPlot\subcommand\HomesSubCommand;
 use MyPlot\subcommand\ResetSubCommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
@@ -62,6 +63,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new UnDenySubCommand($plugin, "undeny"));
         $this->loadSubCommand(new DoneSubCommand($plugin, "done"));
         $this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
+        $this->loadSubCommand(new ListSubCommand($plugin, "list"));
     }
 
     /**
