@@ -12,7 +12,6 @@ class ListSubCommand extends SubCOmmand {
     
     public function execute(CommandSender $sender, array $args) {
         if($sender->hasPermission("myplot.admin.list")) {
-            $this->translateString("list.header"));
             if(count($args) == 1) {
                 $plots = $this->getPlugin()->getPlotsByOwner($sender->getName());
                 foreach($plots as $plot) {
@@ -33,7 +32,6 @@ class ListSubCommand extends SubCOmmand {
                 }
             }
         }elseif($sender->hasPermission("myplot.command.list")) {
-            $this->translateString("list.header"));
             $plots = $this->getPlugin()->getPlotsByOwner($sender->getName
             foreach($plots as $plot) {
                 $name = $plot->name;
