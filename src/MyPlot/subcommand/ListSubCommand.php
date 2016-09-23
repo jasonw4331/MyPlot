@@ -3,7 +3,7 @@ namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as TF;
 
 class ListSubCommand extends SubCOmmand {
     public function canUse(CommandSender $sender) {
@@ -19,7 +19,7 @@ class ListSubCommand extends SubCOmmand {
                     $x = $plot->X;
                     $z = $plot->Z;
                     
-                    $this->translateString("list.found", [$name, $x, $z]));
+                    $sender->sendMessage(TF::YELLOW.$this->translateString("list.found", [$name, $x, $z]));
                 }
             }else{
                 $plots = $this->getPlugin()->getPlotsByOwner($sender->getName());
@@ -28,17 +28,17 @@ class ListSubCommand extends SubCOmmand {
                     $x = $plot->X;
                     $z = $plot->Z;
                     
-                    $this->translateString("list.found", [$name, $x, $z]));
+                    $sender->sendMessage(TF::YELLOW.$this->translateString("list.found", [$name, $x, $z]));
                 }
             }
         }elseif($sender->hasPermission("myplot.command.list")) {
-            $plots = $this->getPlugin()->getPlotsByOwner($sender->getName
+            $plots = $this->getPlugin()->getPlotsByOwner($sender->getName());
             foreach($plots as $plot) {
                 $name = $plot->name;
                 $x = $plot->X;
                 $z = $plot->Z;
                 
-                $this->translateString("list.found", [$name, $x, $z]));
+                $sender->sendMessage(TF::YELLOW.$this->translateString("list.found", [$name, $x, $z]));
             }
         }
         return true;
