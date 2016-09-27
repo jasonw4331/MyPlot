@@ -1,8 +1,8 @@
 name: MyPlot
-description: "Plots Protection Plugin"
-author: "Wiez, Exxarion, and jasonwynn10"
+description: "Plots and Protection Plugin for MCPE Servers"
+authors: ["Wiez","Exxarion","jasonwynn10"]
 main: MyPlot\MyPlot
-version: 0.3.6_alpha
+version: 0.6.2_alpha
 api: [1.13.1, 2.0.0]
 softdepend: [EconomyAPI, PocketMoney]
 
