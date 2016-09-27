@@ -5,7 +5,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 use pocketmine\level\generator\biome\Biome;
 
-class BiomeSubCommand extends SubCommand {
+class BiomesSubCommand extends SubCommand {
     private $biomes = [
         "PLAINS" => Biome::PLAINS,
         "DESERT" => Biome::DESERT,
