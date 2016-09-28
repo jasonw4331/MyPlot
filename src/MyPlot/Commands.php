@@ -27,6 +27,7 @@ use MyPlot\subcommand\GiveSubCommand;
 use MyPlot\subcommand\WarpSubCommand;
 use MyPlot\subcommand\DenyPlayerSubCommand;
 use MyPlot\subcommand\UnDenySubCommand;
+use MyPlot\subcommand\SetOwnerSubCommand;
 
 class Commands extends PluginCommand
 {
