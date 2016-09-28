@@ -1,7 +1,9 @@
 <?php
 namespace MyPlot\task;
 
+use pocketmine\level\particle\FloatingTextParticle;
 use pocketmine\level\particle\HappyVillagerParticle;
+use pocketmine\math\Vector3;
 use pocketmine\scheduler\PluginTask;
 use pocketmine\utils\TextFormat as TF;
 
@@ -22,17 +24,21 @@ class DoneMarkTask extends PluginTask {
         $this->plugin->getServer()->getLevel($lname)->addParticle(new HappyVillagerParticle($plocation));
         $text = [];
         
-        $br = TF::RESET. "\n";
+        $br = TF::RESET. "\n"; // line break
         
-        $text[0] = TF::BLUE. F::BOLD. $this->plot->name;
+        $text[0] = TF::BLUE. TF::BOLD. $this->plot->name;
         $text[1] = TF::DARK_GREEN."By: ".$this->plot->owner;
+        $text[2] = TF::GREEN."DONE";
        
-        $level = $this->getServer()->getLevel($lname);
+        $level = $this->getOwner()->getServer()->getLevel($lname);
        
         $title = TF::RESET. $text[0]. TF::RESET;
-        $texter = $text[1];
+        $texter = $text[1].$br.$text[2];
         $particle = new FloatingTextParticle(new Vector3($plocation->x, $plocation->y+5, $plocation->z), $texter, $title);
-
+        $p = null;
+        foreach ($this->getOwner()->getServer()->getOnlinePlayers() as $player) {
+            $p = $player;
+        }
         $level->addParticle($particle, $p);
     }
 }

@@ -4,6 +4,10 @@ namespace MyPlot;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\task\ClearPlotTask;
+use MyPlot\provider\DataProvider;
+use MyPlot\provider\SQLiteDataProvider;
+use MyPlot\provider\EconomyProvider;
+
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\generator\biome\Biome;
@@ -13,10 +17,7 @@ use pocketmine\permission\Permission;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\Player;
-use MyPlot\provider\DataProvider;
 use pocketmine\level\Level;
-use MyPlot\provider\SQLiteDataProvider;
-use MyPlot\provider\EconomyProvider;
 
 class MyPlot extends PluginBase
 {
@@ -354,6 +355,7 @@ class MyPlot extends PluginBase
         /** @var Permission[] $perms */
         $perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
         foreach($perms as $perm => $key) {
+            var_dump($key); //TODO check output
             for($n=0;$n!=9;$n++) {
                 if(strpos($perm[$key], $n)) {
                     return $n;

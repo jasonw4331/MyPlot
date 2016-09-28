@@ -3,8 +3,9 @@ namespace MyPlot\subcommand;
 
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
+use pocketmine\command\PluginIdentifiableCommand;
 
-abstract class SubCommand
+abstract class SubCommand implements PluginIdentifiableCommand
 {
     /** @var MyPlot */
     private $plugin;
@@ -27,9 +28,10 @@ abstract class SubCommand
     }
 
     /**
-     * @param string   $str
+     * @param string $str
      * @param string[] $params
      *
+     * @param string $onlyPrefix
      * @return string
      */
     protected function translateString($str, array $params = [], $onlyPrefix = null) {

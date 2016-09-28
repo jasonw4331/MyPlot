@@ -5,15 +5,16 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
-class ListSubCommand extends SubCOmmand {
+class ListSubCommand extends SubCommand {
     public function canUse(CommandSender $sender) {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.list");
     }
     
     public function execute(CommandSender $sender, array $args) {
+        if($sender instanceof Player);
         if($sender->hasPermission("myplot.admin.list")) {
             if(count($args) == 1) {
-                $plots = $this->getPlugin()->getPlotsByOwner($sender->getName());
+                $plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel());
                 foreach($plots as $plot) {
                     $name = $plot->name;
                     $x = $plot->X;
@@ -22,7 +23,7 @@ class ListSubCommand extends SubCOmmand {
                     $sender->sendMessage(TF::YELLOW.$this->translateString("list.found", [$name, $x, $z]));
                 }
             }else{
-                $plots = $this->getPlugin()->getPlotsByOwner($sender->getName());
+                $plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel());
                 foreach($plots as $plot) {
                     $name = $plot->name;
                     $x = $plot->X;
@@ -32,7 +33,7 @@ class ListSubCommand extends SubCOmmand {
                 }
             }
         }elseif($sender->hasPermission("myplot.command.list")) {
-            $plots = $this->getPlugin()->getPlotsByOwner($sender->getName());
+            $plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel());
             foreach($plots as $plot) {
                 $name = $plot->name;
                 $x = $plot->X;

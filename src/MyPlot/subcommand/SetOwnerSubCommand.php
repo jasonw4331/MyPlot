@@ -25,7 +25,6 @@ class SetOwnerSubCommand extends SubCommand {
             $sender->sendMessage(TextFormat::RED . $this->translateString("setowner.maxplots", [$maxPlots]));
             return true;
         }
-        $plotLevel = $this->getPlugin()->getLevelSettings($plot->levelName);
         $plot->owner = $args[0];
         $plot->name = "";
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
