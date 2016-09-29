@@ -43,7 +43,7 @@ class Commands extends PluginCommand
         $this->setAliases([$plugin->getLanguage()->get("command.alias")]);
         $this->setDescription($plugin->getLanguage()->get("command.desc"));
 
-        $this->loadSubCommand(new HelpSubCommand($plugin, "help"));
+        $this->loadSubCommand(new HelpSubCommand($plugin, "help", $this));
         $this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
         $this->loadSubCommand(new GenerateSubCommand($plugin, "generate"));
         $this->loadSubCommand(new InfoSubCommand($plugin, "info"));
@@ -68,18 +68,12 @@ class Commands extends PluginCommand
     }
 
     /**
-     * @return subcommand\SubCommand[]
+     * @return subCommand[]
      */
     public function getCommands() {
         return $this->subCommands;
     }
 
-    /**
-     * @return subcommand\SubCommand[]
-     */
-    public static function getCmd() {
-        return self::getCommands();
-    }
 
     private function loadSubCommand(SubCommand $command) {
         $this->subCommands[$command->getName()] = $command;
