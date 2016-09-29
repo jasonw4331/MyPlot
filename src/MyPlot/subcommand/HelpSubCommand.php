@@ -1,45 +1,54 @@
 <?php
 namespace MyPlot\subcommand;
-
-use MyPlot\MyPlot;
 use MyPlot\Commands;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
+use pocketmine\command\ConsoleCommandSender;
 use pocketmine\utils\TextFormat;
+class HelpSubCommand extends SubCommand
+{
+    /** @var  Commands $cmd */
+    private $cmd;
 
-class HelpSubCommand extends SubCommand {
-
-    /** @var Commands $cmds */
-    private $cmds = null;
-
-    /**
-     * @param MyPlot $plugin
-     * @param string $name
-     * @param Commands $commands
-     */
-    public function __construct(MyPlot $plugin, $name, Commands $commands) {
+    public function __construct(MyPlot $plugin, $name, $commands) {
         parent::__construct($plugin, $name);
-        $this->cmds = $commands;
+        $this->cmd = $commands;
     }
 
-    /**
-     * @param CommandSender $sender
-     * @return bool
-     */
     public function canUse(CommandSender $sender) {
         return $sender->hasPermission("myplot.command.help");
     }
 
     public function execute(CommandSender $sender, array $args) {
-        $sender->sendMessage(TextFormat::YELLOW."=======+--MyPlot--+=======");
-        foreach($this->cmds->getCommands() as $cmd) {
-            $usage = MyPlot::getInstance()->getLanguage()->translateString("subcommand.usage", [$cmd->getUsage()]);
-            if($sender->isOp()) {
-                $sender->sendMessage(TextFormat::YELLOW.$usage);
-            }else{
-                $sender->sendMessage(TextFormat::YELLOW.$usage);
+        if (count($args) === 0) {
+            $pageNumber = 1;
+        } elseif (is_numeric($args[0])) {
+            $pageNumber = (int) array_shift($args);
+            if ($pageNumber <= 0) {
+                $pageNumber = 1;
+            }
+        } else {
+            return false;
+        }
+        if ($sender instanceof ConsoleCommandSender) {
+            $pageHeight = PHP_INT_MAX;
+        } else {
+            $pageHeight = 5;
+        }
+        $commands = [];
+        foreach ($this->cmd->getCommands() as $command) {
+            if ($command->canUse($sender)) {
+                $commands[$command->getName()] = $command;
             }
         }
-        $sender->sendMessage(TextFormat::YELLOW."==========================");
+        ksort($commands, SORT_NATURAL | SORT_FLAG_CASE);
+        $commands = array_chunk($commands, $pageHeight);
+        /** @var SubCommand[][] $commands */
+        $pageNumber = (int) min(count($commands), $pageNumber);
+        $sender->sendMessage($this->translateString("help.header", [$pageNumber, count($commands)]));
+        foreach ($commands[$pageNumber - 1] as $command) {
+            $sender->sendMessage(TextFormat::DARK_GREEN . $command->getName() . ": " . TextFormat::WHITE . $command->getDescription());
+        }
         return true;
     }
 }
