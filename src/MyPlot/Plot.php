@@ -88,6 +88,9 @@ class Plot
      * @return bool
      */
     public function unDenyPlayer($username) {
+        if($this->isDenied($username)) {
+            return true;
+        }
         $key = array_search($username, $this->denied);
         if ($key === false) {
             return false;
