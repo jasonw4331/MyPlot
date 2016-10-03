@@ -11,17 +11,20 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 
 class DoneMarkTask extends PluginTask {
-    private $done, $plot, $plugin;
+    private $plot, $plugin;
     public function __construct(MyPlot $plugin, Plot $plot) {
         parent::__construct($plugin);
         $this->plot = $plot;
         $this->plugin = $plugin;
-        $this->done = $plot->done;
     }
     public function onRun($tick) {
+        if(!$this->plot->done) {
+            return;
+        }
         $lname = $this->plot->levelName;
         $plocation = $this->plugin->getPlotMid($this->plot);
-        $this->plugin->getServer()->getLevelByName($lname)->addParticle(new HappyVillagerParticle($plocation));
+        $level = $this->getOwner()->getServer()->getLevelByName($lname);
+        $level->addParticle(new HappyVillagerParticle($plocation));
         $text = [];
         
         $br = TF::RESET. "\n"; // line break
@@ -29,8 +32,6 @@ class DoneMarkTask extends PluginTask {
         $text[0] = TF::BLUE. TF::BOLD. $this->plot->name;
         $text[1] = TF::DARK_GREEN."By: ".$this->plot->owner;
         $text[2] = TF::GREEN."DONE";
-       
-        $level = $this->getOwner()->getServer()->getLevel($lname);
        
         $title = TF::RESET. $text[0]. TF::RESET;
         $texter = $text[1].$br.$text[2];
