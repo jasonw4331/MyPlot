@@ -28,7 +28,7 @@ class SetOwnerSubCommand extends SubCommand {
         $plot->owner = $args[0];
         $plot->name = "";
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
-            $sender->sendMessage($this->translateString("setowner.success", $plot->owner));
+            $sender->sendMessage($this->translateString("setowner.success", [$plot->owner]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }
