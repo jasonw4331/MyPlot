@@ -1,18 +1,16 @@
 #########################################
-# ___  ___       ______  _         _
-# |  \/  |       | ___ \| |       | |
-# | .  . | _   _ | |_/ /| |  ___  | |_
-# | |\/| || | | ||  __/ | | / _ \ | __|
-# | |  | || |_| || |    | || (_) || |_
-# \_|  |_/ \__, |\_|    |_| \___/  \__|
-#           __/ |
-#          |___/
-#
+# ___  ___       ______  _         _    #
+# |  \/  |       | ___ \| |       | |   #
+# | .  . | _   _ | |_/ /| |  ___  | |_  #
+# | |\/| || | | ||  __/ | | / _ \ | __| #
+# | |  | || |_| || |    | || (_) || |_  #
+# \_|  |_/ \__, |\_|    |_| \___/  \__| #
+#           __/ |                       #
+#          |___/                        #
 #########################################
 
-
 # The language that should be used in MyPlot
-# Available languages: eng, nl, vi, spa, chs, zho
+# Available languages: eng, nl, vi, spa, chs, zho, deu
 #
 # English language pack by @Exxarion
 # Dutch language pack by @Wies
@@ -20,7 +18,7 @@
 # Spanish language pack by @thelucyclub
 # Chinese ( ROC ) pack by @jerryzooyoyo
 # Chinese ( PRC ) pack by @jerryzooyoyo
-
+# Deutsche language pack by @SalmonGER
 language: eng
 
 # The data provider where plot data is stored.
@@ -43,7 +41,6 @@ ShowPlotPopup: true
 # Amount of blocks to reset per tick.
 # Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
 ClearBlocksPerTick: 256
-
 
 # These settings will be used when creating a new world.
 DefaultWorld:
