@@ -43,6 +43,7 @@ class Plot
      */
     public function addHelper($username) {
         if (!$this->isHelper($username)) {
+            $this->unDenyPlayer($username);
             $this->helpers[] = $username;
             return true;
         }
