@@ -18,6 +18,7 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\Player;
 use pocketmine\level\Level;
+use pocketmine\utils\TextFormat;
 
 class MyPlot extends PluginBase
 {
@@ -355,6 +356,7 @@ class MyPlot extends PluginBase
         /** @var Permission[] $perms */
         $perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
         foreach($perms as $perm => $key) {
+            $this->getLogger()->alert(TextFormat::RED."Please Report this output to the issue tracker on Github!");
             var_dump($key); //TODO check output
             for($n=0;$n!=9;$n++) {
                 if(strpos($perm[$key], $n)) {
@@ -414,6 +416,7 @@ class MyPlot extends PluginBase
      * Teleports the player to the exact center of the plot
      *
      * @param Plot $plot
+     * @param Player $player
      * @return bool
      */
     public function teleportMiddle(Plot $plot, Player $player) {

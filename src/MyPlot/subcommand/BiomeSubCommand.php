@@ -51,7 +51,7 @@ class BiomeSubCommand extends SubCommand
         }
         $biome = Biome::getBiome($this->biomes[$biome]);
         if ($this->getPlugin()->setPlotBiome($plot, $biome)) {
-            $sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
+            $sender->sendMessage($this->translateString("biome.success", [$biome]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }

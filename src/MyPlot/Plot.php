@@ -12,6 +12,7 @@ class Plot
      * @param string $name
      * @param string $owner
      * @param array $helpers
+     * @param array $denied
      * @param string $biome
      * @param int $id
      * @param boolean $done

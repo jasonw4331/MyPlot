@@ -4,7 +4,6 @@ namespace MyPlot\subcommand;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use MyPlot\Plot;
 
 class HomesSubCommand extends SubCommand
 {
