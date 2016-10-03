@@ -26,6 +26,10 @@ class AddHelperSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
+        if($plot->unDenyPlayer($helper)) {
+            $sender->sendMessage($this->translateString("undenyplayer.notone", [$helper]));
+            return true
+        }
         if (!$plot->addHelper($helper)) {
             $sender->sendMessage($this->translateString("addhelper.alreadyone", [$helper]));
             return true;
