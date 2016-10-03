@@ -30,7 +30,7 @@ class InfoSubCommand extends SubCommand
         $sender->sendMessage($this->translateString("info.plotname", [TextFormat::GREEN . $plot->name]));
         $helpers = implode(", ", $plot->helpers);
         $sender->sendMessage($this->translateString("info.helpers", [TextFormat::GREEN . $helpers]));
-        $sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
+        $sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome->getName()]));
         return true;
     }
 }
