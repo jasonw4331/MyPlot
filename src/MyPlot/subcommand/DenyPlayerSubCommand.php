@@ -37,7 +37,8 @@ class DenyPlayerSubCommand extends SubCommand
             return true;
         }
         if ($this->getPlugin()->getProvider()->savePlot($plot)) {
-            $sender->sendMessage($this->translateString("denyplayer.success", [$dplayer]));
+            $sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer]));
+            $dp->sendMessage($this->translateString("denyplayer.success2", [$sender->getName()]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }
