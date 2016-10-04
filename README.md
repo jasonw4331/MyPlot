@@ -14,3 +14,5 @@ Future commands can be found [here](http://plotme.worldcretornica.com/cmdsandper
 <br>
 <br>
 Want to help create language resource packs? Well, you can! If you know a language that is not created yet, you can create a new language pack by opening a pull request! If the language you know is already created, you can help improve it by editing it!
+<br>
+The Needed Languages can be found [here](https://github.com/jasonwynn10/MyPlot/projects/2)
