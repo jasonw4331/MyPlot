@@ -116,7 +116,7 @@ class EventListener implements Listener
         $plot = $this->plugin->getPlotByPosition($event->getBlock());
         if ($plot !== null) {
             $username = $event->getPlayer()->getName();
-            if ($plot->owner == $username or $plot->isHelper($username) or $event->getPlayer()->hasPermission("myplot.admin.build.plot")) {
+            if ($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot")) {
                 if (!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
                     return;
 
@@ -182,7 +182,7 @@ class EventListener implements Listener
                 $paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
                 $paddingDenial = str_repeat(" ", max(0, $paddingSize));
                 $denialPopup = $this->plugin->getLanguage()->translateString("popup.denied");
-                if($plot->isDenied($event->getPlayer()->getName())) {
+                if($plot->isDenied($event->getPlayer()->getName()) or $plot->isDenied("*")) {
                     $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
                         TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup . "\n" .
                         TextFormat::RED . $paddingDenial . $denialPopup;
