@@ -68,7 +68,7 @@ class Commands extends PluginCommand
     }
 
     /**
-     * @return subCommand[]
+     * @return SubCommand[]
      */
     public function getCommands() {
         return $this->subCommands;

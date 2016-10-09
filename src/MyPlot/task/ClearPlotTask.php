@@ -3,15 +3,12 @@ namespace MyPlot\task;
 
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 
 class ClearPlotTask extends PluginTask {
-    /** @var Plot $plot  */
-    private $plot;
     /** @var MyPlot $plugin */
     private $plugin;
     private $level, $height, $bottomBlock, $plotFillBlock, $plotFloorBlock, $plotBeginPos, $xMax, $zMax, $maxBlocksPerTick, $pos;
@@ -58,16 +55,6 @@ class ClearPlotTask extends PluginTask {
             }
             $this->pos->z = $this->plotBeginPos->z;
             $this->pos->x++;
-        }
-        foreach($this->level->getEntities() as $entity) {
-            $plot = $this->plugin->getPlotByPosition($entity->getPosition());
-            if($plot != null) {
-                if($plot === $this->plot) {
-                    if(!$entity instanceof Player) {
-                        $entity->close();
-                    }
-                }
-            }
         }
     }
 }

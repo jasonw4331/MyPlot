@@ -8,6 +8,7 @@ use MyPlot\provider\DataProvider;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\EconomyProvider;
 
+use pocketmine\block\Air;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\generator\biome\Biome;
@@ -18,7 +19,6 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\Player;
 use pocketmine\level\Level;
-use pocketmine\utils\TextFormat;
 
 class MyPlot extends PluginBase
 {
@@ -255,8 +255,18 @@ class MyPlot extends PluginBase
         if (!$this->isLevelLoaded($plot->levelName)) {
             return false;
         }
-        $task = new ClearPlotTask($this, $plot, $maxBlocksPerTick);
-        $task->onRun(0);
+        foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
+            $plotb = $this->getPlotByPosition($entity->getPosition());
+            if($plotb != null) {
+                if($plotb === $plot) {
+                    if(!$entity instanceof Player) {
+                        $entity->close();
+                    }
+                }
+            }
+        }
+        $this->getServer()->getScheduler()->scheduleTask($task = new ClearPlotTask($this, $plot, $maxBlocksPerTick));
+        //$task->onRun(0);
         return true;
     }
 
@@ -318,12 +328,10 @@ class MyPlot extends PluginBase
                 $level->setBiomeColor($x, $z, $R, $G, $B);
             }
         }
-        $x = $pos->x;
-        $z = $pos->z;
         foreach ($chunkIndexes as $index) {
-            Level::getXZ($index, $x, $z);
-            $chunk = $level->getChunk($x,$z);
-            foreach ($level->getChunkPlayers($x, $z) as $player) {
+            Level::getXZ($index, $plot->X, $plot->Z);
+            $chunk = $level->getChunk($plot->X,$plot->Z);
+            foreach ($level->getChunkPlayers($plot->X, $plot->Z) as $player) {
                 $player->onChunkChanged($chunk);
             }
         }
@@ -337,7 +345,7 @@ class MyPlot extends PluginBase
      * Returns the PlotLevelSettings of all the loaded levels
      *
      * @api
-     * @return array
+     * @return PlotLevelSettings[]
      */
     public function getPlotLevels() {
         return $this->levels;
@@ -350,18 +358,21 @@ class MyPlot extends PluginBase
      * @return int
      */
     public function getMaxPlotsOfPlayer(Player $player) {
-        if ($player->hasPermission("myplot.claimplots.unlimited") or $player->hasPermission("myplot.claimplots"))
+        if ($player->hasPermission("myplot.claimplots.unlimited"))
             return PHP_INT_MAX;
-
         /** @var Permission[] $perms */
-        $perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
-        foreach($perms as $perm => $key) {
-            $this->getLogger()->alert(TextFormat::RED."Please Report this output to the issue tracker on Github!");
-            var_dump($key); //TODO check output
-            for($n=0;$n!=9;$n++) {
-                if(strpos($perm[$key], $n)) {
-                    return $n;
-                }
+        $perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()),
+            $player->getEffectivePermissions());
+        $perms = array_filter($perms, function ($name) {
+            return (substr($name, 0, 18) === "myplot.claimplots.");
+        }, ARRAY_FILTER_USE_KEY);
+        if (count($perms) == 0)
+            return 0;
+        krsort($perms);
+        foreach ($perms as $name => $perm) {
+            $maxPlots = substr($name, 18);
+            if (is_numeric($maxPlots)) {
+                return $maxPlots;
             }
         }
         return 0;
@@ -371,7 +382,7 @@ class MyPlot extends PluginBase
      * Finds the exact center of the plot at ground level
      *
      * @param Plot $plot
-     * @return Vector3
+     * @return Vector3|bool
      */
     public function getPlotMid(Plot $plot) {
         $gh = $this->getLevelSettings($plot->levelName)->groundHeight;
@@ -393,7 +404,6 @@ class MyPlot extends PluginBase
                 $X = ceil(($x - $ps + 1) / $totalSize) - ($ps / 2) - 0.5;
             }
         }
-
         if ($z >= 0) {
             if($h = $ps % 2 == 0) {
                 $Z = floor($z / $totalSize) + $h;
@@ -401,15 +411,21 @@ class MyPlot extends PluginBase
                 $Z = floor($z / $totalSize) + ceil($ps / 2) + 0.5;
             }
         } else {
-            if($h = $ps % 2 == 0) {
+            if ($h = $ps % 2 == 0) {
                 $Z = floor($z / $totalSize) - $h;
             } else {
                 $Z = floor($z / $totalSize) - ceil($ps / 2) - 0.5;
             }
         }
-        $mid = new Vector3($X,$gh,$Z);
-
-        return $mid;
+        for($Y = $gh; $h<128; $h++) {
+            $mid = new Vector3($X,$Y+0.5,$Z);
+            $mida = new Vector3($X,$Y,$Z);
+            $midb = new Vector3($X,$Y+1,$Z);
+            if ($this->getServer()->getLevelByName($plot->levelName)->getBlock($mida) === Air::class and $this->getServer()->getLevelByName($plot->levelName)->getBlock($midb) === Air::class) {
+                return $mid;
+            }
+        }
+        return false;
     }
 
     /**
@@ -421,6 +437,9 @@ class MyPlot extends PluginBase
      */
     public function teleportMiddle(Plot $plot, Player $player) {
         $mid = $this->getPlotMid($plot);
+        if($mid === false) {
+            $this->teleportPlayerToPlot($player, $plot);
+        }
         $player->teleport($mid);
         return true;
     }
