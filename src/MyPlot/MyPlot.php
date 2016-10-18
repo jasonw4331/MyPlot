@@ -464,10 +464,16 @@ class MyPlot extends PluginBase
         // Initialize DataProvider
         $cacheSize = $this->getConfig()->get("PlotCacheSize");
         switch (strtolower($this->getConfig()->get("DataProvider"))) {
+            case "mysql":
+                $settings = $this->getConfig()->get("MySQLSettings");
+                $this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
+            break;
+            case "json":
+            case "sqlite3":
             case "sqlite":
             default:
                 $this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
-                break;
+            break;
         }
 
         // Initialize EconomyProvider
