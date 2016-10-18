@@ -6,19 +6,20 @@ use MyPlot\Plot;
 
 class SQLiteDataProvider extends DataProvider
 {
-    /** @var MySQLi */
+    /** @var \MySQLi */
     private $db;
     private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
             $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
             $sqlGetExistingXZ;
     /**
-     * SQLiteDataProvider constructor.
+     * MySQLProvider constructor.
      * @param MyPlot $plugin
      * @param int $cacheSize
+     * @param array $settings
      */
-    public function __construct(MyPlot $plugin, $cacheSize = 0) {
+    public function __construct(MyPlot $plugin, $cacheSize = 0, $settings) {
         parent::__construct($plugin, $cacheSize);
-        $this->db = new MySQLi("temp");
+        $this->db = new MySQLi($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
         $this->db->exec(
             "CREATE TABLE IF NOT EXISTS plots
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
