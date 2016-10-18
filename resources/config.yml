@@ -22,8 +22,15 @@
 language: eng
 
 # The data provider where plot data is stored.
-# There is currently only one data provider: sqlite.
+# Current providers are: sqlite, mysql.
 DataProvider: sqlite
+
+# contains settings for mysql provider to use when selected
+MySQLSettings:
+  host: 127.0.0.1
+  port: 19133
+  username: default
+  password: password
 
 # Use an economy with MyPlot. This will allow for plot pricing such as claiming, clearing, etc.
 # Currently supported economy plugins: Economy$, PocketMoney
