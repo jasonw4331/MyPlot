@@ -469,6 +469,8 @@ class MyPlot extends PluginBase
                 $this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
             break;
             case "json":
+                $this->dataProvider = new JSONDataProvider($this, $cacheSize);
+            break;
             case "sqlite3":
             case "sqlite":
             default:
