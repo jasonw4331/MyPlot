@@ -17,7 +17,6 @@ class SQLiteDataProvider extends DataProvider
             $sqlGetExistingXZ;
 
     /**
-     * SQLiteDataProvider constructor.
      * @param MyPlot $plugin
      * @param int $cacheSize
      */

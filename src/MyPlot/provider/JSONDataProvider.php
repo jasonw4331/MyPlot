@@ -10,6 +10,7 @@ class JSONDataProvider extends DataProvider{
     /** @var MyPlot */
     protected $plugin;
     public function __construct(MyPlot $plugin, $cacheSize = 0) {
+        parent::__construct($plugin, $cacheSize);
         $this->plugin = $plugin;
         $this->cacheSize = $cacheSize;
     }

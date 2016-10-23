@@ -6,11 +6,11 @@ use MyPlot\Plot;
 
 class SQLiteDataProvider extends DataProvider
 {
-    /** @var \MySQLi */
+    /** @var \MySQLi $db */
     private $db;
-    private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
-            $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
-            $sqlGetExistingXZ;
+    /** @var string $lastSave */
+    private $lastSave;
+
     /**
      * MySQLProvider constructor.
      * @param MyPlot $plugin
@@ -19,30 +19,11 @@ class SQLiteDataProvider extends DataProvider
      */
     public function __construct(MyPlot $plugin, $cacheSize = 0, $settings) {
         parent::__construct($plugin, $cacheSize);
-        $this->db = new MySQLi($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
-        $this->db->exec(
+        $this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
+        $this->db->query(
             "CREATE TABLE IF NOT EXISTS plots
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
              owner TEXT, helpers TEXT, denied TEXT, biome TEXT)"
-        );
-        $this->sqlGetPlot = $this->db->prepare(
-            "SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = :level AND X = :X AND Z = :Z"
-        );
-        $this->sqlSavePlot = $this->db->prepare(
-            "INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES
-            ((select id from plots where level = :level AND X = :X AND Z = :Z),
-             :level, :X, :Z, :name, :owner, :helpers, :denied, :biome);"
-        );
-        $this->sqlSavePlotById = $this->db->prepare(
-            "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome WHERE id = :id"
-        );
-        $this->sqlRemovePlot = $this->db->prepare(
-            "DELETE FROM plots WHERE level = :level AND X = :X AND Z = :Z"
-        );
-        $this->sqlRemovePlotById = $this->db->prepare("DELETE FROM plots WHERE id = :id");
-        $this->sqlGetPlotsByOwner = $this->db->prepare("SELECT * FROM plots WHERE owner = :owner");
-        $this->sqlGetPlotsByOwnerAndLevel = $this->db->prepare(
-            "SELECT * FROM plots WHERE owner = :owner AND level = :level"
         );
         $this->sqlGetExistingXZ = $this->db->prepare(
             "SELECT X, Z FROM plots WHERE (
@@ -58,24 +39,21 @@ class SQLiteDataProvider extends DataProvider
         $this->db->close();
     }
     public function savePlot(Plot $plot) {
-        $helpers = implode(",", $plot->helpers);
         if ($plot->id >= 0) {
-            $stmt = $this->sqlSavePlotById;
-            $stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
+            $stmt = $this->db->prepare(
+                "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome WHERE id = :id"
+            );
         } else {
-            $stmt = $this->sqlSavePlot;
-            $stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
-            $stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
-            $stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
+            $stmt = $this->db->prepare(
+                "INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES
+            ((select id from plots where level = :level AND X = :X AND Z = :Z),
+             :level, :X, :Z, :name, :owner, :helpers, :denied, :biome);"
+            );
         }
-        $stmt->bindValue(":name", $plot->name, SQLITE3_TEXT);
-        $stmt->bindValue(":owner", $plot->owner, SQLITE3_TEXT);
-        $stmt->bindValue(":helpers", $helpers, SQLITE3_TEXT);
-        $stmt->bindValue(":denied", $plot->denied, SQLITE3_TEXT);
-        $stmt->bindValue(":biome", $plot->biome, SQLITE3_TEXT);
-        $stmt->reset();
-        $result = $stmt->execute();
-        if ($result === false) {
+        $resulta = $stmt->execute();
+        $resultb = $this->db->savepoint($this->lastSave = time());
+
+        if ($resulta === false and $resultb == false) {
             return false;
         }
         $this->cachePlot($plot);
@@ -83,19 +61,17 @@ class SQLiteDataProvider extends DataProvider
     }
     public function deletePlot(Plot $plot) {
         if ($plot->id >= 0) {
-            $stmt = $this->sqlRemovePlotById;
-            $stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
+            $stmt = $this->db->prepare("DELETE FROM plots WHERE id = {$plot->id}");
         } else {
-            $stmt = $this->sqlRemovePlot;
-            $stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
-            $stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
-            $stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
+            $stmt = $this->db->prepare(
+                "DELETE FROM plots WHERE level = {$plot->levelName} AND X = {$plot->X} AND Z = {$plot->Z}"
+            );
         }
-        $stmt->reset();
         $result = $stmt->execute();
         if ($result === false) {
             return false;
         }
+        $this->lastSave = null;
         $plot = new Plot($plot->levelName, $plot->X, $plot->Z);
         $this->cachePlot($plot);
         return true;
@@ -104,12 +80,10 @@ class SQLiteDataProvider extends DataProvider
         if ($plot = $this->getPlotFromCache($levelName, $X, $Z)) {
             return $plot;
         }
-        $this->sqlGetPlot->bindValue(":level", $levelName, SQLITE3_TEXT);
-        $this->sqlGetPlot->bindValue(":X", $X, SQLITE3_INTEGER);
-        $this->sqlGetPlot->bindValue(":Z", $Z, SQLITE3_INTEGER);
-        $this->sqlGetPlot->reset();
-        $result = $this->sqlGetPlot->execute();
-        if ($val = $result->fetchArray(SQLITE3_ASSOC)) {
+        $result = $this->db->prepare(
+            "SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = {$plot->levelName} AND X = {$plot->X} AND Z = {$plot->Z}"
+        )->get_result();
+        if ($val = $result->fetch_array()) {
             if ($val["helpers"] === null or $val["helpers"] === "") {
                 $helpers = [];
             } else {
@@ -130,16 +104,15 @@ class SQLiteDataProvider extends DataProvider
     }
     public function getPlotsByOwner($owner, $levelName = "") {
         if ($levelName === "") {
-            $stmt = $this->sqlGetPlotsByOwner;
+            $stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = {$owner}");
         } else {
-            $stmt = $this->sqlGetPlotsByOwnerAndLevel;
-            $stmt->bindValue(":level", $levelName, SQLITE3_TEXT);
+            $stmt = $this->db->prepare(
+                "SELECT * FROM plots WHERE owner = :owner AND level = {$levelName}"
+            );
         }
-        $stmt->bindValue(":owner", $owner, SQLITE3_TEXT);
         $plots = [];
-        $stmt->reset();
-        $result = $stmt->execute();
-        while ($val = $result->fetchArray(SQLITE3_ASSOC)) {
+        $result = $stmt->get_result();
+        while ($val = $result->fetch_array()) {
             $helpers = explode(",", (string)$val["helpers"]);
             $denied = explode(",", (string)$val["denied"]);
             $plots[] = new Plot((string)$val["level"], (int)$val["X"], (int)$val["Z"], (string)$val["name"],
@@ -156,14 +129,19 @@ class SQLiteDataProvider extends DataProvider
         return $plots;
     }
     public function getNextFreePlot($levelName, $limitXZ = 0) {
-        $this->sqlGetExistingXZ->bindValue(":level", $levelName, SQLITE3_TEXT);
         $i = 0;
-        $this->sqlGetExistingXZ->bindParam(":number", $i, SQLITE3_INTEGER);
         for (; $limitXZ <= 0 or $i < $limitXZ; $i++) {
-            $this->sqlGetExistingXZ->reset();
-            $result = $this->sqlGetExistingXZ->execute();
+            $result = $this->db->prepare(
+                "SELECT X, Z FROM plots WHERE (
+                level = {$levelName}
+                AND (
+                    (abs(X) == {$i} AND abs(Z) <= {$i}) OR
+                    (abs(Z) == {$i} AND abs(X) <= {$i})
+                )
+            )"
+            )->get_result();
             $plots = [];
-            while ($val = $result->fetchArray(SQLITE3_NUM)) {
+            while ($val = $result->fetch_array(MYSQLI_NUM)) {
                 $plots[$val[0]][$val[1]] = true;
             }
             if (count($plots) === max(1, 8 * $i)) {
