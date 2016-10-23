@@ -2,6 +2,8 @@
 namespace MyPlot\provider;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\utils\Config;
+
 class JSONDataProvider extends DataProvider{
     /** @var Plot[] */
     private $cache = [];
@@ -9,10 +11,24 @@ class JSONDataProvider extends DataProvider{
     private $cacheSize;
     /** @var MyPlot */
     protected $plugin;
+    /** @var Config $json */
+    private $json;
+
     public function __construct(MyPlot $plugin, $cacheSize = 0) {
         parent::__construct($plugin, $cacheSize);
         $this->plugin = $plugin;
         $this->cacheSize = $cacheSize;
+        $this->json = new Config($this->plugin->getDataFolder()."plots.json", Config::JSON, [
+            "id" => null,
+            "level" => "",
+            "X" => null,
+            "Z" => null,
+            "name" => "",
+            "owner" => "",
+            "helpers" => [],
+            "denied" => [],
+            "biome" => ""
+        ]);
     }
     /**
      * @param Plot $plot
@@ -54,6 +70,6 @@ class JSONDataProvider extends DataProvider{
       //filler
     }
     public function close(){
-      //filler
+      $this->json->
     }
 }
