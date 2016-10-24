@@ -18,31 +18,21 @@ class JSONDataProvider extends DataProvider{
         parent::__construct($plugin, $cacheSize);
         $this->plugin = $plugin;
         $this->cacheSize = $cacheSize;
-        $this->json = new Config($this->plugin->getDataFolder()."plots.json", Config::JSON, [
-            "id" => null,
-            "level" => "",
-            "X" => null,
-            "Z" => null,
-            "name" => "",
-            "owner" => "",
-            "helpers" => [],
-            "denied" => [],
-            "biome" => ""
-        ]);
+        $this->json = new Config($this->plugin->getDataFolder()."plots.json", Config::JSON, [], false);
     }
     /**
      * @param Plot $plot
      * @return bool
      */
     public function savePlot(Plot $plot){
-      //filler
+      $this->JSON->set("")
     }
     /**
      * @param Plot $plot
      * @return bool
      */
     public function deletePlot(Plot $plot){
-      //filler
+      $this->JSON->set("");
     }
     /**
      * @param string $levelName
@@ -51,7 +41,7 @@ class JSONDataProvider extends DataProvider{
      * @return Plot
      */
     public function getPlot($levelName, $X, $Z){
-      //filler
+      $this->JSON->getNested("");
     }
     /**
      * @param string $owner
@@ -59,7 +49,7 @@ class JSONDataProvider extends DataProvider{
      * @return Plot[]
      */
     public function getPlotsByOwner($owner, $levelName = {
-      //filler
+      $this->JSON->get("");
     }
     /**
      * @param string $levelName
@@ -67,9 +57,9 @@ class JSONDataProvider extends DataProvider{
      * @return Plot|null
      */
     public function getNextFreePlot($levelName, $limitXZ = 0){
-      //filler
+      $this->JSON->get("");
     }
     public function close(){
-      $this->json->
+      unset($this->json);
     }
 }
