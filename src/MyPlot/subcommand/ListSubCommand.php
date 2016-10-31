@@ -14,7 +14,7 @@ class ListSubCommand extends SubCommand {
         if($sender instanceof Player);
         if($sender->hasPermission("myplot.admin.list")) {
             if(count($args) == 1) {
-                $plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel());
+                $plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName());
                 foreach($plots as $plot) {
                     $name = $plot->name;
                     $x = $plot->X;
