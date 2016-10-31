@@ -159,7 +159,7 @@ class SQLiteDataProvider extends DataProvider
 
         // Remove unloaded plots
         $plots = array_filter($plots, function($plot) {
-            return MyPlot::getInstance()->isLevelLoaded($plot->levelName);
+            return $this->plugin->isLevelLoaded($plot->levelName);
         });
         // Sort plots by level
         usort($plots, function ($plot1, $plot2) {

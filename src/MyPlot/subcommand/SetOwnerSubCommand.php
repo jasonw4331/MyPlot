@@ -20,14 +20,14 @@ class SetOwnerSubCommand extends SubCommand {
             return true;
         }
         $maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($player);
-        $plotsOfPlayer = count($this->getPlugin()->getProvider()->getPlotsByOwner($player->getName()));
+        $plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($player->getName(),$player->getLevel()));
         if ($plotsOfPlayer >= $maxPlots) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("setowner.maxplots", [$maxPlots]));
             return true;
         }
         $plot->owner = $args[0];
         $plot->name = "";
-        if ($this->getPlugin()->getProvider()->savePlot($plot)) {
+        if ($this->getPlugin()->savePlot($plot)) {
             $sender->sendMessage($this->translateString("setowner.success", [$plot->owner]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));

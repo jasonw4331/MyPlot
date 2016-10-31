@@ -31,7 +31,7 @@ class UnDenySubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("undenyplayer.notdenied", [$dplayer]));
             return true;
         }
-        if ($this->getPlugin()->getProvider()->savePlot($plot)) {
+        if ($this->getPlugin()->savePlot($plot)) {
             $sender->sendMessage($this->translateString("undenyplayer.success1", [$dplayer]));
             $dp->sendMessage($this->translateString("undenyplayer.success2", [$plot->X,$plot->Z,$sender->getName()]));
         } else {

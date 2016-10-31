@@ -10,6 +10,8 @@ class SQLiteDataProvider extends DataProvider
     private $db;
     /** @var string $lastSave */
     private $lastSave;
+		/** @var MyPlot  */
+		private $plugin;
 
     /**
      * MySQLProvider constructor.
@@ -18,7 +20,8 @@ class SQLiteDataProvider extends DataProvider
      * @param array $settings
      */
     public function __construct(MyPlot $plugin, $cacheSize = 0, $settings) {
-        parent::__construct($plugin, $cacheSize);
+	      $this->plugin = $plugin;
+	      parent::__construct($plugin, $cacheSize);
         $this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
         $this->db->query(
             "CREATE TABLE IF NOT EXISTS plots
@@ -120,7 +123,7 @@ class SQLiteDataProvider extends DataProvider
         }
         // Remove unloaded plots
         $plots = array_filter($plots, function($plot) {
-            return MyPlot::getInstance()->isLevelLoaded($plot->levelName);
+            return $this->plugin->isLevelLoaded($plot->levelName);
         });
         // Sort plots by level
         usort($plots, function ($plot1, $plot2) {

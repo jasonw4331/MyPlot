@@ -30,7 +30,7 @@ class RemoveHelperSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("removehelper.notone", [$helper]));
             return true;
         }
-        if ($this->getPlugin()->getProvider()->savePlot($plot)) {
+        if ($this->getPlugin()->savePlot($plot)) {
             $sender->sendMessage($this->translateString("removehelper.success", [$helper]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));

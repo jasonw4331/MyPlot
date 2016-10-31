@@ -13,14 +13,15 @@ class HomeSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (empty($args)) {
+      if($sender instanceof Player);
+	    if (empty($args)) {
             $plotNumber = 1;
         } elseif (count($args) === 1 and is_numeric($args[0])) {
             $plotNumber = (int) $args[0];
         } else {
             return false;
         }
-        $plots = $this->getPlugin()->getProvider()->getPlotsByOwner($sender->getName());
+        $plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(),$sender->getLevel());
         if (empty($plots)) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));
             return true;

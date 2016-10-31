@@ -35,7 +35,7 @@ class ClaimSubCommand extends SubCommand
         }
 
         $maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($player);
-        $plotsOfPlayer = count($this->getPlugin()->getProvider()->getPlotsByOwner($player->getName()));
+        $plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($player->getName(),$player->getLevel()));
         if ($plotsOfPlayer >= $maxPlots) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxplots", [$maxPlots]));
             return true;
@@ -50,7 +50,7 @@ class ClaimSubCommand extends SubCommand
 
         $plot->owner = $sender->getName();
         $plot->name = $name;
-        if ($this->getPlugin()->getProvider()->savePlot($plot)) {
+        if ($this->getPlugin()->savePlot($plot)) {
             $sender->sendMessage($this->translateString("claim.success"));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));

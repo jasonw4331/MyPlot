@@ -22,8 +22,6 @@ use pocketmine\level\Level;
 
 class MyPlot extends PluginBase
 {
-    /** @var MyPlot */
-    private static $instance;
 
     /** @var PlotLevelSettings[] */
     private $levels = [];
@@ -36,15 +34,6 @@ class MyPlot extends PluginBase
 
     /** @var BaseLang */
     private $baseLang = null;
-
-
-    /**
-     * @api
-     * @return MyPlot
-     */
-    public static function getInstance() {
-        return self::$instance;
-    }
 
     /**
      * @api
@@ -136,10 +125,13 @@ class MyPlot extends PluginBase
      *
      * @api
      * @param string $username
-     * @param string $levelName
+     * @param $levelName
      * @return Plot[]
      */
-    public function getPlotsOfPlayer($username, $levelName = "") {
+    public function getPlotsOfPlayer($username, $levelName) {
+	      if($levelName instanceof Level) {
+		        $levelName = $levelName->getName();
+	      }
         return $this->dataProvider->getPlotsByOwner($username, $levelName);
     }
 
@@ -337,7 +329,7 @@ class MyPlot extends PluginBase
         }
 
         $plot->biome = $biome->getName();
-        $this->dataProvider->savePlot($plot);
+        $this->savePlot($plot);
         return true;
     }
 
@@ -429,7 +421,7 @@ class MyPlot extends PluginBase
     }
 
     /**
-     * Teleports the player to the exact center of the plot
+     * Teleports the player to the exact center of the plot at nearest open space to the ground level
      *
      * @param Plot $plot
      * @param Player $player
@@ -448,7 +440,6 @@ class MyPlot extends PluginBase
 
     public function onEnable() {
         $this->getLogger()->info("Loading MyPlot");
-        self::$instance = $this;
 
         $this->saveDefaultConfig();
         $this->reloadConfig();

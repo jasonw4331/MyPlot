@@ -30,7 +30,7 @@ class AddHelperSubCommand extends SubCommand
             $sender->sendMessage($this->translateString("addhelper.alreadyone", [$helper]));
             return true;
         }
-        if ($this->getPlugin()->getProvider()->savePlot($plot)) {
+        if ($this->getPlugin()->savePlot($plot)) {
             $sender->sendMessage($this->translateString("addhelper.success", [$helper]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));

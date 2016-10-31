@@ -21,7 +21,7 @@ class AutoSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
             return true;
         }
-        if (($plot = $this->getPlugin()->getProvider()->getNextFreePlot($levelName)) !== null) {
+        if (($plot = $this->getPlugin()->getNextFreePlot($levelName)) !== null) {
             $this->getPlugin()->teleportPlayerToPlot($player, $plot);
             $sender->sendMessage($this->translateString("auto.success", [$plot->X, $plot->Z]));
         } else {

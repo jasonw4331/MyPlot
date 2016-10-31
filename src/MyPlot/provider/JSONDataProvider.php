@@ -1,10 +1,11 @@
 <?php
 namespace MyPlot\provider;
+
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\utils\Config;
 
-class JSONDataProvider extends DataProvider{
+class jsonDataProvider extends DataProvider{
     /** @var Plot[] */
     private $cache = [];
     /** @var int */
@@ -18,21 +19,21 @@ class JSONDataProvider extends DataProvider{
         parent::__construct($plugin, $cacheSize);
         $this->plugin = $plugin;
         $this->cacheSize = $cacheSize;
-        $this->json = new Config($this->plugin->getDataFolder()."plots.json", Config::JSON, [], false);
+        $this->json = new Config($this->plugin->getDataFolder()."plots.json", Config::JSON, []);
     }
     /**
      * @param Plot $plot
      * @return bool
      */
     public function savePlot(Plot $plot){
-      $this->JSON->set("")
+      $this->json->set("");
     }
     /**
      * @param Plot $plot
      * @return bool
      */
     public function deletePlot(Plot $plot){
-      $this->JSON->set("");
+      $this->json->set("");
     }
     /**
      * @param string $levelName
@@ -41,15 +42,15 @@ class JSONDataProvider extends DataProvider{
      * @return Plot
      */
     public function getPlot($levelName, $X, $Z){
-      $this->JSON->getNested("");
+      $this->json->getNested("");
     }
     /**
      * @param string $owner
      * @param string $levelName
      * @return Plot[]
      */
-    public function getPlotsByOwner($owner, $levelName = {
-      $this->JSON->get("");
+    public function getPlotsByOwner($owner, $levelName = ""){
+      $this->json->get("");
     }
     /**
      * @param string $levelName
@@ -57,7 +58,7 @@ class JSONDataProvider extends DataProvider{
      * @return Plot|null
      */
     public function getNextFreePlot($levelName, $limitXZ = 0){
-      $this->JSON->get("");
+      $this->json->get("");
     }
     public function close(){
       unset($this->json);

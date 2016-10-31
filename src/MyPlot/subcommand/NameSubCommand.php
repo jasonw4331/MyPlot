@@ -29,7 +29,7 @@ class NameSubCommand extends SubCommand
         
         $name = $args[0];
         $plot->name = $name;
-        if ($this->getPlugin()->getProvider()->savePlot($plot)) {
+        if ($this->getPlugin()->savePlot($plot)) {
             $sender->sendMessage($this->translateString("name.success", [$name]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));

@@ -38,7 +38,7 @@ class GiveSubCommand extends SubCommand
         }
 
         $maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($newOwner);
-        $plotsOfPlayer = count($this->getPlugin()->getProvider()->getPlotsByOwner($newOwner->getName()));
+        $plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(),$newOwner->getLevel()));
         if ($plotsOfPlayer >= $maxPlots) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
             return true;
@@ -46,7 +46,7 @@ class GiveSubCommand extends SubCommand
 
         if ($confirm) {
             $plot->owner = $newOwner->getName();
-            if ($this->getPlugin()->getProvider()->savePlot($plot)) {
+            if ($this->getPlugin()->savePlot($plot)) {
                 $plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
                 $oldOwnerName = TextFormat::GREEN . $sender->getName() . TextFormat::WHITE;
                 $newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;

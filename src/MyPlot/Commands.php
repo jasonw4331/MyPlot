@@ -37,7 +37,11 @@ class Commands extends PluginCommand
     /** @var SubCommand[]  */
     private $aliasSubCommands = [];
 
+		/** @var MyPlot  */
+		private $plugin;
+
     public function __construct(MyPlot $plugin) {
+	      $this->plugin = $plugin;
         parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);
         $this->setPermission("myplot.command");
         $this->setAliases([$plugin->getLanguage()->get("command.alias")]);
@@ -84,7 +88,7 @@ class Commands extends PluginCommand
 
     public function execute(CommandSender $sender, $alias, array $args) {
         if (!isset($args[0])) {
-            $sender->sendMessage(MyPlot::getInstance()->getLanguage()->get("command.usage"));
+            $sender->sendMessage($this->plugin->getLanguage()->get("command.usage"));
             return true;
         }
 
@@ -94,17 +98,17 @@ class Commands extends PluginCommand
         } elseif (isset($this->aliasSubCommands[$subCommand])) {
             $command = $this->aliasSubCommands[$subCommand];
         } else {
-            $sender->sendMessage(TextFormat::RED . MyPlot::getInstance()->getLanguage()->get("command.unknown"));
+            $sender->sendMessage(TextFormat::RED . $this->plugin->getLanguage()->get("command.unknown"));
             return true;
         }
 
         if ($command->canUse($sender)) {
             if (!$command->execute($sender, $args)) {
-                $usage = MyPlot::getInstance()->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
+                $usage = $this->plugin->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
                 $sender->sendMessage($usage);
             }
         } else {
-            $sender->sendMessage(TextFormat::RED . MyPlot::getInstance()->getLanguage()->get("command.unknown"));
+            $sender->sendMessage(TextFormat::RED . $this->plugin->getLanguage()->get("command.unknown"));
         }
         return true;
     }
