@@ -8,7 +8,7 @@
 Have you ever seen those PC servers with the PlotMe plugin, and you thought "Hey, why can't I have plots in my PocketMine server?" Well, now you can with **MyPlot** for PocketMine-MP! It's easy to set up, and simple to use!
 <br>
 <br>
-A list of commands and permissions can be found in the [wiki](https://github.com/wiez/MyPlot/wiki)
+A list of commands and permissions can be found in the [wiki](https://github.com/jasonwynn10/MyPlot/wiki)
 <br>
 Future commands can be found [here](http://plotme.worldcretornica.com/cmdsandperms)
 <br>
