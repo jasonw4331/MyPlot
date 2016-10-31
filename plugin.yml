@@ -8,7 +8,7 @@ softdepend: [EconomyAPI, PocketMoney]
 
 permissions:
     myplot.command:
-        default: op
+        default: true
         children:
             myplot.command.help:
                 default: true
@@ -91,7 +91,7 @@ permissions:
             myplot.admin.done:
                 default: op
             myplot.admin.middle:
-                default: op
+                default: true
             myplot.admin.list:
                 default: op
     myplot.claimplots:
