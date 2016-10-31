@@ -38,8 +38,7 @@ class Commands extends PluginCommand
     private $aliasSubCommands = [];
 
     public function __construct(MyPlot $plugin) {
-        parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);
-        $this->setPermission("myplot.command");
+        parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);       
         $this->setAliases([$plugin->getLanguage()->get("command.alias")]);
         $this->setDescription($plugin->getLanguage()->get("command.desc"));
 
