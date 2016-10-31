@@ -34,7 +34,7 @@ class ListSubCommand extends SubCommand {
                 return true;
             }
         }elseif($sender->hasPermission("myplot.command.list")) {
-            $plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel());
+            $plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName());
             foreach($plots as $plot) {
                 $name = $plot->name;
                 $x = $plot->X;
