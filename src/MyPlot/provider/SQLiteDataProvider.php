@@ -16,6 +16,7 @@ class SQLiteDataProvider extends DataProvider
             $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
             $sqlGetExistingXZ;
 
+	CONST COUNT = 9;
     /**
      * @param MyPlot $plugin
      * @param int $cacheSize
@@ -27,8 +28,21 @@ class SQLiteDataProvider extends DataProvider
         $this->db->exec(
             "CREATE TABLE IF NOT EXISTS plots
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
-             owner TEXT, helpers TEXT, denied TEXT, biome TEXT)"
+             owner TEXT, helpers TEXT, denied TEXT, biome TEXT);"
         );
+
+	    if($this->db->query("SELECT * FROM plots")->numColumns() <= self::COUNT) {
+		    $this->db->exec("
+             ALTER TABLE plots ADD COLUMN denied TEXT;
+             CREATE TABLE temp
+             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
+             owner TEXT, helpers TEXT, denied TEXT, biome TEXT);
+             INSERT INTO temp SELECT id, level, X, Z, name, owner, helpers, denied, biome FROM plots;
+             PRAGMA foreign_keys;
+             PRAGMA foreign_keys = 0;
+             DROP TABLE plots;
+             ALTER TABLE temp RENAME TO plots;");
+	    }
 
         $this->sqlGetPlot = $this->db->prepare(
             "SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = :level AND X = :X AND Z = :Z"
