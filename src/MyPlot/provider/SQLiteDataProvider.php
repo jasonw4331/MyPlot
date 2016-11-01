@@ -66,6 +66,7 @@ class SQLiteDataProvider extends DataProvider
 
     public function savePlot(Plot $plot) {
         $helpers = implode(",", $plot->helpers);
+	    $denied = implode(",",$plot->denied);
         if ($plot->id >= 0) {
             $stmt = $this->sqlSavePlotById;
             $stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
@@ -78,7 +79,7 @@ class SQLiteDataProvider extends DataProvider
         $stmt->bindValue(":name", $plot->name, SQLITE3_TEXT);
         $stmt->bindValue(":owner", $plot->owner, SQLITE3_TEXT);
         $stmt->bindValue(":helpers", $helpers, SQLITE3_TEXT);
-        $stmt->bindValue(":denied", $plot->denied, SQLITE3_TEXT);
+        $stmt->bindValue(":denied", $denied, SQLITE3_TEXT);
         $stmt->bindValue(":biome", $plot->biome, SQLITE3_TEXT);
         $stmt->reset();
         $result = $stmt->execute();
