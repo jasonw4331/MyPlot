@@ -3,19 +3,41 @@ index e69de29..e676d61 100644
 --- a/.codeclimate.yml
 +++ b/.codeclimate.yml
 @@ -0,0 +1,24 @@
-+---
-+engines:
-+  duplication:
-+    enabled: false
-+    config:
-+      languages:
-+      - php
-+  fixme:
-+    enabled: true
-+  phpmd:
-+    enabled: true
-+ratings:
-+  paths:
-+  - "**.php"
-+  - "**.yml"
-+exclude_paths: []
+---
+engines:
+  duplication:
+    enabled: true
+    checks:
+      Identical code:
+        enabled: false
+      Similar code:
+        enabled: false
+    config:
+      languages:
+        php:
+          mass_threshold: 50
+  fixme:
+    enabled: true
+  phpmd:
+    enabled: true
+    checks:
+      Naming/LongVariable:
+        enabled: false
+      Naming/ShortVariable:
+        enabled: false
+      CleanCode/ElseExpression:
+        enabled: false
+    config:
+      file_extensions: 
+        - php
+  phpcodesniffer:
+    enabled: true
+    config:
+      file_extensions: "php"
+  markdownlint:
+    enabled: true
+ratings:
+  paths:
+  - "**.php"
+  - "**.yml"
+exclude_paths: []
