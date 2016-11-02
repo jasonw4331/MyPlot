@@ -14,7 +14,8 @@ engines:
         enabled: false
     config:
       languages:
-      - php
+        php:
+          mass_threshold: 50
   fixme:
     enabled: true
   phpmd:
@@ -26,6 +27,15 @@ engines:
         enabled: false
       CleanCode/ElseExpression:
         enabled: false
+    config:
+      file_extensions: 
+        - php
+  phpcodesniffer:
+    enabled: true
+    config:
+      file_extensions: "php"
+  markdownlint:
+    enabled: true
 ratings:
   paths:
   - "**.php"
