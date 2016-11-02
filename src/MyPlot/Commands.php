@@ -64,8 +64,8 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new NameSubCommand($plugin, "name"));
         $this->loadSubCommand(new GiveSubCommand($plugin, "give"));
         $this->loadSubCommand(new WarpSubCommand($plugin, "warp"));
-        $this->loadSubCommand(new DenyPlayerSubCommand($plugin, "deny"));
-        $this->loadSubCommand(new UnDenySubCommand($plugin, "undeny"));
+        $this->loadSubCommand(new DenyPlayerSubCommand($plugin, "denyplayer"));
+        $this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));
         $this->loadSubCommand(new DoneSubCommand($plugin, "done"));
         $this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
         $this->loadSubCommand(new ListSubCommand($plugin, "list"));
