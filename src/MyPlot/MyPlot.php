@@ -257,8 +257,7 @@ class MyPlot extends PluginBase
                 }
             }
         }
-        $this->getServer()->getScheduler()->scheduleTask($task = new ClearPlotTask($this, $plot, $maxBlocksPerTick));
-        //$task->onRun(0);
+        $this->getServer()->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
         return true;
     }
 

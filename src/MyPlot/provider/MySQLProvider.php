@@ -28,15 +28,6 @@ class SQLiteDataProvider extends DataProvider
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
              owner TEXT, helpers TEXT, denied TEXT, biome TEXT)"
         );
-        $this->sqlGetExistingXZ = $this->db->prepare(
-            "SELECT X, Z FROM plots WHERE (
-                level = :level
-                AND (
-                    (abs(X) == :number AND abs(Z) <= :number) OR
-                    (abs(Z) == :number AND abs(X) <= :number)
-                )
-            )"
-        );
     }
     public function close() {
         $this->db->close();
@@ -86,7 +77,7 @@ class SQLiteDataProvider extends DataProvider
         $result = $this->db->prepare(
             "SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = {$plot->levelName} AND X = {$plot->X} AND Z = {$plot->Z}"
         )->get_result();
-        if ($val = $result->fetch_array()) {
+        if ($val = $result->fetch_array(MYSQLI_ASSOC)) {
             if ($val["helpers"] === null or $val["helpers"] === "") {
                 $helpers = [];
             } else {
