@@ -16,7 +16,7 @@ class DenyPlayerSubCommand extends SubCommand
         if (count($args) !== 1) {
             return false;
         }
-        $dplayer = $args[0];
+        $dplayer = strtolower($args[0]);
         $dp = $this->getPlugin()->getServer()->getPlayer($dplayer);
         $plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
         if ($plot === null) {
@@ -27,17 +27,27 @@ class DenyPlayerSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
-        if($this->getPlugin()->getServer()->getPlayer($dplayer)->hasPermission("myplot.admin.bypassdeny")) {
-            $sender->sendMessage($this->translateString("denyplayer.cannotdeny", [$dplayer]));
+        foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
+            if(similar_text($dplayer,strtolower($player->getName()))/strlen($player->getName()) >= 0.3 ) { //TODO correst with a better system
+                $dplayer = $this->getPlugin()->getServer()->getPlayer($dplayer);
+                break;
+            }
+        }
+        if(!$dplayer instanceof Player) {
+            $sender->sendMessage(translateString("denyplayer.notaplayer"));
+            return true;
+        }
+        if($dplayer->hasPermission("myplot.admin.bypassdeny") or $dplayer->getName() == $plot->owner) {
+            $sender->sendMessage($this->translateString("denyplayer.cannotdeny", [$dplayer->getName()]));
             $dp->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));
             return true;
         }
-        if (!$plot->denyPlayer($dplayer)) {
-            $sender->sendMessage($this->translateString("denyplayer.alreadydenied", [$dplayer]));
+        if (!$plot->denyPlayer($dplayer->getName())) {
+            $sender->sendMessage($this->translateString("denyplayer.alreadydenied", [$dplayer->getName()]));
             return true;
         }
         if ($this->getPlugin()->savePlot($plot)) {
-            $sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer]));
+            $sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer->getName()]));
             $dp->sendMessage($this->translateString("denyplayer.success2", [$plot->X,$plot->Z,$sender->getName()]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
