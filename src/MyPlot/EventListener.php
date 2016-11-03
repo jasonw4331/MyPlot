@@ -167,6 +167,9 @@ class EventListener implements Listener
         if ($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
             $plotName = TextFormat::GREEN . $plot;
             $popup = $this->plugin->getLanguage()->translateString("popup", [$plotName]);
+	        if(strpos($plot,"-0")) {
+		        return;
+	        }
             if ($plot->owner != "") {
                 $owner = TextFormat::GREEN . $plot->owner;
                 $ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);

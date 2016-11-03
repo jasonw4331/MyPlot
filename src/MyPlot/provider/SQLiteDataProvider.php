@@ -29,7 +29,7 @@ class SQLiteDataProvider extends DataProvider
              owner TEXT, helpers TEXT, denied TEXT, biome TEXT);"
         );
 
-	    if($this->db->query("SELECT * FROM plots")->numColumns() <= self::COUNT) {
+	    try{
 		    $this->db->exec("
              ALTER TABLE plots ADD COLUMN denied TEXT;
              CREATE TABLE temp
@@ -40,6 +40,8 @@ class SQLiteDataProvider extends DataProvider
              PRAGMA foreign_keys = 0;
              DROP TABLE plots;
              ALTER TABLE temp RENAME TO plots;");
+	    }catch(\SQLiteException $e){
+		    $this->plugin->getLogger()->debug($e->getMessage());
 	    }
 
         $this->sqlGetPlot = $this->db->prepare(
