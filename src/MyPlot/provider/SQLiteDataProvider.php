@@ -3,15 +3,13 @@ namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use SQLite3;
-use SQLite3Stmt;
 
 class SQLiteDataProvider extends DataProvider
 {
-    /** @var SQLite3 */
+    /** @var \SQLite3 */
     private $db;
 
-    /** @var SQLite3Stmt */
+    /** @var \SQLite3Stmt */
     private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
             $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
             $sqlGetExistingXZ;
@@ -24,7 +22,7 @@ class SQLiteDataProvider extends DataProvider
     public function __construct(MyPlot $plugin, $cacheSize = 0) {
         parent::__construct($plugin, $cacheSize);
 
-        $this->db = new SQLite3($this->plugin->getDataFolder() . "plots.db");
+        $this->db = new \SQLite3($this->plugin->getDataFolder() . "plots.db");
         $this->db->exec(
             "CREATE TABLE IF NOT EXISTS plots
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
