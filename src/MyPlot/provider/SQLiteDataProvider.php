@@ -28,10 +28,7 @@ class SQLiteDataProvider extends DataProvider
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
              owner TEXT, helpers TEXT, denied TEXT, biome TEXT);"
         );
-
-	    try{
-		    $this->db->exec("
-             ALTER TABLE plots ADD COLUMN denied TEXT;
+	    /** $this->db->exec("
              CREATE TABLE temp
              (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
              owner TEXT, helpers TEXT, denied TEXT, biome TEXT);
@@ -39,10 +36,7 @@ class SQLiteDataProvider extends DataProvider
              PRAGMA foreign_keys;
              PRAGMA foreign_keys = 0;
              DROP TABLE plots;
-             ALTER TABLE temp RENAME TO plots;");
-	    }catch(\SQLiteException $e){
-		    $this->plugin->getLogger()->debug($e->getMessage());
-	    }
+             ALTER TABLE temp RENAME TO plots;"); **/
 
         $this->sqlGetPlot = $this->db->prepare(
             "SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = :level AND X = :X AND Z = :Z"
