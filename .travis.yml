@@ -1,3 +1,4 @@
 language: php
 php:
-- 7.0.4
+- 7.1
+script: phpunit src/MyPlot/MyPlot.php
