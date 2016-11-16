@@ -2,7 +2,7 @@
 ### **Create, manage, and build in protected plots! Keep your builds safe from griefers!**
 ======
 
-[![Gitter](https://badges.gitter.im/jasonwynn10/MyPlot.svg)](https://gitter.im/jasonwynn10/MyPlot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://badges.gitter.im/jasonwynn10/MyPlot.svg)](https://gitter.im/jasonwynn10/MyPlot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Travis-Ci](https://api.travis-ci.org/jasonwynn10/MyPlot.svg)](https://travis-ci.org/jasonwynn10/MyPlot)
 <br>
 <br>
 Have you ever seen those PC servers with the PlotMe plugin, and you thought "Hey, why can't I have plots on my MCPE server?" Well, now you can with **MyPlot** for PocketMine-MP and other 3rd party servers! It's easy to set up, and simple to use!
