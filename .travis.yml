@@ -1,4 +1,40 @@
 language: php
+
 php:
-- 7.1
-script: phpunit src/MyPlot/MyPlot.php
+ - 7.1
+
+branches:
+ - master
+
+before_script:
+ - cd /home/travis/build/
+ - pecl install channel://pecl.php.net/pthreads-3.1.6
+ - pecl install channel://pecl.php.net/weakref-0.3.2
+ - echo | pecl install channel://pecl.php.net/yaml-2.0.0RC8
+ - git clone --depth=50 --branch=master https://github.com/pmmp/PocketMine-MP.git
+ - mkdir -p PocketMine-MP/plugins/MyPlot-src
+ - cp -rf jasonwynn10/MyPlot/src PocketMine-MP/plugins/MyPlot-src
+ - cp -rf jasonwynn10/MyPlot/resources PocketMine-MP/plugins/MyPlot-src
+ - cp -rf jasonwynn10/MyPlot/plugin.yml PocketMine-MP/plugins/MyPlot-src
+ - cp -rf jasonwynn10/MyPlot/LICENSE PocketMine-MP/plugins/MyPlot-src
+ - cp -rf jasonwynn10/MyPlot/build.php PocketMine-MP/
+ - cp -rf jasonwynn10/MyPlot/syntaxcheck.php PocketMine-MP/
+ - cd PocketMine-MP/plugins/
+ - wget -O DevTools.phar https://github.com/PocketMine/DevTools/releases/download/v1.11.0/DevTools_v1.11.0.phar
+ - cd /home/travis/build/PocketMine-MP
+ - php syntaxcheck.php
+
+script:
+ - php build.php
+
+deploy:
+  provider: releases
+  api_key: "$traviskey"
+  file: "/home/travis/build/PocketMine-MP/plugins/DevTools/MyPlot.phar"
+  skip_cleanup: false
+  overwrite: true
+  on:
+    tags: false
+
+notifications:
+ email: true
