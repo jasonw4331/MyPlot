@@ -10,7 +10,7 @@
 #########################################
 
 # The language that should be used in MyPlot
-# Available languages: eng, nl, vi, spa, chs, zho, deu
+# Available languages: eng, nl, vi, spa, chs, zho, deu , ces
 #
 # English language pack by @Exxarion
 # Dutch language pack by @Wies
@@ -19,6 +19,7 @@
 # Chinese ( ROC ) pack by @jerryzooyoyo
 # Chinese ( PRC ) pack by @jerryzooyoyo
 # German language pack by @SalmonGER
+# Czech lanauge pack by @GamakCZ
 language: eng
 
 # The data provider where plot data is stored.
