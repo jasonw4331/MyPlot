@@ -51,7 +51,11 @@ ShowPlotPopup: true
 # Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
 ClearBlocksPerTick: 256
 
-# These settings will be used when creating a new world.
+# The MyPlotGenerator is the default Generator
+# Enter the custom generator's class
+Generator: MyPlotGenerator
+
+# These settings will be used when creating a new world with the default generator.
 DefaultWorld:
 
   # Restrict entities (e.g. tnt) from moving except falling
