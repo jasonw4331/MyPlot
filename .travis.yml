@@ -8,10 +8,10 @@ branches:
 
 before_script:
  - cd /home/travis/build/
- - pecl install channel://pecl.php.net/get/pthreads
- - pecl install channel://pecl.php.net/get/Weakref
- - echo | pecl install channel://pecl.php.net/get/yaml
- - git clone --depth=50 --branch=master https://github.com/pmmp/PocketMine-MP.git
+ - pecl install channel://pecl.php.net/pthreads-3.1.6
+ - pecl install channel://pecl.php.net/weakref-0.3.2
+ - echo | pecl install channel://pecl.php.net/yaml-2.0.0RC8
+ - git clone --recursive --branch=master https://github.com/pmmp/PocketMine-MP.git
  - mkdir -p PocketMine-MP/plugins/MyPlot-src
  - cp -rf jasonwynn10/MyPlot/src PocketMine-MP/plugins/MyPlot-src
  - cp -rf jasonwynn10/MyPlot/resources PocketMine-MP/plugins/MyPlot-src
