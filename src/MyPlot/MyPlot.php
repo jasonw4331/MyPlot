@@ -445,8 +445,14 @@ class MyPlot extends PluginBase
 
         @mkdir($this->getDataFolder());
         @mkdir($this->getDataFolder() . "worlds");
-
-        Generator::addGenerator(MyPlotGenerator::class, "myplot");
+	
+	   
+        $gen = $this->getConfig()->get("Generator","MyPlotGenerator");
+        if($gen == "MyPlotGenerator") {
+                Generator::addGenerator(MyPlotGenerator::class, "myplot");
+        }else{
+                Generator::addGenerator(MyPlotGenerator::class, "myplot"); // TODO find all generators in plugin directory and use selected
+        }
 
         $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
         $this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
