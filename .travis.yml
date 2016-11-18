@@ -23,19 +23,20 @@ before_script:
  - cd PocketMine-MP/plugins/
  - wget -O DevTools.phar https://github.com/PocketMine/DevTools/releases/download/v1.11.0/DevTools_v1.11.0.phar
  - cd /home/travis/build/PocketMine-MP
- - php syntaxcheck.php
 
 script:
+ - php syntaxcheck.php
  - php build.php
 
 deploy:
   provider: releases
-  api_key: "$traviskey"
+  user: "jasonwyn10"
+  password: "Blueoeo124"
   file: "/home/travis/build/PocketMine-MP/plugins/DevTools/MyPlot.phar"
-  skip_cleanup: false
+  skip_cleanup: true
   overwrite: true
   on:
-    tags: false
+    tags: true
 
 notifications:
- email: true
+ email: false
