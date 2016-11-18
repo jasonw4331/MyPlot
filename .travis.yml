@@ -36,7 +36,7 @@ deploy:
   skip_cleanup: true
   overwrite: true
   on:
-    tags: false
+    braches: master
 
 notifications:
  email: false
