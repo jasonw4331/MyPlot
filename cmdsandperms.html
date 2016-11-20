@@ -1,305 +1,299 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset='UTF-8'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta name="description" content="PlotMe : A Minecraft Plot Management Plugin">
-    <link rel="stylesheet" type="text/css" media="screen" href="../stylesheets/stylesheet.css">
-    <link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico"/>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400italic,300,700,400' rel='stylesheet' type='text/css'>
-    <script type="text/javascript" src="http://s3.amazonaws.com/codecademy-content/courses/hour-of-code/js/alphabet.js"></script>
-    <title>PlotMe | Cmds & Perms</title>
-</head>
-<body>
-<div id="header_wrap" class="outer">
-    <header class="inner">
-        <h1 id="project_title">Minecraft PlotMe Plugin</h1>
-
-        <h3 id="project_tagline">Welcome to the official PlotMe wiki</h3>
-
-        <div align="left" id="nav">
-            <div align="left" id="nav_wrapper">
-                <ul>
-                    <li><a href="../">Home</a></li>
-                    <li><a href="../downloads">Downloads</a></li>
-                    <li><a href="../cmdsandperms">Commands and Permissions</a></li>
-                    <li><a href="../configurations">Configurations</a></li>
-                    <li><a href="../how-to-use">Setup / Upgrade</a></li>
-                    <li><a href="#">Support</a>
-                        <ul>
-                            <li><a href="../issues">Open an issue</a></li>
-                            <li><a href="https://github.com/WorldCretornica/PlotMe-Core/issues/" target="_blank">View issues</a></li>
-                            <li><a href="http://webchat.esper.net/?channels=worldcretornica" target="_blank">IRC</a></li>
-                        </ul>
-                    <li><a href="../about">About PlotMe</a></li>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </header>
-</div>
-
-<div id="main_content_wrap" class="outer">
-    <section id="main_content" class="inner">
-        <h2 style="font-size: 30px; text-decoration: none; color: black;">Commands and Permissions</h2>
-
-        <p style="font-size: 20px; text-decoration: none; color: black;"><strong>User</strong> commands and permissions
-        </p>
-        <table class="tftable" border="2">
-            <tr>
-                <th>Notes</th>
-                <th>Command</th>
-                <th>Subcommand</th>
-                <th>Argument</th>
-                <th>Description</th>
-                <th>Permission</th>
-                <th>Permissions Group</th>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>claim</td>
-                <td></td>
-                <td>Claim the plot you're standing on</td>
-                <td>plotme.use.claim</td>
-                <td rowspan="17">plotme.use</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>auto</td>
-                <td></td>
-                <td>Auto claim the next free plot</td>
-                <td>plotme.use.auto</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>home</td>
-                <td>:1,2,3.. etc.</td>
-                <td>Teleport to your plot home. Use :# if multiple homes</td>
-                <td>plotme.use.home</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>list</td>
-                <td></td>
-                <td>List your own plots</td>
-                <td>plotme.use.list</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>info</td>
-                <td></td>
-                <td>Displays info about the plot you're standing on</td>
-                <td>plotme.use.info</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>biome</td>
-                <td>biome</td>
-                <td>Change the biome of your plot</td>
-                <td>plotme.use.biome</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>biomes</td>
-                <td></td>
-                <td>List available biomes</td>
-                <td>plotme.use.biome</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>clear</td>
-                <td></td>
-                <td>Clear your plot</td>
-                <td>plotme.use.clear</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>dispose</td>
-                <td></td>
-                <td>Dispose your plot</td>
-                <td>plotme.use.dispose</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>done</td>
-                <td></td>
-                <td>Mark your plot as done</td>
-                <td>plotme.use.done</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>deny</td>
-                <td>player</td>
-                <td>Deny a player from your plot</td>
-                <td>plotme.use.deny</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>undeny</td>
-                <td>player</td>
-                <td>Undeny a denied player from your plot</td>
-                <td>plotme.use.undeny</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>buy</td>
-                <td></td>
-                <td>Buy the plot you're standing on (economy)</td>
-                <td>plotme.use.buy</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>sell</td>
-                <td></td>
-                <td>Sell your plot</td>
-                <td>plotme.use.sell</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>auction</td>
-                <td></td>
-                <td>Auction your plot</td>
-                <td>plotme.use.auction</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>reset</td>
-                <td></td>
-                <td>Reset the plot you're standing on</td>
-                <td>plotme.use.reset</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>middle</td>
-                <td></td>
-                <td>Teleport to the middle of your plot</td>
-                <td>plotme.use.middle</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>add</td>
-                <td>player</td>
-                <td>Grant a player build access on your plot</td>
-                <td>plotme.use.add</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>remove</td>
-                <td>player</td>
-                <td>Remove an added players build access on your plot</td>
-                <td>plotme.use.remove</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>protect</td>
-                <td></td>
-                <td>Protect the plot you are standing on from being cleared or reset</td>
-                <td>plotme.use.protect</td>
-                <td></td>
-            </tr>
-            <tr style="background-color:#fd9090;">
-                <td style="text-align:center;">Coming Soon</td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>name</td>
-                <td>name</td>
-                <td>Name your plot</td>
-                <td>plotme.use.name</td>
-                <td></td>
-            </tr>
-            <tr style="background-color:#fd9090;">
-                <td style="text-align:center;">Coming Soon</td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>like</td>
-                <td></td>
-                <td>Like the plot you are standing on</td>
-                <td>plotme.use.like</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td colspan="4"></td>
-                <td>Limit the number of plots a user can claim/auto or buy</td>
-                <td>plotme.limit.#</td>
-                <td>Replace # with a number, or * for infinite plots</td>
-            </tr>
-        </table>
-        <p style="font-size: 20px; text-decoration: none; color: #000000;"><strong>Admin</strong> commands and
-            permissions</p>
-        <table class="tftable" border="2">
-            <tr>
-                <th>Notes</th>
-                <th>Command</th>
-                <th>Subcommand</th>
-                <th>Argument</th>
-                <th>Description</th>
-                <th>Permission</th>
-                <th>Permissions Group</th>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>claim</td>
-                <td>player</td>
-                <td>Claim a plot for another player</td>
-                <td>plotme.admin.claim.other</td>
-                <td rowspan="22">plotme.admin</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>home</td>
-                <td>player</td>
-                <td>Teleport to another players home. Use :# if multiple homes</td>
-                <td>plotme.admin.home.other</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>list</td>
-                <td>player</td>
-                <td>List your another players plots</td>
-                <td>plotme.admin.list</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>reset</td>
-                <td></td>
-                <td>Reset the plot you're standing on</td>
-                <td>plotme.admin.reset</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>buy</td>
-                <td>player</td>
-                <td>Buy a plot for another player</td>
-                <td>plotme.admin.buy</td>
-            </tr>
-            <tr>
+	<head>
+		<meta charset='UTF-8'>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+		<meta name="description" content="MyPlot : An MCPE Plot Management Plugin">
+		<link rel="stylesheet" type="text/css" media="screen" href="https://jasonwynn10.github.io/MyPlot/stylesheets/stylesheet.css">
+		<link rel="shortcut icon" type="image/x-icon" href="https://jasonwynn10.github.io/MyPlot/images/favicon.ico"/>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+		<link href='http://fonts.googleapis.com/css?family=Roboto:400italic,300,700,400' rel='stylesheet' type='text/css'>
+		<script type="text/javascript" src="http://s3.amazonaws.com/codecademy-content/courses/hour-of-code/js/alphabet.js"></script>
+		<title>MyPlot Cmds and Perms</title>
+	</head>
+	<body>
+		<div id="header_wrap" class="outer">
+			<header class="inner">
+				<h1 id="project_title">MCPE MyPlot Plugin</h1>
+				<h3 id="project_tagline">Welcome to the official MyPlot wiki</h3>
+				<div align="left" id="nav">
+					<div align="left" id="nav_wrapper">
+						<ul>
+							<li><a href="https://jasonwynn10.github.io/MyPlot">Home</a></li>
+							<li><a href="https://jasonwynn10.github.io/MyPlot/downloads">Downloads</a></li>
+							<li><a href="https://jasonwynn10.github.io/MyPlot/cmdsandperms">Commands and Permissions</a></li>
+							<li><a href="https://jasonwynn10.github.io/MyPlot/configurations">Configurations</a></li>
+							<li><a href="https://jasonwynn10.github.io/MyPlot/how-to-use">Setup / Upgrade</a></li>
+							<li><a>Support</a>
+								<ul>
+									<li><a href="https://jasonwynn10.github.io/MyPlot/issues">Open an issue</a></li>
+									<li><a href="https://gitter.im/jasonwynn10/MyPlot/" target="_blank">Gitter Chat</a></li>
+									<!--<li><a href="http://webchat.esper.net/?channels=worldcretornica" target="_blank">IRC</a></li>-->
+								</ul>
+							</li>
+							<li><a href="https://jasonwynn10.github.io/MyPlot/about">About MyPlot</a></li>
+						</ul>
+					</div>
+				</div>
+			</header>
+		</div>
+		<div id="main_content_wrap" class="outer">
+			<section id="main_content" class="inner">
+				<h2 style="font-size: 30px; text-decoration: none; color: black;">Commands and Permissions</h2>
+				<p style="font-size: 20px; text-decoration: none; color: black;"><strong>User</strong> commands and permissions</p>
+				<table class="tftable" border="2">
+					<tr>
+						<th>Notes</th>
+						<th>Command</th>
+						<th>Subcommand</th>
+						<th>Argument</th>
+						<th>Description</th>
+						<th>Permission</th>
+						<th>Permissions Group</th>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>claim</td>
+						<td></td>
+						<td>Claim the plot you're standing on</td>
+						<td>plotme.use.claim</td>
+						<td rowspan="17">plotme.use</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>auto</td>
+						<td></td>
+						<td>Auto claim the next free plot</td>
+						<td>plotme.use.auto</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>home</td>
+						<td>:1,2,3.. etc.</td>
+						<td>Teleport to your plot home. Use :# if multiple homes</td>
+						<td>plotme.use.home</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>list</td>
+						<td></td>
+						<td>List your own plots</td>
+						<td>plotme.use.list</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>info</td>
+						<td></td>
+						<td>Displays info about the plot you're standing on</td>
+						<td>plotme.use.info</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>biome</td>
+						<td>biome</td>
+						<td>Change the biome of your plot</td>
+						<td>plotme.use.biome</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>biomes</td>
+						<td></td>
+						<td>List available biomes</td>
+						<td>plotme.use.biome</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>clear</td>
+						<td></td>
+						<td>Clear your plot</td>
+						<td>plotme.use.clear</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>dispose</td>
+						<td></td>
+						<td>Dispose your plot</td>
+						<td>plotme.use.dispose</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>done</td>
+						<td></td>
+						<td>Mark your plot as done</td>
+						<td>plotme.use.done</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>deny</td>
+						<td>player</td>
+						<td>Deny a player from your plot</td>
+						<td>plotme.use.deny</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>undeny</td>
+						<td>player</td>
+						<td>Undeny a denied player from your plot</td>
+						<td>plotme.use.undeny</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>buy</td>
+						<td></td>
+						<td>Buy the plot you're standing on (economy)</td>
+						<td>plotme.use.buy</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>sell</td>
+						<td></td>
+						<td>Sell your plot</td>
+						<td>plotme.use.sell</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>auction</td>
+						<td></td>
+						<td>Auction your plot</td>
+						<td>plotme.use.auction</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>reset</td>
+						<td></td>
+						<td>Reset the plot you're standing on</td>
+						<td>plotme.use.reset</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>middle</td>
+						<td></td>
+						<td>Teleport to the middle of your plot</td>
+						<td>plotme.use.middle</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>add</td>
+						<td>player</td>
+						<td>Grant a player build access on your plot</td>
+						<td>plotme.use.add</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>remove</td>
+						<td>player</td>
+						<td>Remove an added players build access on your plot</td>
+						<td>plotme.use.remove</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>protect</td>
+						<td></td>
+						<td>Protect the plot you are standing on from being cleared or reset</td>
+						<td>plotme.use.protect</td>
+						<td></td>
+					</tr>
+					<tr style="background-color:#fd9090;">
+						<td style="text-align:center;">Coming Soon</td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>name</td>
+						<td>name</td>
+						<td>Name your plot</td>
+						<td>plotme.use.name</td>
+						<td></td>
+					</tr>
+					<tr style="background-color:#fd9090;">
+						<td style="text-align:center;">Coming Soon</td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>like</td>
+						<td></td>
+						<td>Like the plot you are standing on</td>
+						<td>plotme.use.like</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td colspan="4"></td>
+						<td>Limit the number of plots a user can claim/auto or buy</td>
+						<td>plotme.limit.#</td>
+						<td>Replace # with a number, or * for infinite plots</td>
+					</tr>
+				</table>
+				<p style="font-size: 20px; text-decoration: none; color: #000000;"><strong>Admin</strong> commands and permissions</p>
+				<table class="tftable" border="2">
+					<tr>
+						<th>Notes</th>
+						<th>Command</th>
+						<th>Subcommand</th>
+						<th>Argument</th>
+						<th>Description</th>
+						<th>Permission</th>
+						<th>Permissions Group</th>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>claim</td>
+						<td>player</td>
+						<td>Claim a plot for another player</td>
+						<td>plotme.admin.claim.other</td>
+						<td rowspan="22">plotme.admin</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>home</td>
+						<td>player</td>
+						<td>Teleport to another players home. Use :# if multiple homes</td>
+						<td>plotme.admin.home.other</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>list</td>
+						<td>player</td>
+						<td>List your another players plots</td>
+						<td>plotme.admin.list</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>reset</td>
+						<td></td>
+						<td>Reset the plot you're standing on</td>
+						<td>plotme.admin.reset</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>buy</td>
+						<td>player</td>
+						<td>Buy a plot for another player</td>
+						<td>plotme.admin.buy</td>
+					</tr>
+					<tr>
                 <td></td>
                 <td><strong>/plotme</strong> (/plot,/p)</td>
                 <td>sell</td>
@@ -308,189 +302,185 @@
                 <td>plotme.admin.sell</td>
             </tr>
             <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>auction</td>
-                <td>player</td>
-                <td>Auction another players plot</td>
-                <td>plotme.admin.auction</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>dispose</td>
-                <td>player</td>
-                <td>Dispose your plot</td>
-                <td>plotme.admin.dispose</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>done</td>
-                <td>player</td>
-                <td>Mark another players plot done</td>
-                <td>plotme.admin.done</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>deny</td>
-                <td>player</td>
-                <td>Deny a player from another players plot</td>
-                <td>plotme.admin.deny</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>undeny</td>
-                <td>player</td>
-                <td>Undeny a denied player from another players plot</td>
-                <td>plotme.admin.undeny</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>setowner</td>
-                <td>player</td>
-                <td>Set a new plot owner of the plot you're standing on</td>
-                <td>plotme.admin.setowner</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>move</td>
-                <td>id-from id-to</td>
-                <td>Move a plot</td>
-                <td>plotme.admin.move</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>weanywhere</td>
-                <td></td>
-                <td>WorldEdit everywhere, not only your own plots</td>
-                <td>plotme.admin.weanywhere</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>tp</td>
-                <td>id</td>
-                <td>Teleport to a plot</td>
-                <td>plotme.admin.tp</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>middle</td>
-                <td></td>
-                <td>Teleport to the middle of a plot</td>
-                <td>plotme.admin.middle</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>expired</td>
-                <td></td>
-                <td>List the expired plots in your current world</td>
-                <td>plotme.admin.expired</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>addtime</td>
-                <td></td>
-                <td>Reset the expiration date to whats configured in the config</td>
-                <td>plotme.admin.addtime</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>resetexpired</td>
-                <td>world</td>
-                <td>Resets the 50 oldest plots on that world</td>
-                <td>plotme.admin.resetexpired</td>
-            </tr>
-            <tr>
-                <td colspan="4"></td>
-                <td>Bypass plot deny</td>
-                <td>plotme.admin.bypassdeny</td>
-            </tr>
-            <tr>
-                <td colspan="4"></td>
-                <td>Build anywhere, even on the roads!</td>
-                <td>plotme.buildanywhere</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotme</strong> (/plot,/p)</td>
-                <td>reload</td>
-                <td></td>
-                <td>Reload PlotMe</td>
-                <td>plotme.admin.reload</td>
-            </tr>
-            <tr>
-                <td colspan="4"></td>
-                <td>Bypass protection of a certain block with the given ID</td>
-                <td>plotme.unblock.#</td>
-                <td>Replace # with a minecraft block ID</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong>/plotgenversion</strong></td>
-                <td colspan="2"></td>
-                <td>Returns the version of the PlotMe Generator you are using</td>
-                <td colspan="2">N/A</td>
-            </tr>
-        </table>
-    </section>
-</div>
-<div id="footer_wrap" class="outer">
-    <footer class="inner">
-        <div id="nav" class="quicknav">
-            <div align="left" class="quicknav_wrapper">
-                <ul>
-                    <li><a href="#"><b>Quick Nav</b></a>
-                        <ul>
-                            <li><a href="../">Home</a></li>
-                            <li><a href="../downloads">Downloads</a></li>
-                            <li><a href="../cmdsandperms">Commands and Permissions</a></li>
-                            <li><a href="../configurations">Configurations</a></li>
-                            <li><a href="../how-to-use">Setup / Upgrade</a></li>
-                             <li><a href="../issues">Open an issue</a></li>
-                             <li><a href="https://github.com/WorldCretornica/PlotMe-Core/issues/" target="_blank">View issues</a></li>
-                             <li><a href="http://webchat.esper.net/?channels=worldcretornica" target="_blank">IRC</a></li>
-                            <li><a href="../about">About PlotMe</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <p class="copyright">PlotMe maintained by <a href="https://github.com/WorldCretornica">WorldCretornica</a></p>
-
-        <p><a href="http://spigotmc.org/resources/plotme-official.2131/">PlotMe on Spigot (click)</a></p>
-    </footer>
-    <a href="#" class="back-to-top" style="display: none;text-decoration:none;">Top</a>
-    <script>
-        jQuery(document).ready(function () {
-            var offset = 220;
-            var duration = 500;
-            jQuery(window).scroll(function () {
-                if (jQuery(this).scrollTop() > offset) {
-                    jQuery('.back-to-top').fadeIn(duration);
-                } else {
-                    jQuery('.back-to-top').fadeOut(duration);
-                }
-            });
-
-            jQuery('.back-to-top').click(function (event) {
-                event.preventDefault();
-                jQuery('html, body').animate({scrollTop: 0}, duration);
-                return false;
-            })
-        });
-    </script>
-</div>
-</body>
+							<td></td>
+							<td><strong>/plotme</strong> (/plot,/p)</td>
+							<td>auction</td>
+							<td>player</td>
+							<td>Auction another players plot</td>
+							<td>plotme.admin.auction</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>dispose</td>
+						<td>player</td>
+						<td>Dispose your plot</td>
+						<td>plotme.admin.dispose</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>done</td>
+						<td>player</td>
+						<td>Mark another players plot done</td>
+						<td>plotme.admin.done</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>deny</td>
+						<td>player</td>
+						<td>Deny a player from another players plot</td>
+						<td>plotme.admin.deny</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>undeny</td>
+						<td>player</td>
+						<td>Undeny a denied player from another players plot</td>
+						<td>plotme.admin.undeny</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>setowner</td>
+						<td>player</td>
+						<td>Set a new plot owner of the plot you're standing on</td>
+						<td>plotme.admin.setowner</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>move</td>
+						<td>id-from id-to</td>
+						<td>Move a plot</td>
+						<td>plotme.admin.move</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>weanywhere</td>
+						<td></td>
+						<td>WorldEdit everywhere, not only your own plots</td>
+						<td>plotme.admin.weanywhere</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>tp</td>
+						<td>id</td>
+						<td>Teleport to a plot</td>
+						<td>plotme.admin.tp</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>middle</td>
+						<td></td>
+						<td>Teleport to the middle of a plot</td>
+						<td>plotme.admin.middle</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>expired</td>
+						<td></td>
+						<td>List the expired plots in your current world</td>
+						<td>plotme.admin.expired</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>addtime</td>
+						<td></td>
+						<td>Reset the expiration date to whats configured in the config</td>
+						<td>plotme.admin.addtime</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>resetexpired</td>
+						<td>world</td>
+						<td>Resets the 50 oldest plots on that world</td>
+						<td>plotme.admin.resetexpired</td>
+					</tr>
+					<tr>
+						<td colspan="4"></td>
+						<td>Bypass plot deny</td>
+						<td>plotme.admin.bypassdeny</td>
+					</tr>
+					<tr>
+						<td colspan="4"></td>
+						<td>Build anywhere, even on the roads!</td>
+						<td>plotme.buildanywhere</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotme</strong> (/plot,/p)</td>
+						<td>reload</td>
+						<td></td>
+						<td>Reload PlotMe</td>
+						<td>plotme.admin.reload</td>
+					</tr>
+					<tr>
+						<td colspan="4"></td>
+						<td>Bypass protection of a certain block with the given ID</td>
+						<td>plotme.unblock.#</td>
+						<td>Replace # with a minecraft block ID</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><strong>/plotgenversion</strong></td>
+						<td colspan="2"></td>
+						<td>Returns the version of the PlotMe Generator you are using</td>
+						<td colspan="2">N/A</td>
+					</tr>
+				</table>
+			</section>
+		</div>
+		<div id="footer_wrap" class="outer">
+			<footer class="inner">
+				<div id="nav" class="quicknav">
+					<div align="left" class="quicknav_wrapper">
+						<ul>
+							<li><a><b>Quick Nav</b></a>
+								<ul>
+									<li><a href="https://jasonwynn10.github.io/MyPlot">Home</a></li>
+									<li><a href="https://jasonwynn10.github.io/MyPlot/downloads">Downloads</a></li>
+									<li><a href="https://jasonwynn10.github.io/MyPlot/cmdsandperms">Commands and Permissions</a></li>
+									<li><a href="https://jasonwynn10.github.io/MyPlot/configurations">Configurations</a></li>
+									<li><a href="https://jasonwynn10.github.io/MyPlot/how-to-use">Setup / Upgrade</a></li>
+									<li><a href="https://jasonwynn10.github.io/MyPlot/issues">Open an issue</a></li>
+									<!--<li><a href="https://github.com/jasonwynn10/MyPlot/issues/" target="_blank">View issues</a></li>-->
+									<!--<li><a href="http://webchat.esper.net/?channels=worldcretornica" target="_blank">IRC</a></li>-->
+									<li><a href="https://jasonwynn10.github.io/MyPlot/about">About PlotMe</a></li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<p class="copyright"align="center">MyPlot maintained by <a href="https://github.com/jasonwynn10">jasonwynn10</a></p>
+			</footer>
+			<a class="back-to-top" style="display: none;text-decoration:none;">Top</a>
+			<script>
+				jQuery(document).ready(function () {
+					var offset = 220;
+					var duration = 500;
+					jQuery(window).scroll(function () {
+						if (jQuery(this).scrollTop() > offset) {
+							jQuery('.back-to-top').fadeIn(duration);
+						} else {
+							jQuery('.back-to-top').fadeOut(duration);
+						}
+					});
+					jQuery('.back-to-top').click(function (event) {
+						event.preventDefault();
+						jQuery('html, body').animate({scrollTop: 0}, duration);
+						return false;
+					})
+				});
+			</script>
+		</div>
+	</body>
 </html>
-
