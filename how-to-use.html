@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="PlotMe : A Minecraft Plot Management Plugin">
+    <link rel="stylesheet" type="text/css" media="screen" href="../stylesheets/stylesheet.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400italic,300,700,400' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="http://s3.amazonaws.com/codecademy-content/courses/hour-of-code/js/alphabet.js"></script>
+    <title>PlotMe | Setup</title>
+</head>
+<body>
+<div id="header_wrap" class="outer">
+    <header class="inner">
+        <h1 id="project_title">Minecraft PlotMe Plugin</h1>
+
+        <h3 id="project_tagline">Welcome to the official PlotMe wiki</h3>
+
+        <div align="left" id="nav">
+            <div align="left" id="nav_wrapper">
+                <ul>
+                    <li><a href="../">Home</a></li>
+                    <li><a href="../downloads">Downloads</a></li>
+                    <li><a href="../cmdsandperms">Commands and Permissions</a></li>
+                    <li><a href="../configurations">Configurations</a></li>
+                    <li><a href="../how-to-use">Setup / Upgrade</a></li>
+                    <li><a href="#">Support</a>
+                        <ul>
+                            <li><a href="../issues">Open an issue</a></li>
+                            <li><a href="https://github.com/WorldCretornica/PlotMe-Core/issues/" target="_blank">View issues</a></li>
+                            <li><a href="http://webchat.esper.net/?channels=worldcretornica" target="_blank">IRC</a></li>
+                        </ul>
+                    <li><a href="../about">About PlotMe</a></li>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+</div>
+
+<div id="main_content_wrap" class="outer">
+    <section id="main_content" class="inner">
+        <h3><a aria-hidden="true"><span
+                class="octicon octicon-link"></span></a>Welcome to PlotMe wiki.</h3>
+        <ol>
+            <li>Put PlotMe-Core.jar and PlotMe-DefaultGenerator.jar in your plugins folder</li>
+            <li>Run your server to generate the PlotMe folder</li>
+            <li>Feel free to change settings in the config.yml file in that folder</li>
+            <li>In the PlotMe folder, there will be another folder by the name of PlotMe-DefaultGenerator. Open that folder and feel free to change
+                the generation settings in the config.yml file.
+            </li>
+            <li>Use the command, <i>/plotme reload</i>, to reload the settings.</li>
+        </ol>
+        <p>
+            <strong>The world names in the config.yml files must be in lowercase! That is extremely important.</strong>
+            <br>
+            <strong>You must have your worlds defined in both the Generator config and the PlotMe config.</strong>
+        </p>
+
+        <h3>Creating a PlotWorld with Multiverse</h3>
+        <ol>
+            <li>Set the generator for your world in the bukkit.yml file as shown below</li>
+            <li>Use this command, <i>/mv create {NAME} normal -g PlotMe-DefaultGenerator</i>, to generate a Plotworld</li>
+        </ol>
+
+        <h3>Creating a PlotWorld without Multiverse</h3>
+
+        <p>This is very simple. All you need to do is add the following code snippit in your bukkit.yml file. The following snippit is only an example
+            and should be adapted based on names you set for your plotworlds.</p>
+        <h4>Bukkit.yml Settings</h4>
+<pre>worlds:
+    plotworld:
+        generator: PlotMe-DefaultGenerator
+    plotworld2:
+        generator: PlotMe-DefaultGenerator</pre>
+        <h3>If it doesn't work</h3>
+
+        <p>In rare cases, Multiverse can fail loading your plotworld. To make sure this doesn't happen, it's safe to add the bukkit.yml settings as
+            shown above</p>
+
+        <h3>Video Tutorial by Koz4Christ</h3>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/c74550Zlp84" frameborder="0" allowfullscreen></iframe>
+
+        <h3><a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span
+                class="octicon octicon-link"></span></a>Upgrading from PlotMe 0.13 to PlotMe 0.15.x or 0.16.x</h3>
+        <ol type="1">
+            <li>If you haven't done so already, stop your server</li>
+            <li>Delete your PlotMe.jar file from your plugins folder</li>
+            <li>Download the newest PlotMe version from Spigot</li>
+            <li>Unzip the folder and move PlotMe-Core.jar and PlotMe-DefaultGenerator.jar to your plugins folder</li>
+            <li>Upgrading to the new generator if you do not have Multiverse or MultiWorld:
+                <ul>
+                    <li>Open your bukkit.yml file</li>
+                    <li>For each plotworld, change the generator name from "PlotMe" to "PlotMe-DefaultGenerator"</li>
+                </ul>
+            </li>
+            <li>Upgrading to the new generator if you do have Multiverse or MultiWorld:
+                <ul>
+                    <li>Open the worlds.yml file found inside the Multiverse or MultiWorld folder.</li>
+                    <li>For each plotworld, change the generator name from "PlotMe" to "PlotMe-DefaultGenerator"</li>
+                    <li>If this does not work, copy and paste the bukkit.yml information from the setup page in your
+                        bukkit.yml file.
+                    </li>
+                </ul>
+            </li>
+            <li>If you modified the PlotMe config file or renamed the jar files, you did something wrong.</li>
+            <li>If you completed all the steps above then you should be able to run PlotMe 0.15.2 or 0.16</li>
+        </ol>
+    </section>
+</div>
+<div id="footer_wrap" class="outer">
+    <footer class="inner">
+        <div id="nav" class="quicknav">
+            <div align="left" class="quicknav_wrapper">
+                <ul>
+                    <li><a href="#"><b>Quick Nav</b></a>
+                        <ul>
+                            <li><a href="../">Home</a></li>
+                            <li><a href="../downloads">Downloads</a></li>
+                            <li><a href="../cmdsandperms">Commands and Permissions</a></li>
+                            <li><a href="../configurations">Configurations</a></li>
+                            <li><a href="../how-to-use">Setup / Upgrade</a></li>
+                             <li><a href="../issues">Open an issue</a></li>
+                             <li><a href="https://github.com/WorldCretornica/PlotMe-Core/issues/" target="_blank">View issues</a></li>
+                             <li><a href="http://webchat.esper.net/?channels=worldcretornica" target="_blank">IRC</a></li>
+                            <li><a href="../about">About PlotMe</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <p class="copyright">PlotMe maintained by <a href="https://github.com/WorldCretornica">WorldCretornica</a></p>
+
+        <p><a href="http://spigotmc.org/resources/plotme-official.2131/">PlotMe on Spigot (click)</a></p>
+    </footer>
+    <a href="#" class="back-to-top" style="display: none;text-decoration:none;">Top</a>
+    <script>
+        jQuery(document).ready(function () {
+            var offset = 220;
+            var duration = 500;
+            jQuery(window).scroll(function () {
+                if (jQuery(this).scrollTop() > offset) {
+                    jQuery('.back-to-top').fadeIn(duration);
+                } else {
+                    jQuery('.back-to-top').fadeOut(duration);
+                }
+            });
+
+            jQuery('.back-to-top').click(function (event) {
+                event.preventDefault();
+                jQuery('html, body').animate({scrollTop: 0}, duration);
+                return false;
+            })
+        });
+    </script>
+</div>
+</body>
+</html>
+
