@@ -26,7 +26,7 @@
 					<div align="left" id="nav_wrapper">
 						<ul>
 							<li><a href="https://jasonwynn10.github.io/MyPlot">Home</a></li>
-							<li><a href="https://jasonwynn10.github.io/MyPlot/about">About MyPlot</a></li>
+							<li><a href="https://jasonwynn10.github.io/MyPlot/about">About</a></li>
 							<li><a href="https://jasonwynn10.github.io/MyPlot/downloads">Downloads</a></li>
 							<li><a href="https://jasonwynn10.github.io/MyPlot/cmdsandperms">Commands and Permissions</a></li>
 							<li><a href="https://jasonwynn10.github.io/MyPlot/configurations">Configurations</a></li>
@@ -46,161 +46,99 @@
 		</div>
 		<div id="main_content_wrap" class="outer">
 			<section id="main_content" class="inner">
-				<h3><a class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>PlotMe-Core 0.16 Configuration</h3>
-				<h4>Storage</h4>
-				<p>If you are using SQLite and want to upgrade to mySQL, you must be aware that it is <strong>NOT</strong> possible to convert back to SQLite.</p>
+				<h3><a class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>MyPlot Default Configuration</h3>
 				<table class="tftable" border="2">
 					<tr>
-						<th>Config</th>
+						<th>Setting</th>
 						<th>Explanation</th>
 					</tr>
 					<tr>
-						<td><code>usemySQL</code></td>
-						<td>Set to true if you have a MySQL database, otherwise leave it as false</td>
+						<td><code>language</code></td>
+						<td>This is the language that will be used in all the features of the MyPlot Plugin.</td>
 					</tr>
 					<tr>
-						<td><code>mySQLconn</code></td>
-						<td>Set your connection to your MySQL Database. Only to be used if <code>usemySQL</code> is true.</td>
+						<td><code>DataProvider</code></td>
+						<td>This is the type of system that will be used to save the Plot Worlds data.</td>
 					</tr>
 					<tr>
-						<td><code>mySQLuname</code></td>
-						<td>The username for your MySQL Database. Only to be used if <code>usemySQL</code> is true.</td>
-					</tr>
-					<tr>
-						<td><code>mySQLpass</code></td>
-						<td>The password for your MySQL Database. Only to be used if <code>usemySQL</code> is true.</td>
-					</tr>
-					<tr>
-						<td><code>globalUseEconomy</code></td>
-						<td>This needs to be set to true if you want to use economy features in any plotworld.</td>
-					</tr>
-					<tr>
-						<td><code>allowWorldTeleport</code></td>
-						<td>Allow teleportation to plotworlds from non-plotworlds</td>
-					</tr>
-					<tr>
-						<td><code>defaultWEAnywhere</code></td>
-						<td>Enables the use of WorldEdit Anywhere in plotworld. This is only avaliable to users with the WorldEdit Plugin and have WorldEdit Permissions.</td>
-					</tr>
-					<tr>
-						<td><code>NbClearSpools</code></td>
-						<td>The number of plots that can be cleared at a time. If you set this to X then X number of clears can take place at a time. If you have X+1 clear requests, the X+1 request will run once the other X are finished.</td>
-					</tr>
-					<tr>
-						<td><code>NbBlocksPerClearStep</code></td>
-						<td>The number of blocks to clear per spool in async plot clearing/resetting</td>
-					</tr>
-					<tr>
-						<td><code>AdvancedLogging</code></td>
-						<td>Enables more output results in console and to the player</td>
-					</tr>
-					<tr>
-						<td><code>worlds</code></td>
-						<td>The beginning of world settings</td>
-					</tr>
-					<tr>
-						<td><code>plotworld</code></td>
-						<td>The name of your plotworld, in lowercase. You can customize this to any name you want as long as it is lowercase.</td>
-					</tr>
-					<tr>
-						<td><code>DaysToExpiration</code></td>
-						<td>The number of days until a plot expires. Setting this to zero means it will never expire</td>
-					</tr>
-					<tr>
-						<td><code>ProtectedBlocks</code></td>
-						<td>Will prevent people from interacting with these blocks in plots they aren't allowed.
-						</td>
-					</tr>
-					<tr>
-						<td><code>PreventedItems</code></td>
-						<td>Will prevent people from right-clicking while holding these items in plots they aren't allowed.
-						</td>
-					</tr>
-					<tr>
-						<td><code>economy</code></td>
-						<td>The start of the economy features, if enabled.</td>
+						<td><code>MySQLSettings</code></td>
+						<td>Contains the settings that will be used if the <code>DataProvider</code> setting is set to mysql.</td>
 					</tr>
 					<tr>
 						<td><code>UseEconomy</code></td>
-						<td>True if you want to use economy features or false if you do not.</td>
+						<td>This needs to be set to true if you want to use economy features in plotworlds.</td>
 					</tr>
 					<tr>
-						<td><code>CanPutOnSale</code></td>
-						<td>True if you want to be able to sell plots, false if you do not.</td>
+						<td><code>PlotCacheSize</code></td>
+						<td>The amount of plots that will be saved in the cache for better performance. <i>NOTE:</i> The higher this number is, the more memory the server will occupy.</td>
 					</tr>
 					<tr>
-						<td><code>RefundClaimPriceOnReset</code></td>
-						<td>Refunds the price paid to claim the plot if a user resets it.
-							<i>To Be Removed in 0.17</i>
-						</td>
+						<td><code>ShowPlotPopup</code></td>
+						<td>When a player enters a plot and this setting is true, a popup with basic info about the plot will be shown.</td>
 					</tr>
 					<tr>
-						<td><code>RefundClaimPriceOnSetOwner</code></td>
-						<td>Refunds the price paid to claim the plot to the original owner if a new owner is set.
-							<i>To Be Removed in 0.17</i>
-						</td>
+						<td><code>ClearBlocksPerTick</code></td>
+						<td>This is the amount of blocks to be reset in a plot per tick.</td>
+					</tr>
+					<tr>
+						<td><code>Generator</code></td>
+						<td>This is the name of the Generator that will be used to generate new plot worlds.</td>
+					</tr>
+					<tr>
+						<td><code>DefaultWorld</code></td>
+						<td>These settings will be used when creating a new world with the default generator.</td>
+					</tr>
+					<tr>
+						<td><code>RestrictEntityMovement</code></td>
+						<td>This setting will allod or disallow the movement of entities within the plot world.</td>
 					</tr>
 					<tr>
 						<td><code>ClaimPrice</code></td>
-						<td>The cost to claim a plot.</td>
+						<td>This is the price a plot costs to be claimed. This is only applied when <code>Economy</code> is set to true.</td>
 					</tr>
 					<tr>
-						<td><code>ClearPricePrice</code></td>
-						<td>The cost to clear a plot.</td>
-					</tr>
-					<tr>
-						<td><code>AddPlayerPrice</code></td>
-						<td>The cost to add a player to a plot.</td>
-					</tr>
-					<tr>
-						<td><code>DenyPlayerPrice</code></td>
-						<td>The cost to deny a player from a plot.</td>
-					</tr>
-					<tr>
-						<td><code>RemovePlayerPrice</code></td>
-						<td>The cost to remove a player from a plot.</td>
-					</tr>
-					<tr>
-						<td><code>UndenyPlayerPrice</code></td>
-						<td>The cost to undeny a player from a plot.</td>
-					</tr>
-					<tr>
-						<td><code>PlotHomePrice</code></td>
-						<td>The cost to teleport a player to their home plot.</td>
-					</tr>
-					<tr>
-						<td><code>SellToPlayerPrice</code></td>
-						<td>The price to sell a plot to a player.</td>
-					</tr>
-					<tr>
-						<td><code>BiomeChangePrice</code></td>
-						<td>The price to change the biome of a plot.</td>
-					</tr>
-					<tr>
-						<td><code>ProtectPrice</code></td>
-						<td>The price to protect a plot.</td>
+						<td><code>ClearPrice</code></td>
+						<td>This is the price a plot costs to be cleared. This is only applied when <code>Economy</code> is set to true.</td>
 					</tr>
 					<tr>
 						<td><code>DisposePrice</code></td>
-						<td>The price to dispose a plot.</td>
+						<td>This is the price a plot costs to be disposed of. This is only applied when <code>Economy</code> is set to true.</td>
 					</tr>
 					<tr>
-						<td><code>DisableExplosion</code></td>
-						<td>True if explosions are disabled in the world.</td>
+						<td><code>ResetPrice</code></td>
+						<td>This is the price a plot costs to be reset. This is only applied when <code>Economy</code> is set to true.</td>
 					</tr>
 					<tr>
-						<td><code>DisableIgnition</code></td>
-						<td>True if fire is disabled in the world.</td>
+						<td><code>PlotSize</code></td>
+						<td>This is the length and width of each plot generated.</td>
 					</tr>
 					<tr>
-						<td><code>UseProgressiveClear</code></td>
-						<td>A lag free gradual plot clearing and resetting process.
-							<i>It is recommended that this be set to true as this option will be removed in 0.17</i>
-						</td>
+						<td><code>GroundHeight</code></td>
+						<td>This is the distance from the lowest block in the world where the surface floor will be.</td>
 					</tr>
 					<tr>
-						<td><code>Projectiles</code></td>
-						<td>True if projectiles are enabled in the world.</td>
+						<td><code>RoadWidth</code></td>
+						<td>This is the distance between plots that makes up the road.</td>
+					</tr>
+					<tr>
+						<td><code>RoadBlock</code></td>
+						<td>This is the block id of the road floor.</td>
+					</tr>
+					<tr>
+						<td><code>WallBlock</code></td>
+						<td>This is the block id of the plot walls.</td>
+					</tr>
+					<tr>
+						<td><code>PlotFloorBlock</code></td>
+						<td>This is the block id of the plots surface block.</td>
+					</tr>
+					<tr>
+						<td><code>PlotFillBlock</code></td>
+						<td>This is the block id that will fill the plot under the surface.</td>
+					</tr>
+					<tr>
+						<td><code>BottomBlock</code></td>
+						<td>This is the block id that will make up the bottom block of the world.</td>
 					</tr>
 				</table>
 				<h4>Example PlotMe Configuration File</h4>
