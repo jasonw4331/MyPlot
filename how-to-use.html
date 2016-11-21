@@ -26,7 +26,7 @@
 					<div align="left" id="nav_wrapper">
 						<ul>
 							<li><a href="https://jasonwynn10.github.io/MyPlot">Home</a></li>
-							<li><a href="https://jasonwynn10.github.io/MyPlot/about">About MyPlot</a></li>
+							<li><a href="https://jasonwynn10.github.io/MyPlot/about">About</a></li>
 							<li><a href="https://jasonwynn10.github.io/MyPlot/downloads">Downloads</a></li>
 							<li><a href="https://jasonwynn10.github.io/MyPlot/cmdsandperms">Commands and Permissions</a></li>
 							<li><a href="https://jasonwynn10.github.io/MyPlot/configurations">Configurations</a></li>
@@ -46,12 +46,12 @@
 		</div>
 		<div id="main_content_wrap" class="outer">
 			<section id="main_content" class="inner">
-				<h3>Welcome to PlotMe wiki.</h3>
+				<h3>MyPlot First-Run Setup</h3>
 				<ol>
 					<li>Put the MyPlot.phar in your plugins folder</li>
 					<li>Run your server to generate the MyPlot folder</li>
 					<li>Change settings in the config.yml file in the MyPlot folder</li>
-					<li>Use the command, <i>/plotme reload</i>, to reload the settings.</li>
+					<li>Use the command, <i>/reload</i>, to reload the server with the new settings.</li>
 				</ol>
 				<p>
 					<strong>The world names in the config.yml files must be in lowercase! That is extremely important.</strong>
@@ -60,113 +60,22 @@
 				</p>
 				<h3>Creating a Plot World</h3>
 				<p>This is very simple. run the <code>/p generate</code> command in-game</p>
-				<h4>config.yml Settings</h4>
-				<pre>
-#########################################
-# ___  ___       ______  _         _    #
-# |  \/  |       | ___ \| |       | |   #
-# | .  . | _   _ | |_/ /| |  ___  | |_  #
-# | |\/| || | | ||  __/ | | / _ \ | __| #
-# | |  | || |_| || |    | || (_) || |_  #
-# \_|  |_/ \__, |\_|    |_| \___/  \__| #
-#           __/ |                       #
-#          |___/                        #
-#########################################
-
-# The language that should be used in MyPlot
-# Available languages: eng, nl, vi, spa, chs, zho, deu , ces
-#
-# English language pack by @Exxarion
-# Dutch language pack by @Wies
-# Vietnamese language pack by @daany123
-# Spanish language pack by @thelucyclub
-# Chinese ( ROC ) pack by @jerryzooyoyo
-# Chinese ( PRC ) pack by @jerryzooyoyo
-# German language pack by @SalmonGER
-# Czech lanauge pack by @GamakCZ
-language: eng
-
-# The data provider where plot data is stored.
-# Current providers are: sqlite, mysql.
-DataProvider: sqlite
-
-# contains settings for mysql provider to use when selected
-MySQLSettings:
-  Host: 127.0.0.1
-  Port: 19133
-  Username: default
-  Password: password
-  DatabaseName: plots.db
-
-# Use an economy with MyPlot. This will allow for plot pricing such as claiming, clearing, etc.
-# Currently supported economy plugins: Economy$, PocketMoney
-# MyPlot will use any economy plugin found on the server.
-# Be sure not to use more than 1 economy plugin!
-UseEconomy: false
-
-# Amount of plots to be cached.
-# Increasing this number might improve performance, but also increase memory usage.
-PlotCacheSize: 256
-
-# When a player enters a plot, a popup with basic info will be shown
-ShowPlotPopup: true
-
-# Amount of blocks to reset per tick.
-# Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
-ClearBlocksPerTick: 256
-
-# The MyPlotGenerator is the default Generator
-# Enter the custom generator's class
-Generator: MyPlotGenerator
-
-# These settings will be used when creating a new world with the default generator.
-DefaultWorld:
-
-  # Restrict entities (e.g. tnt) from moving except falling
-  # This will prevent things like tnt cannons from ruining other plots
-  RestrictEntityMovement: true
-
-  # How much it costs to claim a plot (Economy must be set to 'true')
-  ClaimPrice: 0
-  # How much it costs to clear a plot (Economy must be set to 'true')
-  ClearPrice: 0
-  # How much it costs to dispose a plot (Economy must be set to 'true')
-  DisposePrice: 0
-  # How much it costs to reset a plot (Economy must be set to 'true')
-  ResetPrice: 0
-
-  # The size of a plot
-  PlotSize: 32
-  # The height of a plot
-  GroundHeight: 64
-  # The width of the road
-  RoadWidth: 7
-
-  # The block that the road is made of (Default is Oak Planks)
-  RoadBlock: '5:0'
-  # The block that plot walls are made of (Default is Stone Slabs)
-  WallBlock: '44:0'
-  # The block used as the plot floor (Default is Grass)
-  PlotFloorBlock: '2:0'
-  # The block that fills the rest of the plot (Default is Dirt)
-  PlotFillBlock: '3:0'
-  # The block at the bottom (Default is Bedrock)
-  BottomBlock: '7:0'
-				</pre>
-				<h3>Video Tutorial by Koz4Christ</h3>
-				<!--<iframe width="560" height="315" src="https://www.youtube.com/embed/c74550Zlp84" frameborder="0" allowfullscreen></iframe>-->
+				<!--<h3>Video Tutorial by Koz4Christ</h3>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/c74550Zlp84" frameborder="0" allowfullscreen></iframe>-->
 				<h3>Upgrading from old versions</h3>
 				<ol type="1">
 					<li>If you haven't done so already, stop your server</li>
 					<li>Delete your MyPlot.phar file from your plugins folder</li>
-					<li>Download the newest MyPlot version from our github releases</li>
+					<li>Download the newest MyPlot version from our github releases <a href="https://github.com/jasonwynn10/MyPlot/releases/latest">here</a></li>
 					<li>Move the MyPlot.phar file to the plugins folder</li>
+					<li></li>
 				</ol>
 				<h3>Changing Generators</h3>
 				<ol>
+					<li>If you haven't done so already, stop your server</li>
 					<li>Open your config.yml file</li>
-					<li>For each plotworld, change the generator name from "PlotMe" to "PlotMe-DefaultGenerator"</li>
-					<li>If you completed all the steps above then you should be able to generate a new world after a server restart</li>
+					<li>Change the <code>generator</code> setting from "MyPlotGenerator" to the name of the new one.<br><i>NOTE:</i> the generator name is CaSe sensitive!</li>
+					<li>If you completed all the steps above then you should be able to generate a new plot world after a server restart with the new generators settings</li>
 				</ol>
 			</section>
 		</div>
@@ -193,7 +102,7 @@ DefaultWorld:
 				</div>
 				<p class="copyright"align="center">MyPlot is maintained by <a href="https://github.com/jasonwynn10">jasonwynn10</a></p>
 			</footer>
-			<a href="#" class="back-to-top" style="text-decoration: none; display: inline;">Top</a>
+			<a href="" class="back-to-top" style="text-decoration: none; display: inline;">Top</a>
 			<script>
 				jQuery(document).ready(function () {
 					var offset = 220;
