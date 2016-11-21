@@ -8,9 +8,7 @@
 Have you ever seen those PC servers with the PlotMe plugin, and you thought "Hey, why can't I have plots on my MCPE server?" Well, now you can with **MyPlot** for PocketMine-MP and other 3rd party servers! It's easy to set up, and simple to use!
 <br>
 <br>
-A list of commands and permissions can be found in the [wiki](https://github.com/jasonwynn10/MyPlot/wiki) along with a helpful config guide.
-<br>
-Future commands can be found [here](http://plotme.worldcretornica.com/cmdsandperms) on the plotme website.
+A list of commands and permissions can be found in the [wiki](https://jasonwynn10.github.io/MyPlot/cmdsandperms) along with a helpful config guide [here](https://jasonwynn10.github.io/MyPlot/configurations).
 <br>
 <br>
 Want to help create language resource packs? Well, you can! If you know a language that is not created yet, you can create a new language pack by opening a pull request! If the language you know is already created, you can help improve it by editing it!
