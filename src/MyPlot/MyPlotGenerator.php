@@ -2,6 +2,7 @@
 namespace MyPlot;
 
 use pocketmine\block\Block;
+use pocketmine\level\format\FullChunk;
 use pocketmine\level\generator\Generator;
 use pocketmine\level\ChunkManager;
 use pocketmine\math\Vector3;
@@ -45,7 +46,6 @@ class MyPlotGenerator extends Generator
         $this->plotSize = $this->parseNumber($settings, "PlotSize", 32);
         $this->groundHeight = $this->parseNumber($settings, "GroundHeight", 64);
 
-        $this->settings = [];
         $this->settings["preset"] = json_encode([
             "RoadBlock" => $this->roadBlock->getId() . (($meta = $this->roadBlock->getDamage()) === 0 ? '' : ':'.$meta),
             "WallBlock" => $this->wallBlock->getId() . (($meta = $this->wallBlock->getDamage()) === 0 ? '' : ':'.$meta),
@@ -99,7 +99,8 @@ class MyPlotGenerator extends Generator
 
     public function generateChunk($chunkX, $chunkZ) {
         $shape = $this->getShape($chunkX << 4, $chunkZ << 4);
-        $chunk = $this->level->getChunk($chunkX, $chunkZ);
+	    /** @var FullChunk $chunk */
+	    $chunk = $this->level->getChunk($chunkX, $chunkZ);
         $chunk->setGenerated();
         $c = Biome::getBiome(1)->getColor();
         $R = $c >> 16;
