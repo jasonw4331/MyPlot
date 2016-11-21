@@ -155,199 +155,73 @@
 						<td><code>DenyPlayerPrice</code></td>
 						<td>The cost to deny a player from a plot.</td>
 					</tr>
-            <tr>
-                <td><code>RemovePlayerPrice</code></td>
-                <td>The cost to remove a player from a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>UndenyPlayerPrice</code></td>
-                <td>The cost to undeny a player from a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>PlotHomePrice</code></td>
-                <td>The cost to teleport a player to their home plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>SellToPlayerPrice</code></td>
-                <td>The price to sell a plot to a player.
-                </td>
-            </tr>
-            <tr>
-                <td><code>BiomeChangePrice</code></td>
-                <td>The price to change the biome of a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>ProtectPrice</code></td>
-                <td>The price to protect a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>DisposePrice</code></td>
-                <td>The price to dispose a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>DisableExplosion</code></td>
-                <td>True if explosions are disabled in the world.
-                </td>
-            </tr>
-            <tr>
-                <td><code>DisableIgnition</code></td>
-                <td>True if fire is disabled in the world.
-                </td>
-            </tr>
-            <tr>
-                <td><code>UseProgressiveClear</code></td>
-                <td>A lag free gradual plot clearing and resetting process.
-                    <i>It is recommended that this be set to true as this option will be removed in 0.17</i>
-                </td>
-            </tr>
-            <tr>
-                <td><code>Projectiles</code></td>
-                <td>True if projectiles are enabled in the world.
-                </td>
-            </tr>
-        </table>
-        <h4>Example PlotMe Configuration File</h4>
-<pre>
-usemySQL: false
-mySQLconn: jdbc:mysql://localhost:3306/minecraft
-mySQLuname: root
-mySQLpass: password
-globalUseEconomy: true
-allowWorldTeleport: true
-defaultWEAnywhere: false
-NbClearSpools: 3
-NbBlocksPerClearStep: 50000
-AdvancedLogging: false
-worlds:
-  plotworld:
-    PlotAutoLimit: 1000
-    DaysToExpiration: 7
-    ProtectedBlocks:
-    - 54
-    - 61
-    - 54
-    - 62
-    - 120
-    - 94
-    - 93
-    - 84
-    - 25
-    - 355
-    - 118
-    - 117
-    - 138
-    - 140
-    - 145
-    - 154
-    - 23
-    - 158
-    PreventedItems:
-    - '351:15'
-    - '259'
-    - '328'
-    - '343'
-    - '342'
-    - '333'
-    economy:
-      UseEconomy: true
-      CanPutOnSale: true
-      RefundClaimPriceOnReset: true
-      RefundClaimPriceOnSetOwner: true
-      ClaimPrice: 0.0
-      ClearPrice: 0.0
-      AddPlayerPrice: 0.0
-      DenyPlayerPrice: 0.0
-      RemovePlayerPrice: 0.0
-      UndenyPlayerPrice: 0.0
-      PlotHomePrice: 0.0
-      SellToPlayerPrice: 0.0
-      BiomeChangePrice: 0.0
-      ProtectPrice: 0.0
-      DisposePrice: 0.0
-    AutoLinkPlots: false
-    DisableExplosion: true
-    DisableIgnition: true
-    UseProgressiveClear: false
-    NextFreed: -1;0
-  mysurvivalplotworld:
-    PlotAutoLimit: 1000
-    DaysToExpiration: 0
-    ProtectedBlocks:
-    - 54
-    - 61
-    - 54
-    - 62
-    - 120
-    - 94
-    - 93
-    - 84
-    - 25
-    - 355
-    - 118
-    - 117
-    - 138
-    - 140
-    - 145
-    - 154
-    - 23
-    - 158
-    PreventedItems:
-    - '351:15'
-    - '259'
-    - '328'
-    - '343'
-    - '342'
-    - '333'
-    economy:
-      UseEconomy: false
-      CanPutOnSale: false
-      RefundClaimPriceOnReset: false
-      RefundClaimPriceOnSetOwner: false
-      ClaimPrice: 0.0
-      ClearPrice: 0.0
-      AddPlayerPrice: 0.0
-      DenyPlayerPrice: 0.0
-      RemovePlayerPrice: 0.0
-      UndenyPlayerPrice: 0.0
-      PlotHomePrice: 0.0
-      SellToPlayerPrice: 0.0
-      BiomeChangePrice: 0.0
-      ProtectPrice: 0.0
-      DisposePrice: 0.0
-    DisableExplosion: true
-    DisableIgnition: true
-    UseProgressiveClear: false
-    Projectiles: true
-</pre>
-        <br>
-
-        <h3><a class="anchor" aria-hidden="true"><span
-                class="octicon octicon-link"></span></a>PlotMe Default-Generator 0.16 Configuration</h3>
-
-        <table class="tftable" border="2">
-            <tr>
-                <th>Config</th>
-                <th>Explanation</th>
-            </tr>
-            <tr>
-                <td><code>worlds</code></td>
-                <td>The beginning of world settings</td>
-            </tr>
-            <tr>
-                <td><code>RoadMainBlock</code></td>
-                <td>The first stripe of the plotme road.
-                </td>
-            </tr>
-            <tr>
-                <td><code>ProtectedWallBlock</code></td>
-                <td>The block to be used for the plot border when a plot is protected.
-                </td>
+					<tr>
+						<td><code>RemovePlayerPrice</code></td>
+						<td>The cost to remove a player from a plot.</td>
+					</tr>
+					<tr>
+						<td><code>UndenyPlayerPrice</code></td>
+						<td>The cost to undeny a player from a plot.</td>
+					</tr>
+					<tr>
+						<td><code>PlotHomePrice</code></td>
+						<td>The cost to teleport a player to their home plot.</td>
+					</tr>
+					<tr>
+						<td><code>SellToPlayerPrice</code></td>
+						<td>The price to sell a plot to a player.</td>
+					</tr>
+					<tr>
+						<td><code>BiomeChangePrice</code></td>
+						<td>The price to change the biome of a plot.</td>
+					</tr>
+					<tr>
+						<td><code>ProtectPrice</code></td>
+						<td>The price to protect a plot.</td>
+					</tr>
+					<tr>
+						<td><code>DisposePrice</code></td>
+						<td>The price to dispose a plot.</td>
+					</tr>
+					<tr>
+						<td><code>DisableExplosion</code></td>
+						<td>True if explosions are disabled in the world.</td>
+					</tr>
+					<tr>
+						<td><code>DisableIgnition</code></td>
+						<td>True if fire is disabled in the world.</td>
+					</tr>
+					<tr>
+						<td><code>UseProgressiveClear</code></td>
+						<td>A lag free gradual plot clearing and resetting process.
+							<i>It is recommended that this be set to true as this option will be removed in 0.17</i>
+						</td>
+					</tr>
+					<tr>
+						<td><code>Projectiles</code></td>
+						<td>True if projectiles are enabled in the world.</td>
+					</tr>
+				</table>
+				<h4>Example PlotMe Configuration File</h4>
+				<pre src="https://jasonwynn10.github.io/MyPlot/resources/config.yml"></pre>
+				<br>
+				<h3><a class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>PlotMe Default-Generator 0.16 Configuration</h3>
+				<table class="tftable" border="2">
+					<tr>
+						<th>Config</th>
+						<th>Explanation</th>
+					</tr>
+					<tr>
+						<td><code>worlds</code></td>
+						<td>The beginning of world settings</td>
+					</tr>
+					<tr>
+						<td><code>RoadMainBlock</code></td>
+						<td>The first stripe of the plotme road.</td>
+					</tr>
+					<tr>
+						<td><code>ProtectedWallBlock</code></td>
+						<td>The block to be used for the plot border when a plot is protected.</td>
             </tr>
             <tr>
                 <td><code>PlotFloorBlock</code></td>
@@ -475,9 +349,9 @@ worlds:
                 <td><code>ZTranslation</code></td>
                 <td>The spawn point on the z-axis of the plotworld.
                 </td>
-            </tr>
-        </table>
-        <h4>Example PlotMe Configuration File</h4>
+            </tr>       
+				</table>
+				<h4>Example PlotMe Configuration File</h4>
 <pre>
 worlds:
   creative:
@@ -496,8 +370,9 @@ worlds:
     XTranslation: 0
     AuctionWallBlock: '44:1'
 </pre>
-    </section>
-</div>
+   
+			</section>
+		</div>
 		<div id="footer_wrap" class="outer">
 			<footer class="inner">
 				<div id="nav" class="quicknav">
@@ -519,7 +394,7 @@ worlds:
 						</ul>
 					</div>
 				</div>
-				<p class="copyright"align="center">MyPlot maintained by <a href="https://github.com/jasonwynn10">jasonwynn10</a></p>
+				<p class="copyright"align="center">MyPlot is maintained by <a href="https://github.com/jasonwynn10">jasonwynn10</a></p>
 			</footer>
 			<a href="#" class="back-to-top" style="text-decoration: none; display: inline;">Top</a>
 			<script>
