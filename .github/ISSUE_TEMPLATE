@@ -1,12 +1,8 @@
-<!-- DO NOT DELETE - LEAVE THIS IN YOUR ISSUE -->
-<!-- Welcome to the MyPlot issue tracker! -->
-<!--Before you make an issue, make sure your issue matches the criteria below. -->
-<!-- PLEASE TICK THE CHECKBOXES -->
+<!-- put an 'x' in the brackets -->
 - [ ] This issue isn't duplicated - you can check if it is by using the search bar located at the top left hand corner and select "Issues" on the left.
 - [ ] This issue includes appropriate markdown for sections - e.g. code blocks for crash dumps.
 - [ ] This issue is understandable - feel free to use your native language to write issues if you are not comfortable with English.
 
-<!-- If your issue matches this criteria, hooray! Submit this issue with no worries. If your issue doesn't match this criteria, please consider editing your issue to match it. Thanks for contributing to MyPlots! -->
 <!-- ISSUE DESCRIPTION - write a bit about what problem you're having. -->
 ## Issue description
 {Type something here}
