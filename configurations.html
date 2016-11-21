@@ -203,174 +203,98 @@
 					</tr>
 				</table>
 				<h4>Example PlotMe Configuration File</h4>
-				<pre src="https://jasonwynn10.github.io/MyPlot/resources/config.yml"></pre>
-				<br>
-				<h3><a class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>PlotMe Default-Generator 0.16 Configuration</h3>
-				<table class="tftable" border="2">
-					<tr>
-						<th>Config</th>
-						<th>Explanation</th>
-					</tr>
-					<tr>
-						<td><code>worlds</code></td>
-						<td>The beginning of world settings</td>
-					</tr>
-					<tr>
-						<td><code>RoadMainBlock</code></td>
-						<td>The first stripe of the plotme road.</td>
-					</tr>
-					<tr>
-						<td><code>ProtectedWallBlock</code></td>
-						<td>The block to be used for the plot border when a plot is protected.</td>
-            </tr>
-            <tr>
-                <td><code>PlotFloorBlock</code></td>
-                <td>The block to be used for the floor of the plot.</td>
-            </tr>
-            <tr>
-                <td><code>GroundHeight</code></td>
-                <td>The height of the ground for the world</td>
-            </tr>
-            <tr>
-                <td><code>UnclaimedBorder</code></td>
-                <td>The block to be used for the plot border if the plot is unclaimed.
-                </td>
-            </tr>
-            <tr>
-                <td><code>ForSaleWallBlock</code></td>
-                <td>The block to be used for the plot border if the plot is on sale.
-                </td>
-            </tr>
-            <tr>
-                <td><code>AuctionWallBlock</code></td>
-                <td>The block to be used for the plot border if the plot is auctioned.
-                </td>
-            </tr>
-            <tr>
-                <td><code>PlotSize</code></td>
-                <td>The size of each plot</td>
-            </tr>
-            <tr>
-                <td><code>RoadAltBlock</code></td>
-                <td>The second stripe to be used on the plot road.
-                </td>
-            </tr>
-            <tr>
-                <td><code>WallBlock</code></td>
-                <td>The block to be used for the plot border when a plot is claimed.
-                </td>
-            </tr>
-            <tr>
-                <td><code>FillBlock</code></td>
-                <td>The block that the plot is filled with. Typically dirt.
-                </td>
-            </tr>
-            <tr>
-                <td><code>PathWidth</code></td>
-                <td>The width of the roads between plots.
-                </td>
-            </tr>
-            <tr>
-                <td><code>ClearPricePrice</code></td>
-                <td>The cost to clear a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>AddPlayerPrice</code></td>
-                <td>The cost to add a player to a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>DenyPlayerPrice</code></td>
-                <td>The cost to deny a player from a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>RemovePlayerPrice</code></td>
-                <td>The cost to remove a player from a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>UndenyPlayerPrice</code></td>
-                <td>The cost to undeny a player from a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>PlotHomePrice</code></td>
-                <td>The cost to teleport a player to their home plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>SellToPlayerPrice</code></td>
-                <td>The price to sell a plot to a player.
-                </td>
-            </tr>
-            <tr>
-                <td><code>BiomeChangePrice</code></td>
-                <td>The price to change the biome of a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>ProtectPrice</code></td>
-                <td>The price to protect a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>DisposePrice</code></td>
-                <td>The price to dispose a plot.
-                </td>
-            </tr>
-            <tr>
-                <td><code>DisableExplosion</code></td>
-                <td>True if explosions are disabled in the world.
-                </td>
-            </tr>
-            <tr>
-                <td><code>DisableIgnition</code></td>
-                <td>True if fire is disabled in the world.
-                </td>
-            </tr>
-            <tr>
-                <td><code>UseProgressiveClear</code></td>
-                <td>A lag free gradual plot clearing and resetting process.
-                </td>
-            </tr>
-            <tr>
-                <td><code>Projectiles</code></td>
-                <td>True if projectiles are enabled in the world.
-                </td>
-            </tr>
-            <tr>
-                <td><code>XTranslation</code></td>
-                <td>The spawn point on the x-axis of the plotworld.
-                </td>
-            </tr>
-            <tr>
-                <td><code>ZTranslation</code></td>
-                <td>The spawn point on the z-axis of the plotworld.
-                </td>
-            </tr>       
-				</table>
-				<h4>Example PlotMe Configuration File</h4>
-<pre>
-worlds:
-  creative:
-    RoadMainBlock: '5'
-    ProtectedWallBlock: '44:4'
-    PlotFloorBlock: '2'
-    GroundHeight: 64
-    UnclaimedBorder: '44:7'
-    ForSaleWallBlock: '44:1'
-    PlotSize: 32
-    ZTranslation: 0
-    RoadAltBlock: '5:2'
-    WallBlock: '44'
-    FillBlock: '3'
-    PathWidth: 7
-    XTranslation: 0
-    AuctionWallBlock: '44:1'
-</pre>
-   
+				<pre>
+#########################################
+# ___  ___       ______  _         _    #
+# |  \/  |       | ___ \| |       | |   #
+# | .  . | _   _ | |_/ /| |  ___  | |_  #
+# | |\/| || | | ||  __/ | | / _ \ | __| #
+# | |  | || |_| || |    | || (_) || |_  #
+# \_|  |_/ \__, |\_|    |_| \___/  \__| #
+#           __/ |                       #
+#          |___/                        #
+#########################################
+
+# The language that should be used in MyPlot
+# Available languages: eng, nl, vi, spa, chs, zho, deu , ces
+#
+# English language pack by @Exxarion
+# Dutch language pack by @Wies
+# Vietnamese language pack by @daany123
+# Spanish language pack by @thelucyclub
+# Chinese ( ROC ) pack by @jerryzooyoyo
+# Chinese ( PRC ) pack by @jerryzooyoyo
+# German language pack by @SalmonGER
+# Czech lanauge pack by @GamakCZ
+language: eng
+
+# The data provider where plot data is stored.
+# Current providers are: sqlite, mysql.
+DataProvider: sqlite
+
+# contains settings for mysql provider to use when selected
+MySQLSettings:
+  Host: 127.0.0.1
+  Port: 19133
+  Username: default
+  Password: password
+  DatabaseName: plots.db
+
+# Use an economy with MyPlot. This will allow for plot pricing such as claiming, clearing, etc.
+# Currently supported economy plugins: Economy$, PocketMoney
+# MyPlot will use any economy plugin found on the server.
+# Be sure not to use more than 1 economy plugin!
+UseEconomy: false
+
+# Amount of plots to be cached.
+# Increasing this number might improve performance, but also increase memory usage.
+PlotCacheSize: 256
+
+# When a player enters a plot, a popup with basic info will be shown
+ShowPlotPopup: true
+
+# Amount of blocks to reset per tick.
+# Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
+ClearBlocksPerTick: 256
+
+# The MyPlotGenerator is the default Generator
+# Enter the custom generator's class
+Generator: MyPlotGenerator
+
+# These settings will be used when creating a new world with the default generator.
+DefaultWorld:
+
+  # Restrict entities (e.g. tnt) from moving except falling
+  # This will prevent things like tnt cannons from ruining other plots
+  RestrictEntityMovement: true
+
+  # How much it costs to claim a plot (Economy must be set to 'true')
+  ClaimPrice: 0
+  # How much it costs to clear a plot (Economy must be set to 'true')
+  ClearPrice: 0
+  # How much it costs to dispose a plot (Economy must be set to 'true')
+  DisposePrice: 0
+  # How much it costs to reset a plot (Economy must be set to 'true')
+  ResetPrice: 0
+
+  # The size of a plot
+  PlotSize: 32
+  # The height of a plot
+  GroundHeight: 64
+  # The width of the road
+  RoadWidth: 7
+
+  # The block that the road is made of (Default is Oak Planks)
+  RoadBlock: '5:0'
+  # The block that plot walls are made of (Default is Stone Slabs)
+  WallBlock: '44:0'
+  # The block used as the plot floor (Default is Grass)
+  PlotFloorBlock: '2:0'
+  # The block that fills the rest of the plot (Default is Dirt)
+  PlotFillBlock: '3:0'
+  # The block at the bottom (Default is Bedrock)
+  BottomBlock: '7:0'
+				</pre>   
 			</section>
 		</div>
 		<div id="footer_wrap" class="outer">
@@ -396,7 +320,7 @@ worlds:
 				</div>
 				<p class="copyright"align="center">MyPlot is maintained by <a href="https://github.com/jasonwynn10">jasonwynn10</a></p>
 			</footer>
-			<a href="#" class="back-to-top" style="text-decoration: none; display: inline;">Top</a>
+			<a href="" class="back-to-top" style="text-decoration: none; display: inline;">Top</a>
 			<script>
 				jQuery(document).ready(function () {
 					var offset = 220;
