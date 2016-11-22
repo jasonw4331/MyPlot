@@ -27,7 +27,6 @@ before_script:
  - cd /home/travis/build/PocketMine-MP
 
 script:
- - php syntaxcheck.php
  - php build.php
 
 deploy:
