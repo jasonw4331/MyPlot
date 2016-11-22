@@ -19,7 +19,6 @@ before_script:
  - cp -rf jasonwynn10/MyPlot/plugin.yml PocketMine-MP/plugins/MyPlot
  - cp -rf jasonwynn10/MyPlot/LICENSE PocketMine-MP/plugins/MyPlot
  - cp -rf jasonwynn10/MyPlot/build.php PocketMine-MP/
- - cp -rf jasonwynn10/MyPlot/syntaxcheck.php PocketMine-MP/
  - ls
  - cd PocketMine-MP/plugins/
  - ls
