@@ -14,10 +14,10 @@ before_script:
  - echo | pecl install channel://pecl.php.net/yaml-2.0.0RC8
  - git clone --recursive --branch=master https://github.com/pmmp/PocketMine-MP.git
  - mkdir -p PocketMine-MP/plugins/MyPlot-src
- - cp -rf jasonwynn10/MyPlot/src PocketMine-MP/plugins/MyPlot-src
- - cp -rf jasonwynn10/MyPlot/resources PocketMine-MP/plugins/MyPlot-src
- - cp -rf jasonwynn10/MyPlot/plugin.yml PocketMine-MP/plugins/MyPlot-src
- - cp -rf jasonwynn10/MyPlot/LICENSE PocketMine-MP/plugins/MyPlot-src
+ - cp -rf jasonwynn10/MyPlot/src PocketMine-MP/plugins/MyPlot
+ - cp -rf jasonwynn10/MyPlot/resources PocketMine-MP/plugins/MyPlot
+ - cp -rf jasonwynn10/MyPlot/plugin.yml PocketMine-MP/plugins/MyPlot
+ - cp -rf jasonwynn10/MyPlot/LICENSE PocketMine-MP/plugins/MyPlot
  - cp -rf jasonwynn10/MyPlot/build.php PocketMine-MP/
  - cp -rf jasonwynn10/MyPlot/syntaxcheck.php PocketMine-MP/
  - cd PocketMine-MP/plugins/
