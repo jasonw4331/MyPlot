@@ -13,19 +13,19 @@ before_script:
  - pecl install channel://pecl.php.net/weakref-0.3.2
  - echo | pecl install channel://pecl.php.net/yaml-2.0.0RC8
  - git clone --recursive --branch=master https://github.com/pmmp/PocketMine-MP.git
- - mkdir -p PocketMine-MP/plugins/MyPlot-src
- - cp -rf jasonwynn10/MyPlot/src PocketMine-MP/plugins/MyPlot-src
- - cp -rf jasonwynn10/MyPlot/resources PocketMine-MP/plugins/MyPlot-src
- - cp -rf jasonwynn10/MyPlot/plugin.yml PocketMine-MP/plugins/MyPlot-src
- - cp -rf jasonwynn10/MyPlot/LICENSE PocketMine-MP/plugins/MyPlot-src
+ - mkdir -p PocketMine-MP/plugins/MyPlot
+ - cp -rf jasonwynn10/MyPlot/src PocketMine-MP/plugins/MyPlot
+ - cp -rf jasonwynn10/MyPlot/resources PocketMine-MP/plugins/MyPlot
+ - cp -rf jasonwynn10/MyPlot/plugin.yml PocketMine-MP/plugins/MyPlot
+ - cp -rf jasonwynn10/MyPlot/LICENSE PocketMine-MP/plugins/MyPlot
  - cp -rf jasonwynn10/MyPlot/build.php PocketMine-MP/
- - cp -rf jasonwynn10/MyPlot/syntaxcheck.php PocketMine-MP/
+ - ls
  - cd PocketMine-MP/plugins/
+ - ls
  - wget -O DevTools.phar https://github.com/PocketMine/DevTools/releases/download/v1.11.0/DevTools_v1.11.0.phar
  - cd /home/travis/build/PocketMine-MP
 
 script:
- - php syntaxcheck.php
  - php build.php
 
 deploy:
