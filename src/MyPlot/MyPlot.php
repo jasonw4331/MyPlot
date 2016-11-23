@@ -19,12 +19,16 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\Player;
 use pocketmine\level\Level;
+use pocketmine\utils\TextFormat;
 
 class MyPlot extends PluginBase
 {
 
     /** @var PlotLevelSettings[] */
     private $levels = [];
+
+	/** @var [] */
+	private $generators = [];
 
     /** @var DataProvider */
     private $dataProvider = null;
@@ -34,6 +38,8 @@ class MyPlot extends PluginBase
 
     /** @var BaseLang */
     private $baseLang = null;
+
+	CONST GENERATOR_API = "1.1.0";
 
     /**
      * @api
@@ -171,7 +177,7 @@ class MyPlot extends PluginBase
         if ($x >= 0) {
             $X = floor($x / $totalSize);
             $difX = $x % $totalSize;
-        } else {
+        }else{
             $X = ceil(($x - $plotSize + 1) / $totalSize);
             $difX = abs(($x - $plotSize + 1) % $totalSize);
         }
@@ -179,7 +185,7 @@ class MyPlot extends PluginBase
         if ($z >= 0) {
             $Z = floor($z / $totalSize);
             $difZ = $z % $totalSize;
-        } else {
+        }else{
             $Z = ceil(($z - $plotSize + 1) / $totalSize);
             $difZ = abs(($z - $plotSize + 1) % $totalSize);
         }
@@ -385,26 +391,26 @@ class MyPlot extends PluginBase
         if ($x >= 0) {
             if($h = $ps % 2 == 0) {
                 $X = floor($x / $totalSize) + $h;
-            } else {
+            }else{
                 $X = floor($x / $totalSize) + ($ps / 2) + 0.5;
             }
-        } else {
+        }else{
             if($h = $ps % 2 == 0) {
                 $X = ceil(($x - $ps + 1) / $totalSize) - $h;
-            } else {
+            }else{
                 $X = ceil(($x - $ps + 1) / $totalSize) - ($ps / 2) - 0.5;
             }
         }
         if ($z >= 0) {
             if($h = $ps % 2 == 0) {
                 $Z = floor($z / $totalSize) + $h;
-            } else {
+            }else{
                 $Z = floor($z / $totalSize) + ceil($ps / 2) + 0.5;
             }
-        } else {
+        }else{
             if ($h = $ps % 2 == 0) {
                 $Z = floor($z / $totalSize) - $h;
-            } else {
+            }else{
                 $Z = floor($z / $totalSize) - ceil($ps / 2) - 0.5;
             }
         }
@@ -445,13 +451,24 @@ class MyPlot extends PluginBase
 
         @mkdir($this->getDataFolder());
         @mkdir($this->getDataFolder() . "worlds");
-	
-	   
-        $gen = $this->getConfig()->get("Generator","MyPlotGenerator");
-        if($gen == "MyPlotGenerator") {
+
+	    $dir = dir($this->getDataFolder());
+	    while(false !== ($file = $dir->read())) {
+		    if($file{0} !== ".") {
+			    $ext = strtolower(substr($file, -3));
+			    if($ext === "php") {
+				    $this->loadGenerator($dir->path . $file);
+			    }
+		    }
+	    }
+
+	    $this->saveResource("MyPlotGenerator.php");
+
+        $gen = strtolower($this->getConfig()->get("Generator","MyPlotGenerator"));
+        if($gen == "myplotgenerator" or $gen== "default") {
                 Generator::addGenerator(MyPlotGenerator::class, "myplot");
         }else{
-                Generator::addGenerator(MyPlotGenerator::class, "myplot"); // TODO find all generators in plugin directory and use selected
+                Generator::addGenerator(MyPlotGenerator::class, "myplot");
         }
 
         $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
@@ -491,7 +508,75 @@ class MyPlot extends PluginBase
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
     }
 
-    public function addLevelSettings($levelName, PlotLevelSettings $settings) {
+	/**
+	 * @param string $file
+	 * @return bool
+	 */
+	public function loadGenerator($file) {
+		if(is_link($file) or is_dir($file) or !file_exists($file)) {
+			$this->getLogger()->debug(basename($file)." is not a file");
+			return false;
+		}
+			$content = file_get_contents($file);
+			$info = strstr($content, "*/", true);
+			$content = str_repeat(PHP_EOL, substr_count($info, "\n")).substr(strstr($content, "*/"),2);
+			if(preg_match_all('#([a-zA-Z0-9\-_]*)=([^\r\n]*)#u', $info, $matches) == 0) {
+				$this->getLogger()->debug("Failed to parse ".basename($file));
+				return false;
+			}
+			$info = array();
+			foreach($matches[1] as $k => $i) {
+				$v = $matches[2][$k];
+				switch(strtolower($v)) {
+					case "on":
+					case "true":
+					case "yes":
+						$v = true;
+						break;
+					case "off":
+					case "false":
+					case "no":
+						$v = false;
+						break;
+				}
+				$info[$i] = $v;
+			}
+			$info["code"] = $content;
+			$info["class"] = trim(strtolower($info["class"]));
+		if(!isset($info["class"]) or !isset($info["version"])) {
+			$this->getLogger()->debug("[ERROR] Failed parsing of ".basename($file));
+			return false;
+		}
+		$this->getLogger()->debug("Loading generator \"".TextFormat::GREEN.$info["class"].TextFormat::RESET."\"_v".TextFormat::AQUA.$info["version"].TextFormat::RESET." by ".TextFormat::AQUA.$info["author"].TextFormat::RESET);
+		if($info["class"] !== "none" and $info["class"] !== null and class_exists($info["class"])) {
+			$this->getLogger()->debug("Failed loading generator: class already exists");
+			return false;
+		}
+
+		$className = $info["class"];
+		$apiversion = array_map("intval", explode(",", $info["version"]));
+		if(!in_array(self::GENERATOR_API, $apiversion)) {
+			$this->getLogger()->debug("Generator \"".$info["name"]."\" may be outdated!");
+		}
+
+		if($info["class"] !== "none" or $info["class"] !== null) {
+			$object = new $className([]);
+			if(!($object instanceof GeneratorTemplate)) {
+				$this->getLogger()->debug("Generator \"".$info["class"]."\" doesn't use the Generator Template");
+				if(method_exists($object, "__destruct")) {
+					$object->__destruct();
+				}
+				$object = null;
+				unset($object);
+			}else{
+				$this->generators[] = array($object, $info);
+			}
+		}
+		return true;
+	}
+
+
+	public function addLevelSettings($levelName, PlotLevelSettings $settings) {
         $this->levels[$levelName] = $settings;
     }
 

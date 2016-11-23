@@ -3,14 +3,13 @@ namespace MyPlot;
 
 use pocketmine\block\Block;
 use pocketmine\level\format\FullChunk;
-use pocketmine\level\generator\Generator;
 use pocketmine\level\ChunkManager;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Level;
 
-class MyPlotGenerator extends Generator
+class MyPlotGenerator extends GeneratorTemplate
 {
     /** @var Level */
     private $level;
@@ -58,33 +57,6 @@ class MyPlotGenerator extends Generator
         ]);
     }
 
-    private function parseBlock(&$array, $key, $default) {
-        if (isset($array[$key])) {
-            $id = $array[$key];
-            if (is_numeric($id)) {
-                $block = new Block($id);
-            } else {
-                $split = explode(":", $id);
-                if (count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
-                    $block = new Block($split[0], $split[1]);
-                } else {
-                    $block = $default;
-                }
-            }
-        } else {
-            $block = $default;
-        }
-        return $block;
-    }
-
-    private function parseNumber(&$array, $key, $default) {
-        if (isset($array[$key]) and is_numeric($array[$key])) {
-            return $array[$key];
-        } else {
-            return $default;
-        }
-    }
-
     public function getName() {
         return "myplot";
     }
@@ -93,11 +65,11 @@ class MyPlotGenerator extends Generator
         return $this->settings;
     }
 
-    public function init(ChunkManager $level, Random $random) {
+    public final function init(ChunkManager $level, Random $random) {
         $this->level = $level;
     }
 
-    public function generateChunk($chunkX, $chunkZ) {
+    public final function generateChunk($chunkX, $chunkZ) {
         $shape = $this->getShape($chunkX << 4, $chunkZ << 4);
 	    /** @var FullChunk $chunk */
 	    $chunk = $this->level->getChunk($chunkX, $chunkZ);
@@ -144,7 +116,7 @@ class MyPlotGenerator extends Generator
         $this->level->setChunk($chunkX, $chunkZ, $chunk);
     }
 
-    public function getShape($x, $z) {
+    public final function getShape($x, $z) {
         $totalSize = $this->plotSize + $this->roadWidth;
 
         if ($x >= 0) {
@@ -198,9 +170,9 @@ class MyPlotGenerator extends Generator
         return $shape;
     }
 
-    public function populateChunk($chunkX, $chunkZ) {}
+    public final function populateChunk($chunkX, $chunkZ) {}
 
-    public function getSpawn() {
+    public final function getSpawn() {
         return new Vector3(0, $this->groundHeight, 0);
     }
 }
