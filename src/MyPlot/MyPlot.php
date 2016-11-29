@@ -575,7 +575,6 @@ class MyPlot extends PluginBase
 		return true;
 	}
 
-
 	public function addLevelSettings($levelName, PlotLevelSettings $settings) {
         $this->levels[$levelName] = $settings;
     }

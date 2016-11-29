@@ -4,10 +4,14 @@ namespace MyPlot;
 use pocketmine\block\Block;
 use pocketmine\level\generator\Generator;
 use pocketmine\level\ChunkManager;
+use pocketmine\level\Level;
 use pocketmine\utils\Random;
 
 abstract class GeneratorTemplate extends Generator
 {
+
+	/** @var  Level */
+	protected $level;
 
 	/** @var string[] */
 	protected $settings;

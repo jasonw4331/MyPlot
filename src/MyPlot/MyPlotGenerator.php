@@ -7,15 +7,9 @@ use pocketmine\level\ChunkManager;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\level\generator\biome\Biome;
-use pocketmine\level\Level;
 
 class MyPlotGenerator extends GeneratorTemplate
 {
-    /** @var Level */
-    private $level;
-
-    /** @var string[] */
-    private $settings;
 
     /** @var Block */
     public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
@@ -28,14 +22,7 @@ class MyPlotGenerator extends GeneratorTemplate
     const WALL = 2;
 
     public function __construct(array $settings = []) {
-        if (isset($settings["preset"])) {
-            $settings = json_decode($settings["preset"], true);
-            if ($settings === false) {
-                $settings = [];
-            }
-        } else {
-            $settings = [];
-        }
+        parent::__construct($settings);
         $this->roadBlock = $this->parseBlock($settings, "RoadBlock", new Block(5));
         $this->wallBlock = $this->parseBlock($settings, "WallBlock", new Block(44));
         $this->plotFloorBlock = $this->parseBlock($settings, "PlotFloorBlock", new Block(2));
