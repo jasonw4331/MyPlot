@@ -2,6 +2,7 @@
 namespace MyPlot;
 
 use pocketmine\block\Block;
+
 class PlotLevelSettings
 {
     /** @var string */
@@ -11,10 +12,14 @@ class PlotLevelSettings
     /** @var int */
     public $roadWidth, $plotSize, $groundHeight, $claimPrice, $clearPrice,
             $disposePrice, $resetPrice;
+    /** @var bool */
     public $restrictEntityMovement;
+    /** @var GeneratorTemplate */
+	public $generator;
 
-    public function __construct($name, $settings = []) {
+    public function __construct($name, $generator, $settings = []) {
         $this->name = $name;
+        $this->generator = $generator;
         if (!empty($settings)) {
             $this->roadBlock = self::parseBlock($settings, "RoadBlock", new Block(5));
             $this->wallBlock = self::parseBlock($settings, "WallBlock", new Block(44));

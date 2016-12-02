@@ -19,7 +19,6 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\Player;
 use pocketmine\level\Level;
-use pocketmine\utils\TextFormat;
 
 class MyPlot extends PluginBase
 {
@@ -99,15 +98,15 @@ class MyPlot extends PluginBase
      *
      * @api
      * @param string $levelName
-     * @param string $generator
+     * @param GeneratorTemplate $generator
      * @return bool
      */
-    public function generateLevel($levelName, $generator = "MyPlotGenerator") {
+    public function generateLevel($levelName, GeneratorTemplate $generator) {
         if ($this->getServer()->isLevelGenerated($levelName) === true) {
             return false;
         }
-        if($this->generatorExists($generator)) {
-
+        if($this->generatorExists($generator::$name) === false) {
+			return false;
         }
 	    $settings = $this->getConfig()->get("DefaultWorld");
         $settings = [
@@ -518,6 +517,10 @@ class MyPlot extends PluginBase
 
 	public function loadGenerator($gen) {
 		array_push($this->generators,$gen);
+		if($this->generatorExists($gen::$name)) {
+			return true;
+		}
+		return false;
 	}
 
 	public function addLevelSettings($levelName, PlotLevelSettings $settings) {
