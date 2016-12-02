@@ -27,16 +27,13 @@ before_script:
 
 script:
  - php build.php
-after_success:
- - cd DevTools
- - ls
- - 
+
 deploy:
   provider: releases
   api_key: "$traviskey"
   file: "/home/travis/build/PocketMine-MP/plugins/DevTools/MyPlot.phar"
   skip_cleanup: true
-  overwrite: true
+  overwrite: false
   on:
     tags: true
 
