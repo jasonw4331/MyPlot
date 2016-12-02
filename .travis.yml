@@ -30,12 +30,13 @@ script:
 
 deploy:
   provider: releases
-  api_key: "$traviskey"
+  user: "$user"
+  password:"$password"
   file: "/home/travis/build/PocketMine-MP/plugins/DevTools/MyPlot.phar"
   skip_cleanup: true
-  overwrite: false
+  overwrite: true
   on:
-    tags: true
+    tags: false
 
 notifications:
  email: false
