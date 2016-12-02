@@ -30,13 +30,13 @@ script:
 
 deploy:
   provider: releases
-  user: jasonwynn10
-  password: $password
+  user: "jasonwynn10"
+  password: "$password"
   file: "/home/travis/build/PocketMine-MP/plugins/DevTools/MyPlot.phar"
   skip_cleanup: true
   overwrite: true
   on:
-    tags: false
+    tags: true
 
 notifications:
  email: false
