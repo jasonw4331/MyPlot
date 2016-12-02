@@ -11,6 +11,8 @@ use pocketmine\level\generator\biome\Biome;
 class MyPlotGenerator extends GeneratorTemplate
 {
 
+	public static $name = "MyPlotGenerator";
+
     /** @var Block */
     public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
 
@@ -45,7 +47,7 @@ class MyPlotGenerator extends GeneratorTemplate
     }
 
     public function getName() {
-        return "myplot";
+        return self::$name;
     }
 
     public function getSettings() {
@@ -60,6 +62,9 @@ class MyPlotGenerator extends GeneratorTemplate
         $shape = $this->getShape($chunkX << 4, $chunkZ << 4);
 	    /** @var FullChunk $chunk */
 	    $chunk = $this->level->getChunk($chunkX, $chunkZ);
+	    if(!$chunk instanceof FullChunk) {
+		    return;
+	    }
         $chunk->setGenerated();
         $c = Biome::getBiome(1)->getColor();
         $R = $c >> 16;

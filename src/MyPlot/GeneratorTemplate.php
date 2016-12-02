@@ -10,6 +10,8 @@ use pocketmine\utils\Random;
 abstract class GeneratorTemplate extends Generator
 {
 
+	public static $name = "GeneratorTemplate";
+
 	/** @var  Level */
 	protected $level;
 

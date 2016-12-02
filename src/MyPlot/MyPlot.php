@@ -27,7 +27,7 @@ class MyPlot extends PluginBase
     /** @var PlotLevelSettings[] */
     private $levels = [];
 
-	/** @var [] */
+	/** @var GeneratorTemplate[] */
 	private $generators = [];
 
     /** @var DataProvider */
@@ -99,20 +99,21 @@ class MyPlot extends PluginBase
      *
      * @api
      * @param string $levelName
-     * @param array $settings
+     * @param string $generator
      * @return bool
      */
-    public function generateLevel($levelName, $settings = []) {
+    public function generateLevel($levelName, $generator = "MyPlotGenerator") {
         if ($this->getServer()->isLevelGenerated($levelName) === true) {
             return false;
         }
-        if (empty($settings)) {
-            $settings = $this->getConfig()->get("DefaultWorld");
+        if($this->generatorExists($generator)) {
+
         }
+	    $settings = $this->getConfig()->get("DefaultWorld");
         $settings = [
             "preset" => json_encode($settings)
         ];
-        return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $settings);
+        return $this->getServer()->generateLevel($levelName, null, $generator, $settings);
     }
 
     /**
@@ -441,6 +442,21 @@ class MyPlot extends PluginBase
         return true;
     }
 
+	/**
+	 * Checks if the needed generator exists
+	 *
+	 * @param string $name
+	 * @return bool|GeneratorTemplate
+	 */
+	public function generatorExists(string $name) {
+		foreach ($this->generators as $gen) {
+			if(strtolower($gen::$name) == $name) {
+				return $gen;
+			}
+		}
+		return false;
+	}
+
     /* -------------------------- Non-API part -------------------------- */
 
     public function onEnable() {
@@ -452,23 +468,15 @@ class MyPlot extends PluginBase
         @mkdir($this->getDataFolder());
         @mkdir($this->getDataFolder() . "worlds");
 
-	    $dir = dir($this->getDataFolder());
-	    while(false !== ($file = $dir->read())) {
-		    if($file{0} !== ".") {
-			    $ext = strtolower(substr($file, -3));
-			    if($ext === "php") {
-				    $this->loadGenerator($dir->path . $file);
-			    }
-		    }
-	    }
-
-	    $this->saveResource("MyPlotGenerator.php");
-
         $gen = strtolower($this->getConfig()->get("Generator","MyPlotGenerator"));
         if($gen == "myplotgenerator" or $gen== "default") {
-                Generator::addGenerator(MyPlotGenerator::class, "myplot");
+                Generator::addGenerator(MyPlotGenerator::class, MyPlotGenerator::$name);
         }else{
-                Generator::addGenerator(MyPlotGenerator::class, "myplot");
+	        foreach($this->generators as $generator) {
+		        if(strtolower($gen) == strtolower($generator::$name)) {
+			        Generator::addGenerator($generator, $generator::$name);
+		        }
+	        }
         }
 
         $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
@@ -508,71 +516,8 @@ class MyPlot extends PluginBase
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
     }
 
-	/**
-	 * @param string $file
-	 * @return bool
-	 */
-	public function loadGenerator($file) {
-		if(is_link($file) or is_dir($file) or !file_exists($file)) {
-			$this->getLogger()->debug(basename($file)." is not a file");
-			return false;
-		}
-			$content = file_get_contents($file);
-			$info = strstr($content, "*/", true);
-			$content = str_repeat(PHP_EOL, substr_count($info, "\n")).substr(strstr($content, "*/"),2);
-			if(preg_match_all('#([a-zA-Z0-9\-_]*)=([^\r\n]*)#u', $info, $matches) == 0) {
-				$this->getLogger()->debug("Failed to parse ".basename($file));
-				return false;
-			}
-			$info = array();
-			foreach($matches[1] as $k => $i) {
-				$v = $matches[2][$k];
-				switch(strtolower($v)) {
-					case "on":
-					case "true":
-					case "yes":
-						$v = true;
-						break;
-					case "off":
-					case "false":
-					case "no":
-						$v = false;
-						break;
-				}
-				$info[$i] = $v;
-			}
-			$info["code"] = $content;
-			$info["class"] = trim(strtolower($info["class"]));
-		if(!isset($info["class"]) or !isset($info["version"])) {
-			$this->getLogger()->debug("[ERROR] Failed parsing of ".basename($file));
-			return false;
-		}
-		$this->getLogger()->debug("Loading generator \"".TextFormat::GREEN.$info["class"].TextFormat::RESET."\"_v".TextFormat::AQUA.$info["version"].TextFormat::RESET." by ".TextFormat::AQUA.$info["author"].TextFormat::RESET);
-		if($info["class"] !== "none" and $info["class"] !== null and class_exists($info["class"])) {
-			$this->getLogger()->debug("Failed loading generator: class already exists");
-			return false;
-		}
-
-		$className = $info["class"];
-		$apiversion = array_map("intval", explode(",", $info["version"]));
-		if(!in_array(self::GENERATOR_API, $apiversion)) {
-			$this->getLogger()->debug("Generator \"".$info["name"]."\" may be outdated!");
-		}
-
-		if($info["class"] !== "none" or $info["class"] !== null) {
-			$object = new $className([]);
-			if(!($object instanceof GeneratorTemplate)) {
-				$this->getLogger()->debug("Generator \"".$info["class"]."\" doesn't use the Generator Template");
-				if(method_exists($object, "__destruct")) {
-					$object->__destruct();
-				}
-				$object = null;
-				unset($object);
-			}else{
-				$this->generators[] = array($object, $info);
-			}
-		}
-		return true;
+	public function loadGenerator($gen) {
+		array_push($this->generators,$gen);
 	}
 
 	public function addLevelSettings($levelName, PlotLevelSettings $settings) {

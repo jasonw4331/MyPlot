@@ -5,6 +5,7 @@ main: MyPlot\MyPlot
 version: 1.1.0
 api: [1.13.1, 2.0.0]
 softdepend: [EconomyAPI, PocketMoney]
+load: STARTUP
 
 permissions:
     myplot.command:
