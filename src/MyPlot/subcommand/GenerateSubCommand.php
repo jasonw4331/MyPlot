@@ -12,7 +12,7 @@ class GenerateSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (count($args) <= 1) {
+        if (count($args) < 1) {
             return false;
         }
         $levelName = $args[0];
