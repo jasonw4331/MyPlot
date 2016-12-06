@@ -3,7 +3,6 @@ namespace MyPlot\subcommand;
 use MyPlot\Commands;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
-use pocketmine\command\ConsoleCommandSender;
 use pocketmine\utils\TextFormat;
 class HelpSubCommand extends SubCommand
 {
@@ -23,18 +22,14 @@ class HelpSubCommand extends SubCommand
 		if (count($args) === 0) {
 			$pageNumber = 1;
 		} elseif (is_numeric($args[0])) {
-			$pageNumber = (int) array_shift($args);
+			$pageNumber = (int) $args[0];
 			if ($pageNumber <= 0) {
 				$pageNumber = 1;
 			}
 		} else {
 			return false;
 		}
-		if ($sender instanceof ConsoleCommandSender) {
-			$pageHeight = PHP_INT_MAX;
-		} else {
-			$pageHeight = 5;
-		}
+		$pageHeight = 7;
 		$commands = [];
 		foreach ($this->cmd->getCommands() as $command) {
 			if ($command->canUse($sender)) {

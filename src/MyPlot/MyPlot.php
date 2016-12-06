@@ -3,6 +3,7 @@ namespace MyPlot;
 
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\PocketMoneyProvider;
+use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\SQLiteDataProvider;
@@ -37,8 +38,6 @@ class MyPlot extends PluginBase
 
     /** @var BaseLang */
     private $baseLang = null;
-
-	CONST GENERATOR_API = "1.1.0";
 
     /**
      * @api
@@ -488,6 +487,9 @@ class MyPlot extends PluginBase
                 $settings = $this->getConfig()->get("MySQLSettings");
                 $this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
             break;
+	        case "yaml":
+	        	$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
+	        break;
             case "json":
                 $this->dataProvider = new JSONDataProvider($this, $cacheSize);
             break;

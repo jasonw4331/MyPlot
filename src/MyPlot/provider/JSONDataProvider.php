@@ -5,21 +5,21 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\utils\Config;
 
-class jsonDataProvider extends DataProvider{
+class JSONDataProvider extends DataProvider{
     /** @var Plot[] */
     private $cache = [];
     /** @var int */
     private $cacheSize;
     /** @var MyPlot */
     protected $plugin;
-    /** @var Config $json */
-    private $json;
+    /** @var Config */
+    private $json1, $json2;
 
     public function __construct(MyPlot $plugin, $cacheSize = 0) {
         parent::__construct($plugin, $cacheSize);
-        $this->plugin = $plugin;
         $this->cacheSize = $cacheSize;
-        $this->json = new Config($this->plugin->getDataFolder()."plots.json", Config::JSON, []);
+        $this->json1 = new Config($this->plugin->getDataFolder()."Data".DIRECTORY_SEPARATOR."plots.json", Config::JSON, []);
+        $this->json2 = new Config($this->plugin->getDataFolder()."Data".DIRECTORY_SEPARATOR."players.json", Config::JSON, []);
     }
     /**
      * @param Plot $plot
