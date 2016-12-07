@@ -18,8 +18,8 @@ class YAMLDataProvider extends DataProvider{
 	public function __construct(MyPlot $plugin, $cacheSize = 0) {
 		parent::__construct($plugin, $cacheSize);
 		$this->cacheSize = $cacheSize;
-		$this->yaml1 = new Config($this->plugin->getDataFolder()."Data".DIRECTORY_SEPARATOR."plots.yml", Config::YAML, []);
-		$this->yaml2 = new Config($this->plugin->getDataFolder()."Data".DIRECTORY_SEPARATOR."players.yml", Config::YAML, []);
+		$this->yaml1 = new Config($this->plugin->getDataFolder()."Data\\plots.yml", Config::YAML, []);
+		$this->yaml2 = new Config($this->plugin->getDataFolder()."Data\\players.yml", Config::YAML, []);
 	}
 	/**
 	 * @param Plot $plot

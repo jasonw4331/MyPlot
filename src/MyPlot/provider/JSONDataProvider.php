@@ -18,8 +18,8 @@ class JSONDataProvider extends DataProvider{
     public function __construct(MyPlot $plugin, $cacheSize = 0) {
         parent::__construct($plugin, $cacheSize);
         $this->cacheSize = $cacheSize;
-        $this->json1 = new Config($this->plugin->getDataFolder()."Data".DIRECTORY_SEPARATOR."plots.json", Config::JSON, []);
-        $this->json2 = new Config($this->plugin->getDataFolder()."Data".DIRECTORY_SEPARATOR."players.json", Config::JSON, []);
+        $this->json1 = new Config($this->plugin->getDataFolder()."Data\\plots.json", Config::JSON, []);
+        $this->json2 = new Config($this->plugin->getDataFolder()."Data\\players.json", Config::JSON, []);
     }
     /**
      * @param Plot $plot

@@ -448,7 +448,7 @@ class MyPlot extends PluginBase
 	 */
 	public function generatorExists(string $name) {
 		foreach ($this->generators as $gen) {
-			if(strtolower($gen::$name) == $name) {
+			if(strtolower($gen::$name) == strtolower($name)) {
 				return $gen;
 			}
 		}
@@ -465,7 +465,7 @@ class MyPlot extends PluginBase
 
         @mkdir($this->getDataFolder());
         @mkdir($this->getDataFolder() . "worlds");
-
+	    @mkdir($this->getDataFolder() . "Data");
         $gen = strtolower($this->getConfig()->get("Generator","MyPlotGenerator"));
         if($gen == "myplotgenerator" or $gen== "default") {
                 Generator::addGenerator(MyPlotGenerator::class, MyPlotGenerator::$name);

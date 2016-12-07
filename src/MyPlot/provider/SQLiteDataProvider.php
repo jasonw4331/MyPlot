@@ -13,8 +13,6 @@ class SQLiteDataProvider extends DataProvider
     private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
             $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
             $sqlGetExistingXZ;
-
-	CONST COUNT = 9;
     /**
      * @param MyPlot $plugin
      * @param int $cacheSize
@@ -22,7 +20,7 @@ class SQLiteDataProvider extends DataProvider
     public function __construct(MyPlot $plugin, $cacheSize = 0) {
         parent::__construct($plugin, $cacheSize);
 
-        $this->db = new \SQLite3($this->plugin->getDataFolder() . "Data".DIRECTORY_SEPARATOR."plots.db");
+        $this->db = new \SQLite3($this->plugin->getDataFolder()."Data\\plots.db");
         $this->db->exec(
             "CREATE TABLE IF NOT EXISTS plots
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,

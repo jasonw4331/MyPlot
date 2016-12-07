@@ -52,8 +52,8 @@ ShowPlotPopup: true
 ClearBlocksPerTick: 256
 
 # The MyPlotGenerator is the default Generator
-# Enter the custom generator's class
-Generator: MyPlotGenerator
+# Enter the custom generator's class name
+Generator: default
 
 # These settings will be used when creating a new world with the default generator.
 DefaultWorld:
