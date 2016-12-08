@@ -27,7 +27,7 @@ class GenerateSubCommand extends SubCommand
         }
 	    $gen = $this->getPlugin()->generatorExists($gen);
         if($gen == false) {
-	        $sender->sendMessage($this->translateString("generate.genexists", [$gen]));
+	        $sender->sendMessage($this->translateString("generate.gexists", [$gen]));
 	        return true;
         }
         if ($this->getPlugin()->generateLevel($levelName,$gen)) {
