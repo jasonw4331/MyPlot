@@ -6,6 +6,7 @@ use PocketMoney\PocketMoney;
 
 class PocketMoneyProvider implements EconomyProvider
 {
+	/** @var PocketMoney */
     private $plugin;
 
     public function __construct(PocketMoney $plugin) {

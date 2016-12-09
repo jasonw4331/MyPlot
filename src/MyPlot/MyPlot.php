@@ -1,7 +1,9 @@
 <?php
 namespace MyPlot;
 
+use EssentialsPE\Loader;
 use MyPlot\provider\EconomySProvider;
+use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
@@ -9,6 +11,7 @@ use MyPlot\provider\DataProvider;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\EconomyProvider;
 
+use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Air;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
@@ -21,6 +24,7 @@ use pocketmine\level\generator\Generator;
 use pocketmine\Player;
 use pocketmine\level\Level;
 use pocketmine\utils\TextFormat as TF;
+use PocketMoney\PocketMoney;
 
 class MyPlot extends PluginBase
 {
@@ -500,10 +504,18 @@ class MyPlot extends PluginBase
 
         // Initialize EconomyProvider
         if ($this->getConfig()->get("UseEconomy") == true) {
-            if ($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") !== null) {
-                $this->economyProvider = new EconomySProvider();
+            if (($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
+	            if($plugin instanceof EconomyAPI) {
+		            $this->economyProvider = new EconomySProvider($plugin);
+	            }
+            } elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("EssentialsPE")) !== null) {
+            	if($plugin instanceof Loader) {
+		            $this->economyProvider = new EssentialsPEProvider($plugin);
+	            }
             } elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
-                $this->economyProvider = new PocketMoneyProvider($plugin);
+                if($plugin instanceof PocketMoney) {
+	                $this->economyProvider = new PocketMoneyProvider($plugin);
+                }
             }
         }
 
