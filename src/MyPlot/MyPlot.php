@@ -20,6 +20,7 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\Player;
 use pocketmine\level\Level;
+use pocketmine\utils\TextFormat as TF;
 
 class MyPlot extends PluginBase
 {
@@ -458,7 +459,7 @@ class MyPlot extends PluginBase
     /* -------------------------- Non-API part -------------------------- */
 
     public function onEnable() {
-        $this->getLogger()->info("Loading MyPlot");
+        $this->getLogger()->notice(TF::BOLD."Loading...");
 
         $this->saveDefaultConfig();
         $this->reloadConfig();
@@ -467,15 +468,12 @@ class MyPlot extends PluginBase
         @mkdir($this->getDataFolder() . "worlds");
 	    @mkdir($this->getDataFolder() . "Data");
         $gen = strtolower($this->getConfig()->get("Generator","MyPlotGenerator"));
-        if($gen == "myplotgenerator" or $gen== "default") {
-                Generator::addGenerator(MyPlotGenerator::class, MyPlotGenerator::$name);
-        }else{
-	        foreach($this->generators as $generator) {
-		        if(strtolower($gen) == strtolower($generator::$name)) {
-			        Generator::addGenerator($generator, $generator::$name);
-		        }
-	        }
-        }
+	    Generator::addGenerator(MyPlotGenerator::class, MyPlotGenerator::$name);
+	    foreach($this->generators as $generator) {
+		    if(strtolower($gen) == strtolower($generator::$name)) {
+			    Generator::addGenerator($generator, $generator::$name);
+		    }
+	    }
 
         $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
         $this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
@@ -515,6 +513,7 @@ class MyPlot extends PluginBase
             $eventListener->onLevelLoad(new LevelLoadEvent($level));
         }
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
+        $this->getLogger()->notice(TF::GREEN."Enabled!");
     }
 
 	public function loadGenerator($gen) {

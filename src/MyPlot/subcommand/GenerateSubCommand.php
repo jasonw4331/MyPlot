@@ -12,11 +12,11 @@ class GenerateSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (count($args) < 1) {
+        if (count($args) == 0) {
             return false;
         }
         $levelName = $args[0];
-        if($args[1] !== null) {
+        if(!empty($args[1])) {
 	        $gen = strtolower($args[1]);
         }else{
         	$gen = MyPlotGenerator::$name;
