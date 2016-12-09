@@ -507,15 +507,21 @@ class MyPlot extends PluginBase
             if (($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
 	            if($plugin instanceof EconomyAPI) {
 		            $this->economyProvider = new EconomySProvider($plugin);
+		            $this->getLogger()->debug("Eco set to EconomySProvider");
 	            }
+	            $this->getLogger()->debug("Eco not instance of EconomyAPI");
             } elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("EssentialsPE")) !== null) {
             	if($plugin instanceof Loader) {
 		            $this->economyProvider = new EssentialsPEProvider($plugin);
+		            $this->getLogger()->debug("Eco set to EssentialsPE");
 	            }
+	            $this->getLogger()->debug("Eco not instance of EssentialsPE");
             } elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
                 if($plugin instanceof PocketMoney) {
 	                $this->economyProvider = new PocketMoneyProvider($plugin);
+	                $this->getLogger()->debug("Eco set to PocketMoney");
                 }
+	            $this->getLogger()->debug("Eco not instance of PocketMoney");
             }
         }
 
@@ -543,6 +549,7 @@ class MyPlot extends PluginBase
     public function unloadLevelSettings($levelName) {
         if (isset($this->levels[$levelName])) {
             unset($this->levels[$levelName]);
+	        $this->getLogger()->debug("Level ".$levelName." settings unloaded!");
             return true;
         }
         return false;

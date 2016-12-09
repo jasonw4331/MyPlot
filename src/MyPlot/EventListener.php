@@ -27,6 +27,7 @@ class EventListener implements Listener
 
     public function onLevelLoad(LevelLoadEvent $event) {
         if ($event->getLevel()->getProvider()->getGenerator() === "myplot") {
+	        $this->plugin->getLogger()->debug("MyPlot level".$event->getLevel()->getFolderName()." loaded!");
             $settings = $event->getLevel()->getProvider()->getGeneratorOptions();
             if (isset($settings["preset"]) === false or $settings["preset"] === "") {
                 return;
@@ -55,7 +56,9 @@ class EventListener implements Listener
 
     public function onLevelUnload(LevelUnloadEvent $event) {
         $levelName = $event->getLevel()->getName();
-        $this->plugin->unloadLevelSettings($levelName);
+        if($this->plugin->unloadLevelSettings($levelName)) {
+	        $this->plugin->getLogger()->debug("Level ".$event->getLevel()->getFolderName()." unloaded!");
+        }
     }
 
     public function onBlockPlace(BlockPlaceEvent $event) {
@@ -73,11 +76,12 @@ class EventListener implements Listener
     public function onBlockUpdate(BlockUpdateEvent $event) {
         /*
          * Disables water and lava flow as a temporary solution.
+         * TODO make a permanent fix
          */
-
         $levelName = $event->getBlock()->getLevel()->getName();
         if ($this->plugin->isLevelLoaded($levelName)) {
             $event->setCancelled(true);
+	        $this->plugin->getLogger()->debug("Block updated cancelled in ".$levelName);
         }
     }
 
@@ -142,6 +146,7 @@ class EventListener implements Listener
             return;
         }
         $event->setCancelled(true);
+	    $this->plugin->getLogger()->debug("Road block placement cancelled");
     }
 
     public function onEntityMotion(EntityMotionEvent $event) {
@@ -152,6 +157,7 @@ class EventListener implements Listener
         $settings = $this->plugin->getLevelSettings($levelName);
         if ($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
             $event->setCancelled(true);
+	        $this->plugin->getLogger()->debug("Cancelled entity motion on ".$levelName);
         }
     }
 
@@ -176,24 +182,27 @@ class EventListener implements Listener
                 $paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
                 $paddingPopup = str_repeat(" ", max(0, -$paddingSize));
                 $paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
-                $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
-                         TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+	            $paddingDenial = str_repeat(" ", max(0, $paddingSize));
+	            $denialPopup = $this->plugin->getLanguage()->translateString("popup.denied");
+	            if($plot->isDenied($event->getPlayer()->getName())) {
+		            $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
+			            TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup . "\n" .
+			            TextFormat::RED . $paddingDenial . $denialPopup;
+		            $event->setCancelled(true);
+		            $this->plugin->getLogger()->debug("Check for lag! Denied plot popup sent to ".$event->getPlayer()->getName());
+	            } else {
+		            $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
+			            TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+		            $this->plugin->getLogger()->debug("Check for lag! Owned plot popup sent to ".$event->getPlayer()->getName());
+	            }
             } else {
                 $ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
                 $paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
                 $paddingPopup = str_repeat(" ", max(0, -$paddingSize));
                 $paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
-                $paddingDenial = str_repeat(" ", max(0, $paddingSize));
-                $denialPopup = $this->plugin->getLanguage()->translateString("popup.denied");
-                if($plot->isDenied($event->getPlayer()->getName()) or $plot->isDenied("*")) {
-                    $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
-                        TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup . "\n" .
-                        TextFormat::RED . $paddingDenial . $denialPopup;
-                    $event->setCancelled(true);
-                } else {
-                    $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
-                        TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
-                }
+	            $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
+		            TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+	            $this->plugin->getLogger()->debug("Check for lag! Availability plot popup sent to ".$event->getPlayer()->getName());
             }
             $event->getPlayer()->sendTip($popup);
             //$event->getPlayer()->sendPopup($popup);
