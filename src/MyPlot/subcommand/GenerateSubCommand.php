@@ -17,18 +17,17 @@ class GenerateSubCommand extends SubCommand
         }
         $levelName = $args[0];
         if(!empty($args[1])) {
-	        $gen = strtolower($args[1]);
+	        $gen = $this->getPlugin()->generatorExists(strtolower($args[1]));
+	        if($gen == false) {
+		        $sender->sendMessage($this->translateString("generate.gexists", [$gen]));
+		        return true;
+	        }
         }else{
-        	$gen = MyPlotGenerator::$name;
+        	$gen = MyPlotGenerator::class;
         }
         if ($sender->getServer()->isLevelGenerated($levelName)) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("generate.exists", [$levelName]));
             return true;
-        }
-	    $gen = $this->getPlugin()->generatorExists($gen);
-        if($gen == false) {
-	        $sender->sendMessage($this->translateString("generate.gexists", [$gen]));
-	        return true;
         }
         if ($this->getPlugin()->generateLevel($levelName,$gen)) {
             $sender->sendMessage($this->translateString("generate.success", [$levelName]));

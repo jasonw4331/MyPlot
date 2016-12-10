@@ -22,7 +22,7 @@ class HelpSubCommand extends SubCommand
 		if (count($args) === 0) {
 			$pageNumber = 1;
 		} elseif (is_numeric($args[0])) {
-			$pageNumber = (int) $args[0];
+			$pageNumber = (int)$args[0];
 			if ($pageNumber <= 0) {
 				$pageNumber = 1;
 			}

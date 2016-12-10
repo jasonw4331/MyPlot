@@ -534,7 +534,7 @@ class MyPlot extends PluginBase
         $this->getLogger()->notice(TF::GREEN."Enabled!");
     }
 
-	public function loadGenerator($gen) {
+	public function loadGenerator(GeneratorTemplate $gen) {
 		array_push($this->generators,$gen);
 		if($this->generatorExists($gen::$name)) {
 			return true;
