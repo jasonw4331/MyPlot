@@ -27,6 +27,7 @@ abstract class DataProvider
                 array_pop($this->cache);
             }
             $this->cache = array_merge(array($key => clone $plot), $this->cache);
+	        $this->plugin->getLogger()->debug("Plot {$plot->X};{$plot->Z} has been cached");
         }
     }
 
@@ -34,6 +35,7 @@ abstract class DataProvider
         if ($this->cacheSize > 0) {
             $key = $levelName . ';' . $X . ';' . $Z;
             if (isset($this->cache[$key])) {
+	            $this->plugin->getLogger()->debug("Plot {$X};{$Z} was loaded from the cache");
                 return $this->cache[$key];
             }
         }

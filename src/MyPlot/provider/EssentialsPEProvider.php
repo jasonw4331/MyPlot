@@ -23,8 +23,10 @@ class EssentialsPEProvider implements EconomyProvider {
 			$this->plugin->getAPI()->addToPlayerBalance($player, -$amount);
 		}
 		if($this->plugin->getAPI()->getPlayerBalance($player) == $pre - $amount) {
+			$this->plugin->getLogger()->debug("MyPlot reduced money of ".$player->getName());
 			return true;
 		}
+		$this->plugin->getLogger()->debug("MyPlot failed to reduce money of ".$player->getName());
 		return false;
 	}
 }

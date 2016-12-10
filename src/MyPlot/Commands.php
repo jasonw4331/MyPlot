@@ -68,6 +68,7 @@ class Commands extends PluginCommand
         $this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));
         $this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
         $this->loadSubCommand(new ListSubCommand($plugin, "list"));
+	    $this->plugin->getLogger()->debug("Commands Registered to MyPlot");
     }
 
     /**

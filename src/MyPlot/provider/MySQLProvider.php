@@ -28,10 +28,14 @@ class SQLiteDataProvider extends DataProvider
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
              owner TEXT, helpers TEXT, denied TEXT, biome TEXT)"
         );
+	    $this->plugin->getLogger()->debug("MySQL data provider registered");
     }
+
     public function close() {
         $this->db->close();
+	    $this->plugin->getLogger()->debug("MySQL database closed!");
     }
+
     public function savePlot(Plot $plot) {
         if ($plot->id >= 0) {
             $stmt = $this->db->prepare(
@@ -53,6 +57,7 @@ class SQLiteDataProvider extends DataProvider
         $this->cachePlot($plot);
         return true;
     }
+
     public function deletePlot(Plot $plot) {
         if ($plot->id >= 0) {
             $stmt = $this->db->prepare("DELETE FROM plots WHERE id = {$plot->id}");
@@ -70,6 +75,7 @@ class SQLiteDataProvider extends DataProvider
         $this->cachePlot($plot);
         return true;
     }
+
     public function getPlot($levelName, $X, $Z) {
         if ($plot = $this->getPlotFromCache($levelName, $X, $Z)) {
             return $plot;
@@ -96,6 +102,7 @@ class SQLiteDataProvider extends DataProvider
         $this->cachePlot($plot);
         return $plot;
     }
+
     public function getPlotsByOwner($owner, $levelName = "") {
         if ($levelName === "") {
             $stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = {$owner}");
@@ -122,6 +129,7 @@ class SQLiteDataProvider extends DataProvider
         });
         return $plots;
     }
+
     public function getNextFreePlot($levelName, $limitXZ = 0) {
         $i = 0;
         for (; $limitXZ <= 0 or $i < $limitXZ; $i++) {
@@ -132,7 +140,7 @@ class SQLiteDataProvider extends DataProvider
                     (abs(X) == {$i} AND abs(Z) <= {$i}) OR
                     (abs(Z) == {$i} AND abs(X) <= {$i})
                 )
-            )"
+            );"
             )->get_result();
             $plots = [];
             while ($val = $result->fetch_array(MYSQLI_NUM)) {
@@ -164,6 +172,7 @@ class SQLiteDataProvider extends DataProvider
         }
         return null;
     }
+
     private static function findEmptyPlotSquared($a, $b, &$plots) {
         if (!isset($plots[$a][$b])) return array($a, $b);
         if (!isset($plots[$b][$a])) return array($b, $a);
@@ -181,4 +190,5 @@ class SQLiteDataProvider extends DataProvider
         }
         return null;
     }
+
 }

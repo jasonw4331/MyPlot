@@ -55,12 +55,14 @@ class SQLiteDataProvider extends DataProvider
                     (abs(X) == :number AND abs(Z) <= :number) OR
                     (abs(Z) == :number AND abs(X) <= :number)
                 )
-            )"
+            );"
         );
+	    $this->plugin->getLogger()->debug("SQLite data provider registered");
     }
 
     public function close() {
         $this->db->close();
+	    $this->plugin->getLogger()->debug("SQLite database closed!");
     }
 
     public function savePlot(Plot $plot) {

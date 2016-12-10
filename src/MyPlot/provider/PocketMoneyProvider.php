@@ -18,6 +18,11 @@ class PocketMoneyProvider implements EconomyProvider
         if ($money === false or ($money - $amount) < 0) {
             return false;
         }
-        return $this->plugin->setMoney($player->getName(), $money - $amount);
+        if($this->plugin->setMoney($player->getName(), $money - $amount)) {
+	        $this->plugin->getLogger()->debug("MyPlot reduced money of ".$player->getName());
+	        return true;
+        }
+	    $this->plugin->getLogger()->debug("MyPlot failed to reduce money of ".$player->getName());
+        return false;
     }
 }

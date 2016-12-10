@@ -21,6 +21,11 @@ class EconomySProvider implements EconomyProvider
         } else {
             $ret = $this->plugin->reduceMoney($player, $amount, true);
         }
-        return ($ret == 1);
+        if($ret == 1) {
+	        $this->plugin->getLogger()->debug("MyPlot Reduced money of ".$player->getName());
+	        return true;
+        }
+		$this->plugin->getLogger()->debug("MyPlot failed to reduce money of ".$player->getName());
+        return false;
     }
 }

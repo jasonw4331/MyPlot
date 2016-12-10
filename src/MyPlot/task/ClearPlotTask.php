@@ -11,7 +11,9 @@ use MyPlot\Plot;
 class ClearPlotTask extends PluginTask {
     /** @var MyPlot $plugin */
     private $plugin;
+
     private $level, $height, $bottomBlock, $plotFillBlock, $plotFloorBlock, $plotBeginPos, $xMax, $zMax, $maxBlocksPerTick, $pos;
+
     public function __construct(MyPlot $plugin, Plot $plot, $maxBlocksPerTick = 256) {
         parent::__construct($plugin);
         $this->plotBeginPos = $plugin->getPlotPosition($plot);
@@ -27,7 +29,9 @@ class ClearPlotTask extends PluginTask {
         $this->maxBlocksPerTick = $maxBlocksPerTick;
         $this->pos = new Vector3($this->plotBeginPos->x, 0, $this->plotBeginPos->z);
         $this->plugin = $plugin;
+	    $this->plugin->getLogger()->debug("Clear Task started at plot {$plot->X};{$plot->Z}");
     }
+
     public function onRun($tick) {
         $blocks = 0;
         while ($this->pos->x < $this->xMax) {
@@ -56,5 +60,6 @@ class ClearPlotTask extends PluginTask {
             $this->pos->z = $this->plotBeginPos->z;
             $this->pos->x++;
         }
+	    $this->plugin->getLogger()->debug("Clear task completed at {$this->plotBeginPos->x};{$this->plotBeginPos->z}");
     }
 }
