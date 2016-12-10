@@ -46,7 +46,10 @@ crashlytics-build.properties
 fabric.properties
 
 .gitignore
-.travis.yml
-build.php
 .github/
 resources/ignored.ini
+.idea/
+Data/
+config.yml
+plots.db
+worlds/
