@@ -3,15 +3,17 @@
 - [ ] This issue includes appropriate markdown for sections - e.g. code blocks for crash dumps.
 - [ ] This issue is understandable - feel free to use your native language to write issues if you are not comfortable with English.
 
-<!-- ISSUE DESCRIPTION - write a bit about what problem you're having. -->
+<!-- ISSUE DESCRIPTION - write a SHORT title about what problem you're having. -->
 ## Issue description
-{Type something here}
+
 <!-- REPRODUCE ISSUE STEPS - how can this issue be reproduced? -->
 ## Reproducing the issue
-{Type something here}
-<!-- CLIENT INFORMATION - write a bit about what operating system, PHP version and server build you're running. -->
+1. ...
+2. ...
+<!-- CLIENT INFORMATION - what is the plugin version, PHP version, and server build you're running? -->
 ## Client information
-{Type something here}
+PocketMine-MP Version: 
+Plugin Version: 
+PHP version: 7.0.13 (default)
 <!-- OPTIONAL INFORMATION - use this section for posting crash dumps, backtraces or other files(please use code markdown!) -->
 ## Optional information
-{Type something here}
