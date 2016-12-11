@@ -32,9 +32,6 @@ class MyPlot extends PluginBase
     /** @var PlotLevelSettings[] */
     private $levels = [];
 
-	/** @var GeneratorTemplate[] */
-	private $generators = [];
-
     /** @var DataProvider */
     private $dataProvider = null;
 
@@ -105,12 +102,12 @@ class MyPlot extends PluginBase
      * @param GeneratorTemplate $generator
      * @return bool
      */
-    public function generateLevel($levelName, GeneratorTemplate $generator) {
+    public function generateLevel($levelName, $generator = null) {
         if ($this->getServer()->isLevelGenerated($levelName) === true) {
             return false;
         }
-        if($this->generatorExists($generator::$name) === false) {
-			return false;
+        if($generator == null) {
+        	$generator = MyPlotGenerator::class;
         }
 	    $settings = $this->getConfig()->get("DefaultWorld");
         $settings = [
@@ -445,21 +442,6 @@ class MyPlot extends PluginBase
         return true;
     }
 
-	/**
-	 * Checks if the needed generator exists
-	 *
-	 * @param string $name
-	 * @return bool|GeneratorTemplate
-	 */
-	public function generatorExists(string $name) {
-		foreach ($this->generators as $gen) {
-			if(strtolower($gen::$name) == strtolower($name)) {
-				return $gen;
-			}
-		}
-		return false;
-	}
-
     /* -------------------------- Non-API part -------------------------- */
 
     public function onEnable() {
@@ -471,13 +453,8 @@ class MyPlot extends PluginBase
         @mkdir($this->getDataFolder());
         @mkdir($this->getDataFolder() . "worlds");
 	    @mkdir($this->getDataFolder() . "Data");
-        $gen = strtolower($this->getConfig()->get("Generator","MyPlotGenerator"));
+
 	    Generator::addGenerator(MyPlotGenerator::class, MyPlotGenerator::$name);
-	    foreach($this->generators as $generator) {
-		    if(strtolower($gen) == strtolower($generator::$name)) {
-			    Generator::addGenerator($generator, $generator::$name);
-		    }
-	    }
 
         $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
         $this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
@@ -533,14 +510,6 @@ class MyPlot extends PluginBase
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
         $this->getLogger()->notice(TF::GREEN."Enabled!");
     }
-
-	public function loadGenerator(GeneratorTemplate $gen) {
-		array_push($this->generators,$gen);
-		if($this->generatorExists($gen::$name)) {
-			return true;
-		}
-		return false;
-	}
 
 	public function addLevelSettings($levelName, PlotLevelSettings $settings) {
         $this->levels[$levelName] = $settings;

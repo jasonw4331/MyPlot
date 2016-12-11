@@ -51,10 +51,6 @@ ShowPlotPopup: true
 # Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
 ClearBlocksPerTick: 256
 
-# The MyPlotGenerator is the default Generator
-# Enter the custom generator's class name
-Generator: default
-
 # These settings will be used when creating a new world with the default generator.
 DefaultWorld:
 

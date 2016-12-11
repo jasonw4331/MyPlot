@@ -1,7 +1,6 @@
 <?php
 namespace MyPlot\subcommand;
 
-use MyPlot\MyPlotGenerator;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 
@@ -12,24 +11,15 @@ class GenerateSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (count($args) == 0) {
+        if (count($args) !== 1) {
             return false;
         }
         $levelName = $args[0];
-        if(!empty($args[1])) {
-	        $gen = $this->getPlugin()->generatorExists(strtolower($args[1]));
-	        if($gen == false) {
-		        $sender->sendMessage($this->translateString("generate.gexists", [$gen]));
-		        return true;
-	        }
-        }else{
-        	$gen = MyPlotGenerator::class;
-        }
         if ($sender->getServer()->isLevelGenerated($levelName)) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("generate.exists", [$levelName]));
             return true;
         }
-        if ($this->getPlugin()->generateLevel($levelName,$gen)) {
+        if ($this->getPlugin()->generateLevel($levelName)) {
             $sender->sendMessage($this->translateString("generate.success", [$levelName]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("generate.error"));
