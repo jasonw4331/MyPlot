@@ -6,7 +6,7 @@
 [![Poggit-Ci](https://poggit.pmmp.io/ci.badge/jasonwynn10/MyPlot/MyPlot)](https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot)
 <br>
 <br>
-Have you ever seen those PC servers with the PlotMe plugin, and you thought "Hey, why can't I have plots on my MCPE server?" Well, now you can with **MyPlot** for PocketMine-MP and other 3rd party servers! It's easy to set up, and simple to use!
+Have you ever seen those PC servers with the PlotMe plugin, and you thought "Hey, why can't I have plots on my MCPE server?" Well, now you can with **MyPlot** for PocketMine-MP! It's easy to set up, and simple to use! *NOTE:* MyPlot is designed to only support PocketMine-MP. Other server softwares will not recieve help with issues!
 <br>
 <br>
 A list of commands and permissions can be found in the [wiki](https://jasonwynn10.github.io/MyPlot/cmdsandperms) along with a helpful config guide [here](https://jasonwynn10.github.io/MyPlot/configurations).
