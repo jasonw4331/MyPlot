@@ -1,0 +1,215 @@
+# Popup when entering a plot
+popup=
+popup.owner=
+popup.available=
+popup.denied=
+
+# /p info
+command.name=plot
+command.alias=p
+command.desc=
+command.usage=
+command.unknown=
+
+subcommand.usage=
+
+#Errors that are displayed when the player does something wrong, or the plugin screws up.
+error=
+notinplot=
+notowner=
+
+confirm=
+
+#The /p help Subcommand
+help.name=help
+help.desc=
+help.usage=
+help.header=
+
+#The /p addhelper Subcommand
+addhelper.name=addhelper
+addhelper.alias=addh
+addhelper.desc=
+addhelper.usage=
+addhelper.alreadyone=
+addhelper.success=
+
+#The /p removehelper Subcommand
+removehelper.name=removehelper
+removehelper.alias=delh
+removehelper.desc=
+removehelper.usage=
+removehelper.notone=
+removehelper.success=
+
+#The /p denyplayer Subcommand
+denyplayer.name=denyplayer
+denyplayer.alias=deny
+denyplayer.desc=
+denyplayer.usage=
+denyplayer.helper=
+denyplayer.alreadyone=
+denyplayer.notaplayer=
+denyplayer.cannotdeny=
+denyplayer.attempteddeny=
+denyplayer.success1=
+denyplayer.success2=
+
+#The /p undenyplayer Subcommand
+undenyplayer.name=undenyplayer
+undenyplayer.alias=undeny
+undenyplayer.desc=
+undenyplayer.usage=
+undenyplayer.notone=
+undenyplayer.notaplayer=
+undenyplayer.success1=
+undenyplayer.success2=
+
+#The /p claim Subcommand
+claim.name=claim
+claim.desc=
+claim.usage=
+claim.yourplot=
+claim.alreadyclaimed=
+claim.maxplots=
+claim.nomoney=
+claim.success=
+
+#The /p auto Subcommand
+auto.name=auto
+auto.alias=a
+auto.desc=
+auto.usage=
+auto.notplotworld=
+auto.success=
+auto.noplots=
+
+#The /p dispose Subcommand
+dispose.name=dispose
+dispose.desc=
+dispose.usage=
+dispose.confirm=
+dispose.nomoney=
+dispose.success=
+
+#The /p reset Subcommand
+reset.name=reset
+reset.desc=
+reset.usage=
+reset.confirm=
+reset.nomoney=
+reset.success=
+
+#The /p clear Subcommand
+clear.name=clear
+clear.desc=
+clear.usage=
+clear.confirm=
+clear.nomoney=
+clear.success=
+
+#The /p biome Subcommand
+biome.name=biome
+biome.desc=
+biome.usage=
+biome.success=
+biome.invalid=
+biome.possible=
+
+#The /p biomes Subcommand
+biomes.name=biomes
+biomes.desc=
+biomes.usage=
+biomes.possible=
+
+#The /p name Subcommand
+name.name=name
+name.desc=
+name.usage=
+name.success=
+
+#The /p home Subcommand
+home.name=home
+home.alias=h
+home.desc=
+home.usage=
+home.noplots=
+home.notexist=
+home.success=
+home.error=
+
+#The /p homes Subcommand
+homes.name=homes
+homes.desc=
+homes.usage=
+homes.noplots=
+homes.header=
+
+#The /p info Subcommand
+info.name=info
+info.alias=i
+info.desc=
+info.usage=
+info.about=
+info.plotname=
+info.owner=
+info.helpers=
+info.biome=
+
+#The /p generate Subcommand - Can only be used by Players with the myplot.command.generate permission or the console
+generate.name=generate
+generate.alias=gen
+generate.desc=
+generate.usage=
+generate.exists=
+generate.gexists=
+generate.success=
+generate.error=
+
+#The /p give Subcommand
+give.name=give
+give.desc=
+give.usage=
+give.notonline=
+give.maxedout=
+give.toself=
+give.confirm=
+give.success=
+give.received=
+
+# The /p warp Subcommand
+warp.name=warp
+warp.desc=
+warp.usage=
+warp.wrongid=
+warp.notinplotworld=
+warp.unclaimed=
+warp.success=
+
+# The /p done Subcommand
+done.name=done
+done.desc=
+done.usage=
+done.completed=
+done.undone=
+
+# The /p middle Subcommand
+middle.name=middle
+middle.alias=m
+middle.desc=
+middle.usage=
+middle.success=
+
+# The /p setowner Subcommand
+setowner.name=setowner
+setowner.desc=
+setowner.usage=
+setowner.maxplots=
+setowner.success=
+
+#The /p list Subcommand
+list.name=list
+list.alias=l
+list.desc=
+list.usage=
+list.found=
