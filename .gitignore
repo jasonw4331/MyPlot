@@ -1,4 +1,6 @@
 .gitignore
-.github/
+worlds/
+config.yml
+plots.db
 .idea/
-resources/template.txt
+!/resources/config.yml
