@@ -34,7 +34,7 @@ class UnDenySubCommand extends SubCommand
             }
         }
         if(!$dplayer instanceof Player) {
-            $sender->sendMessage(translateString("denyplayer.notaplayer"));
+            $sender->sendMessage($this->translateString("denyplayer.notaplayer"));
             return true;
         }
         if (!$plot->unDenyPlayer($dplayer->getName())) {
