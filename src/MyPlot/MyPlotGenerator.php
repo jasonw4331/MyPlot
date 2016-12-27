@@ -2,11 +2,10 @@
 namespace MyPlot;
 
 use pocketmine\block\Block;
-use pocketmine\level\format\FullChunk;
+use pocketmine\level\format\Chunk as FullChunk;
 use pocketmine\level\ChunkManager;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
-use pocketmine\level\generator\biome\Biome;
 
 class MyPlotGenerator extends GeneratorTemplate
 {
@@ -66,10 +65,12 @@ class MyPlotGenerator extends GeneratorTemplate
 		    return;
 	    }
         $chunk->setGenerated();
-        $c = Biome::getBiome(1)->getColor();
+        /*
+        $c = Biome::getBiome(1)->getColor(); // TODO Get Color
         $R = $c >> 16;
         $G = ($c >> 8) & 0xff;
         $B = $c & 0xff;
+        */
 
         $bottomBlockId = $this->bottomBlock->getId();
         $bottomBlockMeta = $this->bottomBlock->getDamage();
@@ -86,8 +87,9 @@ class MyPlotGenerator extends GeneratorTemplate
         for ($Z = 0; $Z < 16; ++$Z) {
             for ($X = 0; $X < 16; ++$X) {
                 $chunk->setBiomeId($X, $Z, 1);
-                $chunk->setBiomeColor($X, $Z, $R, $G, $B);
-
+                /*
+                $chunk->setBiomeColor($X, $Z, $R, $G, $B); // TODO Set Color
+				*/
                 $chunk->setBlock($X, 0, $Z, $bottomBlockId, $bottomBlockMeta);
                 for ($y = 1; $y < $groundHeight; ++$y) {
                     $chunk->setBlock($X, $y, $Z, $plotFillBlockId, $plotFillBlockMeta);
