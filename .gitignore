@@ -4,3 +4,4 @@ config.yml
 plots.db
 .idea/
 !/resources/config.yml
+resources/langtemplate.ini
