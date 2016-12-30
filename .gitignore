@@ -5,3 +5,4 @@ plots.db
 .idea/
 !/resources/config.yml
 resources/langtemplate.ini
+README.md
