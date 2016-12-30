@@ -1,4 +1,5 @@
 # MyPlot
+# WARNING: DO NOT USE THE API3 BRANCH! IT IS HIGHLY UNSTABLE.
 ### **Create, manage, and build in protected plots! Keep your builds safe from griefers!**
 ======
 
