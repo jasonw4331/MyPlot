@@ -65,13 +65,6 @@ class MyPlotGenerator extends GeneratorTemplate
 		    return;
 	    }
         $chunk->setGenerated();
-        /*
-        $c = Biome::getBiome(1)->getColor(); // TODO Get Color
-        $R = $c >> 16;
-        $G = ($c >> 8) & 0xff;
-        $B = $c & 0xff;
-        */
-
         $bottomBlockId = $this->bottomBlock->getId();
         $bottomBlockMeta = $this->bottomBlock->getDamage();
         $plotFillBlockId = $this->plotFillBlock->getId();
@@ -87,9 +80,7 @@ class MyPlotGenerator extends GeneratorTemplate
         for ($Z = 0; $Z < 16; ++$Z) {
             for ($X = 0; $X < 16; ++$X) {
                 $chunk->setBiomeId($X, $Z, 1);
-                /*
-                $chunk->setBiomeColor($X, $Z, $R, $G, $B); // TODO Set Color
-				*/
+                // TODO change biome Color
                 $chunk->setBlock($X, 0, $Z, $bottomBlockId, $bottomBlockMeta);
                 for ($y = 1; $y < $groundHeight; ++$y) {
                     $chunk->setBlock($X, $y, $Z, $plotFillBlockId, $plotFillBlockMeta);

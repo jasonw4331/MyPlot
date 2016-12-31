@@ -319,11 +319,7 @@ class MyPlot extends PluginBase
                 if (!in_array($index, $chunkIndexes)) {
                     $chunkIndexes[] = $index;
                 }
-                $color = $biome->getColor();
-                $R = $color >> 16;
-                $G = ($color >> 8) & 0xff;
-                $B = $color & 0xff;
-                $level->setBiomeColor($x, $z, $R, $G, $B);
+                // TODO change biome color
             }
         }
         foreach ($chunkIndexes as $index) {

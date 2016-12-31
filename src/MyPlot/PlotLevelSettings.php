@@ -21,11 +21,11 @@ class PlotLevelSettings
         $this->name = $name;
         $this->generator = $generator;
         if (!empty($settings)) {
-            $this->roadBlock = self::parseBlock($settings, "RoadBlock", new Block(5));
-            $this->wallBlock = self::parseBlock($settings, "WallBlock", new Block(44));
-            $this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", new Block(2));
-            $this->plotFillBlock = self::parseBlock($settings, "PlotFillBlock", new Block(3));
-            $this->bottomBlock = self::parseBlock($settings, "BottomBlock", new Block(7));
+            $this->roadBlock = self::parseBlock($settings, "RoadBlock", new Block(Block::PLANK));
+            $this->wallBlock = self::parseBlock($settings, "WallBlock", new Block(Block::SLABS));
+            $this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", new Block(Block::GRASS));
+            $this->plotFillBlock = self::parseBlock($settings, "PlotFillBlock", new Block(Block::DIRT));
+            $this->bottomBlock = self::parseBlock($settings, "BottomBlock", new Block(Block::BEDROCK));
             $this->roadWidth = self::parseNumber($settings, "RoadWidth", 7);
             $this->plotSize = self::parseNumber($settings, "PlotSize", 22);
             $this->groundHeight = self::parseNumber($settings, "GroundHeight", 64);

@@ -1,7 +1,9 @@
 <?php
 namespace MyPlot;
 
+use pocketmine\block\Lava;
 use pocketmine\block\Sapling;
+use pocketmine\block\Water;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\Player;
 use pocketmine\event\block\BlockUpdateEvent;
@@ -80,8 +82,10 @@ class EventListener implements Listener
          */
         $levelName = $event->getBlock()->getLevel()->getName();
         if ($this->plugin->isLevelLoaded($levelName)) {
-            $event->setCancelled(true);
-	        $this->plugin->getLogger()->debug("Block updated cancelled in ".$levelName);
+        	if($event->getBlock() instanceof Water or $event->getBlock() instanceof Lava) {
+		        $event->setCancelled();
+		        $this->plugin->getLogger()->debug("Block updated cancelled in ".$levelName);
+	        }
         }
     }
 
@@ -92,7 +96,7 @@ class EventListener implements Listener
 
         $plot = $this->plugin->getPlotByPosition($event->getPosition());
         if ($plot === null) {
-            $event->setCancelled(true);
+            $event->setCancelled();
             return;
         }
         $beginPos = $this->plugin->getPlotPosition($plot);
@@ -145,7 +149,7 @@ class EventListener implements Listener
         } elseif ($event->getPlayer()->hasPermission("myplot.admin.build.road")) {
             return;
         }
-        $event->setCancelled(true);
+        $event->setCancelled();
 	    $this->plugin->getLogger()->debug("Road block placement cancelled");
     }
 
@@ -156,7 +160,7 @@ class EventListener implements Listener
 
         $settings = $this->plugin->getLevelSettings($levelName);
         if ($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
-            $event->setCancelled(true);
+            $event->setCancelled();
 	        $this->plugin->getLogger()->debug("Cancelled entity motion on ".$levelName);
         }
     }
@@ -188,7 +192,7 @@ class EventListener implements Listener
 		            $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
 			            TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup . "\n" .
 			            TextFormat::RED . $paddingDenial . $denialPopup;
-		            $event->setCancelled(true);
+		            $event->setCancelled();
 		            $this->plugin->getLogger()->debug("Check for lag! Denied plot popup sent to ".$event->getPlayer()->getName());
 	            } else {
 		            $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
