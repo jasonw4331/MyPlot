@@ -15,9 +15,8 @@ class Plot
      * @param array $denied
      * @param string $biome
      * @param int $id
-     * @param boolean $done
      */
-    public function __construct($levelName, $X, $Z, $name = "", $owner = "", $helpers = [], $denied = [], $biome = "PLAINS", $id = -1, $done = false) {
+    public function __construct(string $levelName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", int $id = -1) {
         $this->levelName = $levelName;
         $this->X = $X;
         $this->Z = $Z;
@@ -25,12 +24,12 @@ class Plot
         $this->owner = $owner;
         $this->helpers = $helpers;
         $this->denied = $denied;
-        $this->biome = $biome;
+        $this->biome = strtoupper($biome);
         $this->id = $id;
-        $this->done = $done;
     }
 
     /**
+     * @api
      * @param string $username
      * @return bool
      */
@@ -39,6 +38,7 @@ class Plot
     }
 
     /**
+     * @api
      * @param string $username
      * @return bool
      */
@@ -52,11 +52,15 @@ class Plot
     }
 
     /**
+     * @api
      * @param string $username
      * @return bool
      */
     public function removeHelper($username) {
-        $key = array_search($username, $this->helpers);
+        if(!$this->isHelper($username)) {
+        	return false;
+        }
+    	$key = array_search($username, $this->helpers);
         if ($key === false) {
             return false;
         }
@@ -65,6 +69,7 @@ class Plot
     }
 
     /**
+     * @api
      * @param string $username
      * @return bool
      */
@@ -73,6 +78,7 @@ class Plot
     }
 
     /**
+     * @api
      * @param string $username
      * @return bool
      */
@@ -86,12 +92,13 @@ class Plot
     }
 
     /**
+     * @api
      * @param string $username
      * @return bool
      */
     public function unDenyPlayer($username) {
-        if($this->isDenied($username)) {
-            return true;
+        if(!$this->isDenied($username)) {
+            return false;
         }
         $key = array_search($username, $this->denied);
         if ($key === false) {
@@ -99,14 +106,6 @@ class Plot
         }
         unset($this->denied[$key]);
         return true;
-    }
-
-    /**
-     * @return bool
-     */
-    public function toggleDone() {
-        $this->done = !$this->done;
-        return $this->done;
     }
 
     public function __toString() {

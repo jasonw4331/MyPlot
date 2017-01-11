@@ -27,23 +27,14 @@ class UnDenySubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
-        foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
-            if(similar_text($dplayer,strtolower($player->getName()))/strlen($player->getName()) >= 0.3 ) { //TODO correct with a better system
-                $dplayer = $this->getPlugin()->getServer()->getPlayer($dplayer);
-                break;
-            }
-        }
-        if(!$dplayer instanceof Player) {
-            $sender->sendMessage($this->translateString("denyplayer.notaplayer"));
-            return true;
-        }
-        if (!$plot->unDenyPlayer($dplayer->getName())) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("undenyplayer.notdenied", [$dplayer->getName()]));
+        if (!$plot->unDenyPlayer($dplayer)) {
+            $sender->sendMessage(TextFormat::RED . $this->translateString("undenyplayer.notdenied", [$dplayer]));
             return true;
         }
         if ($this->getPlugin()->savePlot($plot)) {
-            $sender->sendMessage($this->translateString("undenyplayer.success1", [$dplayer->getName()]));
-            $dp->sendMessage($this->translateString("undenyplayer.success2", [$plot->X,$plot->Z,$sender->getName()]));
+            $sender->sendMessage($this->translateString("undenyplayer.success1", [$dplayer]));
+            if($dp  instanceof Player)
+                $dp->sendMessage($this->translateString("undenyplayer.success2", [$plot->X,$plot->Z,$sender->getName()]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }

@@ -5,6 +5,7 @@ use pocketmine\block\Block;
 use pocketmine\level\generator\Generator;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
+use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 
 abstract class GeneratorTemplate extends Generator
@@ -41,7 +42,7 @@ abstract class GeneratorTemplate extends Generator
 		}
 	}
 
-	protected static function parseBlock(&$array, $key, $default) {
+	protected static function parseBlock(&$array, $key, $default) : Block {
 		if (isset($array[$key])) {
 			$id = $array[$key];
 			if (is_numeric($id)) {
@@ -60,7 +61,7 @@ abstract class GeneratorTemplate extends Generator
 		return $block;
 	}
 
-	protected static function parseNumber(&$array, $key, $default) {
+	protected static function parseNumber(&$array, $key, $default) : int {
 		if (isset($array[$key]) and is_numeric($array[$key])) {
 			return $array[$key];
 		}else{
@@ -82,5 +83,7 @@ abstract class GeneratorTemplate extends Generator
 
 	public function populateChunk($chunkX, $chunkZ) {}
 
-	public function getSpawn() {}
+	public function getSpawn() {
+		return new Vector3(0, $this->groundHeight, 0);
+	}
 }

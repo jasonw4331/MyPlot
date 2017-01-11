@@ -45,7 +45,7 @@ class MyPlot extends PluginBase
      * @api
      * @return BaseLang
      */
-    public function getLanguage() {
+    public function getLanguage() : BaseLang {
         return $this->baseLang;
     }
 
@@ -55,7 +55,7 @@ class MyPlot extends PluginBase
      * @api
      * @return DataProvider
      */
-    public function getProvider() {
+    public function getProvider() : DataProvider {
         return $this->dataProvider;
     }
 
@@ -65,7 +65,7 @@ class MyPlot extends PluginBase
      * @api
      * @return EconomyProvider
      */
-    public function getEconomyProvider() {
+    public function getEconomyProvider() : EconomyProvider {
         return $this->economyProvider;
     }
 
@@ -90,7 +90,7 @@ class MyPlot extends PluginBase
      * @param string $levelName
      * @return bool
      */
-    public function isLevelLoaded($levelName) {
+    public function isLevelLoaded($levelName) : bool {
         return isset($this->levels[$levelName]);
     }
 
@@ -102,7 +102,7 @@ class MyPlot extends PluginBase
      * @param GeneratorTemplate $generator
      * @return bool
      */
-    public function generateLevel($levelName, $generator = null) {
+    public function generateLevel($levelName, $generator = null) : bool {
         if ($this->getServer()->isLevelGenerated($levelName) === true) {
             return false;
         }
@@ -123,7 +123,7 @@ class MyPlot extends PluginBase
      * @param Plot $plot
      * @return bool
      */
-    public function savePlot(Plot $plot) {
+    public function savePlot(Plot $plot) : bool {
         return $this->dataProvider->savePlot($plot);
     }
 
@@ -135,7 +135,7 @@ class MyPlot extends PluginBase
      * @param $levelName
      * @return Plot[]
      */
-    public function getPlotsOfPlayer($username, $levelName) {
+    public function getPlotsOfPlayer($username, $levelName) : array {
 	      if($levelName instanceof Level) {
 		        $levelName = $levelName->getName();
 	      }
@@ -228,7 +228,7 @@ class MyPlot extends PluginBase
      * @param Plot $plot
      * @return bool
      */
-    public function teleportPlayerToPlot(Player $player, Plot $plot) {
+    public function teleportPlayerToPlot(Player $player, Plot $plot) : bool {
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return false;
@@ -250,7 +250,7 @@ class MyPlot extends PluginBase
      * @param int $maxBlocksPerTick
      * @return bool
      */
-    public function clearPlot(Plot $plot, $maxBlocksPerTick = 256) {
+    public function clearPlot(Plot $plot, $maxBlocksPerTick = 256) : bool {
         if (!$this->isLevelLoaded($plot->levelName)) {
             return false;
         }
@@ -274,7 +274,7 @@ class MyPlot extends PluginBase
      * @param Plot $plot
      * @return bool
      */
-    public function disposePlot(Plot $plot) {
+    public function disposePlot(Plot $plot) : bool {
         return $this->dataProvider->deletePlot($plot);
     }
 
@@ -285,7 +285,7 @@ class MyPlot extends PluginBase
      * @param int $maxBlocksPerTick
      * @return bool
      */
-    public function resetPlot(Plot $plot, $maxBlocksPerTick = 256) {
+    public function resetPlot(Plot $plot, $maxBlocksPerTick = 256) : bool {
         if ($this->disposePlot($plot)) {
             return $this->clearPlot($plot, $maxBlocksPerTick);
         }
@@ -300,7 +300,7 @@ class MyPlot extends PluginBase
      * @param Biome $biome
      * @return bool
      */
-    public function setPlotBiome(Plot $plot, Biome $biome) {
+    public function setPlotBiome(Plot $plot, Biome $biome) : bool {
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return false;
@@ -343,7 +343,7 @@ class MyPlot extends PluginBase
      * @api
      * @return PlotLevelSettings[]
      */
-    public function getPlotLevels() {
+    public function getPlotLevels() : array {
         return $this->levels;
     }
 
@@ -353,7 +353,7 @@ class MyPlot extends PluginBase
      * @param Player $player
      * @return int
      */
-    public function getMaxPlotsOfPlayer(Player $player) {
+    public function getMaxPlotsOfPlayer(Player $player) : int {
         if ($player->hasPermission("myplot.claimplots.unlimited"))
             return PHP_INT_MAX;
         /** @var Permission[] $perms */
@@ -378,9 +378,9 @@ class MyPlot extends PluginBase
      * Finds the exact center of the plot at ground level
      *
      * @param Plot $plot
-     * @return Vector3|bool
+     * @return Vector3
      */
-    public function getPlotMid(Plot $plot) {
+    public function getPlotMid(Plot $plot) : Vector3 {
         $gh = $this->getLevelSettings($plot->levelName)->groundHeight;
         $ps = $this->getLevelSettings($plot->levelName)->plotSize;
         $rw = $this->getLevelSettings($plot->levelName)->roadWidth;
@@ -421,7 +421,7 @@ class MyPlot extends PluginBase
                 return $mid;
             }
         }
-        return false;
+        return new Vector3($X,$gh,$Z);
     }
 
     /**
@@ -431,7 +431,7 @@ class MyPlot extends PluginBase
      * @param Player $player
      * @return bool
      */
-    public function teleportMiddle(Plot $plot, Player $player) {
+    public function teleportMiddle(Plot $plot, Player $player) : bool {
         $mid = $this->getPlotMid($plot);
         if($mid === false) {
             $this->teleportPlayerToPlot($player, $plot);
@@ -509,11 +509,12 @@ class MyPlot extends PluginBase
         $this->getLogger()->notice(TF::GREEN."Enabled!");
     }
 
-	public function addLevelSettings($levelName, PlotLevelSettings $settings) {
+	public function addLevelSettings($levelName, PlotLevelSettings $settings) : bool {
         $this->levels[$levelName] = $settings;
+        return true;
     }
 
-    public function unloadLevelSettings($levelName) {
+    public function unloadLevelSettings($levelName) : bool {
         if (isset($this->levels[$levelName])) {
             unset($this->levels[$levelName]);
 	        $this->getLogger()->debug("Level ".$levelName." settings unloaded!");

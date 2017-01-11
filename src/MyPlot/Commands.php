@@ -10,7 +10,6 @@ use MyPlot\subcommand\AddHelperSubCommand;
 use MyPlot\subcommand\ClaimSubCommand;
 use MyPlot\subcommand\ClearSubCommand;
 use MyPlot\subcommand\DisposeSubCommand;
-use MyPlot\subcommand\DoneSubCommand;
 use MyPlot\subcommand\GenerateSubCommand;
 use MyPlot\subcommand\HelpSubCommand;
 use MyPlot\subcommand\HomeSubCommand;
@@ -74,7 +73,7 @@ class Commands extends PluginCommand
     /**
      * @return SubCommand[]
      */
-    public function getCommands() {
+    public function getCommands() : array {
         return $this->subCommands;
     }
 

@@ -39,7 +39,8 @@ class DenyPlayerSubCommand extends SubCommand
         }
         if($dplayer->hasPermission("myplot.admin.bypassdeny") or $dplayer->getName() == $plot->owner) {
             $sender->sendMessage($this->translateString("denyplayer.cannotdeny", [$dplayer->getName()]));
-            $dp->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));
+            if($dp instanceof Player)
+                $dp->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));
             return true;
         }
         if (!$plot->denyPlayer($dplayer->getName())) {
@@ -48,7 +49,8 @@ class DenyPlayerSubCommand extends SubCommand
         }
         if ($this->getPlugin()->savePlot($plot)) {
             $sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer->getName()]));
-            $dp->sendMessage($this->translateString("denyplayer.success2", [$plot->X,$plot->Z,$sender->getName()]));
+            if($dp instanceof Player)
+                $dp->sendMessage($this->translateString("denyplayer.success2", [$plot->X,$plot->Z,$sender->getName()]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }
