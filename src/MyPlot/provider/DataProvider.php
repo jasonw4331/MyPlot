@@ -46,13 +46,13 @@ abstract class DataProvider
      * @param Plot $plot
      * @return bool
      */
-    public abstract function savePlot(Plot $plot);
+    public abstract function savePlot(Plot $plot) : bool;
 
     /**
      * @param Plot $plot
      * @return bool
      */
-    public abstract function deletePlot(Plot $plot);
+    public abstract function deletePlot(Plot $plot) : bool;
 
     /**
      * @param string $levelName
@@ -60,14 +60,14 @@ abstract class DataProvider
      * @param int $Z
      * @return Plot
      */
-    public abstract function getPlot($levelName, $X, $Z);
+    public abstract function getPlot($levelName, $X, $Z) : Plot;
 
     /**
      * @param string $owner
      * @param string $levelName
      * @return Plot[]
      */
-    public abstract function getPlotsByOwner($owner, $levelName = "");
+    public abstract function getPlotsByOwner($owner, $levelName = "") : array;
 
     /**
      * @param string $levelName
@@ -77,4 +77,28 @@ abstract class DataProvider
     public abstract function getNextFreePlot($levelName, $limitXZ = 0);
 
     public abstract function close();
+
+	/**
+	 * @param $a
+	 * @param $b
+	 * @param $plots
+	 * @return array|null
+	 */
+	protected static function findEmptyPlotSquared($a, $b, &$plots) {
+		if (!isset($plots[$a][$b])) return array($a, $b);
+		if (!isset($plots[$b][$a])) return array($b, $a);
+		if ($a !== 0) {
+			if (!isset($plots[-$a][$b])) return array(-$a, $b);
+			if (!isset($plots[$b][-$a])) return array($b, -$a);
+		}
+		if ($b !== 0) {
+			if (!isset($plots[-$b][$a])) return array(-$b, $a);
+			if (!isset($plots[$a][-$b])) return array($a, -$b);
+		}
+		if ($a | $b === 0) {
+			if (!isset($plots[-$a][-$b])) return array(-$a, -$b);
+			if (!isset($plots[-$b][-$a])) return array(-$b, -$a);
+		}
+		return null;
+	}
 }

@@ -25,14 +25,14 @@ class JSONDataProvider extends DataProvider{
      * @param Plot $plot
      * @return bool
      */
-    public function savePlot(Plot $plot){
+    public function savePlot(Plot $plot) : bool {
       $this->json->set("");
     }
     /**
      * @param Plot $plot
      * @return bool
      */
-    public function deletePlot(Plot $plot){
+    public function deletePlot(Plot $plot) : bool {
       $this->json->set("");
     }
     /**
@@ -41,7 +41,7 @@ class JSONDataProvider extends DataProvider{
      * @param int $Z
      * @return Plot
      */
-    public function getPlot($levelName, $X, $Z){
+    public function getPlot($levelName, $X, $Z) : Plot {
       $this->json->getNested("");
     }
     /**
@@ -49,7 +49,7 @@ class JSONDataProvider extends DataProvider{
      * @param string $levelName
      * @return Plot[]
      */
-    public function getPlotsByOwner($owner, $levelName = ""){
+    public function getPlotsByOwner($owner, $levelName = "") : array {
       $this->json->get("");
     }
     /**

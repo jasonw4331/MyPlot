@@ -433,9 +433,6 @@ class MyPlot extends PluginBase
      */
     public function teleportMiddle(Plot $plot, Player $player) : bool {
         $mid = $this->getPlotMid($plot);
-        if($mid === false) {
-            $this->teleportPlayerToPlot($player, $plot);
-        }
         $player->teleport($mid);
         return true;
     }

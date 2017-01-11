@@ -65,7 +65,7 @@ class SQLiteDataProvider extends DataProvider
 	    $this->plugin->getLogger()->debug("SQLite database closed!");
     }
 
-    public function savePlot(Plot $plot) {
+    public function savePlot(Plot $plot) : bool {
         $helpers = implode(",", $plot->helpers);
 	    $denied = implode(",",$plot->denied);
         if ($plot->id >= 0) {
@@ -91,7 +91,7 @@ class SQLiteDataProvider extends DataProvider
         return true;
     }
 
-    public function deletePlot(Plot $plot) {
+    public function deletePlot(Plot $plot) : bool {
         if ($plot->id >= 0) {
             $stmt = $this->sqlRemovePlotById;
             $stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
@@ -111,8 +111,8 @@ class SQLiteDataProvider extends DataProvider
         return true;
     }
 
-    public function getPlot($levelName, $X, $Z) {
-        if ($plot = $this->getPlotFromCache($levelName, $X, $Z)) {
+    public function getPlot($levelName, $X, $Z) : Plot {
+        if (($plot = $this->getPlotFromCache($levelName, $X, $Z)) != null) {
             return $plot;
         }
         $this->sqlGetPlot->bindValue(":level", $levelName, SQLITE3_TEXT);
@@ -140,7 +140,7 @@ class SQLiteDataProvider extends DataProvider
         return $plot;
     }
 
-    public function getPlotsByOwner($owner, $levelName = "") {
+    public function getPlotsByOwner($owner, $levelName = "") : array {
         if ($levelName === "") {
             $stmt = $this->sqlGetPlotsByOwner;
         } else {
@@ -205,24 +205,6 @@ class SQLiteDataProvider extends DataProvider
                 $this->cachePlot($plot);
                 return $plot;
             }
-        }
-        return null;
-    }
-
-    private static function findEmptyPlotSquared($a, $b, &$plots) {
-        if (!isset($plots[$a][$b])) return array($a, $b);
-        if (!isset($plots[$b][$a])) return array($b, $a);
-        if ($a !== 0) {
-            if (!isset($plots[-$a][$b])) return array(-$a, $b);
-            if (!isset($plots[$b][-$a])) return array($b, -$a);
-        }
-        if ($b !== 0) {
-            if (!isset($plots[-$b][$a])) return array(-$b, $a);
-            if (!isset($plots[$a][-$b])) return array($a, -$b);
-        }
-        if ($a | $b === 0) {
-            if (!isset($plots[-$a][-$b])) return array(-$a, -$b);
-            if (!isset($plots[-$b][-$a])) return array(-$b, -$a);
         }
         return null;
     }

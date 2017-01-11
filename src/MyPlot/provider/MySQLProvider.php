@@ -36,7 +36,7 @@ class SQLiteDataProvider extends DataProvider
 	    $this->plugin->getLogger()->debug("MySQL database closed!");
     }
 
-    public function savePlot(Plot $plot) {
+    public function savePlot(Plot $plot) : bool {
         if ($plot->id >= 0) {
             $stmt = $this->db->prepare(
                 "UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome WHERE id = :id"
@@ -58,7 +58,7 @@ class SQLiteDataProvider extends DataProvider
         return true;
     }
 
-    public function deletePlot(Plot $plot) {
+    public function deletePlot(Plot $plot) : bool {
         if ($plot->id >= 0) {
             $stmt = $this->db->prepare("DELETE FROM plots WHERE id = {$plot->id}");
         } else {
@@ -76,7 +76,7 @@ class SQLiteDataProvider extends DataProvider
         return true;
     }
 
-    public function getPlot($levelName, $X, $Z) {
+    public function getPlot($levelName, $X, $Z) : Plot {
         if ($plot = $this->getPlotFromCache($levelName, $X, $Z)) {
             return $plot;
         }
@@ -103,7 +103,7 @@ class SQLiteDataProvider extends DataProvider
         return $plot;
     }
 
-    public function getPlotsByOwner($owner, $levelName = "") {
+    public function getPlotsByOwner($owner, $levelName = "") : array {
         if ($levelName === "") {
             $stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = {$owner}");
         } else {
@@ -169,24 +169,6 @@ class SQLiteDataProvider extends DataProvider
                 $this->cachePlot($plot);
                 return $plot;
             }
-        }
-        return null;
-    }
-
-    private static function findEmptyPlotSquared($a, $b, &$plots) {
-        if (!isset($plots[$a][$b])) return array($a, $b);
-        if (!isset($plots[$b][$a])) return array($b, $a);
-        if ($a !== 0) {
-            if (!isset($plots[-$a][$b])) return array(-$a, $b);
-            if (!isset($plots[$b][-$a])) return array($b, -$a);
-        }
-        if ($b !== 0) {
-            if (!isset($plots[-$b][$a])) return array(-$b, $a);
-            if (!isset($plots[$a][-$b])) return array($a, -$b);
-        }
-        if ($a | $b === 0) {
-            if (!isset($plots[-$a][-$b])) return array(-$a, -$b);
-            if (!isset($plots[-$b][-$a])) return array(-$b, -$a);
         }
         return null;
     }
