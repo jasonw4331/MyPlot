@@ -80,7 +80,6 @@ class MyPlotGenerator extends GeneratorTemplate
         for ($Z = 0; $Z < 16; ++$Z) {
             for ($X = 0; $X < 16; ++$X) {
                 $chunk->setBiomeId($X, $Z, 1);
-                // TODO change biome Color
                 $chunk->setBlock($X, 0, $Z, $bottomBlockId, $bottomBlockMeta);
                 for ($y = 1; $y < $groundHeight; ++$y) {
                     $chunk->setBlock($X, $y, $Z, $plotFillBlockId, $plotFillBlockMeta);

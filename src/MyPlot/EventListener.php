@@ -1,9 +1,8 @@
 <?php
 namespace MyPlot;
 
-use pocketmine\block\Lava;
+use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
-use pocketmine\block\Water;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\Player;
 use pocketmine\event\block\BlockUpdateEvent;
@@ -82,9 +81,9 @@ class EventListener implements Listener
          */
         $levelName = $event->getBlock()->getLevel()->getName();
         if ($this->plugin->isLevelLoaded($levelName)) {
-        	if($event->getBlock() instanceof Water or $event->getBlock() instanceof Lava) {
+        	if($event->getBlock() instanceof Liquid) {
 		        $event->setCancelled();
-		        $this->plugin->getLogger()->debug("Block updated cancelled in ".$levelName);
+		        $this->plugin->getLogger()->debug("Block update cancelled in ".$levelName);
 	        }
         }
     }

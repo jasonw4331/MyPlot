@@ -28,7 +28,7 @@ class DenyPlayerSubCommand extends SubCommand
             return true;
         }
         foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
-            if(similar_text($dplayer,strtolower($player->getName()))/strlen($player->getName()) >= 0.3 ) { //TODO correst with a better system
+            if(similar_text($dplayer,strtolower($player->getName()))/strlen($player->getName()) >= 0.3 ) { //TODO correct with a better system
                 $dplayer = $this->getPlugin()->getServer()->getPlayer($dplayer);
                 break;
             }

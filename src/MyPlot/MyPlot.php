@@ -319,7 +319,9 @@ class MyPlot extends PluginBase
                 if (!in_array($index, $chunkIndexes)) {
                     $chunkIndexes[] = $index;
                 }
-                // TODO change biome color
+	            Level::getXZ($index, $pos->x, $pos->z);
+                $chunk = $level->getChunk($pos->x, $pos->z);
+                $chunk->setBiomeId($pos->x, $pos->z, $biome->getId());
             }
         }
         foreach ($chunkIndexes as $index) {
