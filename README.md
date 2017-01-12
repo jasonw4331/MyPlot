@@ -3,7 +3,7 @@
 [![Poggit-Ci](https://poggit.pmmp.io/ci.badge/jasonwynn10/MyPlot/MyPlot)](https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot)
 ### **Create, manage, and build in protected plots! Keep your builds safe from griefers!**
 ======
-#### Please not that the API3 Branch is currently under heavy development for the new changes in pmmp 1.0
+#### Please not that the [API3](https://github.com/jasonwynn10/MyPlot/tree/API3) Branch is currently under heavy development for the new changes in pmmp 1.0
 <br>
 <br>
 Have you ever seen those PC servers with the PlotMe plugin, and you thought "Hey, why can't I have plots on my MCPE server?" Well, now you can with **MyPlot** for PocketMine-MP! It's easy to set up, and simple to use! *NOTE:* MyPlot is designed to only support PocketMine-MP. Other server softwares will not recieve help with issues!
