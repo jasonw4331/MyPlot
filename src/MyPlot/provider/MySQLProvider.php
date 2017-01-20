@@ -4,7 +4,7 @@ namespace MyPlot\provider;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 
-class SQLiteDataProvider extends DataProvider
+class MySQLProvider extends DataProvider
 {
     /** @var \MySQLi $db */
     private $db;
