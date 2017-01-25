@@ -449,7 +449,7 @@ class MyPlot extends PluginBase
         @mkdir($this->getDataFolder() . "worlds");
 	    @mkdir($this->getDataFolder() . "Data");
 
-	    Generator::addGenerator(MyPlotGenerator::class, MyPlotGenerator::$name);
+	    Generator::addGenerator(MyPlotGenerator::class, "MyPlotGenerator");
 
         $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
         $this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");

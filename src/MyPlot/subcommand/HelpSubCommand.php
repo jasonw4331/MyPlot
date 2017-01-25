@@ -1,17 +1,19 @@
 <?php
 namespace MyPlot\subcommand;
+
 use MyPlot\Commands;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
+use pocketmine\command\ConsoleCommandSender;
 use pocketmine\utils\TextFormat;
+
 class HelpSubCommand extends SubCommand
 {
-	/** @var  Commands $cmd */
-	private $cmd;
-
-	public function __construct(MyPlot $plugin, $name, $commands) {
+	/** @var  Commands */
+	private $cmds;
+	public function __construct(MyPlot $plugin, $name, $cmds) {
 		parent::__construct($plugin, $name);
-		$this->cmd = $commands;
+		$this->cmds = $cmds;
 	}
 
 	public function canUse(CommandSender $sender) {
@@ -22,16 +24,22 @@ class HelpSubCommand extends SubCommand
 		if (count($args) === 0) {
 			$pageNumber = 1;
 		} elseif (is_numeric($args[0])) {
-			$pageNumber = (int)$args[0];
+			$pageNumber = (int) array_shift($args);
 			if ($pageNumber <= 0) {
 				$pageNumber = 1;
 			}
 		} else {
 			return false;
 		}
-		$pageHeight = 7;
+
+		if ($sender instanceof ConsoleCommandSender) {
+			$pageHeight = PHP_INT_MAX;
+		} else {
+			$pageHeight = 9;
+		}
+
 		$commands = [];
-		foreach ($this->cmd->getCommands() as $command) {
+		foreach ($this->cmds->getCommands() as $command) {
 			if ($command->canUse($sender)) {
 				$commands[$command->getName()] = $command;
 			}
@@ -40,15 +48,10 @@ class HelpSubCommand extends SubCommand
 		$commands = array_chunk($commands, $pageHeight);
 		/** @var SubCommand[][] $commands */
 		$pageNumber = (int) min(count($commands), $pageNumber);
+
 		$sender->sendMessage($this->translateString("help.header", [$pageNumber, count($commands)]));
-		if($sender instanceof Player) {
-			foreach ($commands[$pageNumber - 1] as $command) {
-				$sender->sendMessage(TextFormat::DARK_GREEN . $command->getName() . ": " . TextFormat::WHITE . $command->getDescription());
-			}
-		}else{
-			foreach ($this->cmd->getCommands() as $subCommand) {
-				$sender->sendMessage(TextFormat::DARK_GREEN . $subCommand->getName() . ": " . TextFormat::WHITE . $subCommand->getDescription());
-			}
+		foreach ($commands[$pageNumber - 1] as $command) {
+			$sender->sendMessage(TextFormat::DARK_GREEN . $command->getName() . ": " . TextFormat::WHITE . $command->getDescription());
 		}
 		return true;
 	}
