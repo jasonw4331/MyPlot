@@ -6,3 +6,4 @@ plots.db
 !/resources/config.yml
 resources/langtemplate.ini
 README.md
+.pullapprove.yml
