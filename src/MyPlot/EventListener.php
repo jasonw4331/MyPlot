@@ -173,12 +173,11 @@ class EventListener implements Listener
             return;
 
         $plot = $this->plugin->getPlotByPosition($event->getTo());
-        if($plot->isDenied($event->getPlayer()->getName())) {
-        	$event->setCancelled();
-        	return;
-        }
-
         if ($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
+	        if($plot->isDenied($event->getPlayer()->getName())) {
+		        $event->setCancelled();
+		        return;
+	        }
             $plotName = TextFormat::GREEN . $plot;
             $popup = $this->plugin->getLanguage()->translateString("popup", [$plotName]);
 	        if(strpos($plot,"-0")) {
