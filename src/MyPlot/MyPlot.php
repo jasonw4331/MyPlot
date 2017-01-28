@@ -65,7 +65,7 @@ class MyPlot extends PluginBase
      * @api
      * @return EconomyProvider
      */
-    public function getEconomyProvider() : EconomyProvider {
+    public function getEconomyProvider() {
         return $this->economyProvider;
     }
 
@@ -99,22 +99,21 @@ class MyPlot extends PluginBase
      *
      * @api
      * @param string $levelName
-     * @param GeneratorTemplate $generator
+     * @param array $settings
      * @return bool
      */
-    public function generateLevel($levelName, $generator = null) : bool {
-        if ($this->getServer()->isLevelGenerated($levelName) === true) {
-            return false;
-        }
-        if($generator == null) {
-        	$generator = MyPlotGenerator::class;
-        }
-	    $settings = $this->getConfig()->get("DefaultWorld");
-        $settings = [
-            "preset" => json_encode($settings)
-        ];
-        return $this->getServer()->generateLevel($levelName, null, $generator, $settings);
-    }
+	public function generateLevel($levelName, $settings = []) {
+		if ($this->getServer()->isLevelGenerated($levelName) === true) {
+			return false;
+		}
+		if (empty($settings)) {
+			$settings = $this->getConfig()->get("DefaultWorld");
+		}
+		$settings = [
+			"preset" => json_encode($settings)
+		];
+		return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $settings);
+	}
 
     /**
      * Saves provided plot if changed
@@ -447,9 +446,8 @@ class MyPlot extends PluginBase
 
         @mkdir($this->getDataFolder());
         @mkdir($this->getDataFolder() . "worlds");
-	    @mkdir($this->getDataFolder() . "Data");
 
-	    Generator::addGenerator(MyPlotGenerator::class, "MyPlotGenerator");
+	    Generator::addGenerator(MyPlotGenerator::class, "myplot");
 
         $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
         $this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
@@ -500,7 +498,7 @@ class MyPlot extends PluginBase
         $eventListener = new EventListener($this);
         $this->getServer()->getPluginManager()->registerEvents($eventListener, $this);
         foreach($this->getServer()->getLevels() as $level) {
-            $eventListener->onLevelLoad(new LevelLoadEvent($level));
+	        $eventListener->onLevelLoad(new LevelLoadEvent($level));
         }
         $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
         $this->getLogger()->notice(TF::GREEN."Enabled!");

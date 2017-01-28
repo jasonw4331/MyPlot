@@ -14,12 +14,9 @@ class PlotLevelSettings
             $disposePrice, $resetPrice;
     /** @var bool */
     public $restrictEntityMovement;
-    /** @var GeneratorTemplate */
-	public $generator;
 
-    public function __construct($name, $generator, $settings = []) {
+    public function __construct($name, $settings = []) {
         $this->name = $name;
-        $this->generator = $generator;
         if (!empty($settings)) {
             $this->roadBlock = self::parseBlock($settings, "RoadBlock", new Block(Block::PLANK));
             $this->wallBlock = self::parseBlock($settings, "WallBlock", new Block(Block::SLABS));

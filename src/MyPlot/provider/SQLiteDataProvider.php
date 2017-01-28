@@ -20,15 +20,12 @@ class SQLiteDataProvider extends DataProvider
     public function __construct(MyPlot $plugin, $cacheSize = 0) {
         parent::__construct($plugin, $cacheSize);
 
-        $this->db = new \SQLite3($this->plugin->getDataFolder()."Data".DIRECTORY_SEPARATOR."plots.db");
+        $this->db = new \SQLite3($this->plugin->getDataFolder()."plots.db");
         $this->db->exec(
             "CREATE TABLE IF NOT EXISTS plots
             (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
              owner TEXT, helpers TEXT, denied TEXT, biome TEXT);"
         );
-	    if($this->plugin->getDescription()->getVersion() < "1.1.0") {
-		    $this->db->exec("ALTER TABLE plots ADD COLUMN denied;");
-	    }
         $this->sqlGetPlot = $this->db->prepare(
             "SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = :level AND X = :X AND Z = :Z"
         );

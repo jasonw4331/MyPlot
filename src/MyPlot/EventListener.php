@@ -27,7 +27,7 @@ class EventListener implements Listener
     }
 
     public function onLevelLoad(LevelLoadEvent $event) {
-        if ($event->getLevel()->getProvider()->getGenerator() === "myplot") {
+        if ($event->getLevel()->getProvider()->getGenerator() == "myplot") {
 	        $this->plugin->getLogger()->debug("MyPlot level".$event->getLevel()->getFolderName()." loaded!");
             $settings = $event->getLevel()->getProvider()->getGeneratorOptions();
             if (isset($settings["preset"]) === false or $settings["preset"] === "") {
@@ -38,14 +38,14 @@ class EventListener implements Listener
                 return;
             }
             $levelName = $event->getLevel()->getName();
-            $filePath = $this->plugin->getDataFolder() . "worlds/" . $levelName . ".yml";
+            $filePath = $this->plugin->getDataFolder() . "worlds" . DIRECTORY_SEPARATOR . $levelName . ".yml";
             $config = $this->plugin->getConfig();
             $default = [
                 "RestrictEntityMovement" => $config->getNested("DefaultWorld.RestrictEntityMovement"),
                 "ClaimPrice" => $config->getNested("DefaultWorld.ClaimPrice"),
                 "ClearPrice" => $config->getNested("DefaultWorld.ClearPrice"),
                 "DisposePrice" => $config->getNested("DefaultWorld.DisposePrice"),
-                "ResetPrice" => $config->getNested("DefaultWorld.ResetPrice"),
+                "ResetPrice" => $config->getNested("DefaultWorld.ResetPrice")
             ];
             $config = new Config($filePath, Config::YAML, $default);
             foreach (array_keys($default) as $key) {
@@ -165,7 +165,7 @@ class EventListener implements Listener
     }
 
     public function onPlayerMove(PlayerMoveEvent $event) {
-        if (!$this->plugin->getConfig()->get("ShowPlotPopup", true))
+	    if (!$this->plugin->getConfig()->get("ShowPlotPopup", true))
             return;
 
         $levelName = $event->getPlayer()->getLevel()->getName();
@@ -173,6 +173,11 @@ class EventListener implements Listener
             return;
 
         $plot = $this->plugin->getPlotByPosition($event->getTo());
+        if($plot->isDenied($event->getPlayer()->getName())) {
+        	$event->setCancelled();
+        	return;
+        }
+
         if ($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
             $plotName = TextFormat::GREEN . $plot;
             $popup = $this->plugin->getLanguage()->translateString("popup", [$plotName]);
@@ -185,19 +190,9 @@ class EventListener implements Listener
                 $paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
                 $paddingPopup = str_repeat(" ", max(0, -$paddingSize));
                 $paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
-	            $paddingDenial = str_repeat(" ", max(0, $paddingSize));
-	            $denialPopup = $this->plugin->getLanguage()->translateString("popup.denied");
-	            if($plot->isDenied($event->getPlayer()->getName())) {
-		            $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
-			            TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup . "\n" .
-			            TextFormat::RED . $paddingDenial . $denialPopup;
-		            $event->setCancelled();
-		            $this->plugin->getLogger()->debug("Check for lag! Denied plot popup sent to ".$event->getPlayer()->getName());
-	            } else {
-		            $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
-			            TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
-		            $this->plugin->getLogger()->debug("Check for lag! Owned plot popup sent to ".$event->getPlayer()->getName());
-	            }
+	            $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
+		            TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+	            $this->plugin->getLogger()->debug("Check for lag! Owned plot popup sent to ".$event->getPlayer()->getName());
             } else {
                 $ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
                 $paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
@@ -208,7 +203,7 @@ class EventListener implements Listener
 	            $this->plugin->getLogger()->debug("Check for lag! Availability plot popup sent to ".$event->getPlayer()->getName());
             }
             $event->getPlayer()->sendTip($popup);
-            //$event->getPlayer()->sendPopup($popup);
+            #$event->getPlayer()->sendPopup($popup);
         }
     }
 }
