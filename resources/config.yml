@@ -55,7 +55,7 @@ ClearBlocksPerTick: 256
 DefaultWorld:
 
   # Restrict entities (e.g. tnt) from moving except falling
-  # This will prevent things like tnt cannons from ruining other plots
+  # This will prevent things like tnt cannons and mobs from ruining other plots
   RestrictEntityMovement: true
 
   # How much it costs to claim a plot (Economy must be set to 'true')
@@ -84,3 +84,9 @@ DefaultWorld:
   PlotFillBlock: '3:0'
   # The block at the bottom (Default is Bedrock)
   BottomBlock: '7:0'
+
+# These settings allow for more command customization
+Commands:
+  Auto:
+    AutoCenter: false #Makes players teleport to the center of the plot
+    AutoClaim: false #Allows instant plot claiming after being teleported

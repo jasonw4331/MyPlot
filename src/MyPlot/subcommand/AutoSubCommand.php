@@ -12,7 +12,7 @@ class AutoSubCommand extends SubCommand
     }
 
     public function execute(CommandSender $sender, array $args) {
-        if (!empty($args)) {
+        if (count($args) >= 2) {
             return false;
         }
         $player = $sender->getServer()->getPlayer($sender->getName());
@@ -22,10 +22,20 @@ class AutoSubCommand extends SubCommand
             return true;
         }
         if (($plot = $this->getPlugin()->getNextFreePlot($levelName)) !== null) {
-            $this->getPlugin()->teleportPlayerToPlot($player, $plot);
+        	if($this->getPlugin()->getConfig()->getNested("Commands.Auto.AutoCenter", false) === true) {
+		        $this->getPlugin()->teleportMiddle($plot, $player);
+	        }else{
+		        $this->getPlugin()->teleportPlayerToPlot($player, $plot);
+	        }
             $sender->sendMessage($this->translateString("auto.success", [$plot->X, $plot->Z]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("auto.noplots"));
+        }
+        if($this->getPlugin()->getConfig()->getNested("Commands.Auto.AutoClaim", false) === true) {
+        	$c = new ClaimSubCommand($this->getPlugin(),"claim");
+        	if($c->canUse($sender))
+        	    $c->execute($sender,$args[0]);
+        	unset($c);
         }
         return true;
     }
