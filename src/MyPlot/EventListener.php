@@ -28,7 +28,7 @@ class EventListener implements Listener
 
     public function onLevelLoad(LevelLoadEvent $event) {
         if ($event->getLevel()->getProvider()->getGenerator() == "myplot") {
-	        $this->plugin->getLogger()->debug("MyPlot level".$event->getLevel()->getFolderName()." loaded!");
+	        $this->plugin->getLogger()->debug("MyPlot level ".$event->getLevel()->getFolderName()." loaded!");
             $settings = $event->getLevel()->getProvider()->getGeneratorOptions();
             if (isset($settings["preset"]) === false or $settings["preset"] === "") {
                 return;

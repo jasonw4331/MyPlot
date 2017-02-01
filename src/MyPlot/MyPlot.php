@@ -15,6 +15,7 @@ use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Air;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
+use pocketmine\level\format\Chunk;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -319,8 +320,13 @@ class MyPlot extends PluginBase
                     $chunkIndexes[] = $index;
                 }
 	            Level::getXZ($index, $pos->x, $pos->z);
-                $chunk = $level->getChunk($pos->x, $pos->z);
-                $chunk->setBiomeId($pos->x, $pos->z, $biome->getId());
+                if(($chunk = $level->getChunk($pos->x, $pos->z)) instanceof Chunk) {
+	                $chunk->setBiomeId($pos->x, $pos->z, $biome->getId());
+	                return true;
+                }else{
+                	$this->getLogger()->error("The chunk isn't a chunk!");
+                	return false;
+                }
             }
         }
         foreach ($chunkIndexes as $index) {
