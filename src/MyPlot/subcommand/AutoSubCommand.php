@@ -33,8 +33,12 @@ class AutoSubCommand extends SubCommand
         }
         if($this->getPlugin()->getConfig()->getNested("Commands.Auto.AutoClaim", false) === true) {
         	$c = new ClaimSubCommand($this->getPlugin(),"claim");
-        	if($c->canUse($sender))
-        	    $c->execute($sender,[$args[0]]);
+        	if($c->canUse($sender)){
+		        if(!isset($args[0])) {
+			        $args[0] = "";
+		        }
+		        $c->execute($sender,[$args[0]]);
+	        }
         	unset($c);
         }
         return true;

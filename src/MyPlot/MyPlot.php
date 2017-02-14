@@ -18,7 +18,6 @@ use pocketmine\lang\BaseLang;
 use pocketmine\level\format\Chunk;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
-use pocketmine\math\Vector3;
 use pocketmine\permission\Permission;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
@@ -383,50 +382,29 @@ class MyPlot extends PluginBase
      * Finds the exact center of the plot at ground level
      *
      * @param Plot $plot
-     * @return Vector3
+     * @return Position
      */
-    public function getPlotMid(Plot $plot) : Vector3 {
-        $gh = $this->getLevelSettings($plot->levelName)->groundHeight;
-        $ps = $this->getLevelSettings($plot->levelName)->plotSize;
-        $rw = $this->getLevelSettings($plot->levelName)->roadWidth;
-        $totalSize = $ps + $rw;
-        $x = $plot->X;
-        $z = $plot->Z;
-        if ($x >= 0) {
-            if($h = $ps % 2 == 0) {
-                $X = floor($x / $totalSize) + $h;
-            }else{
-                $X = floor($x / $totalSize) + ($ps / 2) + 0.5;
-            }
-        }else{
-            if($h = $ps % 2 == 0) {
-                $X = ceil(($x - $ps + 1) / $totalSize) - $h;
-            }else{
-                $X = ceil(($x - $ps + 1) / $totalSize) - ($ps / 2) - 0.5;
-            }
-        }
-        if ($z >= 0) {
-            if($h = $ps % 2 == 0) {
-                $Z = floor($z / $totalSize) + $h;
-            }else{
-                $Z = floor($z / $totalSize) + ceil($ps / 2) + 0.5;
-            }
-        }else{
-            if ($h = $ps % 2 == 0) {
-                $Z = floor($z / $totalSize) - $h;
-            }else{
-                $Z = floor($z / $totalSize) - ceil($ps / 2) - 0.5;
-            }
-        }
-        for($Y = $gh; $h<128; $h++) {
-            $mid = new Vector3($X,$Y+0.5,$Z);
-            $mida = new Vector3($X,$Y,$Z);
-            $midb = new Vector3($X,$Y+1,$Z);
-            if ($this->getServer()->getLevelByName($plot->levelName)->getBlock($mida) === Air::class and $this->getServer()->getLevelByName($plot->levelName)->getBlock($midb) === Air::class) {
+    public function getPlotMid(Plot $plot) : Position {
+	    $plotLevel = $this->getLevelSettings($plot->levelName);
+	    if ($plotLevel === null) {
+		    return null;
+	    }
+
+	    $plotSize = $plotLevel->plotSize;
+	    $roadWidth = $plotLevel->roadWidth;
+	    $totalSize = $plotSize + $roadWidth;
+	    $x = ($totalSize * $plot->X) + ($plotSize / 2);
+	    $z = ($totalSize * $plot->Z);
+	    $level = $this->getServer()->getLevelByName($plot->levelName);
+        for($y = $plotLevel->groundHeight; $y<128; $y++) {
+            $mid = new Position($x,$y+0.5,$z,$level);
+            $mida = new Position($x,$y,$z,$level);
+            $midb = new Position($x,$y+1,$z,$level);
+            if ($this->getServer()->getLevelByName($plot->levelName)->getBlock($mida) instanceof Air and $this->getServer()->getLevelByName($plot->levelName)->getBlock($midb) instanceof Air) {
                 return $mid;
             }
         }
-        return new Vector3($X,$gh,$Z);
+        return new Position($x,$plotLevel->groundHeight,$z,$level);
     }
 
     /**
