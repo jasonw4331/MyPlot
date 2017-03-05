@@ -88,7 +88,6 @@ class MyPlotGenerator extends Generator
 	public function generateChunk($chunkX, $chunkZ) {
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
 		$chunk = $this->level->getChunk($chunkX, $chunkZ);
-		$chunk->setGenerated();
 
 		$bottomBlockId = $this->bottomBlock->getId();
 		$bottomBlockMeta = $this->bottomBlock->getDamage();
@@ -122,6 +121,7 @@ class MyPlotGenerator extends Generator
 		}
 		$chunk->setX($chunkX);
 		$chunk->setZ($chunkZ);
+		$chunk->setGenerated();
 		$this->level->setChunk($chunkX, $chunkZ, $chunk);
 	}
 	public function getShape($x, $z) {
