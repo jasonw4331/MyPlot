@@ -1,4 +1,5 @@
 <?php
+
 namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
@@ -10,8 +11,8 @@ class MySQLProvider extends DataProvider
 	private $db;
 	/** @var string $lastSave */
 	private $lastSave;
-		/** @var MyPlot  */
-		private $plugin;
+	/** @var MyPlot */
+	protected $plugin;
 
 	/**
 	 * MySQLProvider constructor.
@@ -19,15 +20,12 @@ class MySQLProvider extends DataProvider
 	 * @param int $cacheSize
 	 * @param array $settings
 	 */
-	public function __construct(MyPlot $plugin, int $cacheSize = 0, array $settings) {
-		  $this->plugin = $plugin;
-		  parent::__construct($plugin, $cacheSize);
+	public function __construct(MyPlot $plugin, $cacheSize = 0, $settings) {
+		$this->plugin = $plugin;
+		parent::__construct($plugin, $cacheSize);
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
 		$this->db->query(
-			"CREATE TABLE IF NOT EXISTS plots
-			(id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
-			 owner TEXT, helpers TEXT, denied TEXT, biome TEXT)"
-		);
+			"CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT);");
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
 
@@ -36,17 +34,14 @@ class MySQLProvider extends DataProvider
 		$this->plugin->getLogger()->debug("MySQL database closed!");
 	}
 
-	public function savePlot(Plot $plot) : bool {
+	public function savePlot(Plot $plot): bool{
 		if ($plot->id >= 0) {
 			$stmt = $this->db->prepare(
 				"UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome WHERE id = :id"
 			);
 		} else {
 			$stmt = $this->db->prepare(
-				"INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES
-			((select id from plots where level = :level AND X = :X AND Z = :Z),
-			 :level, :X, :Z, :name, :owner, :helpers, :denied, :biome);"
-			);
+				"INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES ((select id from plots where level = :level AND X = :X AND Z = :Z), :level, :X, :Z, :name, :owner, :helpers, :denied, :biome);");
 		}
 		$resulta = $stmt->execute();
 		$resultb = $this->db->savepoint($this->lastSave = time());
@@ -57,8 +52,11 @@ class MySQLProvider extends DataProvider
 		$this->cachePlot($plot);
 		return true;
 	}
+	public function getLastSave() {
+		return $this->lastSave;
+	}
 
-	public function deletePlot(Plot $plot) : bool {
+	public function deletePlot(Plot $plot): bool{
 		if ($plot->id >= 0) {
 			$stmt = $this->db->prepare("DELETE FROM plots WHERE id = {$plot->id}");
 		} else {
@@ -76,13 +74,14 @@ class MySQLProvider extends DataProvider
 		return true;
 	}
 
-	public function getPlot(string $levelName, int $X, int $Z) : Plot {
+	public function getPlot(string $levelName, int $X, int $Z): Plot{
 		if ($plot = $this->getPlotFromCache($levelName, $X, $Z)) {
 			return $plot;
 		}
-		$result = $this->db->prepare(
-			"SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = {$plot->levelName} AND X = {$plot->X} AND Z = {$plot->Z}"
-		)->get_result();
+		$result = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = ? AND X = ? AND Z = ?;");
+		$result->bind_param('sii', $plot->levelName, $plot->X, $plot->Z);
+		$result->execute(); // $result->execute() only returns a boolean, not the result
+		$result = $result->get_result();
 		if ($val = $result->fetch_array(MYSQLI_ASSOC)) {
 			if ($val["helpers"] === null or $val["helpers"] === "") {
 				$helpers = [];
@@ -103,13 +102,12 @@ class MySQLProvider extends DataProvider
 		return $plot;
 	}
 
-	public function getPlotsByOwner(string $owner, string $levelName = "") : array {
+	public function getPlotsByOwner(string $owner, string $levelName = ""): array{
 		if ($levelName === "") {
 			$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = {$owner}");
 		} else {
 			$stmt = $this->db->prepare(
-				"SELECT * FROM plots WHERE owner = :owner AND level = {$levelName}"
-			);
+				"SELECT * FROM plots WHERE owner = :owner AND level = {$levelName}");
 		}
 		$plots = [];
 		$result = $stmt->get_result();
@@ -120,7 +118,7 @@ class MySQLProvider extends DataProvider
 				(string)$val["owner"], $helpers, $denied, (string)$val["biome"], (int)$val["id"]);
 		}
 		// Remove unloaded plots
-		$plots = array_filter($plots, function($plot) {
+		$plots = array_filter($plots, function ($plot) {
 			return $this->plugin->isLevelLoaded($plot->levelName);
 		});
 		// Sort plots by level
@@ -134,14 +132,7 @@ class MySQLProvider extends DataProvider
 		$i = 0;
 		for (; $limitXZ <= 0 or $i < $limitXZ; $i++) {
 			$result = $this->db->prepare(
-				"SELECT X, Z FROM plots WHERE (
-				level = {$levelName}
-				AND (
-					(abs(X) == {$i} AND abs(Z) <= {$i}) OR
-					(abs(Z) == {$i} AND abs(X) <= {$i})
-				)
-			);"
-			)->get_result();
+				"SELECT X, Z FROM plots WHERE(level = {$levelName} AND ((abs(X) == {$i} AND abs(Z) <= {$i}) OR (abs(Z) == {$i} AND abs(X) <= {$i})));")->get_result();
 			$plots = [];
 			while ($val = $result->fetch_array(MYSQLI_NUM)) {
 				$plots[$val[0]][$val[1]] = true;
@@ -172,5 +163,4 @@ class MySQLProvider extends DataProvider
 		}
 		return null;
 	}
-
 }
