@@ -2,7 +2,7 @@
 [![Gitter](https://badges.gitter.im/jasonwynn10/MyPlot.svg)](https://gitter.im/jasonwynn10/MyPlot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Poggit-Ci](https://poggit.pmmp.io/ci.shield/jasonwynn10/MyPlot/MyPlot)](https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot)
 ### **Create, manage, and build in protected plots! Keep your builds safe from griefers!**
-======
+
 #### Please note that the [API3](https://github.com/jasonwynn10/MyPlot/tree/API3) Branch is currently under heavy development for the new changes in pmmp 1.0 and may not work 100% of the time. The master branch is for compatability with 0.16 clients
 <br>
 <br>

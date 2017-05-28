@@ -30,85 +30,92 @@ use MyPlot\subcommand\SetOwnerSubCommand;
 
 class Commands extends PluginCommand
 {
-    /** @var SubCommand[] */
-    private $subCommands = [];
+	/** @var SubCommand[] */
+	private $subCommands = [];
 
-    /** @var SubCommand[]  */
-    private $aliasSubCommands = [];
+	/** @var SubCommand[]  */
+	private $aliasSubCommands = [];
 
-		/** @var MyPlot  */
-		private $plugin;
+	/** @var MyPlot  */
+	private $plugin;
 
-    public function __construct(MyPlot $plugin) {
-	      $this->plugin = $plugin;
-        parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);
-        $this->setPermission("myplot.command");
-        $this->setAliases([$plugin->getLanguage()->get("command.alias")]);
-        $this->setDescription($plugin->getLanguage()->get("command.desc"));
+	public function __construct(MyPlot $plugin) {
+		  $this->plugin = $plugin;
+		parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);
+		$this->setPermission("myplot.command");
+		$this->setAliases([$plugin->getLanguage()->get("command.alias")]);
+		$this->setDescription($plugin->getLanguage()->get("command.desc"));
 
-        $this->loadSubCommand(new HelpSubCommand($plugin, "help", $this));
-        $this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
-        $this->loadSubCommand(new GenerateSubCommand($plugin, "generate"));
-        $this->loadSubCommand(new InfoSubCommand($plugin, "info"));
-        $this->loadSubCommand(new AddHelperSubCommand($plugin, "addhelper"));
-        $this->loadSubCommand(new RemoveHelperSubCommand($plugin, "removehelper"));
-        $this->loadSubCommand(new AutoSubCommand($plugin, "auto"));
-        $this->loadSubCommand(new ClearSubCommand($plugin, "clear"));
-        $this->loadSubCommand(new DisposeSubCommand($plugin, "dispose"));
-        $this->loadSubCommand(new ResetSubCommand($plugin, "reset"));
-        $this->loadSubCommand(new BiomeSubCommand($plugin, "biome"));
-        $this->loadSubCommand(new BiomesSubCommand($plugin, "biomes"));
-        $this->loadSubCommand(new HomeSubCommand($plugin, "home"));
-        $this->loadSubCommand(new HomesSubCommand($plugin, "homes"));
-        $this->loadSubCommand(new NameSubCommand($plugin, "name"));
-        $this->loadSubCommand(new GiveSubCommand($plugin, "give"));
-        $this->loadSubCommand(new WarpSubCommand($plugin, "warp"));
-        $this->loadSubCommand(new DenyPlayerSubCommand($plugin, "denyplayer"));
-        $this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));
-        $this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
-        $this->loadSubCommand(new ListSubCommand($plugin, "list"));
-	    $this->plugin->getLogger()->debug("Commands Registered to MyPlot");
-    }
+		$this->loadSubCommand(new HelpSubCommand($plugin, "help", $this));
+		$this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
+		$this->loadSubCommand(new GenerateSubCommand($plugin, "generate"));
+		$this->loadSubCommand(new InfoSubCommand($plugin, "info"));
+		$this->loadSubCommand(new AddHelperSubCommand($plugin, "addhelper"));
+		$this->loadSubCommand(new RemoveHelperSubCommand($plugin, "removehelper"));
+		$this->loadSubCommand(new AutoSubCommand($plugin, "auto"));
+		$this->loadSubCommand(new ClearSubCommand($plugin, "clear"));
+		$this->loadSubCommand(new DisposeSubCommand($plugin, "dispose"));
+		$this->loadSubCommand(new ResetSubCommand($plugin, "reset"));
+		$this->loadSubCommand(new BiomeSubCommand($plugin, "biome"));
+		$this->loadSubCommand(new HomeSubCommand($plugin, "home"));
+		$this->loadSubCommand(new HomesSubCommand($plugin, "homes"));
+		$this->loadSubCommand(new NameSubCommand($plugin, "name"));
+		$this->loadSubCommand(new GiveSubCommand($plugin, "give"));
+		$this->loadSubCommand(new WarpSubCommand($plugin, "warp"));
+		$this->loadSubCommand(new DenyPlayerSubCommand($plugin, "denyplayer"));
+		$this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));
+		$this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
+		$this->loadSubCommand(new ListSubCommand($plugin, "list"));
+		$this->plugin->getLogger()->debug("Commands Registered to MyPlot");
+	}
 
-    /**
-     * @return SubCommand[]
-     */
-    public function getCommands() : array {
-        return $this->subCommands;
-    }
+	/**
+	 * @return SubCommand[]
+	 */
+	public function getCommands() : array {
+		return $this->subCommands;
+	}
 
+	/**
+	 * @param SubCommand $command
+	 */
+	private function loadSubCommand(SubCommand $command) {
+		$this->subCommands[$command->getName()] = $command;
+		if ($command->getAlias() != "") {
+			$this->aliasSubCommands[$command->getAlias()] = $command;
+		}
+	}
 
-    private function loadSubCommand(SubCommand $command) {
-        $this->subCommands[$command->getName()] = $command;
-        if ($command->getAlias() != "") {
-            $this->aliasSubCommands[$command->getAlias()] = $command;
-        }
-    }
+	/**
+	 * @param CommandSender $sender
+	 * @param string $alias
+	 * @param string[] $args
+	 * @return bool
+	 */
+	public function execute(CommandSender $sender, $alias, array $args) {
+		if (!isset($args[0])) {
+			$sender->sendMessage($this->plugin->getLanguage()->get("command.usage"));
+			return true;
+		}
 
-    public function execute(CommandSender $sender, $alias, array $args) {
-        if (!isset($args[0])) {
-            $sender->sendMessage($this->plugin->getLanguage()->get("command.usage"));
-            return true;
-        }
+		$subCommand = strtolower(array_shift($args));
+		if (isset($this->subCommands[$subCommand])) {
+			$command = $this->subCommands[$subCommand];
+		} elseif (isset($this->aliasSubCommands[$subCommand])) {
+			$command = $this->aliasSubCommands[$subCommand];
+		} else {
+			$sender->sendMessage(TextFormat::RED . $this->plugin->getLanguage()->get("command.unknown"));
+			return true;
+		}
 
-        $subCommand = strtolower(array_shift($args));
-        if (isset($this->subCommands[$subCommand])) {
-            $command = $this->subCommands[$subCommand];
-        } elseif (isset($this->aliasSubCommands[$subCommand])) {
-            $command = $this->aliasSubCommands[$subCommand];
-        } else {
-            $sender->sendMessage(TextFormat::RED . $this->plugin->getLanguage()->get("command.unknown"));
-            return true;
-        }
-
-        if ($command->canUse($sender)) {
-            if (!$command->execute($sender, $args)) {
-                $usage = $this->plugin->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
-                $sender->sendMessage($usage);
-            }
-        } else {
-            $sender->sendMessage(TextFormat::RED . $this->plugin->getLanguage()->get("command.unknown"));
-        }
-        return true;
-    }
+		if ($command->canUse($sender)) {
+			if (!$command->execute($sender, $args)) {
+				$usage = $this->plugin->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
+				$sender->sendMessage($usage);
+			}
+		} else {
+			$sender->sendMessage(TextFormat::RED . $this->plugin->getLanguage()->get("command.unknown"));
+		}
+		return true;
+	}
 }

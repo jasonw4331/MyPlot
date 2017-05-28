@@ -1,7 +1,9 @@
 <?php
 namespace MyPlot;
 
+use EconomyPlus\EconomyPlus;
 use EssentialsPE\Loader;
+use MyPlot\provider\EconomyPlusProvider;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\PocketMoneyProvider;
@@ -19,7 +21,6 @@ use pocketmine\lang\BaseLang;
 use pocketmine\level\format\Chunk;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
-use pocketmine\math\Vector3;
 use pocketmine\permission\Permission;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
@@ -33,80 +34,80 @@ use spoondetector\SpoonDetector;
 class MyPlot extends PluginBase
 {
 
-    /** @var PlotLevelSettings[] */
-    private $levels = [];
+	/** @var PlotLevelSettings[] $levels */
+	private $levels = [];
 
-    /** @var DataProvider */
-    private $dataProvider = null;
+	/** @var DataProvider $dataProvider */
+	private $dataProvider = null;
 
-    /** @var EconomyProvider */
-    private $economyProvider = null;
+	/** @var EconomyProvider $economyProvider */
+	private $economyProvider = null;
 
-    /** @var BaseLang */
-    private $baseLang = null;
+	/** @var BaseLang $baseLang */
+	private $baseLang = null;
 
-    /**
-     * @api
-     * @return BaseLang
-     */
-    public function getLanguage() : BaseLang {
-        return $this->baseLang;
-    }
+	/**
+	 * @api
+	 * @return BaseLang
+	 */
+	public function getLanguage() : BaseLang {
+		return $this->baseLang;
+	}
 
-    /**
-     * Returns the DataProvider that is being used
-     *
-     * @api
-     * @return DataProvider
-     */
-    public function getProvider() : DataProvider {
-        return $this->dataProvider;
-    }
+	/**
+	 * Returns the DataProvider that is being used
+	 *
+	 * @api
+	 * @return DataProvider
+	 */
+	public function getProvider() : DataProvider {
+		return $this->dataProvider;
+	}
 
-    /**
-     * Returns the EconomyProvider that is being used
-     *
-     * @api
-     * @return EconomyProvider
-     */
-    public function getEconomyProvider() {
-        return $this->economyProvider;
-    }
+	/**
+	 * Returns the EconomyProvider that is being used
+	 *
+	 * @api
+	 * @return EconomyProvider
+	 */
+	public function getEconomyProvider() {
+		return $this->economyProvider;
+	}
 
-    /**
-     * Returns a PlotLevelSettings object which contains all the settings of a level
-     *
-     * @api
-     * @param string $levelName
-     * @return PlotLevelSettings|null
-     */
-    public function getLevelSettings($levelName) {
-        if (isset($this->levels[$levelName])) {
-            return $this->levels[$levelName];
-        }
-        return null;
-    }
+	/**
+	 * Returns a PlotLevelSettings object which contains all the settings of a level
+	 *
+	 * @api
+	 * @param string $levelName
+	 * @return PlotLevelSettings|null
+	 */
+	public function getLevelSettings(string $levelName) {
+		if (isset($this->levels[$levelName])) {
+			return $this->levels[$levelName];
+		}
+		return null;
+	}
 
-    /**
-     * Checks if a plot level is loaded
-     *
-     * @api
-     * @param string $levelName
-     * @return bool
-     */
-    public function isLevelLoaded($levelName) : bool {
-        return isset($this->levels[$levelName]);
-    }
+	/**
+	 * Checks if a plot level is loaded
+	 *
+	 * @api
+	 * @param string $levelName
+	 * @return bool
+	 */
+	public function isLevelLoaded(string $levelName) : bool {
+		return isset($this->levels[$levelName]);
+	}
 
-    /**
-     * Generate a new plot level with optional settings
-     *
-     * @api
-     * @param string $levelName
-     * @param array $settings
-     * @return bool
-     */
-	public function generateLevel($levelName, $settings = []) {
+	/**
+	 * Generate a new plot level with optional settings
+	 *
+	 * @api
+	 * @param string $levelName
+	 * @param array $settings
+	 * @return bool
+	 */
+	public function generateLevel(string $levelName, array $settings = []) {
 		if ($this->getServer()->isLevelGenerated($levelName) === true) {
 			return false;
 		}
@@ -119,418 +120,426 @@ class MyPlot extends PluginBase
 		return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $settings);
 	}
 
-    /**
-     * Saves provided plot if changed
-     *
-     * @api
-     * @param Plot $plot
-     * @return bool
-     */
-    public function savePlot(Plot $plot) : bool {
-        return $this->dataProvider->savePlot($plot);
-    }
+	/**
+	 * Saves provided plot if changed
+	 *
+	 * @api
+	 * @param Plot $plot
+	 * @return bool
+	 */
+	public function savePlot(Plot $plot) : bool {
+		return $this->dataProvider->savePlot($plot);
+	}
 
-    /**
-     * Get all the plots a player owns (in a certain level if $levelName is provided)
-     *
-     * @api
-     * @param string $username
-     * @param $levelName
-     * @return Plot[]
-     */
-    public function getPlotsOfPlayer($username, $levelName) : array {
-	      if($levelName instanceof Level) {
-		        $levelName = $levelName->getName();
-	      }
-        return $this->dataProvider->getPlotsByOwner($username, $levelName);
-    }
+	/**
+	 * Get all the plots a player owns (in a certain level if $levelName is provided)
+	 *
+	 * @api
+	 * @param string $username
+	 * @param $levelName
+	 * @return Plot[]
+	 */
+	public function getPlotsOfPlayer(string $username, string $levelName) : array {
+		  if($levelName instanceof Level) {
+				$levelName = $levelName->getName();
+		  }
+		return $this->dataProvider->getPlotsByOwner($username, $levelName);
+	}
 
-    /**
-     * Get the next free plot in a level
-     *
-     * @api
-     * @param string $levelName
-     * @param int $limitXZ
-     * @return Plot|null
-     */
-    public function getNextFreePlot($levelName, $limitXZ = 0) {
-        return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
-    }
+	/**
+	 * Get the next free plot in a level
+	 *
+	 * @api
+	 * @param string $levelName
+	 * @param int $limitXZ
+	 * @return Plot|null
+	 */
+	public function getNextFreePlot(string $levelName, int $limitXZ = 0) {
+		return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
+	}
 
-    /**
-     * Finds the plot at a certain position or null if there is no plot at that position
-     *
-     * @api
-     * @param Position $position
-     * @return Plot|null
-     */
-    public function getPlotByPosition(Position $position) {
-        $x = $position->x;
-        $z = $position->z;
-        $levelName = $position->level->getName();
+	/**
+	 * Finds the plot at a certain position or null if there is no plot at that position
+	 *
+	 * @api
+	 * @param Position $position
+	 * @return Plot|null
+	 */
+	public function getPlotByPosition(Position $position) {
+		$x = $position->x;
+		$z = $position->z;
+		$levelName = $position->level->getName();
 
-        $plotLevel = $this->getLevelSettings($levelName);
-        if ($plotLevel === null) {
-            return null;
-        }
+		$plotLevel = $this->getLevelSettings($levelName);
+		if ($plotLevel === null) {
+			return null;
+		}
 
-        $plotSize = $plotLevel->plotSize;
-        $roadWidth = $plotLevel->roadWidth;
-        $totalSize = $plotSize + $roadWidth;
+		$plotSize = $plotLevel->plotSize;
+		$roadWidth = $plotLevel->roadWidth;
+		$totalSize = $plotSize + $roadWidth;
 
-        if ($x >= 0) {
-            $X = floor($x / $totalSize);
-            $difX = $x % $totalSize;
-        }else{
-            $X = ceil(($x - $plotSize + 1) / $totalSize);
-            $difX = abs(($x - $plotSize + 1) % $totalSize);
-        }
+		if ($x >= 0) {
+			$X = floor($x / $totalSize);
+			$difX = $x % $totalSize;
+		}else{
+			$X = ceil(($x - $plotSize + 1) / $totalSize);
+			$difX = abs(($x - $plotSize + 1) % $totalSize);
+		}
 
-        if ($z >= 0) {
-            $Z = floor($z / $totalSize);
-            $difZ = $z % $totalSize;
-        }else{
-            $Z = ceil(($z - $plotSize + 1) / $totalSize);
-            $difZ = abs(($z - $plotSize + 1) % $totalSize);
-        }
+		if ($z >= 0) {
+			$Z = floor($z / $totalSize);
+			$difZ = $z % $totalSize;
+		}else{
+			$Z = ceil(($z - $plotSize + 1) / $totalSize);
+			$difZ = abs(($z - $plotSize + 1) % $totalSize);
+		}
 
-        if (($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
-            return null;
-        }
+		if (($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
+			return null;
+		}
 
-        return $this->dataProvider->getPlot($levelName, $X, $Z);
-    }
+		return $this->dataProvider->getPlot($levelName, $X, $Z);
+	}
 
-    /**
-     *  Get the begin position of a plot
-     *
-     * @api
-     * @param Plot $plot
-     * @return Position|null
-     */
-    public function getPlotPosition(Plot $plot) {
-        $plotLevel = $this->getLevelSettings($plot->levelName);
-        if ($plotLevel === null) {
-            return null;
-        }
+	/**
+	 *  Get the begin position of a plot
+	 *
+	 * @api
+	 * @param Plot $plot
+	 * @return Position|null
+	 */
+	public function getPlotPosition(Plot $plot) {
+		$plotLevel = $this->getLevelSettings($plot->levelName);
+		if ($plotLevel === null) {
+			return null;
+		}
 
-        $plotSize = $plotLevel->plotSize;
-        $roadWidth = $plotLevel->roadWidth;
-        $totalSize = $plotSize + $roadWidth;
-        $x = $totalSize * $plot->X;
-        $z = $totalSize * $plot->Z;
-        $level = $this->getServer()->getLevelByName($plot->levelName);
-        return new Position($x, $plotLevel->groundHeight, $z, $level);
-    }
+		$plotSize = $plotLevel->plotSize;
+		$roadWidth = $plotLevel->roadWidth;
+		$totalSize = $plotSize + $roadWidth;
+		$x = $totalSize * $plot->X;
+		$z = $totalSize * $plot->Z;
+		$level = $this->getServer()->getLevelByName($plot->levelName);
+		return new Position($x, $plotLevel->groundHeight, $z, $level);
+	}
 
-    /**
-     * Teleport a player to a plot
-     *
-     * @api
-     * @param Player $player
-     * @param Plot $plot
-     * @return bool
-     */
-    public function teleportPlayerToPlot(Player $player, Plot $plot) : bool {
-        $plotLevel = $this->getLevelSettings($plot->levelName);
-        if ($plotLevel === null) {
-            return false;
-        }
-        $pos = $this->getPlotPosition($plot);
-        $plotSize = $plotLevel->plotSize;
-        $pos->x += floor($plotSize / 2);
-        $pos->z -= 1;
-        $pos->y += 1;
-        $player->teleport($pos);
-        return true;
-    }
+	/**
+	 * Teleport a player to a plot
+	 *
+	 * @api
+	 * @param Player $player
+	 * @param Plot $plot
+	 * @return bool
+	 */
+	public function teleportPlayerToPlot(Player $player, Plot $plot) : bool {
+		$plotLevel = $this->getLevelSettings($plot->levelName);
+		if ($plotLevel === null) {
+			return false;
+		}
+		$pos = $this->getPlotPosition($plot);
+		$plotSize = $plotLevel->plotSize;
+		$pos->x += floor($plotSize / 2);
+		$pos->z -= 1;
+		$pos->y += 1;
+		$player->teleport($pos);
+		return true;
+	}
 
-    /**
-     * Reset all the blocks inside a plot
-     *
-     * @api
-     * @param Plot $plot
-     * @param int $maxBlocksPerTick
-     * @return bool
-     */
-    public function clearPlot(Plot $plot, $maxBlocksPerTick = 256) : bool {
-        if (!$this->isLevelLoaded($plot->levelName)) {
-            return false;
-        }
-        foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
-            $plotb = $this->getPlotByPosition($entity->getPosition());
-            if($plotb != null) {
-                if($plotb === $plot) {
-                    if(!$entity instanceof Player) {
-                        $entity->close();
-                    }
-                }
-            }
-        }
-        $this->getServer()->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
-        return true;
-    }
+	/**
+	 * Reset all the blocks inside a plot
+	 *
+	 * @api
+	 * @param Plot $plot
+	 * @param int $maxBlocksPerTick
+	 * @return bool
+	 */
+	public function clearPlot(Plot $plot, $maxBlocksPerTick = 256) : bool {
+		if (!$this->isLevelLoaded($plot->levelName)) {
+			return false;
+		}
+		foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
+			$plotb = $this->getPlotByPosition($entity->getPosition());
+			if($plotb != null) {
+				if($plotb === $plot) {
+					if(!$entity instanceof Player) {
+						$entity->close();
+					}
+				}
+			}
+		}
+		$this->getServer()->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
+		return true;
+	}
 
-    /**
-     * Delete the plot data
-     *
-     * @param Plot $plot
-     * @return bool
-     */
-    public function disposePlot(Plot $plot) : bool {
-        return $this->dataProvider->deletePlot($plot);
-    }
+	/**
+	 * Delete the plot data
+	 *
+	 * @param Plot $plot
+	 * @return bool
+	 */
+	public function disposePlot(Plot $plot) : bool {
+		return $this->dataProvider->deletePlot($plot);
+	}
 
-    /**
-     * Clear and dispose a plot
-     *
-     * @param Plot $plot
-     * @param int $maxBlocksPerTick
-     * @return bool
-     */
-    public function resetPlot(Plot $plot, $maxBlocksPerTick = 256) : bool {
-        if ($this->disposePlot($plot)) {
-            return $this->clearPlot($plot, $maxBlocksPerTick);
-        }
-        return false;
-    }
+	/**
+	 * Clear and dispose a plot
+	 *
+	 * @param Plot $plot
+	 * @param int $maxBlocksPerTick
+	 * @return bool
+	 */
+	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+		if ($this->disposePlot($plot)) {
+			return $this->clearPlot($plot, $maxBlocksPerTick);
+		}
+		return false;
+	}
 
-    /**
-     * Changes the biome of a plot
-     *
-     * @api
-     * @param Plot $plot
-     * @param Biome $biome
-     * @return bool
-     */
-    public function setPlotBiome(Plot $plot, Biome $biome) : bool {
-        $plotLevel = $this->getLevelSettings($plot->levelName);
-        if ($plotLevel === null) {
-            return false;
-        }
+	/**
+	 * Changes the biome of a plot
+	 *
+	 * @api
+	 * @param Plot $plot
+	 * @param Biome $biome
+	 * @return bool
+	 */
+	public function setPlotBiome(Plot $plot, Biome $biome) : bool {
+		foreach($this->getPlotChunks($plot) as $chunk) {
+			if($chunk instanceof Chunk) {
+				for($x = 0; $x <= 16; $x++) {
+					for($z = 0; $z <= 16; $z++) {
+						$chunk->setBiomeId($x, $z, $biome->getId());
+						$chunk->setChanged(true);
+						foreach ($chunk->getEntities() as $entity) {
+							if($entity instanceof Player) {
+								$entity->onChunkChanged($chunk);
+								$entity->sendChunk($x, $z, $chunk);
+							}
+						}
+					}
+				}
+			}
+		}
 
-        $level = $this->getServer()->getLevelByName($plot->levelName);
-        $pos = $this->getPlotPosition($plot);
-        $plotSize = $plotLevel->plotSize;
-        $xMax = $pos->x + $plotSize;
-        $zMax = $pos->z + $plotSize;
+		$plot->biome = $biome->getName();
+		$this->savePlot($plot);
+		return true;
+	}
 
-        $chunkIndexes = [];
-        for ($x = $pos->x; $x < $xMax; $x++) {
-            for ($z = $pos->z; $z < $zMax; $z++) {
-                $index = Level::chunkHash($x >> 4, $z >> 4);
-                if (!in_array($index, $chunkIndexes)) {
-                    $chunkIndexes[] = $index;
-                }
-	            Level::getXZ($index, $pos->x, $pos->z);
-                if(($chunk = $level->getChunk($pos->x, $pos->z)) instanceof Chunk) {
-	                $chunk->setBiomeId($pos->x, $pos->z, $biome->getId());
-	                return true;
-                }else{
-                	$this->getLogger()->error("The chunk isn't a chunk!");
-                	return false;
-                }
-            }
-        }
-        foreach ($chunkIndexes as $index) {
-            Level::getXZ($index, $plot->X, $plot->Z);
-            $chunk = $level->getChunk($plot->X,$plot->Z);
-            foreach ($level->getChunkPlayers($plot->X, $plot->Z) as $player) {
-                $player->onChunkChanged($chunk);
-            }
-        }
+	/**
+	 * Returns the PlotLevelSettings of all the loaded levels
+	 *
+	 * @api
+	 * @return PlotLevelSettings[]
+	 */
+	public function getPlotLevels() : array {
+		return $this->levels;
+	}
 
-        $plot->biome = $biome->getName();
-        $this->savePlot($plot);
-        return true;
-    }
+	/**
+	 * Returns the Chunks contained in a plot
+	 *
+	 * @param Plot $plot
+	 * @return Chunk[]
+	 */
+	public function getPlotChunks(Plot $plot) : array {
+		$plotLevel = $this->getLevelSettings($plot->levelName);
+		$level = $this->getServer()->getLevelByName($plot->levelName);
+		$pos = $this->getPlotPosition($plot);
+		$plotSize = $plotLevel->plotSize;
+		$xMax = $pos->x + $plotSize;
+		$zMax = $pos->z + $plotSize;
 
-    /**
-     * Returns the PlotLevelSettings of all the loaded levels
-     *
-     * @api
-     * @return PlotLevelSettings[]
-     */
-    public function getPlotLevels() : array {
-        return $this->levels;
-    }
+		$chunkIndexes = [];
+		for ($x = $pos->x; $x < $xMax; $x++) {
+			for ($z = $pos->z; $z < $zMax; $z++) {
+				$index = Level::chunkHash($x >> 4, $z >> 4);
+				if (!in_array($index, $chunkIndexes)) {
+					$chunkIndexes[] = $index;
+				}
+				Level::getXZ($index, $pos->x, $pos->z);
+				if(!($chunk = $level->getChunk($pos->x, $pos->z)) instanceof Chunk) {
+					$this->getLogger()->error("The chunk isn't a valid chunk!");
+				}
+			}
+		}
+		$chunks = [];
+		foreach ($chunkIndexes as $index) {
+			Level::getXZ($index, $plot->X, $plot->Z);
+			$chunk = $level->getChunk($plot->X,$plot->Z);
+			$chunks[] = $chunk;
+		}
 
-    /**
-     * Get the maximum number of plots a player can claim
-     *
-     * @param Player $player
-     * @return int
-     */
-    public function getMaxPlotsOfPlayer(Player $player) : int {
-        if ($player->hasPermission("myplot.claimplots.unlimited"))
-            return PHP_INT_MAX;
-        /** @var Permission[] $perms */
-        $perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()),
-            $player->getEffectivePermissions());
-        $perms = array_filter($perms, function ($name) {
-            return (substr($name, 0, 18) === "myplot.claimplots.");
-        }, ARRAY_FILTER_USE_KEY);
-        if (count($perms) == 0)
-            return 0;
-        krsort($perms);
-        foreach ($perms as $name => $perm) {
-            $maxPlots = substr($name, 18);
-            if (is_numeric($maxPlots)) {
-                return $maxPlots;
-            }
-        }
-        return 0;
-    }
+		return $chunks;
+	}
 
-    /**
-     * Finds the exact center of the plot at ground level
-     *
-     * @param Plot $plot
-     * @return Vector3
-     */
-    public function getPlotMid(Plot $plot) : Vector3 {
-        $gh = $this->getLevelSettings($plot->levelName)->groundHeight;
-        $ps = $this->getLevelSettings($plot->levelName)->plotSize;
-        $rw = $this->getLevelSettings($plot->levelName)->roadWidth;
-        $totalSize = $ps + $rw;
-        $x = $plot->X;
-        $z = $plot->Z;
-        if ($x >= 0) {
-            if($h = $ps % 2 == 0) {
-                $X = floor($x / $totalSize) + $h;
-            }else{
-                $X = floor($x / $totalSize) + ($ps / 2) + 0.5;
-            }
-        }else{
-            if($h = $ps % 2 == 0) {
-                $X = ceil(($x - $ps + 1) / $totalSize) - $h;
-            }else{
-                $X = ceil(($x - $ps + 1) / $totalSize) - ($ps / 2) - 0.5;
-            }
-        }
-        if ($z >= 0) {
-            if($h = $ps % 2 == 0) {
-                $Z = floor($z / $totalSize) + $h;
-            }else{
-                $Z = floor($z / $totalSize) + ceil($ps / 2) + 0.5;
-            }
-        }else{
-            if ($h = $ps % 2 == 0) {
-                $Z = floor($z / $totalSize) - $h;
-            }else{
-                $Z = floor($z / $totalSize) - ceil($ps / 2) - 0.5;
-            }
-        }
-        for($Y = $gh; $h<128; $h++) {
-            $mid = new Vector3($X,$Y+0.5,$Z);
-            $mida = new Vector3($X,$Y,$Z);
-            $midb = new Vector3($X,$Y+1,$Z);
-            if ($this->getServer()->getLevelByName($plot->levelName)->getBlock($mida) === Air::class and $this->getServer()->getLevelByName($plot->levelName)->getBlock($midb) === Air::class) {
-                return $mid;
-            }
-        }
-        return new Vector3($X,$gh,$Z);
-    }
 
-    /**
-     * Teleports the player to the exact center of the plot at nearest open space to the ground level
-     *
-     * @param Plot $plot
-     * @param Player $player
-     * @return bool
-     */
-    public function teleportMiddle(Plot $plot, Player $player) : bool {
-        $mid = $this->getPlotMid($plot);
-        $player->teleport($mid);
-        return true;
-    }
+	/**
+	 * Get the maximum number of plots a player can claim
+	 *
+	 * @param Player $player
+	 * @return int
+	 */
+	public function getMaxPlotsOfPlayer(Player $player) : int {
+		if ($player->hasPermission("myplot.claimplots.unlimited"))
+			return PHP_INT_MAX;
+		/** @var Permission[] $perms */
+		$perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()),
+			$player->getEffectivePermissions());
+		$perms = array_filter($perms, function ($name) {
+			return (substr($name, 0, 18) === "myplot.claimplots.");
+		}, ARRAY_FILTER_USE_KEY);
+		if (count($perms) == 0)
+			return 0;
+		krsort($perms);
+		foreach ($perms as $name => $perm) {
+			$maxPlots = substr($name, 18);
+			if (is_numeric($maxPlots)) {
+				return $maxPlots;
+			}
+		}
+		return 0;
+	}
 
-    /* -------------------------- Non-API part -------------------------- */
+	/**
+	 * Finds the exact center of the plot at ground level
+	 *
+	 * @param Plot $plot
+	 * @return Position|null
+	 */
+	public function getPlotMid(Plot $plot) {
+		$plotLevel = $this->getLevelSettings($plot->levelName);
+		if ($plotLevel === null) {
+			return null;
+		}
+
+		$plotSize = $plotLevel->plotSize;
+		$pos = $this->getPlotPosition($plot);
+		$X = $pos->getX() + ($plotSize / 2);
+		$Z = $pos->getZ();
+
+		for($Y = $pos->getY(); $Y < 128; $Y++) {
+			$mid = new Position($X,$Y+0.5,$Z, $this->getServer()->getLevelByName($plot->levelName));
+			$mida = new Position($X,$Y,$Z, $this->getServer()->getLevelByName($plot->levelName));
+			$midb = new Position($X,$Y+1,$Z, $this->getServer()->getLevelByName($plot->levelName));
+			if ($this->getServer()->getLevelByName($plot->levelName)->getBlock($mida) === Air::class and $this->getServer()->getLevelByName($plot->levelName)->getBlock($midb) === Air::class) {
+				return $mid;
+			}
+		}
+		return new Position($X, $pos->getY(), $Z, $this->getServer()->getLevelByName($plot->levelName));
+	}
+
+	/**
+	 * Teleports the player to the exact center of the plot at nearest open space to the ground level
+	 *
+	 * @param Plot $plot
+	 * @param Player $player
+	 * @return bool
+	 */
+	public function teleportMiddle(Plot $plot, Player $player) : bool {
+		$mid = $this->getPlotMid($plot);
+		if($mid == null) {
+			return false;
+		}
+		return $player->teleport($mid);
+	}
+
+	/* -------------------------- Non-API part -------------------------- */
 
     public function onEnable() {
-	SpoonDetector::printSpoon($this, 'spoon.txt');
+		SpoonDetector::printSpoon($this, 'spoon.txt');
         $this->getLogger()->notice(TF::BOLD."Loading...");
 
-        $this->saveDefaultConfig();
-        $this->reloadConfig();
+		$this->saveDefaultConfig();
+		$this->reloadConfig();
 
-        @mkdir($this->getDataFolder());
-        @mkdir($this->getDataFolder() . "worlds");
+		@mkdir($this->getDataFolder());
+		@mkdir($this->getDataFolder() . "worlds");
 
-	    Generator::addGenerator(MyPlotGenerator::class, "myplot");
+		Generator::addGenerator(MyPlotGenerator::class, "myplot");
 
-        $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
-        $this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
+		$lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
+		$this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
 
-        // Initialize DataProvider
-        $cacheSize = $this->getConfig()->get("PlotCacheSize");
-        switch (strtolower($this->getConfig()->get("DataProvider"))) {
-            case "mysql":
-                $settings = $this->getConfig()->get("MySQLSettings");
-                $this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
-            break;
-	        case "yaml":
-	        	$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
-	        break;
-            case "json":
-                $this->dataProvider = new JSONDataProvider($this, $cacheSize);
-            break;
-            case "sqlite3":
-            case "sqlite":
-            default:
-                $this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
-            break;
-        }
+		// Initialize DataProvider
+		$cacheSize = $this->getConfig()->get("PlotCacheSize");
+		switch (strtolower($this->getConfig()->get("DataProvider"))) {
+			case "mysql":
+				$settings = $this->getConfig()->get("MySQLSettings");
+				$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
+			break;
+			case "yaml":
+				$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
+			break;
+			case "json":
+				$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+			break;
+			case "sqlite3":
+			case "sqlite":
+			default:
+				$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
+			break;
+		}
 
-        // Initialize EconomyProvider
-        if ($this->getConfig()->get("UseEconomy") == true) {
-            if (($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
-	            if($plugin instanceof EconomyAPI) {
-		            $this->economyProvider = new EconomySProvider($plugin);
-		            $this->getLogger()->debug("Eco set to EconomySProvider");
-	            }
-	            $this->getLogger()->debug("Eco not instance of EconomyAPI");
-            } elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("EssentialsPE")) !== null) {
-            	if($plugin instanceof Loader) {
-		            $this->economyProvider = new EssentialsPEProvider($plugin);
-		            $this->getLogger()->debug("Eco set to EssentialsPE");
-	            }
-	            $this->getLogger()->debug("Eco not instance of EssentialsPE");
-            } elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
-                if($plugin instanceof PocketMoney) {
-	                $this->economyProvider = new PocketMoneyProvider($plugin);
-	                $this->getLogger()->debug("Eco set to PocketMoney");
-                }
-	            $this->getLogger()->debug("Eco not instance of PocketMoney");
-            }
-        }
+		// Initialize EconomyProvider
+		if ($this->getConfig()->get("UseEconomy") == true) {
+			if (($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
+				if($plugin instanceof EconomyAPI) {
+					$this->economyProvider = new EconomySProvider($plugin);
+					$this->getLogger()->debug("Eco set to EconomySProvider");
+				}
+				$this->getLogger()->debug("Eco not instance of EconomyAPI");
+			} elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("EssentialsPE")) !== null) {
+				if($plugin instanceof Loader) {
+					$this->economyProvider = new EssentialsPEProvider($plugin);
+					$this->getLogger()->debug("Eco set to EssentialsPE");
+				}
+				$this->getLogger()->debug("Eco not instance of EssentialsPE");
+			} elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
+				if($plugin instanceof PocketMoney) {
+					$this->economyProvider = new PocketMoneyProvider($plugin);
+					$this->getLogger()->debug("Eco set to PocketMoney");
+				}
+				$this->getLogger()->debug("Eco not instance of PocketMoney");
+			} elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyPlus")) !== null) {
+				if($plugin instanceof EconomyPlus) {
+					$this->economyProvider = new EconomyPlusProvider($plugin);
+					$this->getLogger()->debug("Eco set to EconomyPlus");
+				}
+				$this->getLogger()->debug("Eco not instance of EconomyPlus");
+			} else {
+				$this->getLogger()->info("No supported economy plugin found!");
+				$this->getConfig()->set("UseEconomy",false);
+			}
+		}
 
-        $eventListener = new EventListener($this);
-        $this->getServer()->getPluginManager()->registerEvents($eventListener, $this);
-        foreach($this->getServer()->getLevels() as $level) {
-	        $eventListener->onLevelLoad(new LevelLoadEvent($level));
-        }
-        $this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
-        $this->getLogger()->notice(TF::GREEN."Enabled!");
-    }
+		$eventListener = new EventListener($this);
+		$this->getServer()->getPluginManager()->registerEvents($eventListener, $this);
+		foreach($this->getServer()->getLevels() as $level) {
+			$eventListener->onLevelLoad(new LevelLoadEvent($level));
+		}
+		$this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
+		$this->getLogger()->notice(TF::GREEN."Enabled!");
+	}
 
-	public function addLevelSettings($levelName, PlotLevelSettings $settings) : bool {
-        $this->levels[$levelName] = $settings;
-        return true;
-    }
+	public function addLevelSettings(string $levelName, PlotLevelSettings $settings) : bool {
+		$this->levels[$levelName] = $settings;
+		return true;
+	}
 
-    public function unloadLevelSettings($levelName) : bool {
-        if (isset($this->levels[$levelName])) {
-            unset($this->levels[$levelName]);
-	        $this->getLogger()->debug("Level ".$levelName." settings unloaded!");
-            return true;
-        }
-        return false;
-    }
+	public function unloadLevelSettings(string $levelName) : bool {
+		if (isset($this->levels[$levelName])) {
+			unset($this->levels[$levelName]);
+			$this->getLogger()->debug("Level ".$levelName." settings unloaded!");
+			return true;
+		}
+		return false;
+	}
 
-    public function onDisable() {
-        if ($this->dataProvider !== null) {
-            $this->dataProvider->close();
-        }
-    }
+	public function onDisable() {
+		if ($this->dataProvider !== null) {
+			$this->dataProvider->close();
+		}
+	}
 }
