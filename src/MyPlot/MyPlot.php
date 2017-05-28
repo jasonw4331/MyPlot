@@ -12,6 +12,7 @@ use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\EconomyProvider;
 
 use onebone\economyapi\EconomyAPI;
+
 use pocketmine\block\Air;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
@@ -26,6 +27,8 @@ use pocketmine\Player;
 use pocketmine\level\Level;
 use pocketmine\utils\TextFormat as TF;
 use PocketMoney\PocketMoney;
+
+use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
 {
@@ -445,6 +448,7 @@ class MyPlot extends PluginBase
     /* -------------------------- Non-API part -------------------------- */
 
     public function onEnable() {
+	SpoonDetector::printSpoon($this, 'spoon.txt');
         $this->getLogger()->notice(TF::BOLD."Loading...");
 
         $this->saveDefaultConfig();
