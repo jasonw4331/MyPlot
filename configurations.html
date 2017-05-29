@@ -35,7 +35,6 @@
 								<ul>
 									<li><a href="https://jasonwynn10.github.io/MyPlot/issues">Open an issue</a></li>
 									<li><a href="https://gitter.im/jasonwynn10/MyPlot/" target="_blank">Gitter Chat</a></li>
-									<!--<li><a href="http://webchat.esper.net/?channels=worldcretornica" target="_blank">IRC</a></li>-->
 								</ul>
 							</li>
 							<li><a href="https://jasonwynn10.github.com/MyPlot/contributors">Contributors</a></li>
@@ -141,7 +140,7 @@
 						<td>This is the block id that will make up the bottom block of the world.</td>
 					</tr>
 				</table>
-				<h4>Example PlotMe Configuration File</h4>
+				<h4>Example MyPlot Configuration File</h4>
 				<pre>
 #########################################
 # ___  ___       ______  _         _    #
@@ -155,7 +154,7 @@
 #########################################
 
 # The language that should be used in MyPlot
-# Available languages: eng, nl, vi, spa, chs, zho, deu , ces
+# Available languages: eng, nl, vi, spa, chs, zho, deu , cze
 #
 # English language pack by @Exxarion
 # Dutch language pack by @Wies
@@ -163,7 +162,7 @@
 # Spanish language pack by @thelucyclub
 # Chinese ( ROC ) pack by @jerryzooyoyo
 # Chinese ( PRC ) pack by @jerryzooyoyo
-# German language pack by @SalmonGER
+# German language pack by @morpheusTP and @SalmonGER
 # Czech lanauge pack by @GamakCZ
 language: eng
 
@@ -195,10 +194,6 @@ ShowPlotPopup: true
 # Amount of blocks to reset per tick.
 # Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
 ClearBlocksPerTick: 256
-
-# The MyPlotGenerator is the default Generator
-# Enter the custom generator's class
-Generator: MyPlotGenerator
 
 # These settings will be used when creating a new world with the default generator.
 DefaultWorld:
@@ -233,7 +228,7 @@ DefaultWorld:
   PlotFillBlock: '3:0'
   # The block at the bottom (Default is Bedrock)
   BottomBlock: '7:0'
-				</pre>   
+				</pre>
 			</section>
 		</div>
 		<div id="footer_wrap" class="outer">
