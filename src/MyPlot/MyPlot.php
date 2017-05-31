@@ -2,10 +2,13 @@
 namespace MyPlot;
 
 use EssentialsPE\Loader;
+use MyPlot\events\MyPlotBiomeChangeEvent;
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\YAMLDataProvider;
+use MyPlot\subcommand\BiomeSubCommand;
 use MyPlot\task\ClearPlotTask;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\SQLiteDataProvider;
@@ -124,7 +127,11 @@ class MyPlot extends PluginBase
      * @return bool
      */
     public function savePlot(Plot $plot) : bool {
-        return $this->dataProvider->savePlot($plot);
+    	$this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotSaveEvent($this, "MyPlot", $this->dataProvider->type)));
+        if($ev->isCancelled()) {
+        	return false;
+        }
+    	return $this->dataProvider->savePlot($plot);
     }
 
     /**
@@ -301,6 +308,7 @@ class MyPlot extends PluginBase
      * @return bool
      */
     public function setPlotBiome(Plot $plot, Biome $biome) : bool {
+	    $this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotBiomeChangeEvent($this, "MyPlot", BiomeSubCommand::$biomes[strtoupper($biome->getName())],BiomeSubCommand::$biomes[$plot->biome])));
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return false;

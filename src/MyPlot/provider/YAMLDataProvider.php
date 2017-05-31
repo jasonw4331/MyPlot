@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\provider;
 
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\utils\Config;
@@ -14,6 +15,8 @@ class YAMLDataProvider extends DataProvider{
 	protected $plugin;
 	/** @var Config */
 	private $yaml1, $yaml2;
+
+	public $type = MyPlotSaveEvent::YAML;
 
 	public function __construct(MyPlot $plugin, $cacheSize = 0) {
 		parent::__construct($plugin, $cacheSize);

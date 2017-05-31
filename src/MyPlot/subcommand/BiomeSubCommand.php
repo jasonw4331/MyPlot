@@ -8,7 +8,7 @@ use pocketmine\level\generator\biome\Biome;
 
 class BiomeSubCommand extends SubCommand
 {
-    private $biomes = [
+    public static $biomes = [
         "PLAINS" => Biome::PLAINS,
         "DESERT" => Biome::DESERT,
         "MOUNTAINS" => Biome::MOUNTAINS,
@@ -26,7 +26,7 @@ class BiomeSubCommand extends SubCommand
 
     public function execute(CommandSender $sender, array $args) {
         if (count($args) === 0) {
-            $biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
+            $biomes = TextFormat::WHITE . implode(", ", array_keys(self::$biomes));
             $sender->sendMessage($this->translateString("biome.possible", [$biomes]));
             return true;
         } elseif (count($args) !== 1) {
@@ -43,13 +43,13 @@ class BiomeSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
-        if (!isset($this->biomes[$biome])) {
+        if (!isset(self::$biomes[$biome])) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
-            $biomes = implode(", ", array_keys($this->biomes));
+            $biomes = implode(", ", array_keys(self::$biomes));
             $sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
             return true;
         }
-        $biome = Biome::getBiome($this->biomes[$biome]);
+        $biome = Biome::getBiome(self::$biomes[$biome]);
         if ($this->getPlugin()->setPlotBiome($plot, $biome)) {
             $sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
         } else {

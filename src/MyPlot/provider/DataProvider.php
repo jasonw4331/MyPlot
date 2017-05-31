@@ -12,6 +12,8 @@ abstract class DataProvider
     private $cacheSize;
     /** @var MyPlot */
     protected $plugin;
+    /** @var int $type */
+    public $type = -1;
 
     public function __construct(MyPlot $plugin, $cacheSize = 0) {
         $this->plugin = $plugin;

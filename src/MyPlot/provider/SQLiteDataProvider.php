@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\provider;
 
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 
@@ -13,6 +14,7 @@ class SQLiteDataProvider extends DataProvider
     private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
             $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
             $sqlGetExistingXZ;
+    public $type = MyPlotSaveEvent::SQLITE3;
     /**
      * @param MyPlot $plugin
      * @param int $cacheSize
