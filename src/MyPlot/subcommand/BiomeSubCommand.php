@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\subcommand;
 
+use MyPlot\events\MyPlotBiomeChangeEvent;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -8,7 +9,7 @@ use pocketmine\level\generator\biome\Biome;
 
 class BiomeSubCommand extends SubCommand
 {
-    public static $biomes = [
+    private $biomes = [
         "PLAINS" => Biome::PLAINS,
         "DESERT" => Biome::DESERT,
         "MOUNTAINS" => Biome::MOUNTAINS,
@@ -26,7 +27,7 @@ class BiomeSubCommand extends SubCommand
 
     public function execute(CommandSender $sender, array $args) {
         if (count($args) === 0) {
-            $biomes = TextFormat::WHITE . implode(", ", array_keys(self::$biomes));
+            $biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
             $sender->sendMessage($this->translateString("biome.possible", [$biomes]));
             return true;
         } elseif (count($args) !== 1) {
@@ -43,14 +44,17 @@ class BiomeSubCommand extends SubCommand
             $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
             return true;
         }
-        if (!isset(self::$biomes[$biome])) {
+        if (!isset($this->biomes[$biome])) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
-            $biomes = implode(", ", array_keys(self::$biomes));
+            $biomes = implode(", ", array_keys($this->biomes));
             $sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
             return true;
         }
-        $biome = Biome::getBiome(self::$biomes[$biome]);
-        if ($this->getPlugin()->setPlotBiome($plot, $biome)) {
+        $biome = Biome::getBiome($this->biomes[$biome]);
+	    $this->getPlugin()->getServer()->getPluginManager()->callEvent(
+	    	($ev = new MyPlotBiomeChangeEvent($this->getPlugin(), "MyPlot", $plot, $this->biomes[strtoupper($biome->getName())], $this->biomes[$plot->biome]))
+	    );
+        if ($this->getPlugin()->setPlotBiome($ev->getPlot(), Biome::getBiome($ev->getNewBiome()))) {
             $sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));

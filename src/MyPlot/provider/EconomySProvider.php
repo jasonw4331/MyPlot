@@ -13,7 +13,7 @@ class EconomySProvider implements EconomyProvider
 		$this->plugin = $plugin;
 	}
 
-	public function reduceMoney(Player $player, $amount) : bool {
+	public function reduceMoney(Player $player, float $amount) : bool {
         if ($amount == 0) {
             return true;
         } elseif ($amount < 0) {

@@ -13,7 +13,7 @@ class PocketMoneyProvider implements EconomyProvider
         $this->plugin = $plugin;
     }
 
-    public function reduceMoney(Player $player, $amount) : bool {
+    public function reduceMoney(Player $player, float $amount) : bool {
         $money = $this->plugin->getMoney($player->getName());
         if ($money === false or ($money - $amount) < 0) {
             return false;

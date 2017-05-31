@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\subcommand;
 
+use MyPlot\events\MyPlotHelperEvent;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -36,11 +37,18 @@ class AddHelperSubCommand extends SubCommand
 		    $sender->sendMessage($this->translateString("addhelper.notaplayer"));
 		    return true;
 	    }
-        if (!$plot->addHelper($helper->getName())) {
+	    $this->getPlugin()->getServer()->getPluginManager()->callEvent(
+	    	($ev = new MyPlotHelperEvent($this->getPlugin(), "MyPlot", $plot, MyPlotHelperEvent::ADD, $helper->getName()))
+	    );
+        if($ev->isCancelled()) {
+	        $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+        	return true;
+        }
+        if (!$ev->getPlot()->addHelper($ev->getHelper())) {
             $sender->sendMessage($this->translateString("addhelper.alreadyone", [$helper->getName()]));
             return true;
         }
-        if ($this->getPlugin()->savePlot($plot)) {
+        if ($this->getPlugin()->savePlot($ev->getPlot())) {
             $sender->sendMessage($this->translateString("addhelper.success", [$helper->getName()]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));

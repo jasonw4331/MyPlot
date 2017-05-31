@@ -69,7 +69,7 @@ class MyPlot extends PluginBase
      * @api
      * @return EconomyProvider
      */
-    public function getEconomyProvider() {
+    public function getEconomyProvider() : EconomyProvider {
         return $this->economyProvider;
     }
 
@@ -106,7 +106,7 @@ class MyPlot extends PluginBase
      * @param array $settings
      * @return bool
      */
-	public function generateLevel($levelName, $settings = []) {
+	public function generateLevel($levelName, $settings = []) : bool {
 		if ($this->getServer()->isLevelGenerated($levelName) === true) {
 			return false;
 		}
@@ -127,11 +127,11 @@ class MyPlot extends PluginBase
      * @return bool
      */
     public function savePlot(Plot $plot) : bool {
-    	$this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotSaveEvent($this, "MyPlot", $this->dataProvider->type)));
+    	$this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotSaveEvent($this, "MyPlot", $this->dataProvider->type, $plot)));
         if($ev->isCancelled()) {
         	return false;
         }
-    	return $this->dataProvider->savePlot($plot);
+    	return $this->dataProvider->savePlot($ev->getPlot());
     }
 
     /**
@@ -308,7 +308,6 @@ class MyPlot extends PluginBase
      * @return bool
      */
     public function setPlotBiome(Plot $plot, Biome $biome) : bool {
-	    $this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotBiomeChangeEvent($this, "MyPlot", BiomeSubCommand::$biomes[strtoupper($biome->getName())],BiomeSubCommand::$biomes[$plot->biome])));
         $plotLevel = $this->getLevelSettings($plot->levelName);
         if ($plotLevel === null) {
             return false;
