@@ -3,11 +3,11 @@
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, menu, nav, section {
-    display: block;
+	display: block;
 }
 
 ol, ul {
-    list-style: none;
+	list-style: none;
 }
 
 /*--------------------------------*/
@@ -15,518 +15,518 @@ ol, ul {
 /*-------------vvvvvv-------------*/
 /* Dropdown Menu (navigator) function compacted*/
 #nav {
-    background-color: #111111;
+	background-color: #111111;
 }
 
 #nav_wrapper {
-    margin: 0 auto 0 auto;
-    text-align: center;
+	margin: 0 auto 0 auto;
+	text-align: center;
 }
 
 #nav ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    position: relative;
-    min-width: 140px;
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	position: relative;
+	min-width: 140px;
 }
 
 #nav ul li {
-    display: inline-block;
+	display: inline-block;
 }
 
 #nav ul li:hover {
-    background-color: #525252;
+	background-color: #525252;
 }
 
 #nav ul li a {
-    color: #ccc;
-    display: block;
-    padding: 15px;
-    text-decoration: none;
+	color: #ccc;
+	display: block;
+	padding: 15px;
+	text-decoration: none;
 }
 
 #nav ul li:hover ul {
-    display: block;
+	display: block;
 }
 
 #nav ul ul {
-    display: none;
-    position: absolute;
-    background-color: #111111;
+	display: none;
+	position: absolute;
+	background-color: #111111;
 }
 
 #nav ul ul li {
-    display: block;
+	display: block;
 }
 
 #nav ul ul li a:hover {
-    color: #699;
+	color: #699;
 }
 
 .quicknav {
-    position: absolute;
-    left: 1150px;
+	position: absolute;
+	left: 1150px;
 }
 
 .quicknav ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    position: relative;
-    min-width: 235px !important;
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	position: relative;
+	min-width: 235px !important;
 }
 
 .quicknav ul li:hover ul {
-    display: block;
-    bottom: 100%;
+	display: block;
+	bottom: 100%;
 }
 
 /* Back to Top button function compacted*/
 .back-to-top {
-    position: fixed;
-    bottom: 2em;
-    right: 10px;
-    text-decoration: none;
-    color: #000;
-    background-color: #848484;
-    font-size: 16px;
-    padding: 1em;
-    display: none;
-    border-radius: 10px;
+	position: fixed;
+	bottom: 2em;
+	right: 10px;
+	text-decoration: none;
+	color: #000;
+	background-color: #848484;
+	font-size: 16px;
+	padding: 1em;
+	display: none;
+	border-radius: 10px;
 }
 
 .back-to-top:hover {
-    background-color: #6e6e6e;
-    text-decoration: none;
+	background-color: #6e6e6e;
+	text-decoration: none;
 }
 
 /* Spoiler Function compacted */
 .spoilerbutton {
-    box-shadow: inset 0 1px 0 -50px #fff;
-    background-color: transparent;
-    border-radius: 42px;
-    border: 3px solid #dcdcdc;
-    display: block;
-    cursor: pointer;
-    color: #777;
-    font-family: 'Roboto', sans-serif;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 6px 18px;
-    text-decoration: none;
+	box-shadow: inset 0 1px 0 -50px #fff;
+	background-color: transparent;
+	border-radius: 42px;
+	border: 3px solid #dcdcdc;
+	display: block;
+	cursor: pointer;
+	color: #777;
+	font-family: 'Roboto', sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 6px 18px;
+	text-decoration: none;
 }
 
 .spoilerbutton:hover {
-    background-color: transparent;
+	background-color: transparent;
 }
 
 .spoilerbutton:active {
-    position: relative;
-    top: 1px;
+	position: relative;
+	top: 1px;
 }
 
 .spoiler {
-    overflow: hidden;
-    background: #f5f5f5;
+	overflow: hidden;
+	background: #f5f5f5;
 }
 
 .spoiler > div {
-    -webkit-transition: all 0.2s ease;
-    -moz-transition: margin 0.2s ease;
-    -o-transition: all 0.2s ease;
-    transition: margin 0.2s ease;
+	-webkit-transition: all 0.2s ease;
+	-moz-transition: margin 0.2s ease;
+	-o-transition: all 0.2s ease;
+	transition: margin 0.2s ease;
 }
 
 .spoilerbutton[value="Show"] + .spoiler > div {
-    margin-top: -100%;
+	margin-top: -100%;
 }
 
 .spoilerbutton[value="Hide"] + .spoiler {
-    padding: 5px;
+	padding: 5px;
 }
 
 .insidespoiler {
-    background-color: transparent;
-    border-radius: 5px;
-    border: 1px solid #b6b6b6;
-    padding: 6px 18px;
+	background-color: transparent;
+	border-radius: 5px;
+	border: 1px solid #b6b6b6;
+	padding: 6px 18px;
 }
 
 /* Table Function compacted*/
 table.tftable {
-    font-size: 15px;
-    color: #555;
-    width: 100%;
-    height: 100%;
-    border: 1px #a9a9a9;
-    border-collapse: collapse;
-    border-radius: 15px;
-    text-align: center;
+	font-size: 15px;
+	color: #555;
+	width: 100%;
+	height: 100%;
+	border: 1px #a9a9a9;
+	border-collapse: collapse;
+	border-radius: 15px;
+	text-align: center;
 }
 
 table.tftable th {
-    font-size: 20px;
-    background-color: #dfdfdf;
-    color: #555;
-    padding: 10px;
-    min-width: 100px;
+	font-size: 20px;
+	background-color: #dfdfdf;
+	color: #555;
+	padding: 10px;
+	min-width: 100px;
 }
 
 table.tftable tr {
-    background-color: #f2f2f2;
+	background-color: #f2f2f2;
 }
 
 table.tftable tr:nth-child(even) {
-    background: #ecf0f1;
+	background: #ecf0f1;
 }
 
 table.tftable tr:hover {
-    background: #d3d3d3;
+	background: #d3d3d3;
 }
 
 table.tftable td {
-    font-size: 15px;
-    padding: 10px;
-    color: #1b1b1b;
+	font-size: 15px;
+	padding: 10px;
+	color: #1b1b1b;
 }
 
 table.tftable td:hover {
-    color: #ffa500;
+	color: #ffa500;
 }
 
 /* Code & Pre tags style compacted*/
 pre, code {
-    width: 100%;
-    color: #222;
-    background-color: #fff;
-    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
-    font-size: 14px;
-    border-radius: 2px;
+	width: 100%;
+	color: #222;
+	background-color: #fff;
+	font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
+	font-size: 14px;
+	border-radius: 2px;
 }
 
 pre {
-    width: 100%;
-    padding: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
-    overflow: auto;
-    color: #a4a4a4;
+	width: 100%;
+	padding: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+	overflow: auto;
+	color: #a4a4a4;
 }
 
 code {
-    padding: 7px 10px;
-    margin: 0 3px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
-    background-color: #d5d5d5;
-    font-style: italic;
-    color: #151515;
+	padding: 7px 10px;
+	margin: 0 3px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+	background-color: #d5d5d5;
+	font-style: italic;
+	color: #151515;
 }
 
 pre code {
-    display: block;
-    box-shadow: none;
+	display: block;
+	box-shadow: none;
 }
 
 /* Contributors class compacted*/
 .contributors {
-    height: 250px;
-    width: auto;
-    margin: 3px;
-    padding: 15px;
-    border: 4px inset #848484;
-    border-radius: 10px;
-    background-color: #e6e6e6;
+	height: 250px;
+	width: auto;
+	margin: 3px;
+	padding: 15px;
+	border: 4px inset #848484;
+	border-radius: 10px;
+	background-color: #e6e6e6;
 }
 
 .contributors h2 {
-    text-align: center;
+	text-align: center;
 }
 
 .contributors p {
-    text-align: center;
+	text-align: center;
 }
 
 .contributors img {
-    float: left;
-    height: 250px;
-    width: 250px;
+	float: left;
+	height: 250px;
+	width: 250px;
 }
 
 /* Outer and Inner classes (full width styles) */
 .outer {
-    width: auto;
+	width: auto;
 }
 
 .inner {
-    position: center;
-    min-width: 100px;
-    max-width: 1100px;
-    padding: 2px 2px;
-    margin: auto;
+	position: center;
+	min-width: 100px;
+	max-width: 1100px;
+	padding: 2px 2px;
+	margin: auto;
 }
 
 /*Header styles*/
 #header_wrap {
-    background: #111111;
+	background: #111111;
 }
 
 /*Main content styles*/
 #main_content_wrap {
-    background: #f2f2f2;
-    border-top: 1px solid #111;
-    border-bottom: 1px solid #111;
+	background: #f2f2f2;
+	border-top: 1px solid #111;
+	border-bottom: 1px solid #111;
 }
 
 #main_content {
-    padding-top: 20px;
-    height: auto;
-    width: auto;
-    overflow: hidden;
+	padding-top: 20px;
+	height: auto;
+	width: auto;
+	overflow: hidden;
 }
 
 /*Footer styles*/
 #footer_wrap {
-    background: #111111;
-    height: auto;
+	background: #111111;
+	height: auto;
 }
 
 /*******************************************************************************
 Original styles (almost untouched and therefor compacted)
 *******************************************************************************/
 body {
-    color: #373737;
-    background: #212121;
-    padding: 0;
-    margin: 0;
-    font-size: 17px;
-    font-family: 'Roboto', sans-serif;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    height: auto;
-    width: auto;
+	color: #373737;
+	background: #212121;
+	padding: 0;
+	margin: 0;
+	font-size: 17px;
+	font-family: 'Roboto', sans-serif;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	height: auto;
+	width: auto;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    margin: 10px 0;
-    font-weight: bold;
-    color: #222;
-    font-family: 'Roboto', sans-serif;
-    letter-spacing: -1px;
+	margin: 10px 0;
+	font-weight: bold;
+	color: #222;
+	font-family: 'Roboto', sans-serif;
+	letter-spacing: -1px;
 }
 
 h1 {
-    font-size: 36px;
-    font-weight: bold;
+	font-size: 36px;
+	font-weight: bold;
 }
 
 h2 {
-    padding-bottom: 10px;
-    font-size: 32px;
-    background: url('../images/bg_hr.png') repeat-x bottom;
+	padding-bottom: 10px;
+	font-size: 32px;
+	background: url("../images/bg_hr.png") repeat-x bottom;
 }
 
 h3 {
-    font-size: 24px;
+	font-size: 24px;
 }
 
 h4 {
-    font-size: 21px;
+	font-size: 21px;
 }
 
 h5 {
-    font-size: 18px;
+	font-size: 18px;
 }
 
 h6 {
-    font-size: 16px;
+	font-size: 16px;
 }
 
 footer p {
-    color: #f2f2f2;
+	color: #f2f2f2;
 }
 
 a {
-    text-decoration: none;
-    color: #007edf;
-    text-shadow: none;
-    transition: text-shadow 0.5s ease;
-    -webkit-transition: text-shadow 0.5s ease;
-    -moz-transition: text-shadow 0.5s ease;
-    -o-transition: text-shadow 0.5s ease;
-    -ms-transition: color 0.5s ease;
+	text-decoration: none;
+	color: #007edf;
+	text-shadow: none;
+	transition: text-shadow 0.5s ease;
+	-webkit-transition: text-shadow 0.5s ease;
+	-moz-transition: text-shadow 0.5s ease;
+	-o-transition: text-shadow 0.5s ease;
+	-ms-transition: color 0.5s ease;
 }
 
 a:hover, a:focus {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
 footer a {
-    color: #d8d8d8;
-    text-decoration: none;
+	color: #d8d8d8;
+	text-decoration: none;
 }
 
 footer a:hover {
-    color: #a4a4a4;
-    text-decoration: underline;
+	color: #a4a4a4;
+	text-decoration: underline;
 }
 
 em {
-    font-style: italic;
+	font-style: italic;
 }
 
 strong {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 blockquote {
-    color: #666;
-    margin-bottom: 20px;
-    padding: 0 0 0 20px;
-    border-left: 3px solid #bbb;
+	color: #666;
+	margin-bottom: 20px;
+	padding: 0 0 0 20px;
+	border-left: 3px solid #bbb;
 }
 
 ul, ol, dl {
-    margin-bottom: 15px;
+	margin-bottom: 15px;
 }
 
 ul {
-    list-style: disc inside;
-    padding-left: 20px;
+	list-style: disc inside;
+	padding-left: 20px;
 }
 
 ol {
-    list-style: decimal inside;
-    padding-left: 20px;
+	list-style: decimal inside;
+	padding-left: 20px;
 }
 
 dl dt {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 dl dd {
-    padding-left: 20px;
-    font-style: italic;
+	padding-left: 20px;
+	font-style: italic;
 }
 
 dl p {
-    padding-left: 20px;
-    font-style: italic;
+	padding-left: 20px;
+	font-style: italic;
 }
 
 hr {
-    height: 1px;
-    margin-bottom: 5px;
-    border: none;
-    background: url('../images/bg_hr.png') repeat-x center;
+	height: 1px;
+	margin-bottom: 5px;
+	border: none;
+	background: url('../images/bg_hr.png') repeat-x center;
 }
 
 form {
-    background: #f2f2f2;
-    padding: 20px;
+	background: #f2f2f2;
+	padding: 20px;
 }
 
 /* Project title, subtitle and downloads style */
 #project_title {
-    text-align: center;
-    margin: 0;
-    color: #fff;
-    font-size: 42px;
-    font-weight: bold;
+	text-align: center;
+	margin: 0;
+	color: #fff;
+	font-size: 42px;
+	font-weight: bold;
 }
 
 #project_tagline {
-    text-align: center;
-    color: #fff;
-    font-size: 24px;
-    font-weight: 300;
-    background: none;
+	text-align: center;
+	color: #fff;
+	font-size: 24px;
+	font-weight: 300;
+	background: none;
 }
 
 #downloads {
-    position: absolute;
-    width: 210px;
-    z-index: 10;
-    bottom: -40px;
-    right: 0;
-    height: 70px;
-    background: url('../images/icon_download.png') no-repeat 0 90%;
+	position: absolute;
+	width: 210px;
+	z-index: 10;
+	bottom: -40px;
+	right: 0;
+	height: 70px;
+	background: url('../images/icon_download.png') no-repeat 0 90%;
 }
 
 /* [Not using] Tar & Zip download icon styles */
 .zip_download_link {
-    display: block;
-    float: right;
-    width: 90px;
-    height: 70px;
-    text-indent: -5000px;
-    overflow: hidden;
-    background: url(../images/sprite_download.png) no-repeat bottom left;
+	display: block;
+	float: right;
+	width: 90px;
+	height: 70px;
+	text-indent: -5000px;
+	overflow: hidden;
+	background: url(../images/sprite_download.png) no-repeat bottom left;
 }
 
 .tar_download_link {
-    display: block;
-    float: right;
-    width: 90px;
-    height: 70px;
-    text-indent: -5000px;
-    overflow: hidden;
-    background: url(../images/sprite_download.png) no-repeat bottom right;
-    margin-left: 10px;
+	display: block;
+	float: right;
+	width: 90px;
+	height: 70px;
+	text-indent: -5000px;
+	overflow: hidden;
+	background: url(../images/sprite_download.png) no-repeat bottom right;
+	margin-left: 10px;
 }
 
 .zip_download_link:hover {
-    background: url(../images/sprite_download.png) no-repeat top left;
+	background: url(../images/sprite_download.png) no-repeat top left;
 }
 
 .tar_download_link:hover {
-    background: url(../images/sprite_download.png) no-repeat top right;
+	background: url(../images/sprite_download.png) no-repeat top right;
 }
 
 @media screen and (max-width: 480px) {
-    body {
-        font-size: 14px;
-    }
+	body {
+		font-size: 14px;
+	}
 
-    #downloads {
-        display: none;
-    }
+	#downloads {
+		display: none;
+	}
 
-    .inner {
-        min-width: 320px;
-        max-width: 480px;
-    }
+	.inner {
+		min-width: 320px;
+		max-width: 480px;
+	}
 
-    #project_title {
-        font-size: 32px;
-    }
+	#project_title {
+		font-size: 32px;
+	}
 
-    h1 {
-        font-size: 28px;
-    }
+	h1 {
+		font-size: 28px;
+	}
 
-    h2 {
-        font-size: 24px;
-    }
+	h2 {
+		font-size: 24px;
+	}
 
-    h3 {
-        font-size: 21px;
-    }
+	h3 {
+		font-size: 21px;
+	}
 
-    h4 {
-        font-size: 18px;
-    }
+	h4 {
+		font-size: 18px;
+	}
 
-    h5 {
-        font-size: 14px;
-    }
+	h5 {
+		font-size: 14px;
+	}
 
-    h6 {
-        font-size: 12px;
-    }
+	h6 {
+		font-size: 12px;
+	}
 
-    code, pre {
-        min-width: 320px;
-        max-width: 480px;
-        font-size: 11px;
-    }
+	code, pre {
+		min-width: 320px;
+		max-width: 480px;
+		font-size: 11px;
+	}
 }
