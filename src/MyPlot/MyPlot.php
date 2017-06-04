@@ -136,7 +136,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @api
 	 * @param string $username
-	 * @param $levelName
+	 * @param string $levelName
 	 * @return Plot[]
 	 */
 	public function getPlotsOfPlayer(string $username, string $levelName) : array {
@@ -448,7 +448,7 @@ class MyPlot extends PluginBase
 	/* -------------------------- Non-API part -------------------------- */
 
     public function onEnable() {
-		SpoonDetector::printSpoon($this, 'spoon.txt');
+		SpoonDetector::printSpoon($this);
         $this->getLogger()->notice(TF::BOLD."Loading...");
 
 		$this->saveDefaultConfig();

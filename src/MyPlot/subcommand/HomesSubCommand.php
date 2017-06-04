@@ -24,7 +24,7 @@ class HomesSubCommand extends SubCommand
 		if (!empty($args)) {
 			return false;
 		}
-		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(),$sender->getLevel());
+		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(),$sender->getLevel()->getName());
 		if (empty($plots)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("homes.noplots"));
 			return true;
