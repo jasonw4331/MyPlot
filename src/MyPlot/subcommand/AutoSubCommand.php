@@ -7,26 +7,34 @@ use pocketmine\utils\TextFormat;
 
 class AutoSubCommand extends SubCommand
 {
-    public function canUse(CommandSender $sender) {
-        return ($sender instanceof Player) and $sender->hasPermission("myplot.command.auto");
-    }
+	/**
+	 * @param CommandSender $sender
+	 * @return bool
+	 */
+	public function canUse(CommandSender $sender) {
+		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.auto");
+	}
 
-    public function execute(CommandSender $sender, array $args) {
-        if (!empty($args)) {
-            return false;
-        }
-        $player = $sender->getServer()->getPlayer($sender->getName());
-        $levelName = $player->getLevel()->getName();
-        if (!$this->getPlugin()->isLevelLoaded($levelName)) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
-            return true;
-        }
-        if (($plot = $this->getPlugin()->getNextFreePlot($levelName)) !== null) {
-            $this->getPlugin()->teleportPlayerToPlot($player, $plot);
-            $sender->sendMessage($this->translateString("auto.success", [$plot->X, $plot->Z]));
-        } else {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("auto.noplots"));
-        }
-        return true;
-    }
+	/**
+	 * @param Player $sender
+	 * @param string[] $args
+	 * @return bool
+	 */
+	public function execute(CommandSender $sender, array $args) {
+		if (!empty($args)) {
+			return false;
+		}
+		$levelName = $sender->getLevel()->getName();
+		if (!$this->getPlugin()->isLevelLoaded($levelName)) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
+			return true;
+		}
+		if (($plot = $this->getPlugin()->getNextFreePlot($levelName)) !== null) {
+			$this->getPlugin()->teleportPlayerToPlot($sender, $plot);
+			$sender->sendMessage($this->translateString("auto.success", [$plot->X, $plot->Z]));
+		} else {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.noplots"));
+		}
+		return true;
+	}
 }

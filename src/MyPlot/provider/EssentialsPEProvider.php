@@ -4,7 +4,8 @@ namespace MyPlot\provider;
 use EssentialsPE\Loader;
 use pocketmine\Player;
 
-class EssentialsPEProvider implements EconomyProvider {
+class EssentialsPEProvider implements EconomyProvider
+{
 	/** @var Loader */
 	private $plugin;
 
@@ -12,6 +13,11 @@ class EssentialsPEProvider implements EconomyProvider {
 		$this->plugin = $plugin;
 	}
 
+	/**
+	 * @param Player $player
+	 * @param float $amount
+	 * @return bool
+	 */
 	public function reduceMoney(Player $player, float $amount) : bool {
 		if ($amount == 0) {
 			return true;

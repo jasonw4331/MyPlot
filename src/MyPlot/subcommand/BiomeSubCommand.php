@@ -9,23 +9,32 @@ use pocketmine\level\generator\biome\Biome;
 
 class BiomeSubCommand extends SubCommand
 {
-    private $biomes = [
-        "PLAINS" => Biome::PLAINS,
-        "DESERT" => Biome::DESERT,
-        "MOUNTAINS" => Biome::MOUNTAINS,
-        "FOREST" => Biome::FOREST,
-        "TAIGA" => Biome::TAIGA,
-        "SWAMP" => Biome::SWAMP,
-        "NETHER" => Biome::HELL,
-        "HELL" => Biome::HELL,
-        "ICE" => Biome::ICE_PLAINS
-    ];
+	/** @var int[] $biomes */
+	private $biomes = [
+		"PLAINS" => Biome::PLAINS,
+		"DESERT" => Biome::DESERT,
+		"MOUNTAINS" => Biome::MOUNTAINS,
+		"FOREST" => Biome::FOREST,
+		"TAIGA" => Biome::TAIGA,
+		"SWAMP" => Biome::SWAMP,
+		"NETHER" => Biome::HELL,
+		"HELL" => Biome::HELL,
+		"ICE" => Biome::ICE_PLAINS
+	];
 
-    public function canUse(CommandSender $sender) {
-        return ($sender instanceof Player) and $sender->hasPermission("myplot.command.biome");
-    }
+	/**
+	 * @param CommandSender $sender
+	 * @return bool
+	 */
+	public function canUse(CommandSender $sender) {
+		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.biome");
+	}
 
-    public function execute(CommandSender $sender, array $args) {
+    /**
+	 * @param Player $sender
+	 * @param string[] $args
+	 * @return bool
+	 */public function execute(CommandSender $sender, array $args) {
         if (count($args) === 0) {
             $biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
             $sender->sendMessage($this->translateString("biome.possible", [$biomes]));
@@ -51,8 +60,8 @@ class BiomeSubCommand extends SubCommand
             return true;
         }
         $biome = Biome::getBiome($this->biomes[$biome]);
-	    $this->getPlugin()->getServer()->getPluginManager()->callEvent(
-	    	($ev = new MyPlotBiomeChangeEvent($this->getPlugin(), "MyPlot", $plot, $this->biomes[strtoupper($biome->getName())], $this->biomes[$plot->biome]))
+        $this->getPlugin()->getServer()->getPluginManager()->callEvent(
+	    	($ev = new MyPlotBiomeChangeEvent($this->getPlugin(), "MyPlot",$plot, $this->biomes[strtoupper($biome->getName())], $this->biomes[$plot->biome]))
 	    );
         if ($this->getPlugin()->setPlotBiome($ev->getPlot(), Biome::getBiome($ev->getNewBiome()))) {
             $sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));

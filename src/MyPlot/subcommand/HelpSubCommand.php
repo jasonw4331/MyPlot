@@ -16,10 +16,19 @@ class HelpSubCommand extends SubCommand
 		$this->cmds = $cmds;
 	}
 
+	/**
+	 * @param CommandSender $sender
+	 * @return bool
+	 */
 	public function canUse(CommandSender $sender) {
 		return $sender->hasPermission("myplot.command.help");
 	}
 
+	/**
+	 * @param CommandSender $sender
+	 * @param string[] $args
+	 * @return bool
+	 */
 	public function execute(CommandSender $sender, array $args) {
 		if (count($args) === 0) {
 			$pageNumber = 1;

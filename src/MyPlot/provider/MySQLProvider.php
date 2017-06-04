@@ -8,27 +8,30 @@ use MyPlot\Plot;
 
 class MySQLProvider extends DataProvider
 {
-	/** @var \MySQLi $db */
-	private $db;
-	/** @var string $lastSave */
-	private $lastSave;
-	/** @var MyPlot */
-	protected $plugin;
-	/** @var int $type */
-	public $type = MyPlotSaveEvent::MySQL;
-	/**
-	 * @param MyPlot $plugin
-	 * @param int $cacheSize
-	 * @param array $settings
-	 */
-	public function __construct(MyPlot $plugin, $cacheSize = 0, $settings) {
-		$this->plugin = $plugin;
-		parent::__construct($plugin, $cacheSize);
-		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
-		$this->db->query(
-			"CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT);");
-		$this->plugin->getLogger()->debug("MySQL data provider registered");
-	}
+    /** @var \MySQLi $db */
+    private $db;
+    /** @var string $lastSave */
+    private $lastSave;
+		/** @var MyPlot  */
+		protected $plugin;
+/** @var int $type */
+    public $type = MyPlotSaveEvent::MySQL;
+     /* *
+     * @param MyPlot $plugin
+     * @param int $cacheSize
+     * @param array $settings
+     */
+    public function __construct(MyPlot $plugin, $cacheSize = 0, $settings) {
+	      $this->plugin = $plugin;
+	      parent::__construct($plugin, $cacheSize);
+        $this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
+        $this->db->query(
+            "CREATE TABLE IF NOT EXISTS plots
+            (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT,
+             owner TEXT, helpers TEXT, denied TEXT, biome TEXT);"
+        );
+	    $this->plugin->getLogger()->debug("MySQL data provider registered");
+    }
 
 	public function close() {
 		$this->db->close();
@@ -53,28 +56,29 @@ class MySQLProvider extends DataProvider
 		$this->cachePlot($plot);
 		return true;
 	}
-
 	public function getLastSave() {
 		return $this->lastSave;
 	}
 
-	public function deletePlot(Plot $plot): bool{
-		if ($plot->id >= 0) {
-			$stmt = $this->db->prepare("DELETE FROM plots WHERE id = {$plot->id}");
-		} else {
-			$stmt = $this->db->prepare(
-				"DELETE FROM plots WHERE level = {$plot->levelName} AND X = {$plot->X} AND Z = {$plot->Z}"
-			);
-		}
-		$result = $stmt->execute();
-		if ($result === false) {
-			return false;
-		}
-		$this->lastSave = null;
-		$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
-		$this->cachePlot($plot);
-		return true;
-	}
+    public function getLastSave() {
+		return $this->lastSave;
+	}public function deletePlot(Plot $plot) : bool {
+        if ($plot->id >= 0) {
+            $stmt = $this->db->prepare("DELETE FROM plots WHERE id = {$plot->id}");
+        } else {
+            $stmt = $this->db->prepare(
+                "DELETE FROM plots WHERE level = {$plot->levelName} AND X = {$plot->X} AND Z = {$plot->Z}"
+            );
+        }
+        $result = $stmt->execute();
+        if ($result === false) {
+            return false;
+        }
+        $this->lastSave = null;
+        $plot = new Plot($plot->levelName, $plot->X, $plot->Z);
+        $this->cachePlot($plot);
+        return true;
+    }
 
 	public function getPlot(string $levelName, int $X, int $Z): Plot{
 		if ($plot = $this->getPlotFromCache($levelName, $X, $Z)) {
