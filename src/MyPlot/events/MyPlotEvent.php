@@ -6,6 +6,7 @@ use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 
 class MyPlotEvent extends PluginEvent implements Cancellable {
+	public static $handlerList = null;
 	/** @var string $issuer */
 	private $issuer;
 	public function __construct(MyPlot $plugin, string $issuer) {

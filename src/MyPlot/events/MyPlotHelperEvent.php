@@ -6,7 +6,7 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\Player;
 
-class MyPlotHelperEvent extends MyPlotEvent {
+class MyPlotHelperEvent extends MyPlotPlotEvent {
 	const ADD = 0;
 	const REMOVE = 1;
 	/** @var Plot $plot */
@@ -19,13 +19,7 @@ class MyPlotHelperEvent extends MyPlotEvent {
 		$this->plot = $plot;
 		$this->type = $type;
 		$this->player = $player;
-		parent::__construct($plugin, $issuer);
-	}
-	public function getPlot() : Plot {
-		return $this->plot;
-	}
-	public function setPlot(Plot $plot) {
-		$this->plot = $plot;
+		parent::__construct($plugin, $issuer, $plot);
 	}
 	public function getType() : int {
 		return $this->type;

@@ -4,29 +4,21 @@ namespace MyPlot\events;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 
-class MyPlotBiomeChangeEvent extends MyPlotEvent {
+class MyPlotBiomeChangeEvent extends MyPlotPlotEvent {
 	/** @var int  */
 	private $newBiome, $oldBiome;
-	/** @var Plot $plot */
-	private $plot;
 	public function __construct(MyPlot $plugin, string $issuer, Plot $plot, int $newBiome, int $oldBiome) {
 		$this->newBiome = $newBiome;
 		$this->oldBiome = $oldBiome;
-		parent::__construct($plugin, $issuer);
+		parent::__construct($plugin, $issuer, $plot);
 	}
-	public function getPlot() : Plot {
-		return $this->plot;
-	}
-	public function setPlot(Plot $plot) {
-		$this->plot = $plot;
-	}
-	public function getNewBiome() : int {
+	public function getNewBiomeId() : int {
 		return $this->newBiome;
 	}
-	public function setNewBiome(int $biome) {
+	public function setNewBiomeId(int $biome) {
 		$this->newBiome = $biome;
 	}
-	public function getOldBiome() : int {
+	public function getOldBiomeId() : int {
 		return $this->oldBiome;
 	}
 }

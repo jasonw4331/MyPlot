@@ -3,18 +3,23 @@ namespace MyPlot\events;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\Player;
 
-class MyPlotClaimEvent extends MyPlotEvent {
-	/** @var Plot $plot */
-	private $plot;
-	public function __construct(MyPlot $plugin, string $issuer, Plot $plot) {
-		$this->plot = $plot;
-		parent::__construct($plugin, $issuer);
+class MyPlotClaimEvent extends MyPlotPlotEvent {
+	/** @var string $claimer */
+	private $claimer;
+	public function __construct(MyPlot $plugin, string $issuer, Plot $plot, string $claimer) {
+		$this->claimer = $claimer;
+		parent::__construct($plugin, $issuer, $plot);
 	}
-	public function getPlot() : Plot {
-		return $this->plot;
+	public function getClaimer() : string {
+		return $this->claimer;
 	}
-	public function setplot(Plot $plot) {
-		$this->plot = $plot;
+	public function setClaimer($claimer) {
+		if($claimer instanceof Player) {
+			$this->claimer = $claimer->getName();
+		}elseif(is_string($claimer)) {
+			$this->claimer = $claimer;
+		}
 	}
 }

@@ -8,22 +8,20 @@ use pocketmine\utils\TextFormat;
 
 class AddHelperSubCommand extends SubCommand
 {
-	/**
+    /**
 	 * @param CommandSender $sender
 	 * @return bool
-	 */
-	public function canUse(CommandSender $sender) {
-		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.addhelper");
-	}
+	 */public function canUse(CommandSender $sender) {
+        return ($sender instanceof Player) and $sender->hasPermission("myplot.command.addhelper");
+    }
 
-	/**
+    /**
 	 * @param Player $sender
 	 * @param string[] $args
 	 * @return bool
-	 */
-	public function execute(CommandSender $sender, array $args) {
-		if (count($args) !== 1)
-			return false;
+	 */public function execute(CommandSender $sender, array $args) {
+        if (count($args) !== 1)
+            return false;
 
         $helper = $args[0];
         $plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
@@ -45,14 +43,15 @@ class AddHelperSubCommand extends SubCommand
 		    $sender->sendMessage($this->translateString("addhelper.notaplayer"));
 		    return true;
 	    }
-        $this->getPlugin()->getServer()->getPluginManager()->callEvent(
-	    	($ev = new MyPlotHelperEvent($this->getPlugin(), "MyPlot",$plot, MyPlotHelperEvent::ADD,$helper->getName()))
-            );
+	    $this->getPlugin()->getServer()->getPluginManager()->callEvent(
+	    	($ev = new MyPlotHelperEvent($this->getPlugin(), "MyPlot", $plot, MyPlotHelperEvent::ADD, $helper->getName()))
+	    );
         if($ev->isCancelled()) {
 	        $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         	return true;
         }
-        if (!$ev->getPlot()->addHelper($ev->getHelper())) {$sender->sendMessage($this->translateString("addhelper.alreadyone", [$helper->getName()]));
+        if (!$ev->getPlot()->addHelper($ev->getHelper())) {
+            $sender->sendMessage($this->translateString("addhelper.alreadyone", [$helper->getName()]));
             return true;
         }
         if ($this->getPlugin()->savePlot($ev->getPlot())) {
