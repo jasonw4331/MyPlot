@@ -448,7 +448,7 @@ class MyPlot extends PluginBase
 	/* -------------------------- Non-API part -------------------------- */
 
     public function onEnable() {
-		SpoonDetector::printSpoon($this);
+		SpoonDetector::printSpoon($this, "spoon.txt");
         $this->getLogger()->notice(TF::BOLD."Loading...");
 
 		$this->saveDefaultConfig();
