@@ -6,7 +6,6 @@ use pocketmine\level\generator\Generator;
 use pocketmine\level\ChunkManager;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
-use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Level;
 
 class MyPlotGenerator extends Generator
@@ -101,10 +100,6 @@ class MyPlotGenerator extends Generator
         $shape = $this->getShape($chunkX << 4, $chunkZ << 4);
         $chunk = $this->level->getChunk($chunkX, $chunkZ);
         $chunk->setGenerated();
-        $c = Biome::getBiome(1)->getColor();
-        $R = $c >> 16;
-        $G = ($c >> 8) & 0xff;
-        $B = $c & 0xff;
 
         $bottomBlockId = $this->bottomBlock->getId();
         $bottomBlockMeta = $this->bottomBlock->getDamage();
@@ -121,7 +116,6 @@ class MyPlotGenerator extends Generator
         for ($Z = 0; $Z < 16; ++$Z) {
             for ($X = 0; $X < 16; ++$X) {
                 $chunk->setBiomeId($X, $Z, 1);
-                $chunk->setBiomeColor($X, $Z, $R, $G, $B);
 
                 $chunk->setBlock($X, 0, $Z, $bottomBlockId, $bottomBlockMeta);
                 for ($y = 1; $y < $groundHeight; ++$y) {

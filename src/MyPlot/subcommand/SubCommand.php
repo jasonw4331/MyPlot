@@ -29,6 +29,7 @@ abstract class SubCommand
     /**
      * @param string   $str
      * @param string[] $params
+     * @param string $onlyPrefix
      *
      * @return string
      */

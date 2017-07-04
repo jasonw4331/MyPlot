@@ -7,14 +7,12 @@ use MyPlot\task\ClearPlotTask;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\Listener;
 use pocketmine\lang\BaseLang;
-use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\Position;
 use pocketmine\permission\Permission;
 use pocketmine\plugin\PluginBase;
 use pocketmine\level\generator\Generator;
 use pocketmine\Player;
 use MyPlot\provider\DataProvider;
-use pocketmine\level\Level;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\EconomyProvider;
 
@@ -283,58 +281,10 @@ class MyPlot extends PluginBase implements Listener
     }
 
     /**
-     * Changes the biome of a plot
-     *
-     * @api
-     * @param Plot $plot
-     * @param Biome $biome
-     * @return bool
-     */
-    public function setPlotBiome(Plot $plot, Biome $biome) {
-        $plotLevel = $this->getLevelSettings($plot->levelName);
-        if ($plotLevel === null) {
-            return false;
-        }
-
-        $level = $this->getServer()->getLevelByName($plot->levelName);
-        $pos = $this->getPlotPosition($plot);
-        $plotSize = $plotLevel->plotSize;
-        $xMax = $pos->x + $plotSize;
-        $zMax = $pos->z + $plotSize;
-
-        $chunkIndexes = [];
-        for ($x = $pos->x; $x < $xMax; $x++) {
-            for ($z = $pos->z; $z < $zMax; $z++) {
-                $index = Level::chunkHash($x >> 4, $z >> 4);
-                if (!in_array($index, $chunkIndexes)) {
-                    $chunkIndexes[] = $index;
-                }
-                $color = $biome->getColor();
-                $R = $color >> 16;
-                $G = ($color >> 8) & 0xff;
-                $B = $color & 0xff;
-                $level->setBiomeColor($x, $z, $R, $G, $B);
-            }
-        }
-
-        foreach ($chunkIndexes as $index) {
-            Level::getXZ($index, $X, $Z);
-            $chunk = $level->getChunk($X, $Z);
-            foreach ($level->getChunkPlayers($X, $Z) as $player) {
-                $player->onChunkChanged($chunk);
-            }
-        }
-
-        $plot->biome = $biome->getName();
-        $this->dataProvider->savePlot($plot);
-        return true;
-    }
-
-    /**
      * Returns the PlotLevelSettings of all the loaded levels
      *
      * @api
-     * @return string[]
+     * @return PlotLevelSettings[]
      */
     public function getPlotLevels() {
         return $this->levels;

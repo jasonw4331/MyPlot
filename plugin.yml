@@ -1,9 +1,9 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.0
+version: 1.1
 load: STARTUP
-api: [1.13.0, 2.0.0]
-author: Wies and Exxarion
+api: [1.13.0, 2.0.0, 3.0.0-ALPHA5, 3.0.0-ALPHA6]
+author: Wies, Exxarion, and jasonwynn10
 description: Plot and protection plugin
 softdepend: [EconomyAPI, PocketMoney]
 
@@ -41,9 +41,6 @@ permissions:
         default: true
       myplot.command.reset:
         description: Gives the reset command
-        default: true
-      myplot.command.biome:
-        description: Gives the biome command
         default: true
       myplot.command.home:
         description: Gives the home command
@@ -94,9 +91,6 @@ permissions:
         default: op
       myplot.admin.warp:
         description: Allow player to warp to unclaimed plots
-        default: op
-      myplot.admin.biome:
-        description: Allow player to change everybody's plot biome
         default: op
   myplot.claimplots:
     description: Allows players to claim X plots

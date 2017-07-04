@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\subcommand;
 
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -30,8 +31,8 @@ class HomeSubCommand extends SubCommand
         }
         
         usort($plots, function ($plot1, $plot2) {
-            /** @var $plot1 Plot */
-            /** @var $plot2 Plot */
+            /** @var Plot $plot1 */
+            /** @var Plot $plot2 */
             if ($plot1->levelName == $plot2->levelName) {
                 return 0;
             }
