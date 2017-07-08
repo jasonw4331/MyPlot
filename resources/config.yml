@@ -10,7 +10,7 @@
 #########################################
 
 # The language that should be used in MyPlot
-# Available languages: eng, nl, vi, spa, chs, zho, deu , cze
+# Available languages: eng, nl, vi, spa, chs, zho, deu, cze
 #
 # English language pack by @Exxarion
 # Dutch language pack by @Wies
@@ -29,10 +29,10 @@ DataProvider: sqlite
 # contains settings for mysql provider to use when selected
 MySQLSettings:
   Host: 127.0.0.1
-  Port: 19133
+  Port: 3306
   Username: default
   Password: password
-  DatabaseName: plots.db
+  DatabaseName: MyPlot
 
 # Use an economy with MyPlot. This will allow for plot pricing such as claiming, clearing, etc.
 # Currently supported economy plugins: Economy$, PocketMoney
