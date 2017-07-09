@@ -447,15 +447,15 @@ class MyPlot extends PluginBase
 
 	/* -------------------------- Non-API part -------------------------- */
 
-    public function onEnable() {
+    	public function onEnable() {
+	    	@mkdir($this->getDataFolder());
+		SpoonDetector::printSpoon($this, "spoon.txt");
+		
         	$this->getLogger()->notice(TF::BOLD."Loading...");
 
 		$this->saveDefaultConfig();
 		$this->reloadConfig();
-
-		@mkdir($this->getDataFolder());
 		@mkdir($this->getDataFolder() . "worlds");
-	    	SpoonDetector::printSpoon($this, "spoon.txt");
 
 		Generator::addGenerator(MyPlotGenerator::class, "myplot");
 
