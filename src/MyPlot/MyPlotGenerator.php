@@ -217,7 +217,7 @@ class MyPlotGenerator extends Generator
 
 	/**
 	 * @param $chunkX
-	 * @param $chunkZx
+	 * @param $chunkZ
 	 */
 	public function populateChunk($chunkX, $chunkZ) {}
 
@@ -225,6 +225,6 @@ class MyPlotGenerator extends Generator
 	 * @return Vector3
 	 */
 	public function getSpawn() {
-		return new Vector3(0, $this->groundHeight+1, 0);
+		return new Vector3(0, $this->groundHeight + 1, 0);
 	}
 }

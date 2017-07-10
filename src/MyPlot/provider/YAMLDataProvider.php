@@ -145,7 +145,8 @@ class YAMLDataProvider extends DataProvider
 	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0){
 		$plots = $this->yaml->get("plots", []);
-		//TODO
+		//TODO missing return statement
+		return null;
 	}
 	public function close(){
 		unset($this->yaml);

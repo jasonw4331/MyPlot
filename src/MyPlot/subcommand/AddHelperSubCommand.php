@@ -16,7 +16,7 @@ class AddHelperSubCommand extends SubCommand
 	}
 
 	/**
-	 * @param Player $sender
+	 * @param CommandSender $sender
 	 * @param string[] $args
 	 * @return bool
 	 */

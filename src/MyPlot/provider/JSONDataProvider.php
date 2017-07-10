@@ -145,7 +145,8 @@ class JSONDataProvider extends DataProvider
 	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0){
 		$plots = $this->json->get("plots", []);
-		//TODO
+		//TODO missing return statement
+		return null;
 	}
 	public function close(){
 		unset($this->json);
