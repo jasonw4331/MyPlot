@@ -217,7 +217,7 @@ class MyPlotGenerator extends Generator
 
 	/**
 	 * @param $chunkX
-	 * @param $chunkZx
+	 * @param $chunkZ
 	 */
 	public function populateChunk($chunkX, $chunkZ) {}
 

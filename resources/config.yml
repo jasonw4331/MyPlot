@@ -58,6 +58,10 @@ DefaultWorld:
   # This will prevent things like tnt cannons from ruining other plots
   RestrictEntityMovement: true
 
+  # Update liquids (e.g. Water) from updating and moving
+  # This will allows things like water to lag the server in plot worlds
+  UpdatePlotLiquids: false
+
   # How much it costs to claim a plot (Economy must be set to 'true')
   ClaimPrice: 0
   # How much it costs to clear a plot (Economy must be set to 'true')
