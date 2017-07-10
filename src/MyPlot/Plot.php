@@ -28,6 +28,22 @@ class Plot
 		$this->id = $id;
 	}
 
+	public function getHelpersAsString(){
+		return implode(",", $this->helpers);
+	}
+
+	public function getDeniedAsString(){
+		return implode(",", $this->denied);
+	}
+
+	public function setHelpersFromString($string){
+		$this->helpers = explode(",", $string);
+	}
+
+	public function setDeniedFromString($string){
+		$this->denied = explode(",", $string);
+	}
+
 	/**
 	 * @api
 	 * @param string $username
