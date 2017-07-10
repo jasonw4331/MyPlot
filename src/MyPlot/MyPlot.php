@@ -5,7 +5,7 @@ use MyPlot\provider\EconomyPlusProvider;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\JSONDataProvider;
-use MyPlot\provider\MySQLProvider;
+use MyPlot\provider\MySQLiProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
@@ -32,8 +32,6 @@ use pocketmine\Player;
 use pocketmine\level\Level;
 use pocketmine\utils\TextFormat as TF;
 use PocketMoney\PocketMoney;
-
-use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
 {
@@ -453,7 +451,6 @@ class MyPlot extends PluginBase
 
 	public function onEnable() {
 		@mkdir($this->getDataFolder());
-		SpoonDetector::printSpoon($this, "spoon.txt");
 
 		$this->getLogger()->notice(TF::BOLD."Loading...");
 
@@ -472,7 +469,7 @@ class MyPlot extends PluginBase
 		switch (strtolower($this->getConfig()->get("DataProvider"))) {
 			case "mysql":
 				$settings = $this->getConfig()->get("MySQLSettings");
-				$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
+				$this->dataProvider = new MySQLiProvider($this, $cacheSize, $settings);
 			break;
 			case "yaml":
 				$this->dataProvider = new YAMLDataProvider($this, $cacheSize);

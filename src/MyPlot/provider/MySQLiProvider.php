@@ -4,8 +4,9 @@ namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\Server;
 
-class MySQLProvider extends DataProvider
+class MySQLiProvider extends DataProvider
 {
 	/** @var \MySQLi $db */
 	private $db;
@@ -15,7 +16,7 @@ class MySQLProvider extends DataProvider
 	protected $plugin;
 
 	/**
-	 * MySQLProvider constructor.
+	 * MySQLiProvider constructor.
 	 * @param MyPlot $plugin
 	 * @param int $cacheSize
 	 * @param array $settings
@@ -39,11 +40,19 @@ class MySQLProvider extends DataProvider
 		$denied = implode(',', $plot->denied);
 		if ($plot->id >= 0) {
 			$stmt = $this->db->prepare(
-				"UPDATE plots SET name = {$plot->name}, owner = {$plot->owner}, helpers = {$helpers}, denied = {$denied}, biome = {$plot->biome} WHERE id = {$plot->id}"
+				"UPDATE plots SET name = ?, owner = ?, helpers = ?, denied = ?, biome = ? WHERE id = ?"
 			);
+			$helper = $plot->getHelpersAsString();
+			$denied = $plot->getDeniedAsString();
+			$stmt->bind_param('sssssi', $plot->name, $plot->owner, $helper, $denied, $plot->biome, $plot->id);
 		} else {
 			$stmt = $this->db->prepare(
-				"INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES ((select id from plots where level = {$plot->levelName} AND X = {$plot->X} AND Z = {$plot->Z}), {$plot->levelName}, {$plot->X}, {$plot->Z}, {$plot->name}, {$plot->owner}, {$helpers}, {$denied}, {$plot->biome});");
+				//TODO duplicate check
+				#"INSERT INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), owner = VALUES(owner), helpers = VALUES(helpers), denied = VALUES(denied), biome = VALUES(biome);");
+			"INSERT INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);");
+			$helper = $plot->getHelpersAsString();
+			$denied = $plot->getDeniedAsString();
+			$stmt->bind_param('isiisssss', $plot->id, $plot->levelName, $plot->X, $plot->Z, $plot->name, $plot->owner, $helper, $denied, $plot->biome);
 		}
 		$resulta = $stmt->execute();
 		$resultb = $this->db->savepoint($this->lastSave = time());
@@ -60,11 +69,15 @@ class MySQLProvider extends DataProvider
 
 	public function deletePlot(Plot $plot): bool{
 		if ($plot->id >= 0) {
-			$stmt = $this->db->prepare("DELETE FROM plots WHERE id = {$plot->id}");
+			$stmt = $this->db->prepare(
+				"DELETE FROM plots WHERE id = ?"
+			);
+			$stmt->bind_param('i', $plot->id);
 		} else {
 			$stmt = $this->db->prepare(
-				"DELETE FROM plots WHERE level = {$plot->levelName} AND X = {$plot->X} AND Z = {$plot->Z}"
+				"DELETE FROM plots WHERE level = ? AND X = ? AND Z = ?"
 			);
+			$stmt->bind_param('sii', $plot->levelName, $plot->X, $plot->Z);
 		}
 		$result = $stmt->execute();
 		if ($result === false) {
@@ -77,20 +90,23 @@ class MySQLProvider extends DataProvider
 	}
 
 	public function getPlot(string $levelName, int $X, int $Z): Plot{
-		if ($plot = $this->getPlotFromCache($levelName, $X, $Z)) {
+		if (($plot = $this->getPlotFromCache($levelName, $X, $Z)) instanceof Plot) {
 			return $plot;
 		}
-		$result = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = ? AND X = ? AND Z = ?;");
-		$result->bind_param('sii', $plot->levelName, $plot->X, $plot->Z);
-		$result->execute(); // $result->execute() only returns a boolean, not the result
-		$result = $result->get_result();
+		$stmt = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = ? AND X = ? AND Z = ?;");
+		$stmt->bind_param('sii', $levelName, $X, $Z);
+		$result = $stmt->execute();
+		if ($result === false) {
+			$this->plugin->getLogger()->error($stmt->error);
+		}
+		$result = $stmt->get_result();
 		if ($val = $result->fetch_array(MYSQLI_ASSOC)) {
-			if ($val["helpers"] === null or $val["helpers"] === "") {
+			if ($val["helpers"] === null or empty($val["helpers"] === "")) {
 				$helpers = [];
 			} else {
 				$helpers = explode(",", (string)$val["helpers"]);
 			}
-			if ($val["denied"] === null or $val["denied"] === "") {
+			if ($val["denied"] === null or empty($val["denied"] === "")) {
 				$denied = [];
 			} else {
 				$denied = explode(",", (string)$val["denied"]);
@@ -105,13 +121,22 @@ class MySQLProvider extends DataProvider
 	}
 
 	public function getPlotsByOwner(string $owner, string $levelName = ""): array{
-		if ($levelName === "") {
-			$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = {$owner}");
+		if (empty($levelName)) {
+			$stmt = $this->db->prepare(
+				"SELECT * FROM plots WHERE owner = ?"
+			);
+			$stmt->bind_param('s', $owner);
 		} else {
 			$stmt = $this->db->prepare(
-				"SELECT * FROM plots WHERE owner = {$owner} AND level = {$levelName}");
+				"SELECT * FROM plots WHERE owner = ? AND level = ?"
+			);
+			$stmt->bind_param('ss', $owner, $levelName);
 		}
 		$plots = [];
+		$result = $stmt->execute();
+		if ($result === false) {
+			return $plots;
+		}
 		$result = $stmt->get_result();
 		while ($val = $result->fetch_array()) {
 			$helpers = explode(",", (string)$val["helpers"]);
@@ -133,8 +158,15 @@ class MySQLProvider extends DataProvider
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0) {
 		$i = 0;
 		for (; $limitXZ <= 0 or $i < $limitXZ; $i++) {
-			$result = $this->db->prepare(
-				"SELECT X, Z FROM plots WHERE(level = {$levelName} AND ((abs(X) == {$i} AND abs(Z) <= {$i}) OR (abs(Z) == {$i} AND abs(X) <= {$i})));")->get_result();
+			$stmt = $this->db->prepare(
+				"SELECT X, Z FROM plots WHERE(level = ? AND ((abs(X) == ? AND abs(Z) <= ?) OR (abs(Z) == ? AND abs(X) <= ?)));"
+			);
+			$stmt->bind_param('siiii', $levelName, $i, $i, $i, $i);
+			$result = $stmt->execute();
+			if ($result === false) {
+				return null;
+			}
+			$result = $stmt->get_result();
 			$plots = [];
 			while ($val = $result->fetch_array(MYSQLI_NUM)) {
 				$plots[$val[0]][$val[1]] = true;
