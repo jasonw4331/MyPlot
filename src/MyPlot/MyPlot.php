@@ -469,7 +469,7 @@ class MyPlot extends PluginBase
 		switch (strtolower($this->getConfig()->get("DataProvider"))) {
 			case "mysql":
 				$settings = $this->getConfig()->get("MySQLSettings");
-				$this->dataProvider = new MySQLiProvider($this, $cacheSize, $settings);
+				$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
 			break;
 			case "yaml":
 				$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
