@@ -99,13 +99,9 @@ class EventListener implements Listener
 	 * @param BlockUpdateEvent $event
 	 */
 	public function onBlockUpdate(BlockUpdateEvent $event) {
-		/*
-		 * Disables water and lava flow as a temporary solution.
-		 * TODO make a permanent fix
-		 */
 		$levelName = $event->getBlock()->getLevel()->getName();
 		if ($this->plugin->isLevelLoaded($levelName)) {
-			if($event->getBlock() instanceof Liquid) {
+			if($event->getBlock() instanceof Liquid and is_null($this->plugin->getPlotByPosition($event->getBlock()))) {
 				$event->setCancelled();
 				$this->plugin->getLogger()->debug("Block update cancelled in ".$levelName);
 			}
