@@ -5,7 +5,7 @@ use MyPlot\provider\EconomyPlusProvider;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\JSONDataProvider;
-use MyPlot\provider\MySQLiProvider;
+use MyPlot\provider\MySQLProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
