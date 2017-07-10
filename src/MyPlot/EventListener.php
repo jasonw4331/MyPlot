@@ -28,6 +28,7 @@ class EventListener implements Listener
 
 	/**
 	 * @priority LOWEST
+	 *
 	 * @param LevelLoadEvent $event
 	 */
 	public function onLevelLoad(LevelLoadEvent $event) {
@@ -60,10 +61,15 @@ class EventListener implements Listener
 	}
 
 	/**
+	 * @ignoreCancelled false
 	 * @priority MONITOR
+	 *
 	 * @param LevelUnloadEvent $event
 	 */
 	public function onLevelUnload(LevelUnloadEvent $event) {
+		if($event->isCancelled()) {
+			return;
+		}
 		$levelName = $event->getLevel()->getName();
 		if($this->plugin->unloadLevelSettings($levelName)) {
 			$this->plugin->getLogger()->debug("Level ".$event->getLevel()->getFolderName()." unloaded!");
@@ -71,7 +77,9 @@ class EventListener implements Listener
 	}
 
 	/**
+	 * @ignoreCancelled false
 	 * @priority LOWEST
+	 *
 	 * @param BlockPlaceEvent $event
 	 */
 	public function onBlockPlace(BlockPlaceEvent $event) {
@@ -79,7 +87,9 @@ class EventListener implements Listener
 	}
 
 	/**
+	 * @ignoreCancelled false
 	 * @priority LOWEST
+	 *
 	 * @param BlockBreakEvent $event
 	 */
 	public function onBlockBreak(BlockBreakEvent $event) {
@@ -87,7 +97,9 @@ class EventListener implements Listener
 	}
 
 	/**
+	 * @ignoreCancelled false
 	 * @priority LOWEST
+	 *
 	 * @param PlayerInteractEvent $event
 	 */
 	public function onPlayerInteract(PlayerInteractEvent $event) {
@@ -95,51 +107,12 @@ class EventListener implements Listener
 	}
 
 	/**
-	 * @priority LOWEST
-	 * @param BlockUpdateEvent $event
-	 */
-	public function onBlockUpdate(BlockUpdateEvent $event) {
-		$levelName = $event->getBlock()->getLevel()->getName();
-		if ($this->plugin->isLevelLoaded($levelName)) {
-			if($event->getBlock() instanceof Liquid and is_null($this->plugin->getPlotByPosition($event->getBlock()))) {
-				$event->setCancelled();
-				$this->plugin->getLogger()->debug("Block update cancelled in ".$levelName);
-			}
-		}
-	}
-
-	/**
-	 * @priority LOWEST
-	 * @param EntityExplodeEvent $event
-	 */
-	public function onExplosion(EntityExplodeEvent $event) {
-		$levelName = $event->getEntity()->getLevel()->getName();
-		if (!$this->plugin->isLevelLoaded($levelName))
-			return;
-
-		$plot = $this->plugin->getPlotByPosition($event->getPosition());
-		if ($plot === null) {
-			$event->setCancelled();
-			return;
-		}
-		$beginPos = $this->plugin->getPlotPosition($plot);
-		$endPos = clone $beginPos;
-		$plotSize = $this->plugin->getLevelSettings($levelName)->plotSize;
-		$endPos->x += $plotSize;
-		$endPos->z += $plotSize;
-		$blocks = array_filter($event->getBlockList(), function($block) use($beginPos, $endPos) {
-			if ($block->x >= $beginPos->x and $block->z >= $beginPos->z and $block->x < $endPos->x and $block->z < $endPos->z) {
-				return true;
-			}
-			return false;
-		});
-		$event->setBlockList($blocks);
-	}
-
-	/**
 	 * @param BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent $event
 	 */
 	private function onEventOnBlock($event) {
+		if($event->isCancelled()) {
+			return;
+		}
 		$levelName = $event->getBlock()->getLevel()->getName();
 		if (!$this->plugin->isLevelLoaded($levelName)) {
 			return;
@@ -177,10 +150,69 @@ class EventListener implements Listener
 	}
 
 	/**
+	 * @ignoreCancelled false
 	 * @priority LOWEST
+	 *
+	 * @param BlockUpdateEvent $event
+	 */
+	public function onBlockUpdate(BlockUpdateEvent $event) {
+		if($event->isCancelled()){
+			return;
+		}
+		$levelName = $event->getBlock()->getLevel()->getName();
+		if ($this->plugin->isLevelLoaded($levelName)) {
+			if ($event->getBlock() instanceof Liquid) {
+				if ($this->plugin->getLevelSettings($levelName)->updatePlotLiquids and is_null($this->plugin->getPlotByPosition($event->getBlock()))) {
+					$event->setCancelled();
+					$this->plugin->getLogger()->debug("Block update cancelled in ".$levelName);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param EntityExplodeEvent $event
+	 */
+	public function onExplosion(EntityExplodeEvent $event) {
+		if($event->isCancelled()) {
+			return;
+		}
+		$levelName = $event->getEntity()->getLevel()->getName();
+		if (!$this->plugin->isLevelLoaded($levelName))
+			return;
+
+		$plot = $this->plugin->getPlotByPosition($event->getPosition());
+		if ($plot === null) {
+			$event->setCancelled();
+			return;
+		}
+		$beginPos = $this->plugin->getPlotPosition($plot);
+		$endPos = clone $beginPos;
+		$plotSize = $this->plugin->getLevelSettings($levelName)->plotSize;
+		$endPos->x += $plotSize;
+		$endPos->z += $plotSize;
+		$blocks = array_filter($event->getBlockList(), function($block) use($beginPos, $endPos) {
+			if ($block->x >= $beginPos->x and $block->z >= $beginPos->z and $block->x < $endPos->x and $block->z < $endPos->z) {
+				return true;
+			}
+			return false;
+		});
+		$event->setBlockList($blocks);
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
 	 * @param EntityMotionEvent $event
 	 */
 	public function onEntityMotion(EntityMotionEvent $event) {
+		if($event->isCancelled()) {
+			return;
+		}
 		$levelName = $event->getEntity()->getLevel()->getName();
 		if (!$this->plugin->isLevelLoaded($levelName))
 			return;
@@ -193,10 +225,15 @@ class EventListener implements Listener
 	}
 
 	/**
+	 * @ignoreCancelled false
 	 * @priority LOWEST
+	 *
 	 * @param PlayerMoveEvent $event
 	 */
 	public function onPlayerMove(PlayerMoveEvent $event) {
+		if($event->isCancelled()) {
+			return;
+		}
 		if (!$this->plugin->getConfig()->get("ShowPlotPopup", true))
 			return;
 
