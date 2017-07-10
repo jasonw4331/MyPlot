@@ -33,8 +33,6 @@ use pocketmine\level\Level;
 use pocketmine\utils\TextFormat as TF;
 use PocketMoney\PocketMoney;
 
-use spoondetector\SpoonDetector;
-
 class MyPlot extends PluginBase
 {
 
@@ -453,7 +451,6 @@ class MyPlot extends PluginBase
 
 	public function onEnable() {
 		@mkdir($this->getDataFolder());
-		SpoonDetector::printSpoon($this, "spoon.txt");
 
 		$this->getLogger()->notice(TF::BOLD."Loading...");
 
