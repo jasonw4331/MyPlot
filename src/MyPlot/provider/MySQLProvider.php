@@ -35,13 +35,15 @@ class MySQLProvider extends DataProvider
 	}
 
 	public function savePlot(Plot $plot): bool{
+		$helpers = implode(',', $plot->helpers);
+		$denied = implode(',', $plot->denied);
 		if ($plot->id >= 0) {
 			$stmt = $this->db->prepare(
-				"UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome WHERE id = :id"
+				"UPDATE plots SET name = {$plot->name}, owner = {$plot->owner}, helpers = {$helpers}, denied = {$denied}, biome = {$plot->biome} WHERE id = {$plot->id}"
 			);
 		} else {
 			$stmt = $this->db->prepare(
-				"INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES ((select id from plots where level = :level AND X = :X AND Z = :Z), :level, :X, :Z, :name, :owner, :helpers, :denied, :biome);");
+				"INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES ((select id from plots where level = {$plot->levelName} AND X = {$plot->X} AND Z = {$plot->Z}), {$plot->levelName}, {$plot->X}, {$plot->Z}, {$plot->name}, {$plot->owner}, {$helpers}, {$denied}, {$plot->biome});");
 		}
 		$resulta = $stmt->execute();
 		$resultb = $this->db->savepoint($this->lastSave = time());
@@ -107,7 +109,7 @@ class MySQLProvider extends DataProvider
 			$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = {$owner}");
 		} else {
 			$stmt = $this->db->prepare(
-				"SELECT * FROM plots WHERE owner = :owner AND level = {$levelName}");
+				"SELECT * FROM plots WHERE owner = {$owner} AND level = {$levelName}");
 		}
 		$plots = [];
 		$result = $stmt->get_result();

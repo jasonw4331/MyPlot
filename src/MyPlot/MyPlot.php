@@ -1,11 +1,10 @@
 <?php
 namespace MyPlot;
 
-use EconomyPlus\EconomyPlus;
-use EssentialsPE\Loader;
 use MyPlot\provider\EconomyPlusProvider;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\EssentialsPEProvider;
+use MyPlot\provider\JSONDataProvider;
 use MyPlot\provider\MySQLProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\YAMLDataProvider;
@@ -15,6 +14,10 @@ use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\EconomyProvider;
 
 use onebone\economyapi\EconomyAPI;
+
+use EconomyPlus\EconomyPlus;
+
+use EssentialsPE\Loader;
 
 use pocketmine\block\Air;
 use pocketmine\event\level\LevelLoadEvent;
