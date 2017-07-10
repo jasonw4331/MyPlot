@@ -6,6 +6,7 @@ use EssentialsPE\Loader;
 use MyPlot\provider\EconomyPlusProvider;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\EssentialsPEProvider;
+use MyPlot\provider\MySQLProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
@@ -455,6 +456,7 @@ class MyPlot extends PluginBase
 
 		$this->saveDefaultConfig();
 		$this->reloadConfig();
+
 		@mkdir($this->getDataFolder() . "worlds");
 
 		Generator::addGenerator(MyPlotGenerator::class, "myplot");
