@@ -18,7 +18,7 @@ class MySQLProvider extends DataProvider
 	protected $plugin;
 
 	/**
-	 * MySQLiProvider constructor.
+	 * MySQLProvider constructor.
 	 * @param MyPlot $plugin
 	 * @param int $cacheSize
 	 * @param array $settings
@@ -26,7 +26,6 @@ class MySQLProvider extends DataProvider
 	public function __construct(MyPlot $plugin, $cacheSize = 0, $settings) {
 		$this->plugin = $plugin;
 		parent::__construct($plugin, $cacheSize);
-
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
 		$this->db->query(
 			"CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT);");
