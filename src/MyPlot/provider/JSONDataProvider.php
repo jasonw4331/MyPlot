@@ -63,7 +63,7 @@ class JSONDataProvider extends DataProvider
 		if (($plot = $this->getPlotFromCache($levelName, $X, $Z)) != null) {
 			return $plot;
 		}
-		$plots = $this->json->get("plots");
+		$plots = $this->json->get("plots", []);
 		$levelKeys = array_keys($plots, $levelName);
 		$xKeys = array_keys($plots, $X);
 		$zKeys = array_keys($plots, $Z);
@@ -99,7 +99,6 @@ class JSONDataProvider extends DataProvider
 	 * @return Plot[]
 	 */
 	public function getPlotsByOwner(string $owner, string $levelName = "") : array {
-
 		$plots = $this->json->get("plots");
 		$ownerPlots = [];
 		if($levelName != "") {
@@ -144,10 +143,43 @@ class JSONDataProvider extends DataProvider
 	 * @return Plot|null
 	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0){
-		$plots = $this->json->get("plots", []);
-		//TODO
+		$plotsArr = $this->json->get("plots", []);
+		for ($i = 0; $limitXZ <= 0 or $i < $limitXZ; $i++) {
+			// TODO recreate sql formula using if statements
+			//"SELECT X, Z FROM plots WHERE (level = :level AND ((abs(X) == :number AND abs(Z) <= :number) OR (abs(Z) == :number AND abs(X) <= :number)));"
+			$plots = [];
+			#while ($val = $result->fetchArray(SQLITE3_NUM)) {
+			#	$plots[$val[0]][$val[1]] = true;
+			#}
+			if (count($plots) === max(1, 8 * $i)) {
+				continue;
+			}
+
+			if ($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
+				list($X, $Z) = $ret;
+				$plot = new Plot($levelName, $X, $Z);
+				$this->cachePlot($plot);
+				return $plot;
+			}
+			for ($a = 1; $a < $i; $a++) {
+				if ($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
+					list($X, $Z) = $ret;
+					$plot = new Plot($levelName, $X, $Z);
+					$this->cachePlot($plot);
+					return $plot;
+				}
+			}
+			if ($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
+				list($X, $Z) = $ret;
+				$plot = new Plot($levelName, $X, $Z);
+				$this->cachePlot($plot);
+				return $plot;
+			}
+		}
+		return null;
 	}
 	public function close(){
+		$this->json->save();
 		unset($this->json);
 	}
 }
