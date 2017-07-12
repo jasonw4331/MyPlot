@@ -33,8 +33,6 @@ use pocketmine\level\Level;
 use pocketmine\utils\TextFormat as TF;
 use PocketMoney\PocketMoney;
 
-use spoondetector\SpoonDetector;
-
 class MyPlot extends PluginBase
 {
 
