@@ -22,7 +22,7 @@ extensions:
 - yaml
 permissions:
     myplot.command:
-        default: true
+        default: op
         children:
             myplot.command.help:
                 default: true
