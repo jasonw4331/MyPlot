@@ -49,8 +49,8 @@ class SQLiteDataProvider extends DataProvider
 			"SELECT X, Z FROM plots WHERE (
 				level = :level
 				AND (
-					(abs(X) == :number AND abs(Z) <= :number) OR
-					(abs(Z) == :number AND abs(X) <= :number)
+					(abs(X) = :number AND abs(Z) <= :number) OR
+					(abs(Z) = :number AND abs(X) <= :number)
 				)
 			);"
 		);
