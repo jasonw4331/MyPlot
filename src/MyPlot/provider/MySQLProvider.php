@@ -1,5 +1,4 @@
 <?php
-
 namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
