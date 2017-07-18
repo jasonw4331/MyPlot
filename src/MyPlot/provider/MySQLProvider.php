@@ -10,6 +10,8 @@ class MySQLProvider extends DataProvider{
 	protected $plugin;
 	/** @var \mysqli $db */
 	private $db;
+	/** @var array */
+	private $settings;
 	/** @var string $lastSave */
 	private $lastSave = null;
 	/** @var \mysqli_stmt */
@@ -24,8 +26,13 @@ class MySQLProvider extends DataProvider{
 	 * @param array $settings
 	 */
 	public function __construct(MyPlot $plugin, $cacheSize = 0, $settings){
+		ini_set("mysqli.reconnect",1);
+		ini_set('mysqli.allow_persistent', 1);
+		ini_set('mysql.connect_timeout', 300);
+		ini_set('default_socket_timeout', 300);
 		$this->plugin = $plugin;
 		parent::__construct($plugin, $cacheSize);
+		$this->settings = $settings;
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
 		$this->db->query(
 			"CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT);");
@@ -78,7 +85,7 @@ class MySQLProvider extends DataProvider{
 	}
 
 	public function savePlot(Plot $plot): bool{
-		$this->db->ping();
+		$this->reconnect();
 		$helpers = implode(',', $plot->helpers);
 		$denied = implode(',', $plot->denied);
 
@@ -105,7 +112,7 @@ class MySQLProvider extends DataProvider{
 	}
 
 	public function deletePlot(Plot $plot): bool{
-		$this->db->ping();
+		$this->reconnect();;
 
 		if ($plot->id >= 0){
 			$stmt = $this->sqlRemovePlot;
@@ -126,7 +133,7 @@ class MySQLProvider extends DataProvider{
 	}
 
 	public function getPlot(string $levelName, int $X, int $Z): Plot{
-		$this->db->ping();
+		$this->reconnect();;
 
 		if (($plot = $this->getPlotFromCache($levelName, $X, $Z)) != null){
 			return $plot;
@@ -159,7 +166,7 @@ class MySQLProvider extends DataProvider{
 	}
 
 	public function getPlotsByOwner(string $owner, string $levelName = ""): array{
-		$this->db->ping();
+		$this->reconnect();;
 
 		if (empty($levelName)){
 			$stmt = $this->sqlGetPlotsByOwner;
@@ -193,7 +200,7 @@ class MySQLProvider extends DataProvider{
 	}
 
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0){
-		$this->db->ping();
+		$this->reconnect();;
 
 		$i = 0;
 		for (; $limitXZ <= 0 or $i < $limitXZ; $i++){
@@ -234,5 +241,24 @@ class MySQLProvider extends DataProvider{
 			}
 		}
 		return null;
+	}
+
+	private function reconnect(){
+		if(!$this->db->ping()){
+			$this->plugin->getLogger()->notice("The MySQL server can not be reached! Trying to reconnect!");
+			$this->db->close();
+			$this->db->connect($this->settings['Host'], $this->settings['Username'], $this->settings['Password'], $this->settings['DatabaseName'], $this->settings['Port']);
+			if($this->db->ping()){
+				$this->plugin->getLogger()->notice("The MySQL connection has been reestablished!");
+			}else{
+				$this->plugin->getLogger()->critical("The MySQL connection COULD NOT been reestablished!");
+				$this->plugin->getLogger()->critical("Will shut down for safety!");
+				foreach ($this->plugin->getPlotLevels() as $levelname => $values){
+					$this->plugin->getServer()->getLevelByName($levelname)->save(true);
+					$this->plugin->getServer()->unloadLevel($levelname);
+				}
+				$this->plugin->getServer()->shutdown();
+			}
+		}
 	}
 }
