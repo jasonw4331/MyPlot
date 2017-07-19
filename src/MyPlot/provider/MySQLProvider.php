@@ -36,9 +36,6 @@ class MySQLProvider extends DataProvider{
 		$this->db->query(
 			"CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT);");
 		$this->sqlGetPlot = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = ? AND X = ? AND Z = ?;");
-		$this->sqlGetIdFromLevelXZ = $this->db->prepare(
-			"SELECT id FROM plots WHERE level = ? AND X = ? AND Z = ?"
-		);
 		$this->sqlSavePlot = $this->db->prepare(
 			"INSERT INTO plots (`id`, `level`, `X`, `Z`, `name`, `owner`, `helpers`, `denied`, `biome`)
     VALUES((SELECT id
@@ -253,8 +250,8 @@ class MySQLProvider extends DataProvider{
 				$this->plugin->getLogger()->critical("The MySQL connection COULD NOT been reestablished!");
 				$this->plugin->getLogger()->critical("Will shut down for safety!");
 				foreach ($this->plugin->getPlotLevels() as $levelname => $values){
-					$this->plugin->getServer()->getLevelByName($levelname)->save(true);
-					$this->plugin->getServer()->unloadLevel($levelname);
+					($level = $this->plugin->getServer()->getLevelByName($levelname))->save(true);
+					$this->plugin->getServer()->unloadLevel($level);
 				}
 				$this->plugin->getServer()->shutdown();
 			}
