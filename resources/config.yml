@@ -41,7 +41,7 @@ MySQLSettings:
 UseEconomy: false
 
 # Amount of plots to be cached.
-# Increasing this number might improve performance, but also increase memory usage.
+# Increasing this number will improve performance, but also increase memory usage.
 PlotCacheSize: 256
 
 # When a player enters a plot, a popup with basic info will be shown
