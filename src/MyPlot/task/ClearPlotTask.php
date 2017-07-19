@@ -33,7 +33,7 @@ class ClearPlotTask extends PluginTask
         $this->pos = new Vector3($this->plotBeginPos->x, 0, $this->plotBeginPos->z);
     }
 
-    public function onRun($tick) {
+    public function onRun(int $tick) {
         $blocks = 0;
         while ($this->pos->x < $this->xMax) {
             while ($this->pos->z < $this->zMax) {
