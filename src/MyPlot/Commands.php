@@ -20,7 +20,6 @@ use MyPlot\subcommand\ResetSubCommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
 use MyPlot\subcommand\BiomeSubCommand;
-use MyPlot\subcommand\BiomesSubCommand;
 use MyPlot\subcommand\NameSubCommand;
 use MyPlot\subcommand\GiveSubCommand;
 use MyPlot\subcommand\WarpSubCommand;

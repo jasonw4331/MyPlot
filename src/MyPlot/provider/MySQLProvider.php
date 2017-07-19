@@ -4,18 +4,19 @@ namespace MyPlot\provider;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 
-class MySQLProvider extends DataProvider
-{
-	/** @var \mysqli $db */
-	private $db;
-	/** @var string $lastSave */
-	private $lastSave = null;
-	/** @var \mysqli_stmt  */
-	private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
-		$sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
-		$sqlGetExistingXZ;
+class MySQLProvider extends DataProvider{
 	/** @var MyPlot */
 	protected $plugin;
+	/** @var \mysqli $db */
+	private $db;
+	/** @var array */
+	private $settings;
+	/** @var string $lastSave */
+	private $lastSave = null;
+	/** @var \mysqli_stmt */
+	private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
+		$sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
+		$sqlGetExistingXZ, $sqlGetIdFromLevelXZ;
 
 	/**
 	 * MySQLProvider constructor.
@@ -23,20 +24,32 @@ class MySQLProvider extends DataProvider
 	 * @param int $cacheSize
 	 * @param array $settings
 	 */
-	public function __construct(MyPlot $plugin, $cacheSize = 0, $settings) {
+	public function __construct(MyPlot $plugin, $cacheSize = 0, $settings){
+		ini_set("mysqli.reconnect",1);
+		ini_set('mysqli.allow_persistent', 1);
+		ini_set('mysql.connect_timeout', 300);
+		ini_set('default_socket_timeout', 300);
 		$this->plugin = $plugin;
 		parent::__construct($plugin, $cacheSize);
+		$this->settings = $settings;
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
 		$this->db->query(
 			"CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT);");
 		$this->sqlGetPlot = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = ? AND X = ? AND Z = ?;");
 		$this->sqlSavePlot = $this->db->prepare(
-			"UPDATE plots SET name = ?, owner = ?, helpers = ?, denied = ?, biome = ? WHERE id = ?;"
+			"INSERT INTO plots (`id`, `level`, `X`, `Z`, `name`, `owner`, `helpers`, `denied`, `biome`)
+    VALUES((SELECT id
+    FROM plots p
+    WHERE p.level = ? AND X = ? AND Z = ?),?,?,?,?,?,?,?,?)
+    ON DUPLICATE KEY
+        UPDATE name = VALUES(name),
+               owner = VALUES(owner),
+               helpers = VALUES(helpers),
+               denied = VALUES(denied),
+               biome = VALUES(biome);"
 		);
 		$this->sqlSavePlotById = $this->db->prepare(
-		//TODO duplicate check
-		#"INSERT INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), owner = VALUES(owner), helpers = VALUES(helpers), denied = VALUES(denied), biome = VALUES(biome);");
-			"INSERT INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);"
+			"UPDATE plots SET id = ?, level = ?, X = ?, Z = ?, name = ?, owner = ?, helpers = ?, denied = ?, biome = ? WHERE id = VALUES(id);"
 		);
 		$this->sqlRemovePlot = $this->db->prepare(
 			"DELETE FROM plots WHERE id = ?;"
@@ -54,52 +67,59 @@ class MySQLProvider extends DataProvider
 			"SELECT X, Z FROM plots WHERE (
 				level = ? 
 				AND (
-					(abs(X) == ? AND abs(Z) <= ?) OR
-					(abs(Z) == ? AND abs(X) <= ?)
+					(abs(X) = ? AND abs(Z) <= ?) OR
+					(abs(Z) = ? AND abs(X) <= ?)
 				)
 			);"
 		);
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
 
-	public function close() {
+	public function close(){
 		$this->db->close();
 		$this->plugin->getLogger()->debug("MySQL database closed!");
 	}
 
 	public function savePlot(Plot $plot): bool{
+		$this->reconnect();
 		$helpers = implode(',', $plot->helpers);
 		$denied = implode(',', $plot->denied);
-		if ($plot->id >= 0) {
-			$stmt = $this->sqlSavePlot;
-			$stmt->bind_param('sssssi', $plot->name, $plot->owner, $helpers, $denied, $plot->biome, $plot->id);
-		} else {
+
+		if ($plot->id >= 0){
 			$stmt = $this->sqlSavePlotById;
 			$stmt->bind_param('isiisssss', $plot->id, $plot->levelName, $plot->X, $plot->Z, $plot->name, $plot->owner, $helpers, $denied, $plot->biome);
+		} else{
+			$stmt = $this->sqlSavePlot;
+			$stmt->bind_param('siisiisssss', $plot->levelName, $plot->X, $plot->Z, $plot->levelName, $plot->X, $plot->Z, $plot->name, $plot->owner, $helpers, $denied, $plot->biome);
 		}
-		$resulta = $stmt->execute();
-		$resultb = $this->db->savepoint($this->lastSave = time());
+		$result = $stmt->execute();
+		$this->lastSave = time();
 
-		if ($resulta === false) {
+		if ($result === false){
+			$this->plugin->getLogger()->error($stmt->error);
 			return false;
 		}
 		$this->cachePlot($plot);
 		return true;
 	}
-	public function getLastSave() {
+
+	public function getLastSave(){
 		return $this->lastSave;
 	}
 
 	public function deletePlot(Plot $plot): bool{
-		if ($plot->id >= 0) {
+		$this->reconnect();;
+
+		if ($plot->id >= 0){
 			$stmt = $this->sqlRemovePlot;
 			$stmt->bind_param('i', $plot->id);
-		} else {
+		} else{
 			$stmt = $this->sqlRemovePlotById;
 			$stmt->bind_param('sii', $plot->levelName, $plot->X, $plot->Z);
 		}
 		$result = $stmt->execute();
-		if ($result === false) {
+		if ($result === false){
+			$this->plugin->getLogger()->error($stmt->error);
 			return false;
 		}
 		$this->lastSave = null;
@@ -109,30 +129,32 @@ class MySQLProvider extends DataProvider
 	}
 
 	public function getPlot(string $levelName, int $X, int $Z): Plot{
-		if (($plot = $this->getPlotFromCache($levelName, $X, $Z)) != null) {
+		$this->reconnect();;
+
+		if (($plot = $this->getPlotFromCache($levelName, $X, $Z)) != null){
 			return $plot;
 		}
 		$stmt = $this->sqlGetPlot;
 		$stmt->bind_param('sii', $levelName, $X, $Z);
 		$result = $stmt->execute();
-		if ($result === false) {
+		if ($result === false){
 			$this->plugin->getLogger()->error($stmt->error);
 		}
 		$result = $stmt->get_result();
-		if ($val = $result->fetch_array(MYSQLI_ASSOC)) {
-			if ($val["helpers"] === null or $val["helpers"] === "") {
+		if ($val = $result->fetch_array(MYSQLI_ASSOC)){
+			if (empty($val["helpers"])){
 				$helpers = [];
-			} else {
+			} else{
 				$helpers = explode(",", (string)$val["helpers"]);
 			}
-			if ($val["denied"] === null or $val["denied"] === "") {
+			if (empty($val["denied"])){
 				$denied = [];
-			} else {
+			} else{
 				$denied = explode(",", (string)$val["denied"]);
 			}
 			$plot = new Plot($levelName, $X, $Z, (string)$val["name"], (string)$val["owner"],
 				$helpers, $denied, (string)$val["biome"], (int)$val["id"]);
-		} else {
+		} else{
 			$plot = new Plot($levelName, $X, $Z);
 		}
 		$this->cachePlot($plot);
@@ -140,68 +162,74 @@ class MySQLProvider extends DataProvider
 	}
 
 	public function getPlotsByOwner(string $owner, string $levelName = ""): array{
-		if (empty($levelName)) {
+		$this->reconnect();;
+
+		if (empty($levelName)){
 			$stmt = $this->sqlGetPlotsByOwner;
 			$stmt->bind_param('s', $owner);
-		} else {
+		} else{
 			$stmt = $this->sqlGetPlotsByOwnerAndLevel;
 			$stmt->bind_param('ss', $owner, $levelName);
 		}
 		$plots = [];
 		$result = $stmt->execute();
-		if ($result === false) {
+		if ($result === false){
+			$this->plugin->getLogger()->error($stmt->error);
 			return $plots;
 		}
 		$result = $stmt->get_result();
-		while ($val = $result->fetch_array()) {
+		while ($val = $result->fetch_array()){
 			$helpers = explode(",", (string)$val["helpers"]);
 			$denied = explode(",", (string)$val["denied"]);
 			$plots[] = new Plot((string)$val["level"], (int)$val["X"], (int)$val["Z"], (string)$val["name"],
 				(string)$val["owner"], $helpers, $denied, (string)$val["biome"], (int)$val["id"]);
 		}
 		// Remove unloaded plots
-		$plots = array_filter($plots, function ($plot) {
+		$plots = array_filter($plots, function ($plot){
 			return $this->plugin->isLevelLoaded($plot->levelName);
 		});
 		// Sort plots by level
-		usort($plots, function ($plot1, $plot2) {
+		usort($plots, function ($plot1, $plot2){
 			return strcmp($plot1->levelName, $plot2->levelName);
 		});
 		return $plots;
 	}
 
-	public function getNextFreePlot(string $levelName, int $limitXZ = 0) {
+	public function getNextFreePlot(string $levelName, int $limitXZ = 0){
+		$this->reconnect();;
+
 		$i = 0;
-		for (; $limitXZ <= 0 or $i < $limitXZ; $i++) {
+		for (; $limitXZ <= 0 or $i < $limitXZ; $i++){
 			$stmt = $this->sqlGetExistingXZ;
 			$stmt->bind_param('siiii', $levelName, $i, $i, $i, $i);
 			$result = $stmt->execute();
-			if ($result === false) {
+			if ($result === false){
+				$this->plugin->getLogger()->error($stmt->error);
 				continue;
 			}
 			$result = $stmt->get_result();
 			$plots = [];
-			while ($val = $result->fetch_array(MYSQLI_NUM)) {
+			while ($val = $result->fetch_array(MYSQLI_NUM)){
 				$plots[$val[0]][$val[1]] = true;
 			}
-			if (count($plots) === max(1, 8 * $i)) {
+			if (count($plots) === max(1, 8 * $i)){
 				continue;
 			}
-			if ($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
+			if ($ret = self::findEmptyPlotSquared(0, $i, $plots)){
 				list($X, $Z) = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;
 			}
-			for ($a = 1; $a < $i; $a++) {
-				if ($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
+			for ($a = 1; $a < $i; $a++){
+				if ($ret = self::findEmptyPlotSquared($a, $i, $plots)){
 					list($X, $Z) = $ret;
 					$plot = new Plot($levelName, $X, $Z);
 					$this->cachePlot($plot);
 					return $plot;
 				}
 			}
-			if ($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
+			if ($ret = self::findEmptyPlotSquared($i, $i, $plots)){
 				list($X, $Z) = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
@@ -209,5 +237,24 @@ class MySQLProvider extends DataProvider
 			}
 		}
 		return null;
+	}
+
+	private function reconnect(){
+		if(!$this->db->ping()){
+			$this->plugin->getLogger()->notice("The MySQL server can not be reached! Trying to reconnect!");
+			$this->db->close();
+			$this->db->connect($this->settings['Host'], $this->settings['Username'], $this->settings['Password'], $this->settings['DatabaseName'], $this->settings['Port']);
+			if($this->db->ping()){
+				$this->plugin->getLogger()->notice("The MySQL connection has been reestablished!");
+			}else{
+				$this->plugin->getLogger()->critical("The MySQL connection COULD NOT been reestablished!");
+				$this->plugin->getLogger()->critical("Will shut down for safety!");
+				foreach ($this->plugin->getPlotLevels() as $levelname => $values){
+					($level = $this->plugin->getServer()->getLevelByName($levelname))->save(true);
+					$this->plugin->getServer()->unloadLevel($level);
+				}
+				$this->plugin->getServer()->shutdown();
+			}
+		}
 	}
 }
