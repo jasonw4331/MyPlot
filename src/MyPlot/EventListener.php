@@ -35,7 +35,7 @@ class EventListener implements Listener
 		if ($event->getLevel()->getProvider()->getGenerator() == "myplot") {
 			$this->plugin->getLogger()->debug("MyPlot level ".$event->getLevel()->getFolderName()." loaded!");
 			$settings = $event->getLevel()->getProvider()->getGeneratorOptions();
-			if (isset($settings["preset"]) === false or $settings["preset"] === "") {
+			if (!isset($settings["preset"]) or empty($settings["preset"])) {
 				return;
 			}
 			$settings = json_decode($settings["preset"], true);
@@ -46,11 +46,12 @@ class EventListener implements Listener
 			$filePath = $this->plugin->getDataFolder() . "worlds" . DIRECTORY_SEPARATOR . $levelName . ".yml";
 			$config = $this->plugin->getConfig();
 			$default = [
-				"RestrictEntityMovement" => $config->getNested("DefaultWorld.RestrictEntityMovement"),
-				"ClaimPrice" => $config->getNested("DefaultWorld.ClaimPrice"),
-				"ClearPrice" => $config->getNested("DefaultWorld.ClearPrice"),
-				"DisposePrice" => $config->getNested("DefaultWorld.DisposePrice"),
-				"ResetPrice" => $config->getNested("DefaultWorld.ResetPrice")
+				"RestrictEntityMovement" => $config->getNested("DefaultWorld.RestrictEntityMovement", true),
+				"UpdatePlotLiquids" => $config->getNested("DefaultWorld.UpdatePlotLiquids", false),
+				"ClaimPrice" => $config->getNested("DefaultWorld.ClaimPrice", 0),
+				"ClearPrice" => $config->getNested("DefaultWorld.ClearPrice", 0),
+				"DisposePrice" => $config->getNested("DefaultWorld.DisposePrice", 0),
+				"ResetPrice" => $config->getNested("DefaultWorld.ResetPrice", 0)
 			];
 			$config = new Config($filePath, Config::YAML, $default);
 			foreach (array_keys($default) as $key) {
