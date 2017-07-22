@@ -44,7 +44,7 @@ abstract class DataProvider
 		if ($this->cacheSize > 0) {
 			$key = $levelName . ';' . $X . ';' . $Z;
 			if (isset($this->cache[$key])) {
-				$this->plugin->getLogger()->debug("Plot {$X};{$Z} was loaded from the cache");
+				#$this->plugin->getLogger()->debug("Plot {$X};{$Z} was loaded from the cache");
 				return $this->cache[$key];
 			}
 		}
