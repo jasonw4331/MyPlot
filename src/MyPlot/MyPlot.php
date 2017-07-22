@@ -144,9 +144,6 @@ class MyPlot extends PluginBase
 	 * @return Plot[]
 	 */
 	public function getPlotsOfPlayer(string $username, string $levelName) : array {
-		  if($levelName instanceof Level) {
-				$levelName = $levelName->getName();
-		  }
 		return $this->dataProvider->getPlotsByOwner($username, $levelName);
 	}
 

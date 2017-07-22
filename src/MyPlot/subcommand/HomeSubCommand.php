@@ -29,7 +29,11 @@ class HomeSubCommand extends SubCommand
 		} else {
 			return false;
 		}
-		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName());
+		if(isset($args[1])) {
+			$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $args[1]);
+		}else{
+			$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName());
+		}
 		if (empty($plots)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));
 			return true;
@@ -48,7 +52,7 @@ class HomeSubCommand extends SubCommand
 
 		$plot = $plots[$plotNumber - 1];
 		if ($this->getPlugin()->teleportPlayerToPlot($sender, $plot)) {
-			$sender->sendMessage($this->translateString("home.success", [$plot]));
+			$sender->sendMessage($this->translateString("home.success", [$plot, $plot->levelName]));
 		} else {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.error"));
 		}
