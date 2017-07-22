@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\plugin\Plugin;
 
 abstract class SubCommand implements PluginIdentifiableCommand
 {
@@ -24,7 +25,7 @@ abstract class SubCommand implements PluginIdentifiableCommand
     /**
      * @return MyPlot
      */
-    public final function getPlugin() : MyPlot {
+    public final function getPlugin() : Plugin {
         return $this->plugin;
     }
 
