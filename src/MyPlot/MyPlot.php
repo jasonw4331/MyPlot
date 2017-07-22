@@ -125,19 +125,20 @@ class MyPlot extends PluginBase
 		return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $settings);
 	}
 
-    /**
-     * Saves provided plot if changed
-     *
-     * @api
-     * @param Plot $plot
-     * @return bool
-     */
-    public function savePlot(Plot $plot) : bool {
-        $this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotSaveEvent($this, "MyPlot", $this->dataProvider->type, $plot)));
-        if($ev->isCancelled()) {
-        	return false;
-        }return $this->dataProvider->savePlot($ev->getPlot());
-    }
+	/**
+	 * Saves provided plot if changed
+	 *
+	 * @api
+	 * @param Plot $plot
+	 * @return bool
+	 */
+	public function savePlot(Plot $plot) : bool {
+		$this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotSaveEvent($this, "MyPlot", $this->dataProvider->type, $plot)));
+		if($ev->isCancelled()) {
+			return false;
+		}
+		return $this->dataProvider->savePlot($ev->getPlot());
+	}
 
 	/**
 	 * Get all the plots a player owns (in a certain level if $levelName is provided)

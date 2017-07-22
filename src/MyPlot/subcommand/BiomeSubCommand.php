@@ -34,7 +34,8 @@ class BiomeSubCommand extends SubCommand
 	 * @param Player $sender
 	 * @param string[] $args
 	 * @return bool
-	 */public function execute(CommandSender $sender, array $args) {
+	 */
+    public function execute(CommandSender $sender, array $args) {
         if (count($args) === 0) {
             $biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
             $sender->sendMessage($this->translateString("biome.possible", [$biomes]));
@@ -63,7 +64,7 @@ class BiomeSubCommand extends SubCommand
         $this->getPlugin()->getServer()->getPluginManager()->callEvent(
 	    	($ev = new MyPlotBiomeChangeEvent($this->getPlugin(), "MyPlot",$plot, $this->biomes[strtoupper($biome->getName())], $this->biomes[$plot->biome]))
 	    );
-        if ($this->getPlugin()->setPlotBiome($ev->getPlot(), Biome::getBiome($ev->getNewBiome()))) {
+        if ($this->getPlugin()->setPlotBiome($ev->getPlot(), Biome::getBiome($ev->getNewBiomeId()))) {
             $sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
         } else {
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
