@@ -30,7 +30,7 @@ class SetOwnerSubCommand extends SubCommand
 			return true;
 		}
 		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($sender);
-		$plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()));
+		$plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName()));
 		if ($plotsOfPlayer >= $maxPlots) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("setowner.maxplots", [$maxPlots]));
 			return true;

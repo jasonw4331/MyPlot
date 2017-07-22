@@ -46,7 +46,7 @@ class GiveSubCommand extends SubCommand
 		}
 
 		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($newOwner);
-		$plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(),$newOwner->getLevel()));
+		$plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(),$newOwner->getLevel()->getName()));
 		if ($plotsOfPlayer >= $maxPlots) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
 			return true;

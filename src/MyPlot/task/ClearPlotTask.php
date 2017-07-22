@@ -32,7 +32,7 @@ class ClearPlotTask extends PluginTask {
 		$this->plugin->getLogger()->debug("Clear Task started at plot {$plot->X};{$plot->Z}");
 	}
 
-	public function onRun($tick) {
+	public function onRun(int $tick) {
 		$blocks = 0;
 		while ($this->pos->x < $this->xMax) {
 			while ($this->pos->z < $this->zMax) {

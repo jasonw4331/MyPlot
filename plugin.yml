@@ -4,11 +4,14 @@ authors: ["Wiez","Exxarion","jasonwynn10"]
 main: MyPlot\MyPlot
 version: 1.1.4
 api:
+- 3.0.0
 - 3.0.0-ALPHA1
 - 3.0.0-ALPHA2
 - 3.0.0-ALPHA3
 - 3.0.0-ALPHA4
 - 3.0.0-ALPHA5
+- 3.0.0-ALPHA6
+- 3.0.0-ALPHA7
 softdepend:
 - EconomyAPI
 - PocketMoney
@@ -21,7 +24,7 @@ extensions:
 - yaml
 permissions:
     myplot.command:
-        default: true
+        default: op
         children:
             myplot.command.help:
                 default: true

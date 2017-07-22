@@ -10,9 +10,9 @@
 #########################################
 
 # The language that should be used in MyPlot
-# Available languages: eng, nl, vi, spa, chs, zho, deu , cze
+# Available languages: eng, nl, vi, spa, chs, zho, deu, cze
 #
-# English language pack by @Exxarion
+# English language pack by @jasonwynn10
 # Dutch language pack by @Wies
 # Vietnamese language pack by @daany123
 # Spanish language pack by @thelucyclub
@@ -29,10 +29,10 @@ DataProvider: sqlite
 # contains settings for mysql provider to use when selected
 MySQLSettings:
   Host: 127.0.0.1
-  Port: 19133
+  Port: 3306
   Username: default
   Password: password
-  DatabaseName: plots.db
+  DatabaseName: MyPlot
 
 # Use an economy with MyPlot. This will allow for plot pricing such as claiming, clearing, etc.
 # Currently supported economy plugins: Economy$, PocketMoney
@@ -41,7 +41,7 @@ MySQLSettings:
 UseEconomy: false
 
 # Amount of plots to be cached.
-# Increasing this number might improve performance, but also increase memory usage.
+# Increasing this number will improve performance, but also increase memory usage.
 PlotCacheSize: 256
 
 # When a player enters a plot, a popup with basic info will be shown
@@ -57,6 +57,10 @@ DefaultWorld:
   # Restrict entities (e.g. tnt) from moving except falling
   # This will prevent things like tnt cannons from ruining other plots
   RestrictEntityMovement: true
+
+  # Update liquids (e.g. Water) from updating and moving
+  # This will allows things like water to lag the server in plot worlds
+  UpdatePlotLiquids: false
 
   # How much it costs to claim a plot (Economy must be set to 'true')
   ClaimPrice: 0

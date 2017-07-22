@@ -29,7 +29,7 @@ class HomeSubCommand extends SubCommand
 		} else {
 			return false;
 		}
-		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel());
+		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName());
 		if (empty($plots)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));
 			return true;

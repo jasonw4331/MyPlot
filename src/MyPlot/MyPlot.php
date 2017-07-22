@@ -1,12 +1,12 @@
 <?php
 namespace MyPlot;
 
-use EconomyPlus\EconomyPlus;
-use EssentialsPE\Loader;
 use MyPlot\provider\EconomyPlusProvider;
 use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\EssentialsPEProvider;
+use MyPlot\provider\JSONDataProvider;
+use MyPlot\provider\MySQLProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
@@ -15,6 +15,10 @@ use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\EconomyProvider;
 
 use onebone\economyapi\EconomyAPI;
+
+use EconomyPlus\EconomyPlus;
+
+use EssentialsPE\Loader;
 
 use pocketmine\block\Air;
 use pocketmine\event\level\LevelLoadEvent;
@@ -140,7 +144,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @api
 	 * @param string $username
-	 * @param $levelName
+	 * @param string $levelName
 	 * @return Plot[]
 	 */
 	public function getPlotsOfPlayer(string $username, string $levelName) : array {
@@ -451,14 +455,15 @@ class MyPlot extends PluginBase
 
 	/* -------------------------- Non-API part -------------------------- */
 
-    public function onEnable() {
-		SpoonDetector::printSpoon($this, 'spoon.txt');
-        $this->getLogger()->notice(TF::BOLD."Loading...");
+	public function onEnable() {
+		@mkdir($this->getDataFolder());
+		SpoonDetector::printSpoon($this, "spoon.txt");
+
+		$this->getLogger()->notice(TF::BOLD."Loading...");
 
 		$this->saveDefaultConfig();
 		$this->reloadConfig();
 
-		@mkdir($this->getDataFolder());
 		@mkdir($this->getDataFolder() . "worlds");
 
 		Generator::addGenerator(MyPlotGenerator::class, "myplot");

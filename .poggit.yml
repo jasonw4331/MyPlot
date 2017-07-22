@@ -1,7 +1,4 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/jasonwynn10/MyPlot
-branches:
-- master
-- API3
 projects:
   MyPlot:
     path: ""

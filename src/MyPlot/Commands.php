@@ -20,7 +20,6 @@ use MyPlot\subcommand\ResetSubCommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
 use MyPlot\subcommand\BiomeSubCommand;
-use MyPlot\subcommand\BiomesSubCommand;
 use MyPlot\subcommand\NameSubCommand;
 use MyPlot\subcommand\GiveSubCommand;
 use MyPlot\subcommand\WarpSubCommand;
@@ -92,7 +91,7 @@ class Commands extends PluginCommand
 	 * @param string[] $args
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, $alias, array $args) {
+	public function execute(CommandSender $sender, string $alias, array $args) {
 		if (!isset($args[0])) {
 			$sender->sendMessage($this->plugin->getLanguage()->get("command.usage"));
 			return true;

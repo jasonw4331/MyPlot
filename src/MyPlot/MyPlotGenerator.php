@@ -33,15 +33,15 @@ class MyPlotGenerator extends Generator
 		} else {
 			$settings = [];
 		}
-		$this->roadBlock = $this->parseBlock($settings, "RoadBlock", new Block(5));
-		$this->wallBlock = $this->parseBlock($settings, "WallBlock", new Block(44));
-		$this->plotFloorBlock = $this->parseBlock($settings, "PlotFloorBlock", new Block(2));
-		$this->plotFillBlock = $this->parseBlock($settings, "PlotFillBlock", new Block(3));
-		$this->bottomBlock = $this->parseBlock($settings, "BottomBlock", new Block(7));
+		$this->roadBlock = PlotLevelSettings::parseBlock($settings, "RoadBlock", new Block(5));
+		$this->wallBlock = PlotLevelSettings::parseBlock($settings, "WallBlock", new Block(44));
+		$this->plotFloorBlock = PlotLevelSettings::parseBlock($settings, "PlotFloorBlock", new Block(2));
+		$this->plotFillBlock = PlotLevelSettings::parseBlock($settings, "PlotFillBlock", new Block(3));
+		$this->bottomBlock = PlotLevelSettings::parseBlock($settings, "BottomBlock", new Block(7));
 
-		$this->roadWidth = $this->parseNumber($settings, "RoadWidth", 7);
-		$this->plotSize = $this->parseNumber($settings, "PlotSize", 32);
-		$this->groundHeight = $this->parseNumber($settings, "GroundHeight", 64);
+		$this->roadWidth = PlotLevelSettings::parseNumber($settings, "RoadWidth", 7);
+		$this->plotSize = PlotLevelSettings::parseNumber($settings, "PlotSize", 32);
+		$this->groundHeight = PlotLevelSettings::parseNumber($settings, "GroundHeight", 64);
 		$this->settings = [];
 		$this->settings["preset"] = json_encode([
 			"RoadBlock" => $this->roadBlock->getId() . (($meta = $this->roadBlock->getDamage()) === 0 ? '' : ':'.$meta),
@@ -51,60 +51,21 @@ class MyPlotGenerator extends Generator
 			"BottomBlock" => $this->bottomBlock->getId() . (($meta = $this->bottomBlock->getDamage()) === 0 ? '' : ':'.$meta),
 			"RoadWidth" => $this->roadWidth,
 			"PlotSize" => $this->plotSize,
-			"GroundHeight" => $this->groundHeight,
+			"GroundHeight" => $this->groundHeight
 		]);
-	}
-
-	/**
-	 * @param array $array
-	 * @param string $key
-	 * @param Block $default
-	 * @return Block
-	 */
-	private function parseBlock(&$array, $key, $default) : Block {
-		if (isset($array[$key])) {
-			$id = $array[$key];
-			if (is_numeric($id)) {
-				$block = new Block($id);
-			} else {
-				$split = explode(":", $id);
-				if (count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
-					$block = new Block($split[0], $split[1]);
-				} else {
-					$block = $default;
-				}
-			}
-		} else {
-			$block = $default;
-		}
-		return $block;
-	}
-
-	/**
-	 * @param array $array
-	 * @param string $key
-	 * @param int $default
-	 * @return int
-	 */
-	private function parseNumber(&$array, $key, $default) : int {
-		if (isset($array[$key]) and is_numeric($array[$key])) {
-			return $array[$key];
-		} else {
-			return $default;
-		}
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getName() {
+	public function getName() : string {
 		return "myplot";
 	}
 
 	/**
 	 * @return string[]
 	 */
-	public function getSettings() {
+	public function getSettings() : array {
 		return $this->settings;
 	}
 
@@ -117,10 +78,10 @@ class MyPlotGenerator extends Generator
 	}
 
 	/**
-	 * @param $chunkX
-	 * @param $chunkZ
+	 * @param int $chunkX
+	 * @param int $chunkZ
 	 */
-	public function generateChunk($chunkX, $chunkZ) {
+	public function generateChunk(int $chunkX, int $chunkZ) {
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
 		$chunk = $this->level->getChunk($chunkX, $chunkZ);
 
@@ -161,11 +122,11 @@ class MyPlotGenerator extends Generator
 	}
 
 	/**
-	 * @param $x
-	 * @param $z
+	 * @param int $x
+	 * @param int $z
 	 * @return \SplFixedArray
 	 */
-	public function getShape($x, $z) {
+	public function getShape(int $x, int $z) {
 		$totalSize = $this->plotSize + $this->roadWidth;
 		if ($x >= 0) {
 			$X = $x % $totalSize;
@@ -216,15 +177,15 @@ class MyPlotGenerator extends Generator
 	}
 
 	/**
-	 * @param $chunkX
-	 * @param $chunkZx
+	 * @param int $chunkX
+	 * @param int $chunkZ
 	 */
-	public function populateChunk($chunkX, $chunkZ) {}
+	public function populateChunk(int $chunkX, int $chunkZ) {}
 
 	/**
 	 * @return Vector3
 	 */
-	public function getSpawn() {
+	public function getSpawn() : Vector3 {
 		return new Vector3(0, $this->groundHeight+1, 0);
 	}
 }
