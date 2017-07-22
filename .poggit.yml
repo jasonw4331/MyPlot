@@ -3,6 +3,6 @@ projects:
   MyPlot:
     path: ""
     libs:
-     - src: Falkirks/spoondetector/spoondetector
-       version: ^0
+      - src: Falkirks/spoondetector/spoondetector
+        version: 0.0.0
 ...
