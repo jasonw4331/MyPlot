@@ -146,12 +146,20 @@ class YAMLDataProvider extends DataProvider
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0){
 		$plotsArr = $this->yaml->get("plots", []);
 		for ($i = 0; $limitXZ <= 0 or $i < $limitXZ; $i++) {
-			// TODO recreate sql formula using if statements
-			//"SELECT X, Z FROM plots WHERE (level = :level AND ((abs(X) == :number AND abs(Z) <= :number) OR (abs(Z) == :number AND abs(X) <= :number)));"
+			$tmp = [];
+			foreach($plotsArr as $id => $data) {
+				if($data["level"] === $levelName) {
+					if(abs($data["x"]) === $i and abs($data["z"]) <= $i) {
+						$tmp[] = [$data["x"], $data["z"]];
+					}elseif(abs($data["z"]) === $i and abs($data["x"]) <= $i) {
+						$tmp[] = [$data["x"], $data["z"]];
+					}
+				}
+			}
 			$plots = [];
-			#while ($val = $result->fetchArray(SQLITE3_NUM)) {
-			#	$plots[$val[0]][$val[1]] = true;
-			#}
+			foreach($tmp as $arr) {
+				$plots[$arr[0]][$arr[1]] = true;
+			}
 			if (count($plots) === max(1, 8 * $i)) {
 				continue;
 			}

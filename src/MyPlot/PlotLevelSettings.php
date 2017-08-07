@@ -10,20 +10,20 @@ class PlotLevelSettings
 	/** @var Block  */
 	public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
 	/** @var int  */
-	public $roadWidth, $plotSize, $groundHeight, $claimPrice, $clearPrice, $disposePrice, $resetPrice;
+	public $roadWidth = 7, $plotSize = 32, $groundHeight = 64, $claimPrice = 0, $clearPrice = 0, $disposePrice = 0, $resetPrice = 0;
 	/** @var bool  */
-	public $restrictEntityMovement, $updatePlotLiquids;
+	public $restrictEntityMovement = true, $updatePlotLiquids = false;
 
 	public function __construct(string $name, array $settings = []) {
 		$this->name = $name;
 		if (!empty($settings)) {
-			$this->roadBlock = self::parseBlock($settings, "RoadBlock", Block::get(Block::PLANK));
-			$this->wallBlock = self::parseBlock($settings, "WallBlock", Block::get(Block::SLABS));
+			$this->roadBlock = self::parseBlock($settings, "RoadBlock", Block::get(Block::PLANKS));
+			$this->wallBlock = self::parseBlock($settings, "WallBlock", Block::get(Block::STONE_SLAB));
 			$this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", Block::get(Block::GRASS));
 			$this->plotFillBlock = self::parseBlock($settings, "PlotFillBlock", Block::get(Block::DIRT));
 			$this->bottomBlock = self::parseBlock($settings, "BottomBlock", Block::get(Block::BEDROCK));
 			$this->roadWidth = self::parseNumber($settings, "RoadWidth", 7);
-			$this->plotSize = self::parseNumber($settings, "PlotSize", 22);
+			$this->plotSize = self::parseNumber($settings, "PlotSize", 32);
 			$this->groundHeight = self::parseNumber($settings, "GroundHeight", 64);
 			$this->claimPrice = self::parseNumber($settings, "ClaimPrice", 0);
 			$this->clearPrice = self::parseNumber($settings, "ClearPrice", 0);
