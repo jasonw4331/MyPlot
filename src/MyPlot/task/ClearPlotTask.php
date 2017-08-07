@@ -3,6 +3,7 @@ namespace MyPlot\task;
 
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
+use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
 
 use MyPlot\MyPlot;
@@ -59,6 +60,15 @@ class ClearPlotTask extends PluginTask {
 			}
 			$this->pos->z = $this->plotBeginPos->z;
 			$this->pos->x++;
+		}
+		foreach ($this->level->getEntities() as $entity) {
+			if (($plot = $this->plugin->getPlotByPosition($entity)) != null) {
+				if ($plot->X === $this->plotBeginPos->x and $plot->Z === $this->plotBeginPos->z) {
+					if (!$entity instanceof Player) {
+						$entity->close();
+					}
+				}
+			}
 		}
 		$this->plugin->getLogger()->debug("Clear task completed at {$this->plotBeginPos->x};{$this->plotBeginPos->z}");
 	}
