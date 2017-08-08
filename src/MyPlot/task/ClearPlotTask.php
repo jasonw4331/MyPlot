@@ -33,7 +33,7 @@ class ClearPlotTask extends PluginTask {
 		$this->plugin->getLogger()->debug("Clear Task started at plot {$plot->X};{$plot->Z}");
 	}
 
-	public function onRun($tick) {
+	public function onRun(int $currentTick) {
 		foreach ($this->level->getEntities() as $entity) {
 			if (($plot = $this->plugin->getPlotByPosition($entity)) != null) {
 				if ($plot->X === $this->plotBeginPos->x and $plot->Z === $this->plotBeginPos->z) {

@@ -4,13 +4,17 @@ namespace MyPlot\provider;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 
-class MySQLProvider extends DataProvider{
+class MySQLProvider extends DataProvider
+{
 	/** @var MyPlot */
 	protected $plugin;
+
 	/** @var \mysqli $db */
 	private $db;
+
 	/** @var array */
 	private $settings;
+
 	/** @var \mysqli_stmt */
 	private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
 		$sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
@@ -18,6 +22,7 @@ class MySQLProvider extends DataProvider{
 
 	/**
 	 * MySQLProvider constructor.
+	 *
 	 * @param MyPlot $plugin
 	 * @param int $cacheSize
 	 * @param array $settings
