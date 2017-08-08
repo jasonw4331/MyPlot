@@ -21,11 +21,9 @@ class DisposeSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		$confirm = (count($args) == 1 and $args[0] == $this->translateString("confirm"));
-		if (count($args) != 0 and !$confirm) {
+		if (empty($args)) {
 			return false;
 		}
-
 		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if ($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
@@ -36,7 +34,7 @@ class DisposeSubCommand extends SubCommand
 			return true;
 		}
 
-		if ($confirm) {
+		if (isset($args[0]) and $args[0] == $this->translateString("confirm")) {
 			$economy = $this->getPlugin()->getEconomyProvider();
 			$price = $this->getPlugin()->getLevelSettings($plot->levelName)->disposePrice;
 			if ($economy !== null and !$economy->reduceMoney($sender, $price)) {

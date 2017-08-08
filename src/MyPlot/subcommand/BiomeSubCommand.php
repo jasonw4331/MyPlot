@@ -35,12 +35,10 @@ class BiomeSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (count($args) === 0) {
+		if (empty($args)) {
 			$biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
 			$sender->sendMessage($this->translateString("biome.possible", [$biomes]));
 			return true;
-		} elseif (count($args) !== 1) {
-			return false;
 		}
 		$player = $sender->getServer()->getPlayer($sender->getName());
 		$biome = strtoupper($args[0]);
@@ -53,6 +51,16 @@ class BiomeSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
+		if(is_numeric($biome)) {
+			$biome = (int) $biome;
+			if($biome > 27 or $biome < 0) {
+				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
+				$biomes = implode(", ", array_keys($this->biomes));
+				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
+				return true;
+			}
+			$biome = Biome::getBiome($biome);
+		}else{
 		if (!isset($this->biomes[$biome])) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
 			$biomes = implode(", ", array_keys($this->biomes));
@@ -60,6 +68,7 @@ class BiomeSubCommand extends SubCommand
 			return true;
 		}
 		$biome = Biome::getBiome($this->biomes[$biome]);
+		}
 		if ($this->getPlugin()->setPlotBiome($plot, $biome)) {
 			$sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
 		} else {

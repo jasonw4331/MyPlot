@@ -21,9 +21,6 @@ class ClaimSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (count($args) > 1) {
-			return false;
-		}
 		$name = "";
 		if (isset($args[0])) {
 			$name = $args[0];

@@ -21,9 +21,9 @@ class AddHelperSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (count($args) !== 1)
+		if (empty($args)) {
 			return false;
-
+		}
 		$helper = $args[0];
 		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if ($plot === null) {

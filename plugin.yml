@@ -1,17 +1,20 @@
 name: MyPlot
-description: "Plots and Protection Plugin for PMMP Servers"
-authors: ["Wiez","Exxarion","jasonwynn10"]
 main: MyPlot\MyPlot
-version: 1.1.4
+version: 1.1.5
 api:
 - 3.0.0
 - 3.0.0-ALPHA7
+authors:
+ - Wiez
+ - Exxarion
+ - jasonwynn10
+description: "Plots and Protection Plugin for PMMP Servers"
+load: STARTUP
 softdepend:
 - EconomyAPI
 - PocketMoney
 - EssentialsPE
 - EconomyPlus
-load: STARTUP
 extensions:
 - sqlite3
 - mysqli

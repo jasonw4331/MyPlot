@@ -21,11 +21,9 @@ class GiveSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		$confirm = (count($args) == 2 and $args[1] == $this->translateString("confirm"));
-		if (count($args) != 1 and !$confirm) {
+		if (empty($args)) {
 			return false;
 		}
-
 		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if ($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
@@ -51,8 +49,7 @@ class GiveSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
 			return true;
 		}
-
-		if ($confirm) {
+		if (count($args) == 2 and $args[1] == $this->translateString("confirm")) {
 			$plot->owner = $newOwner->getName();
 			if ($this->getPlugin()->savePlot($plot)) {
 				$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;

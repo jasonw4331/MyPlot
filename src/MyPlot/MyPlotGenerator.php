@@ -10,9 +10,9 @@ use pocketmine\level\Level;
 
 class MyPlotGenerator extends Generator
 {
-	/** @var Level */
+	/** @var ChunkManager $level */
 	private $level;
-	/** @var string[] */
+	/** @var string[] $settings */
 	private $settings;
 
 	/** @var Block */

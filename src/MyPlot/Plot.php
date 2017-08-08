@@ -3,7 +3,7 @@ namespace MyPlot;
 
 class Plot
 {
-	public $levelName, $X, $Z, $name, $owner, $helpers, $biome, $id, $denied;
+	public $levelName, $X, $Z, $name = "", $owner = "", $helpers = [], $denied = [], $biome = "PLAINS", $id = -1;
 
 	/**
 	 * @param string $levelName

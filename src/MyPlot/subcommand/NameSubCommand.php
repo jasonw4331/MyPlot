@@ -21,10 +21,9 @@ class NameSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (count($args) !== 1) {
+		if(empty($args)) {
 			return false;
 		}
-
 		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if ($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));

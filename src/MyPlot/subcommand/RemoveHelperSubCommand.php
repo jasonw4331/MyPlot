@@ -21,7 +21,7 @@ class RemoveHelperSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (count($args) !== 1) {
+		if(empty($args)) {
 			return false;
 		}
 		$helper = $args[0];

@@ -21,9 +21,6 @@ class InfoSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (!empty($args)) {
-			return false;
-		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if ($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
@@ -34,6 +31,8 @@ class InfoSubCommand extends SubCommand
 		$sender->sendMessage($this->translateString("info.plotname", [TextFormat::GREEN . $plot->name]));
 		$helpers = implode(", ", $plot->helpers);
 		$sender->sendMessage($this->translateString("info.helpers", [TextFormat::GREEN . $helpers]));
+		$denied = implode(", ", $plot->denied);
+		$sender->sendMessage($this->translateString("info.denied", [TextFormat::GREEN . $denied]));
 		$sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
 		return true;
 	}

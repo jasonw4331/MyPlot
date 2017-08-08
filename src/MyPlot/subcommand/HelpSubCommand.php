@@ -30,7 +30,7 @@ class HelpSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (count($args) === 0) {
+		if (empty($args)) {
 			$pageNumber = 1;
 		} elseif (is_numeric($args[0])) {
 			$pageNumber = (int) array_shift($args);
@@ -41,12 +41,6 @@ class HelpSubCommand extends SubCommand
 			return false;
 		}
 
-		if ($sender instanceof ConsoleCommandSender) {
-			$pageHeight = PHP_INT_MAX;
-		} else {
-			$pageHeight = 9;
-		}
-
 		$commands = [];
 		foreach ($this->cmds->getCommands() as $command) {
 			if ($command->canUse($sender)) {
@@ -54,7 +48,7 @@ class HelpSubCommand extends SubCommand
 			}
 		}
 		ksort($commands, SORT_NATURAL | SORT_FLAG_CASE);
-		$commands = array_chunk($commands, $pageHeight);
+		$commands = array_chunk($commands, $sender->getScreenLineHeight());
 		/** @var SubCommand[][] $commands */
 		$pageNumber = (int) min(count($commands), $pageNumber);
 

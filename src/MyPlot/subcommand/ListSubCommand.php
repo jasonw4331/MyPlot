@@ -22,17 +22,33 @@ class ListSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) {
 		if($sender->hasPermission("myplot.admin.list")) {
-			if(count($args) == 1) {
-				$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName());
-				foreach($plots as $plot) {
-					$name = $plot->name;
-					$x = $plot->X;
-					$z = $plot->Z;
+			if(!empty($args)) {
+				foreach ($this->getPlugin()->getPlotLevels() as $levelName => $settings) {
+					$plots = $this->getPlugin()->getPlotsOfPlayer($args[0], $levelName);
+					foreach($plots as $plot) {
+						$name = $plot->name;
+						$x = $plot->X;
+						$z = $plot->Z;
 
-					$sender->sendMessage(TF::YELLOW.$this->translateString("list.found", [$name, $x, $z]));
+						$sender->sendMessage(TF::YELLOW.$this->translateString("list.found", [$name, $x, $z]));
+					}
 				}
 			}else{
-				$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName());
+				foreach ($this->getPlugin()->getPlotLevels() as $levelName => $settings) {
+					$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
+					foreach ($plots as $plot) {
+						$name = $plot->name;
+						$x = $plot->X;
+						$z = $plot->Z;
+
+						$sender->sendMessage(TF::YELLOW . $this->translateString("list.found", [$name, $x, $z]));
+					}
+					return true;
+				}
+			}
+		}elseif($sender->hasPermission("myplot.command.list")) {
+			foreach ($this->getPlugin()->getPlotLevels() as $levelName => $settings) {
+				$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
 				foreach($plots as $plot) {
 					$name = $plot->name;
 					$x = $plot->X;
@@ -40,16 +56,6 @@ class ListSubCommand extends SubCommand
 
 					$sender->sendMessage(TF::YELLOW.$this->translateString("list.found", [$name, $x, $z]));
 				}
-				return true;
-			}
-		}elseif($sender->hasPermission("myplot.command.list")) {
-			$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName());
-			foreach($plots as $plot) {
-				$name = $plot->name;
-				$x = $plot->X;
-				$z = $plot->Z;
-
-				$sender->sendMessage(TF::YELLOW.$this->translateString("list.found", [$name, $x, $z]));
 			}
 		}
 		return true;
