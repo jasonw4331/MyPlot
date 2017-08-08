@@ -33,7 +33,7 @@ class MiddleSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		if($this->getPlugin()->teleportMiddle($plot, $sender)) {
+		if($this->getPlugin()->teleportMiddle($sender, $plot)) {
 			$sender->sendMessage(TextFormat::GREEN . $this->translateString("middle.success"));
 		}
 		return true;

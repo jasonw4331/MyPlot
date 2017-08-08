@@ -19,7 +19,6 @@ use EconomyPlus\EconomyPlus;
 
 use EssentialsPE\Loader;
 
-use pocketmine\block\Air;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\format\Chunk;
@@ -417,18 +416,16 @@ class MyPlot extends PluginBase
 
 		$plotSize = $plotLevel->plotSize;
 		$pos = $this->getPlotPosition($plot);
-		$X = $pos->getX() + ($plotSize / 2);
-		$Z = $pos->getZ();
+		if($plot->X >= 0 and $plot->Z >= 0)
+			$pos->add(($plotSize / 2), 1, ($plotSize / 2));
+		if($plot->X < 0 and $plot->Z > 0)
+			$pos->add(-($plotSize / 2), 1, ($plotSize / 2));
+		if($plot->X > 0 and $plot->Z < 0)
+			$pos->add(($plotSize / 2), 1, -($plotSize / 2));
+		if($plot->X < 0 and $plot->Z < 0)
+			$pos->add(-($plotSize / 2), 1, -($plotSize / 2));
 
-		for($Y = $pos->getY(); $Y < 128; $Y++) {
-			$mid = new Position($X,$Y+0.5,$Z, $this->getServer()->getLevelByName($plot->levelName));
-			$mida = new Position($X,$Y,$Z, $this->getServer()->getLevelByName($plot->levelName));
-			$midb = new Position($X,$Y+1,$Z, $this->getServer()->getLevelByName($plot->levelName));
-			if ($this->getServer()->getLevelByName($plot->levelName)->getBlock($mida) === Air::class and $this->getServer()->getLevelByName($plot->levelName)->getBlock($midb) === Air::class) {
-				return $mid;
-			}
-		}
-		return new Position($X, $pos->getY(), $Z, $this->getServer()->getLevelByName($plot->levelName));
+		return $pos;
 	}
 
 	/**
@@ -438,7 +435,7 @@ class MyPlot extends PluginBase
 	 * @param Player $player
 	 * @return bool
 	 */
-	public function teleportMiddle(Plot $plot, Player $player) : bool {
+	public function teleportMiddle(Player $player, Plot $plot) : bool {
 		$mid = $this->getPlotMid($plot);
 		if($mid == null) {
 			return false;

@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot;
 
+use MyPlot\subcommand\MiddleSubCommand;
 use pocketmine\command\PluginCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
@@ -62,6 +63,7 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new NameSubCommand($plugin, "name"));
 		$this->loadSubCommand(new GiveSubCommand($plugin, "give"));
 		$this->loadSubCommand(new WarpSubCommand($plugin, "warp"));
+		$this->loadSubCommand(new MiddleSubCommand($plugin, "middle"));
 		$this->loadSubCommand(new DenyPlayerSubCommand($plugin, "denyplayer"));
 		$this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));
 		$this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
