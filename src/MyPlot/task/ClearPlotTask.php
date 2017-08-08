@@ -33,7 +33,18 @@ class ClearPlotTask extends PluginTask {
 		$this->plugin->getLogger()->debug("Clear Task started at plot {$plot->X};{$plot->Z}");
 	}
 
-	public function onRun(int $tick) {
+	public function onRun($tick) {
+		foreach ($this->level->getEntities() as $entity) {
+			if (($plot = $this->plugin->getPlotByPosition($entity)) != null) {
+				if ($plot->X === $this->plotBeginPos->x and $plot->Z === $this->plotBeginPos->z) {
+					if (!$entity instanceof Player) {
+						$entity->close();
+					}else{
+						$this->plugin->teleportPlayerToPlot($entity, $plot);
+					}
+				}
+			}
+		}
 		$blocks = 0;
 		while ($this->pos->x < $this->xMax) {
 			while ($this->pos->z < $this->zMax) {
@@ -61,12 +72,10 @@ class ClearPlotTask extends PluginTask {
 			$this->pos->z = $this->plotBeginPos->z;
 			$this->pos->x++;
 		}
-		foreach ($this->level->getEntities() as $entity) {
-			if (($plot = $this->plugin->getPlotByPosition($entity)) != null) {
+		foreach ( $this->level->getTiles() as $tile) {
+			if (($plot = $this->plugin->getPlotByPosition($tile)) != null) {
 				if ($plot->X === $this->plotBeginPos->x and $plot->Z === $this->plotBeginPos->z) {
-					if (!$entity instanceof Player) {
-						$entity->close();
-					}
+					$tile->close();
 				}
 			}
 		}

@@ -239,9 +239,7 @@ class MyPlot extends PluginBase
 		}
 		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize;
-		$pos->x += floor($plotSize / 2);
-		$pos->z -= 1;
-		$pos->y += 1;
+		$pos->add(floor($plotSize / 2), -1, 1);
 		$player->teleport($pos);
 		return true;
 	}
@@ -417,13 +415,13 @@ class MyPlot extends PluginBase
 		$plotSize = $plotLevel->plotSize;
 		$pos = $this->getPlotPosition($plot);
 		if($plot->X >= 0 and $plot->Z >= 0)
-			$pos->add(($plotSize / 2), 1, ($plotSize / 2));
+			$pos->add(floor($plotSize / 2), 1, floor($plotSize / 2));
 		if($plot->X < 0 and $plot->Z > 0)
-			$pos->add(-($plotSize / 2), 1, ($plotSize / 2));
+			$pos->add(-floor($plotSize / 2), 1, floor($plotSize / 2));
 		if($plot->X > 0 and $plot->Z < 0)
-			$pos->add(($plotSize / 2), 1, -($plotSize / 2));
+			$pos->add(floor($plotSize / 2), 1, -floor($plotSize / 2));
 		if($plot->X < 0 and $plot->Z < 0)
-			$pos->add(-($plotSize / 2), 1, -($plotSize / 2));
+			$pos->add(-floor($plotSize / 2), 1, -floor($plotSize / 2));
 
 		return $pos;
 	}
