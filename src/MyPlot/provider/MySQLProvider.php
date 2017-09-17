@@ -39,30 +39,7 @@ class MySQLProvider extends DataProvider
 		$this->db->query(
 			"CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT);"
 		);
-		$this->sqlGetPlot = $this->db->prepare(
-			"SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = ? AND X = ? AND Z = ?;"
-		);
-		$this->sqlSavePlot = $this->db->prepare(
-			"INSERT INTO plots (`id`, `level`, `X`, `Z`, `name`, `owner`, `helpers`, `denied`, `biome`) VALUES((SELECT id	FROM plots p WHERE p.level = ? AND X = ? AND Z = ?),?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name = VALUES(name), owner = VALUES(owner), helpers = VALUES(helpers), denied = VALUES(denied), biome = VALUES(biome);"
-		);
-		$this->sqlSavePlotById = $this->db->prepare(
-			"UPDATE plots SET id = ?, level = ?, X = ?, Z = ?, name = ?, owner = ?, helpers = ?, denied = ?, biome = ? WHERE id = VALUES(id);"
-		);
-		$this->sqlRemovePlot = $this->db->prepare(
-			"DELETE FROM plots WHERE id = ?;"
-		);
-		$this->sqlRemovePlotById = $this->db->prepare(
-			"DELETE FROM plots WHERE level = ? AND X = ? AND Z = ?;"
-		);
-		$this->sqlGetPlotsByOwner = $this->db->prepare(
-			"SELECT * FROM plots WHERE owner = ?;"
-		);
-		$this->sqlGetPlotsByOwnerAndLevel = $this->db->prepare(
-			"SELECT * FROM plots WHERE owner = ? AND level = ?;"
-		);
-		$this->sqlGetExistingXZ = $this->db->prepare(
-			"SELECT X, Z FROM plots WHERE (level = ? AND ((abs(X) = ? AND abs(Z) <= ?) OR (abs(Z) = ? AND abs(X) <= ?)));"
-		);
+		$this->prepare();
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
 
@@ -124,6 +101,7 @@ class MySQLProvider extends DataProvider
 		$result = $stmt->execute();
 		if($result === false) {
 			$this->plugin->getLogger()->error($stmt->error);
+			return null;
 		}
 		$result = $stmt->get_result();
 		if($val = $result->fetch_array(MYSQLI_ASSOC)) {
@@ -229,6 +207,7 @@ class MySQLProvider extends DataProvider
 			$this->plugin->getLogger()->error("The MySQL server can not be reached! Trying to reconnect!");
 			$this->db->close();
 			$this->db->connect($this->settings['Host'], $this->settings['Username'], $this->settings['Password'], $this->settings['DatabaseName'], $this->settings['Port']);
+			$this->prepare();
 			if($this->db->ping()) {
 				$this->plugin->getLogger()->notice("The MySQL connection has been re-established!");
 				return true;
@@ -245,5 +224,32 @@ class MySQLProvider extends DataProvider
 			}
 		}
 		return true;
+	}
+
+	private function prepare(){
+		$this->sqlGetPlot = $this->db->prepare(
+			"SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = ? AND X = ? AND Z = ?;"
+		);
+		$this->sqlSavePlot = $this->db->prepare(
+			"INSERT INTO plots (`id`, `level`, `X`, `Z`, `name`, `owner`, `helpers`, `denied`, `biome`) VALUES((SELECT id	FROM plots p WHERE p.level = ? AND X = ? AND Z = ?),?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name = VALUES(name), owner = VALUES(owner), helpers = VALUES(helpers), denied = VALUES(denied), biome = VALUES(biome);"
+		);
+		$this->sqlSavePlotById = $this->db->prepare(
+			"UPDATE plots SET id = ?, level = ?, X = ?, Z = ?, name = ?, owner = ?, helpers = ?, denied = ?, biome = ? WHERE id = VALUES(id);"
+		);
+		$this->sqlRemovePlot = $this->db->prepare(
+			"DELETE FROM plots WHERE id = ?;"
+		);
+		$this->sqlRemovePlotById = $this->db->prepare(
+			"DELETE FROM plots WHERE level = ? AND X = ? AND Z = ?;"
+		);
+		$this->sqlGetPlotsByOwner = $this->db->prepare(
+			"SELECT * FROM plots WHERE owner = ?;"
+		);
+		$this->sqlGetPlotsByOwnerAndLevel = $this->db->prepare(
+			"SELECT * FROM plots WHERE owner = ? AND level = ?;"
+		);
+		$this->sqlGetExistingXZ = $this->db->prepare(
+			"SELECT X, Z FROM plots WHERE (level = ? AND ((abs(X) = ? AND abs(Z) <= ?) OR (abs(Z) = ? AND abs(X) <= ?)));"
+		);
 	}
 }
