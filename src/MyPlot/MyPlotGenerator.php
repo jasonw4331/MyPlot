@@ -6,7 +6,6 @@ use pocketmine\level\generator\Generator;
 use pocketmine\level\ChunkManager;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
-use pocketmine\level\Level;
 
 class MyPlotGenerator extends Generator
 {

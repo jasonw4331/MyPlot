@@ -37,7 +37,6 @@ use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
 {
-
 	/** @var PlotLevelSettings[] $levels */
 	private $levels = [];
 
@@ -258,9 +257,9 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
-			$plotb = $this->getPlotByPosition($entity->getPosition());
-			if($plotb != null) {
-				if($plotb === $plot) {
+			$plotB = $this->getPlotByPosition($entity->getPosition());
+			if($plotB != null) {
+				if($plotB === $plot) {
 					if(!$entity instanceof Player) {
 						$entity->close();
 					}
