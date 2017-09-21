@@ -15,9 +15,11 @@ use MyPlot\provider\EconomyProvider;
 
 use onebone\economyapi\EconomyAPI;
 
-use EconomyPlus\EconomyPlus;
-
 use EssentialsPE\Loader;
+
+use PocketMoney\PocketMoney;
+
+use ImagicalGamer\EconomyPlus\Main;
 
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
@@ -30,7 +32,6 @@ use pocketmine\level\generator\Generator;
 use pocketmine\Player;
 use pocketmine\level\Level;
 use pocketmine\utils\TextFormat as TF;
-use PocketMoney\PocketMoney;
 
 use spoondetector\SpoonDetector;
 
@@ -437,7 +438,7 @@ class MyPlot extends PluginBase
 	/* -------------------------- Non-API part -------------------------- */
 
 	public function onEnable() {
-		@mkdir($this->getDataFolder());
+		@mkdir($this->getDataFolder()); // for spoon detector
 		SpoonDetector::printSpoon($this, "spoon.txt");
 
 		$this->getLogger()->notice(TF::BOLD."Loading...");
@@ -493,7 +494,7 @@ class MyPlot extends PluginBase
 				}
 				$this->getLogger()->debug("Eco not instance of PocketMoney");
 			} elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyPlus")) !== null) {
-				if($plugin instanceof EconomyPlus) {
+				if($plugin instanceof Main) {
 					$this->economyProvider = new EconomyPlusProvider($plugin);
 					$this->getLogger()->debug("Eco set to EconomyPlus");
 				}
