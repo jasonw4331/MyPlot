@@ -394,7 +394,7 @@ class MyPlot extends PluginBase
 		foreach ($perms as $name => $perm) {
 			$maxPlots = substr($name, 18);
 			if (is_numeric($maxPlots)) {
-				return $maxPlots;
+				return (int) $maxPlots;
 			}
 		}
 		return 0;
