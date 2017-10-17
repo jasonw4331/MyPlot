@@ -3,8 +3,10 @@ namespace MyPlot\events;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\event\Cancellable;
 
-class MyPlotSaveEvent extends MyPlotEvent {
+class MyPlotSaveEvent extends MyPlotPlotEvent implements Cancellable {
+	public static $handlerList = null;
 	const SQLITE3 = 0;
 	const MySQL = 1;
 	const JSON = 2;
@@ -12,20 +14,15 @@ class MyPlotSaveEvent extends MyPlotEvent {
 	const OTHER = -1;
 	/** @var int $type */
 	private $type;
-	/** @var Plot $plot */
-	private $plot;
 	public function __construct(MyPlot $plugin, string $issuer, int $type, Plot $plot) {
 		$this->type = $type;
-		$this->plot = $plot;
-		parent::__construct($plugin, $issuer);
+		parent::__construct($plugin, $issuer, $plot);
 	}
+
+	/**
+	 * @return int
+	 */
 	public function getType() : int {
 		return $this->type;
-	}
-	public function getPlot() : plot {
-		return $this->plot;
-	}
-	public function setPlot(Plot $plot) {
-		$this->plot = $plot;
 	}
 }

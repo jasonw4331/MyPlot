@@ -2,17 +2,26 @@
 namespace MyPlot\events;
 
 use MyPlot\MyPlot;
-use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 
-class MyPlotEvent extends PluginEvent implements Cancellable {
-	public static $handlerList = null;
+abstract class MyPlotEvent extends PluginEvent {
 	/** @var string $issuer */
-	private $issuer;
+	protected $issuer;
+
+	/**
+	 * MyPlotEvent constructor.
+	 *
+	 * @param MyPlot $plugin
+	 * @param string $issuer
+	 */
 	public function __construct(MyPlot $plugin, string $issuer) {
 		$this->issuer = $issuer;
 		parent::__construct($plugin);
 	}
+
+	/**
+	 * @return string
+	 */
 	public function getIssuer() : string {
 		return $this->issuer;
 	}

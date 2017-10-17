@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot;
 
+use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
 use pocketmine\event\player\PlayerMoveEvent;
@@ -19,7 +20,7 @@ use pocketmine\utils\TextFormat;
 
 class EventListener implements Listener
 {
-	/** @var MyPlot */
+	/** @var MyPlot $plugin */
 	private $plugin;
 
 	public function __construct(MyPlot $plugin){
@@ -235,15 +236,15 @@ class EventListener implements Listener
 		if($event->isCancelled()) {
 			return;
 		}
-		if (!$this->plugin->getConfig()->get("ShowPlotPopup", true))
-			return;
-
 		$levelName = $event->getPlayer()->getLevel()->getName();
 		if (!$this->plugin->isLevelLoaded($levelName))
 			return;
 
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		if ($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
+			$this->plugin->getServer()->getPluginManager()->callEvent(new MyPlotPlayerEnterPlotEvent($this->plugin, "MyPlot", $plot, $event->getPlayer())); //TODO: make cancellable & use with denied players
+			if (!$this->plugin->getConfig()->get("ShowPlotPopup", true))
+				return;
 			if($plot->isDenied($event->getPlayer()->getName())) {
 				$event->setCancelled();
 				return;
