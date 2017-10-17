@@ -261,7 +261,6 @@ class EventListener implements Listener
 				$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
 				$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
 					TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
-				$this->plugin->getLogger()->debug("Check for lag! Owned plot popup sent to ".$event->getPlayer()->getName());
 			} else {
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
 				$paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
@@ -269,10 +268,8 @@ class EventListener implements Listener
 				$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
 				$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
 					TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
-				$this->plugin->getLogger()->debug("Check for lag! Availability plot popup sent to ".$event->getPlayer()->getName());
 			}
 			$event->getPlayer()->sendTip($popup);
-			#$event->getPlayer()->sendPopup($popup);
 		}
 	}
 }

@@ -21,7 +21,7 @@ class UnDenySubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (count($args) !== 1) {
+		if (empty($args)) {
 			return false;
 		}
 		$dplayer = $args[0];
@@ -36,7 +36,7 @@ class UnDenySubCommand extends SubCommand
 			return true;
 		}
 		if (!$plot->unDenyPlayer($dplayer)) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("undenyplayer.notdenied", [$dplayer]));
+			$sender->sendMessage(TextFormat::RED . $this->translateString("undenyplayer.failure", [$dplayer]));
 			return true;
 		}
 		if ($this->getPlugin()->savePlot($plot)) {

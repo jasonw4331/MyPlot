@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot;
 
+use MyPlot\subcommand\MiddleSubCommand;
 use pocketmine\command\PluginCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
@@ -44,6 +45,7 @@ class Commands extends PluginCommand
 		$this->setPermission("myplot.command");
 		$this->setAliases([$plugin->getLanguage()->get("command.alias")]);
 		$this->setDescription($plugin->getLanguage()->get("command.desc"));
+		$this->setUsage($this->plugin->getLanguage()->get("command.usage"));
 
 		$this->loadSubCommand(new HelpSubCommand($plugin, "help", $this));
 		$this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
@@ -61,6 +63,7 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new NameSubCommand($plugin, "name"));
 		$this->loadSubCommand(new GiveSubCommand($plugin, "give"));
 		$this->loadSubCommand(new WarpSubCommand($plugin, "warp"));
+		$this->loadSubCommand(new MiddleSubCommand($plugin, "middle"));
 		$this->loadSubCommand(new DenyPlayerSubCommand($plugin, "denyplayer"));
 		$this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));
 		$this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
@@ -93,8 +96,7 @@ class Commands extends PluginCommand
 	 */
 	public function execute(CommandSender $sender, string $alias, array $args) {
 		if (!isset($args[0])) {
-			$sender->sendMessage($this->plugin->getLanguage()->get("command.usage"));
-			return true;
+			return false;
 		}
 
 		$subCommand = strtolower(array_shift($args));

@@ -16,11 +16,12 @@ use MyPlot\provider\EconomyProvider;
 
 use onebone\economyapi\EconomyAPI;
 
-use EconomyPlus\EconomyPlus;
-
 use EssentialsPE\Loader;
 
-use pocketmine\block\Air;
+use PocketMoney\PocketMoney;
+
+use ImagicalGamer\EconomyPlus\Main;
+
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\format\Chunk;
@@ -32,13 +33,11 @@ use pocketmine\level\generator\Generator;
 use pocketmine\Player;
 use pocketmine\level\Level;
 use pocketmine\utils\TextFormat as TF;
-use PocketMoney\PocketMoney;
 
 use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
 {
-
 	/** @var PlotLevelSettings[] $levels */
 	private $levels = [];
 
@@ -149,9 +148,6 @@ class MyPlot extends PluginBase
 	 * @return Plot[]
 	 */
 	public function getPlotsOfPlayer(string $username, string $levelName) : array {
-		  if($levelName instanceof Level) {
-				$levelName = $levelName->getName();
-		  }
 		return $this->dataProvider->getPlotsByOwner($username, $levelName);
 	}
 
@@ -248,9 +244,7 @@ class MyPlot extends PluginBase
 		}
 		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize;
-		$pos->x += floor($plotSize / 2);
-		$pos->z -= 1;
-		$pos->y += 1;
+		$pos->add(floor($plotSize / 2), -1, 1);
 		$player->teleport($pos);
 		return true;
 	}
@@ -268,9 +262,9 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
-			$plotb = $this->getPlotByPosition($entity->getPosition());
-			if($plotb != null) {
-				if($plotb === $plot) {
+			$plotB = $this->getPlotByPosition($entity->getPosition());
+			if($plotB != null) {
+				if($plotB === $plot) {
 					if(!$entity instanceof Player) {
 						$entity->close();
 					}
@@ -405,7 +399,7 @@ class MyPlot extends PluginBase
 		foreach ($perms as $name => $perm) {
 			$maxPlots = substr($name, 18);
 			if (is_numeric($maxPlots)) {
-				return $maxPlots;
+				return (int) $maxPlots;
 			}
 		}
 		return 0;
@@ -425,18 +419,9 @@ class MyPlot extends PluginBase
 
 		$plotSize = $plotLevel->plotSize;
 		$pos = $this->getPlotPosition($plot);
-		$X = $pos->getX() + ($plotSize / 2);
-		$Z = $pos->getZ();
+		$pos = new Position($pos->getFloorX() + ($plotSize / 2) + 0.5, $pos->getFloorY() + 1, $pos->getFloorZ() + ($plotSize / 2) + 0.5);
 
-		for($Y = $pos->getY(); $Y < 128; $Y++) {
-			$mid = new Position($X,$Y+0.5,$Z, $this->getServer()->getLevelByName($plot->levelName));
-			$mida = new Position($X,$Y,$Z, $this->getServer()->getLevelByName($plot->levelName));
-			$midb = new Position($X,$Y+1,$Z, $this->getServer()->getLevelByName($plot->levelName));
-			if ($this->getServer()->getLevelByName($plot->levelName)->getBlock($mida) === Air::class and $this->getServer()->getLevelByName($plot->levelName)->getBlock($midb) === Air::class) {
-				return $mid;
-			}
-		}
-		return new Position($X, $pos->getY(), $Z, $this->getServer()->getLevelByName($plot->levelName));
+		return $pos;
 	}
 
 	/**
@@ -446,7 +431,7 @@ class MyPlot extends PluginBase
 	 * @param Player $player
 	 * @return bool
 	 */
-	public function teleportMiddle(Plot $plot, Player $player) : bool {
+	public function teleportMiddle(Player $player, Plot $plot) : bool {
 		$mid = $this->getPlotMid($plot);
 		if($mid == null) {
 			return false;
@@ -457,7 +442,7 @@ class MyPlot extends PluginBase
 	/* -------------------------- Non-API part -------------------------- */
 
 	public function onEnable() {
-		@mkdir($this->getDataFolder());
+		@mkdir($this->getDataFolder()); // for spoon detector
 		SpoonDetector::printSpoon($this, "spoon.txt");
 
 		$this->getLogger()->notice(TF::BOLD."Loading...");
@@ -513,7 +498,7 @@ class MyPlot extends PluginBase
 				}
 				$this->getLogger()->debug("Eco not instance of PocketMoney");
 			} elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyPlus")) !== null) {
-				if($plugin instanceof EconomyPlus) {
+				if($plugin instanceof Main) {
 					$this->economyProvider = new EconomyPlusProvider($plugin);
 					$this->getLogger()->debug("Eco set to EconomyPlus");
 				}

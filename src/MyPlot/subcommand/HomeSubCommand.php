@@ -24,12 +24,13 @@ class HomeSubCommand extends SubCommand
 	public function execute(CommandSender $sender, array $args) {
 		if (empty($args)) {
 			$plotNumber = 1;
-		} elseif (count($args) === 1 and is_numeric($args[0])) {
+		} elseif (is_numeric($args[0])) {
 			$plotNumber = (int) $args[0];
 		} else {
 			return false;
 		}
-		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $sender->getLevel()->getName());
+		$levelName = $args[1] ?? $sender->getLevel()->getName();
+		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
 		if (empty($plots)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));
 			return true;
@@ -48,7 +49,7 @@ class HomeSubCommand extends SubCommand
 
 		$plot = $plots[$plotNumber - 1];
 		if ($this->getPlugin()->teleportPlayerToPlot($sender, $plot)) {
-			$sender->sendMessage($this->translateString("home.success", [$plot]));
+			$sender->sendMessage($this->translateString("home.success", [$plot, $plot->levelName]));
 		} else {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.error"));
 		}

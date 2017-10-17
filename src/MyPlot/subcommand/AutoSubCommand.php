@@ -21,17 +21,18 @@ class AutoSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (!empty($args)) {
-			return false;
-		}
 		$levelName = $sender->getLevel()->getName();
 		if (!$this->getPlugin()->isLevelLoaded($levelName)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
 			return true;
 		}
 		if (($plot = $this->getPlugin()->getNextFreePlot($levelName)) !== null) {
-			$this->getPlugin()->teleportPlayerToPlot($sender, $plot);
+			$this->getPlugin()->teleportMiddle($sender, $plot);
 			$sender->sendMessage($this->translateString("auto.success", [$plot->X, $plot->Z]));
+			$cmd = new ClaimSubCommand($this->getPlugin(), "claim");
+			if(isset($args[0]) and strtolower($args[0]) == "true" and $cmd->canUse($sender)) {
+				$cmd->execute($sender, [$args[1]]);
+			}
 		} else {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.noplots"));
 		}

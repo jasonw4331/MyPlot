@@ -35,40 +35,48 @@ class BiomeSubCommand extends SubCommand
 	 * @param string[] $args
 	 * @return bool
 	 */
-    public function execute(CommandSender $sender, array $args) {
-        if (count($args) === 0) {
-            $biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
-            $sender->sendMessage($this->translateString("biome.possible", [$biomes]));
-            return true;
-        } elseif (count($args) !== 1) {
-            return false;
-        }
-        $player = $sender->getServer()->getPlayer($sender->getName());
-        $biome = strtoupper($args[0]);
-        $plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
-        if ($plot === null) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
-            return true;
-        }
-        if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.biome")) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
-            return true;
-        }
-        if (!isset($this->biomes[$biome])) {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
-            $biomes = implode(", ", array_keys($this->biomes));
-            $sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
-            return true;
-        }
-        $biome = Biome::getBiome($this->biomes[$biome]);
-        $this->getPlugin()->getServer()->getPluginManager()->callEvent(
+	public function execute(CommandSender $sender, array $args) {
+		if (empty($args) ) {
+			$biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
+			$sender->sendMessage($this->translateString("biome.possible", [$biomes]));
+			return true;
+		}
+		$player = $sender->getServer()->getPlayer($sender->getName());
+		$biome = strtoupper($args[0]);
+		$plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
+		if ($plot === null) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			return true;
+		}
+		if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.biome")) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			return true;
+		}
+		if (is_numeric($biome)) {
+			$biome = (int) $biome;
+			if($biome > 27 or $biome < 0) {
+				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
+				$biomes = implode(", ", array_keys($this->biomes));
+				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
+				return true;
+			}
+			$biome = Biome::getBiome($biome);
+		}else{
+		if (!isset($this->biomes[$biome])) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
+			$biomes = implode(", ", array_keys($this->biomes));
+			$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
+			return true;
+		}
+		$biome = Biome::getBiome($this->biomes[$biome]);}
+		$this->getPlugin()->getServer()->getPluginManager()->callEvent(
 	    	($ev = new MyPlotBiomeChangeEvent($this->getPlugin(), "MyPlot",$plot, $this->biomes[strtoupper($biome->getName())], $this->biomes[$plot->biome]))
 	    );
         if ($this->getPlugin()->setPlotBiome($ev->getPlot(), Biome::getBiome($ev->getNewBiomeId()))) {
-            $sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
-        } else {
-            $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
-        }
-        return true;
-    }
+			$sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
+		} else {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+		}
+		return true;
+	}
 }

@@ -1,0 +1,10 @@
+language: php
+php: ["7.2"]
+sudo: false
+dist: trusty
+
+install:
+- "wget -O - https://poggit.pmmp.io/res/travisInstall.sh | bash -s - || true"
+
+script:
+- "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then wget -O - https://poggit.pmmp.io/res/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"

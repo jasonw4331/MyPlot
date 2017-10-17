@@ -21,10 +21,10 @@ class WarpSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (count($args) != 1)
+		if(empty($args)) {
 			return false;
-
-		$levelName = $sender->getLevel()->getName();
+		}
+		$levelName = $args[1] ?? $sender->getLevel()->getName();
 		if (!$this->getPlugin()->isLevelLoaded($levelName)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("warp.notinplotworld"));
 			return true;

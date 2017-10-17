@@ -21,11 +21,6 @@ class ResetSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		$confirm = (count($args) == 1 and $args[0] == $this->translateString("confirm"));
-		if (count($args) != 0 and !$confirm) {
-			return false;
-		}
-
 		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if ($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
@@ -35,8 +30,7 @@ class ResetSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-
-		if ($confirm) {
+		if (isset($args[0]) and $args[0] == $this->translateString("confirm")) {
 			$economy = $this->getPlugin()->getEconomyProvider();
 			$price = $this->getPlugin()->getLevelSettings($plot->levelName)->resetPrice;
 			if ($economy !== null and !$economy->reduceMoney($sender, $price)) {
