@@ -6,13 +6,7 @@
 #### Please note that the [API3 Branch](https://github.com/jasonwynn10/MyPlot/tree/API3) is actively under development for the new changes in PocketMine 3.0.0 and may not work all the time. The [master branch](https://github.com/jasonwynn10/MyPlot/tree/master) is for compatability with 0.16 clients.
 #### Official MyPlot precompiled builds can be found on [Poggit](https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot) at https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot
 
-Have you ever seen those Java servers with the PlotMe plugin and thought "Hey, why can't I have plots on my Minecraft server?" Well, now you can with **MyPlot** for PocketMine-MP! 
-#### Current Features:
- - Easy to set up and simple to use!
- - Simple commands for all your plot needs
- - Multiple methods to save your plot data
- - Customizable permissions to set the amount of plots a player can have
- - Multiple plot worlds are supported!
+Have you ever seen those Java servers with the PlotMe plugin and thought "Hey, why can't I have plots on my Minecraft server?" Well, now you can with **MyPlot** for PocketMine-MP!
 
 A list of commands and permissions can be found in the [MyPlot Wiki](http://jasonwynn10.github.io/MyPlot/cmdsandperms) along with a helpful config guide [here](http://jasonwynn10.github.io/MyPlot/configurations).
 
