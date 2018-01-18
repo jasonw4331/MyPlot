@@ -7,37 +7,21 @@ use MyPlot\Plot;
 use pocketmine\event\Cancellable;
 use pocketmine\Player;
 
-class MyPlotPlayerEnterPlotEvent extends MyPlotEvent implements Cancellable{
+class MyPlotPlayerEnterPlotEvent extends MyPlotPlotEvent implements Cancellable{
 	public static $handlerList = null;
-	/** @var Plot */
-	private $plot;
 	/** @var Player */
 	private $player;
 
 	/**
 	 * PlotEnterEvent constructor.
 	 * @param MyPlot $plugin
+	 * @param string $issuer
 	 * @param Plot $plot
 	 * @param Player $player
 	 */
-	public function __construct(MyPlot $plugin, Plot $plot, Player $player){
-		parent::__construct($plugin);
+	public function __construct(MyPlot $plugin, string $issuer, Plot $plot, Player $player){
+		parent::__construct($plugin, $issuer, $plot);
 		$this->setPlayer($player);
-		$this->setPlot($plot);
-	}
-
-	/**
-	 * @return Plot
-	 */
-	public function getPlot(): Plot{
-		return $this->plot;
-	}
-
-	/**
-	 * @param Plot $plot
-	 */
-	public function setPlot(Plot $plot){
-		$this->plot = $plot;
 	}
 
 	/**
