@@ -44,7 +44,7 @@ class AddHelperSubCommand extends SubCommand
 		    return true;
 	    }
 	    $this->getPlugin()->getServer()->getPluginManager()->callEvent(
-	    	($ev = new MyPlotHelperEvent($this->getPlugin(), "MyPlot", $plot, MyPlotHelperEvent::ADD, $helper->getName()))
+	    	($ev = new MyPlotHelperEvent($this->getPlugin(), $sender->getName(), $plot, MyPlotHelperEvent::ADD, $helper->getName()))
 	    );
         if($ev->isCancelled()) {
 	        $sender->sendMessage(TextFormat::RED . $this->translateString("error"));

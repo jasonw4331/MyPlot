@@ -59,7 +59,7 @@ class ClaimSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("claim.nomoney"));
 			return true;
 		}
-        $this->getPlugin()->getServer()->getPluginManager()->callEvent($ev = new MyPlotClaimEvent($this->getPlugin(), "MyPlot", $plot, $player));
+        $this->getPlugin()->getServer()->getPluginManager()->callEvent($ev = new MyPlotClaimEvent($this->getPlugin(), $sender->getName(), $plot, $player));
         if($ev->isCancelled()) {
 	        $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         	return true;

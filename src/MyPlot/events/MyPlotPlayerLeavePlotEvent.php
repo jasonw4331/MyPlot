@@ -4,10 +4,9 @@ namespace MyPlot\events;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\event\Cancellable;
 use pocketmine\Player;
 
-class MyPlotPlayerEnterPlotEvent extends MyPlotPlotEvent implements Cancellable{
+class MyPlotPlayerLeavePlotEvent extends MyPlotPlotEvent{
 	public static $handlerList = null;
 	/** @var Player */
 	private $player;
