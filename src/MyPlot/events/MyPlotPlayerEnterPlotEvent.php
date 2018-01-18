@@ -1,32 +1,54 @@
 <?php
+
 namespace MyPlot\events;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\event\Cancellable;
+use pocketmine\event\plugin\PluginEvent;
 use pocketmine\Player;
 
-class MyPlotPlayerEnterPlotEvent extends MyPlotPlotEvent {
+class MyPlotPlayerEnterPlotEvent extends PluginEvent implements Cancellable{
 	public static $handlerList = null;
-	/** @var Player $player */
-	private $player;
+	private $plot, $player;
 
 	/**
-	 * MyPlotPlayerEnterPlotEvent constructor.
-	 *
+	 * PlotEnterEvent constructor.
 	 * @param MyPlot $plugin
-	 * @param string $issuer
 	 * @param Plot $plot
 	 * @param Player $player
 	 */
-	public function __construct(MyPlot $plugin, string $issuer, Plot $plot, Player $player) {
-		$this->player = $player;
-		parent::__construct($plugin, $issuer, $plot);
+	public function __construct(MyPlot $plugin, Plot $plot, Player $player){
+		parent::__construct($plugin);
+		$this->setPlayer($player);
+		$this->setPlot($plot);
 	}
 
 	/**
-	 * @return Player
+	 * @return mixed
 	 */
-	public function getPlayer() : Player {
+	public function getPlayer(){
 		return $this->player;
+	}
+
+	/**
+	 * @param mixed $player
+	 */
+	public function setPlayer($player){
+		$this->player = $player;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getPlot(){
+		return $this->plot;
+	}
+
+	/**
+	 * @param mixed $plot
+	 */
+	public function setPlot($plot){
+		$this->plot = $plot;
 	}
 }
