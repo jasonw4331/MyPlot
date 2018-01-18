@@ -4,10 +4,9 @@ namespace MyPlot\events;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\event\plugin\PluginEvent;
 use pocketmine\Player;
 
-class MyPlotPlayerLeavePlotEvent extends PluginEvent{
+class MyPlotPlayerLeavePlotEvent extends MyPlotEvent{
 	public static $handlerList = null;
 	/** @var Plot */
 	private $plot;
