@@ -213,7 +213,7 @@ class MySQLProvider extends DataProvider
 				return true;
 			}else{
 				$this->plugin->getLogger()->critical("The MySQL connection could not be re-established!");
-				$this->plugin->getLogger()->critical("Closing level to prevent griefing!");
+				$this->plugin->getLogger()->critical("Closing level to prevent griefing!");  //TODO: Is this necessary? The cache should still work
 				foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
 					$level = $this->plugin->getServer()->getLevelByName($levelName);
 					$level->save(); // don't force in case owner doesn't want it saved

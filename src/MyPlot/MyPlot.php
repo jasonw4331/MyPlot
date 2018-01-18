@@ -1,39 +1,33 @@
 <?php
 namespace MyPlot;
 
+use EssentialsPE\Loader;
+use ImagicalGamer\EconomyPlus\Main;
+use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyPlusProvider;
+use MyPlot\provider\EconomyProvider;
 use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\JSONDataProvider;
 use MyPlot\provider\MySQLProvider;
 use MyPlot\provider\PocketMoneyProvider;
+use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
-use MyPlot\provider\DataProvider;
-use MyPlot\provider\SQLiteDataProvider;
-use MyPlot\provider\EconomyProvider;
-
 use onebone\economyapi\EconomyAPI;
-
-use EssentialsPE\Loader;
-
-use PocketMoney\PocketMoney;
-
-use ImagicalGamer\EconomyPlus\Main;
-
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\format\Chunk;
 use pocketmine\level\generator\biome\Biome;
+use pocketmine\level\generator\Generator;
+use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\permission\Permission;
-use pocketmine\plugin\PluginBase;
-use pocketmine\level\generator\Generator;
 use pocketmine\Player;
-use pocketmine\level\Level;
+use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat as TF;
-
+use PocketMoney\PocketMoney;
 use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
@@ -86,7 +80,7 @@ class MyPlot extends PluginBase
 	 * @return PlotLevelSettings|null
 	 */
 	public function getLevelSettings(string $levelName) {
-		if (isset($this->levels[$levelName])) {
+		if(isset($this->levels[$levelName])) {
 			return $this->levels[$levelName];
 		}
 		return null;
@@ -111,16 +105,14 @@ class MyPlot extends PluginBase
 	 * @param array $settings
 	 * @return bool
 	 */
-	public function generateLevel(string $levelName, array $settings = []) : bool {
-		if ($this->getServer()->isLevelGenerated($levelName) === true) {
+	public function generateLevel(string $levelName, array $settings = []) {
+		if($this->getServer()->isLevelGenerated($levelName) === true) {
 			return false;
 		}
-		if (empty($settings)) {
+		if(empty($settings)) {
 			$settings = $this->getConfig()->get("DefaultWorld");
 		}
-		$settings = [
-			"preset" => json_encode($settings)
-		];
+		$settings = ["preset" => json_encode($settings)];
 		return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $settings);
 	}
 
@@ -171,36 +163,36 @@ class MyPlot extends PluginBase
 	 * @return Plot|null
 	 */
 	public function getPlotByPosition(Position $position) {
-		$x = $position->x;
-		$z = $position->z;
+		$x         = $position->x;
+		$z         = $position->z;
 		$levelName = $position->level->getName();
 
 		$plotLevel = $this->getLevelSettings($levelName);
-		if ($plotLevel === null) {
+		if($plotLevel === null) {
 			return null;
 		}
 
-		$plotSize = $plotLevel->plotSize;
+		$plotSize  = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
 
-		if ($x >= 0) {
-			$X = floor($x / $totalSize);
+		if($x >= 0) {
+			$X    = floor($x / $totalSize);
 			$difX = $x % $totalSize;
 		}else{
-			$X = ceil(($x - $plotSize + 1) / $totalSize);
+			$X    = ceil(($x - $plotSize + 1) / $totalSize);
 			$difX = abs(($x - $plotSize + 1) % $totalSize);
 		}
 
-		if ($z >= 0) {
-			$Z = floor($z / $totalSize);
+		if($z >= 0) {
+			$Z    = floor($z / $totalSize);
 			$difZ = $z % $totalSize;
 		}else{
-			$Z = ceil(($z - $plotSize + 1) / $totalSize);
+			$Z    = ceil(($z - $plotSize + 1) / $totalSize);
 			$difZ = abs(($z - $plotSize + 1) % $totalSize);
 		}
 
-		if (($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
+		if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
 			return null;
 		}
 
@@ -216,16 +208,16 @@ class MyPlot extends PluginBase
 	 */
 	public function getPlotPosition(Plot $plot) {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		if ($plotLevel === null) {
+		if($plotLevel === null) {
 			return null;
 		}
 
-		$plotSize = $plotLevel->plotSize;
+		$plotSize  = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
-		$x = $totalSize * $plot->X;
-		$z = $totalSize * $plot->Z;
-		$level = $this->getServer()->getLevelByName($plot->levelName);
+		$x         = $totalSize * $plot->X;
+		$z         = $totalSize * $plot->Z;
+		$level     = $this->getServer()->getLevelByName($plot->levelName);
 		return new Position($x, $plotLevel->groundHeight, $z, $level);
 	}
 
@@ -239,12 +231,12 @@ class MyPlot extends PluginBase
 	 */
 	public function teleportPlayerToPlot(Player $player, Plot $plot) : bool {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		if ($plotLevel === null) {
+		if($plotLevel === null) {
 			return false;
 		}
-		$pos = $this->getPlotPosition($plot);
+		$pos      = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize;
-		$pos->add(floor($plotSize / 2), -1, 1);
+		$pos->add(floor($plotSize / 2), 1, -1);
 		$player->teleport($pos);
 		return true;
 	}
@@ -258,7 +250,7 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function clearPlot(Plot $plot, $maxBlocksPerTick = 256) : bool {
-		if (!$this->isLevelLoaded($plot->levelName)) {
+		if(!$this->isLevelLoaded($plot->levelName)) {
 			return false;
 		}
 		foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
@@ -293,7 +285,7 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
-		if ($this->disposePlot($plot)) {
+		if($this->disposePlot($plot)) {
 			return $this->clearPlot($plot, $maxBlocksPerTick);
 		}
 		return false;
@@ -348,17 +340,17 @@ class MyPlot extends PluginBase
 	 */
 	public function getPlotChunks(Plot $plot) : array {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		$level = $this->getServer()->getLevelByName($plot->levelName);
-		$pos = $this->getPlotPosition($plot);
-		$plotSize = $plotLevel->plotSize;
-		$xMax = $pos->x + $plotSize;
-		$zMax = $pos->z + $plotSize;
+		$level     = $this->getServer()->getLevelByName($plot->levelName);
+		$pos       = $this->getPlotPosition($plot);
+		$plotSize  = $plotLevel->plotSize;
+		$xMax      = $pos->x + $plotSize;
+		$zMax      = $pos->z + $plotSize;
 
 		$chunkIndexes = [];
 		for ($x = $pos->x; $x < $xMax; $x++) {
 			for ($z = $pos->z; $z < $zMax; $z++) {
 				$index = Level::chunkHash($x >> 4, $z >> 4);
-				if (!in_array($index, $chunkIndexes)) {
+				if(!in_array($index, $chunkIndexes)) {
 					$chunkIndexes[] = $index;
 				}
 				Level::getXZ($index, $pos->x, $pos->z);
@@ -370,13 +362,12 @@ class MyPlot extends PluginBase
 		$chunks = [];
 		foreach ($chunkIndexes as $index) {
 			Level::getXZ($index, $plot->X, $plot->Z);
-			$chunk = $level->getChunk($plot->X,$plot->Z);
+			$chunk    = $level->getChunk($plot->X, $plot->Z);
 			$chunks[] = $chunk;
 		}
 
 		return $chunks;
 	}
-
 
 	/**
 	 * Get the maximum number of plots a player can claim
@@ -385,20 +376,19 @@ class MyPlot extends PluginBase
 	 * @return int
 	 */
 	public function getMaxPlotsOfPlayer(Player $player) : int {
-		if ($player->hasPermission("myplot.claimplots.unlimited"))
+		if($player->hasPermission("myplot.claimplots.unlimited"))
 			return PHP_INT_MAX;
 		/** @var Permission[] $perms */
-		$perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()),
-			$player->getEffectivePermissions());
+		$perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
 		$perms = array_filter($perms, function ($name) {
 			return (substr($name, 0, 18) === "myplot.claimplots.");
 		}, ARRAY_FILTER_USE_KEY);
-		if (count($perms) == 0)
+		if(count($perms) === 0)
 			return 0;
-		krsort($perms);
+		krsort($perms, SORT_FLAG_CASE | SORT_NATURAL);
 		foreach ($perms as $name => $perm) {
 			$maxPlots = substr($name, 18);
-			if (is_numeric($maxPlots)) {
+			if(is_numeric($maxPlots)) {
 				return (int) $maxPlots;
 			}
 		}
@@ -413,13 +403,13 @@ class MyPlot extends PluginBase
 	 */
 	public function getPlotMid(Plot $plot) {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		if ($plotLevel === null) {
+		if($plotLevel === null) {
 			return null;
 		}
 
 		$plotSize = $plotLevel->plotSize;
-		$pos = $this->getPlotPosition($plot);
-		$pos = new Position($pos->getFloorX() + ($plotSize / 2) + 0.5, $pos->getFloorY() + 1, $pos->getFloorZ() + ($plotSize / 2) + 0.5);
+		$pos      = $this->getPlotPosition($plot);
+		$pos      = new Position($pos->getFloorX() + ($plotSize / 2) + 0.5, $pos->getFloorY() + 1, $pos->getFloorZ() + ($plotSize / 2) + 0.5);
 
 		return $pos;
 	}
@@ -433,7 +423,7 @@ class MyPlot extends PluginBase
 	 */
 	public function teleportMiddle(Player $player, Plot $plot) : bool {
 		$mid = $this->getPlotMid($plot);
-		if($mid == null) {
+		if($mid === null) {
 			return false;
 		}
 		return $player->teleport($mid);
@@ -445,7 +435,7 @@ class MyPlot extends PluginBase
 		@mkdir($this->getDataFolder()); // for spoon detector
 		SpoonDetector::printSpoon($this, "spoon.txt");
 
-		$this->getLogger()->notice(TF::BOLD."Loading...");
+		$this->getLogger()->notice(TF::BOLD . "Loading...");
 
 		$this->saveDefaultConfig();
 		$this->reloadConfig();
@@ -461,7 +451,7 @@ class MyPlot extends PluginBase
 		$cacheSize = $this->getConfig()->get("PlotCacheSize");
 		switch (strtolower($this->getConfig()->get("DataProvider"))) {
 			case "mysql":
-				$settings = $this->getConfig()->get("MySQLSettings");
+				$settings           = $this->getConfig()->get("MySQLSettings");
 				$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
 			break;
 			case "yaml":
@@ -478,20 +468,20 @@ class MyPlot extends PluginBase
 		}
 
 		// Initialize EconomyProvider
-		if ($this->getConfig()->get("UseEconomy") == true) {
-			if (($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
+		if($this->getConfig()->get("UseEconomy") === true) {
+			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
 				if($plugin instanceof EconomyAPI) {
 					$this->economyProvider = new EconomySProvider($plugin);
 					$this->getLogger()->debug("Eco set to EconomySProvider");
 				}
 				$this->getLogger()->debug("Eco not instance of EconomyAPI");
-			} elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("EssentialsPE")) !== null) {
+			} elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("EssentialsPE")) !== null) {
 				if($plugin instanceof Loader) {
 					$this->economyProvider = new EssentialsPEProvider($plugin);
 					$this->getLogger()->debug("Eco set to EssentialsPE");
 				}
 				$this->getLogger()->debug("Eco not instance of EssentialsPE");
-			} elseif (($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
+			} elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
 				if($plugin instanceof PocketMoney) {
 					$this->economyProvider = new PocketMoneyProvider($plugin);
 					$this->getLogger()->debug("Eco set to PocketMoney");
@@ -505,17 +495,17 @@ class MyPlot extends PluginBase
 				$this->getLogger()->debug("Eco not instance of EconomyPlus");
 			} else {
 				$this->getLogger()->info("No supported economy plugin found!");
-				$this->getConfig()->set("UseEconomy",false);
+				$this->getConfig()->set("UseEconomy", false);
 			}
 		}
 
-		$eventListener = new EventListener($this);
+		$eventListener  = new EventListener($this);
 		$this->getServer()->getPluginManager()->registerEvents($eventListener, $this);
 		foreach($this->getServer()->getLevels() as $level) {
 			$eventListener->onLevelLoad(new LevelLoadEvent($level));
 		}
 		$this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
-		$this->getLogger()->notice(TF::GREEN."Enabled!");
+		$this->getLogger()->notice(TF::GREEN . "Enabled!");
 	}
 
 	public function addLevelSettings(string $levelName, PlotLevelSettings $settings) : bool {
@@ -524,16 +514,16 @@ class MyPlot extends PluginBase
 	}
 
 	public function unloadLevelSettings(string $levelName) : bool {
-		if (isset($this->levels[$levelName])) {
+		if(isset($this->levels[$levelName])) {
 			unset($this->levels[$levelName]);
-			$this->getLogger()->debug("Level ".$levelName." settings unloaded!");
+			$this->getLogger()->debug("Level " . $levelName . " settings unloaded!");
 			return true;
 		}
 		return false;
 	}
 
 	public function onDisable() {
-		if ($this->dataProvider !== null) {
+		if($this->dataProvider !== null) {
 			$this->dataProvider->close();
 		}
 	}
