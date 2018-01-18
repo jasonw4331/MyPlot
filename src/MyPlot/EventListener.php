@@ -282,8 +282,8 @@ class EventListener implements Listener
 				$event->getPlayer()->sendTip($popup);
 		}
 
-		if ($plot !== null and ($plotFrom === null or $plotFrom !== $plot)) {
-			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new PlotLeaveEvent($this->plugin, $event->getPlayer(), $plot));
+		if ($plotFrom !== null and ($plot === null or $plot !== $plotFrom)) {
+			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new PlotLeaveEvent($this->plugin, $event->getPlayer(), $plotFrom));
 		}
 	}
 }
