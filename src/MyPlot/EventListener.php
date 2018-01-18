@@ -246,7 +246,7 @@ class EventListener implements Listener
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
 		if ($plot !== null and $plot !== $plotFrom) {
-			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerEnterPlotEvent($this->plugin, $event->getPlayer(), $plot));
+			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerEnterPlotEvent($this->plugin, $plot, $event->getPlayer()));
 			if($ev->isCancelled()) {
 				$event->setCancelled();
 				return;
@@ -283,7 +283,7 @@ class EventListener implements Listener
 		}
 
 		if ($plotFrom !== null and ($plot === null or $plot !== $plotFrom)) {
-			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerLeavePlotEvent($this->plugin, $event->getPlayer(), $plotFrom));
+			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerLeavePlotEvent($this->plugin, $plotFrom, $event->getPlayer()));
 		}
 	}
 }

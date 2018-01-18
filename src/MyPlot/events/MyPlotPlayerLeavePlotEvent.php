@@ -9,7 +9,10 @@ use pocketmine\Player;
 
 class MyPlotPlayerLeavePlotEvent extends PluginEvent{
 	public static $handlerList = null;
-	private $plot, $player;
+	/** @var Plot */
+	private $plot;
+	/** @var Player */
+	private $player;
 
 	/**
 	 * PlotEnterEvent constructor.
@@ -24,30 +27,30 @@ class MyPlotPlayerLeavePlotEvent extends PluginEvent{
 	}
 
 	/**
-	 * @return mixed
+	 * @return Plot
 	 */
-	public function getPlayer(){
-		return $this->player;
-	}
-
-	/**
-	 * @param mixed $player
-	 */
-	public function setPlayer($player){
-		$this->player = $player;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getPlot(){
+	public function getPlot(): Plot{
 		return $this->plot;
 	}
 
 	/**
-	 * @param mixed $plot
+	 * @param Plot $plot
 	 */
-	public function setPlot($plot){
+	public function setPlot(Plot $plot){
 		$this->plot = $plot;
+	}
+
+	/**
+	 * @return Player
+	 */
+	public function getPlayer(): Player{
+		return $this->player;
+	}
+
+	/**
+	 * @param Player $player
+	 */
+	public function setPlayer(Player $player){
+		$this->player = $player;
 	}
 }
