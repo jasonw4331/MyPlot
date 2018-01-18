@@ -1,7 +1,8 @@
 <?php
 namespace MyPlot;
 
-use MyPlot\events\MyPlotPlayerEnterPlotEvent;
+use MyPlot\events\PlotEnterEvent;
+use MyPlot\events\PlotLeaveEvent;
 use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
 use pocketmine\event\player\PlayerMoveEvent;
@@ -236,22 +237,29 @@ class EventListener implements Listener
 		if($event->isCancelled()) {
 			return;
 		}
+		if($event->getFrom()->floor()->equals($event->getTo()->floor())) return; // Save hell-a-lot of performance by ignoring movements on the same block, for example rotating the head
+
 		$levelName = $event->getPlayer()->getLevel()->getName();
 		if (!$this->plugin->isLevelLoaded($levelName))
 			return;
 
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
-		if ($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
-			$this->plugin->getServer()->getPluginManager()->callEvent(new MyPlotPlayerEnterPlotEvent($this->plugin, "MyPlot", $plot, $event->getPlayer())); //TODO: make cancellable & use with denied players
-			if (!$this->plugin->getConfig()->get("ShowPlotPopup", true))
+		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
+		if ($plot !== null and $plot !== $plotFrom) {
+			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new PlotEnterEvent($this->plugin, $event->getPlayer(), $plot));
+			if($ev->isCancelled()) {
+				$event->setCancelled();
 				return;
+			}
+
 			if($plot->isDenied($event->getPlayer()->getName())) {
 				$event->setCancelled();
 				return;
 			}
+
 			$plotName = TextFormat::GREEN . $plot;
 			$popup = $this->plugin->getLanguage()->translateString("popup", [$plotName]);
-			if(strpos($plot,"-0")) {
+			if(strpos($plot,"-0")) { // Jason, tell me WTF this is - strpos needs a string. $plot is not a string.
 				return;
 			}
 			if ($plot->owner != "") {
@@ -270,7 +278,12 @@ class EventListener implements Listener
 				$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
 					TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			}
-			$event->getPlayer()->sendTip($popup);
+			if ($this->plugin->getConfig()->get("ShowPlotPopup", true))
+				$event->getPlayer()->sendTip($popup);
+		}
+
+		if ($plot !== null and ($plotFrom === null or $plotFrom !== $plot)) {
+			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new PlotLeaveEvent($this->plugin, $event->getPlayer(), $plot));
 		}
 	}
 }
