@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\provider;
 
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 
@@ -9,16 +10,16 @@ class SQLiteDataProvider extends DataProvider
 	/** @var \SQLite3 */
 	private $db;
 
-	/** @var \SQLite3Stmt */
-	private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
-			$sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
-			$sqlGetExistingXZ;
-	/**
-	 * @param MyPlot $plugin
-	 * @param int $cacheSize
-	 */
-	public function __construct(MyPlot $plugin, int $cacheSize = 0) {
-		parent::__construct($plugin, $cacheSize);
+    /** @var \SQLite3Stmt */
+    private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot,
+            $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel,
+            $sqlGetExistingXZ;
+    public $type = MyPlotSaveEvent::SQLITE3;/**
+     * @param MyPlot $plugin
+     * @param int $cacheSize
+     */
+    public function __construct(MyPlot $plugin, int$cacheSize = 0) {
+        parent::__construct($plugin, $cacheSize);
 
 		$this->db = new \SQLite3($this->plugin->getDataFolder()."plots.db");
 		$this->db->exec(

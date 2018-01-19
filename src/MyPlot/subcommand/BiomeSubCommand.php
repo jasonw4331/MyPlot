@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\subcommand;
 
+use MyPlot\events\MyPlotBiomeChangeEvent;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -29,13 +30,13 @@ class BiomeSubCommand extends SubCommand
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.biome");
 	}
 
-	/**
+    /**
 	 * @param Player $sender
 	 * @param string[] $args
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) {
-		if (empty($args)) {
+		if (empty($args) ) {
 			$biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
 			$sender->sendMessage($this->translateString("biome.possible", [$biomes]));
 			return true;
@@ -51,7 +52,7 @@ class BiomeSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		if(is_numeric($biome)) {
+		if (is_numeric($biome)) {
 			$biome = (int) $biome;
 			if($biome > 27 or $biome < 0) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
@@ -67,9 +68,11 @@ class BiomeSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
 			return true;
 		}
-		$biome = Biome::getBiome($this->biomes[$biome]);
-		}
-		if ($this->getPlugin()->setPlotBiome($plot, $biome)) {
+		$biome = Biome::getBiome($this->biomes[$biome]);}
+		$this->getPlugin()->getServer()->getPluginManager()->callEvent(
+	    	($ev = new MyPlotBiomeChangeEvent($this->getPlugin(), $sender->getName(), $plot, $this->biomes[strtoupper($biome->getName())], $this->biomes[$plot->biome]))
+	    );
+        if ($this->getPlugin()->setPlotBiome($ev->getPlot(), Biome::getBiome($ev->getNewBiomeId()))) {
 			$sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
 		} else {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));

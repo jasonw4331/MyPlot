@@ -1,6 +1,7 @@
 <?php
 namespace MyPlot\provider;
 
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\utils\Config;
@@ -11,6 +12,8 @@ class JSONDataProvider extends DataProvider
 	protected $plugin;
 	/** @var Config */
 	private $json;
+    /** @var int $type */
+    public $type = MyPlotSaveEvent::JSON;
 
 	public function __construct(MyPlot $plugin, int $cacheSize = 0) {
 		parent::__construct($plugin, $cacheSize);

@@ -6,6 +6,7 @@ use ImagicalGamer\EconomyPlus\Main;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyPlusProvider;
 use MyPlot\provider\EconomyProvider;
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\JSONDataProvider;
@@ -67,7 +68,7 @@ class MyPlot extends PluginBase
 	 * @api
 	 * @return EconomyProvider
 	 */
-	public function getEconomyProvider() {
+	public function getEconomyProvider() : EconomyProvider {
 		return $this->economyProvider;
 	}
 
@@ -123,7 +124,11 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function savePlot(Plot $plot) : bool {
-		return $this->dataProvider->savePlot($plot);
+		$this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotSaveEvent($this, "MyPlot", $this->dataProvider->type, $plot)));
+		if($ev->isCancelled()) {
+			return false;
+		}
+		return $this->dataProvider->savePlot($ev->getPlot());
 	}
 
 	/**
