@@ -1,18 +1,19 @@
 <?php
-
 namespace MyPlot\events;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\event\Cancellable;
 use pocketmine\Player;
 
-class MyPlotPlayerLeavePlotEvent extends MyPlotPlotEvent{
+class MyPlotPlayerLeavePlotEvent extends MyPlotPlotEvent implements Cancellable {
 	public static $handlerList = null;
-	/** @var Player */
+	/** @var Player $player */
 	private $player;
 
 	/**
-	 * PlotEnterEvent constructor.
+	 * MyPlotPlayerLeavePlotEvent constructor.
+	 *
 	 * @param MyPlot $plugin
 	 * @param string $issuer
 	 * @param Plot $plot
@@ -20,7 +21,7 @@ class MyPlotPlayerLeavePlotEvent extends MyPlotPlotEvent{
 	 */
 	public function __construct(MyPlot $plugin, string $issuer, Plot $plot, Player $player){
 		parent::__construct($plugin, $issuer, $plot);
-		$this->setPlayer($player);
+		$this->player = $player;
 	}
 
 	/**

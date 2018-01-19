@@ -5,18 +5,18 @@ use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
-use pocketmine\event\player\PlayerMoveEvent;
-use pocketmine\Player;
+use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
-use pocketmine\event\Listener;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\level\LevelUnloadEvent;
-use pocketmine\utils\Config;
-use pocketmine\event\block\BlockPlaceEvent;
-use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\Player;
+use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 
 class EventListener implements Listener
@@ -234,10 +234,9 @@ class EventListener implements Listener
 	 * @param PlayerMoveEvent $event
 	 */
 	public function onPlayerMove(PlayerMoveEvent $event) {
-		if($event->isCancelled()) {
+		if($event->isCancelled() or $event->getFrom()->distance($event->getTo()) < 0.01) {
 			return;
 		}
-		if($event->getFrom()->floor()->equals($event->getTo()->floor())) return; // Save hell-a-lot of performance by ignoring movements on the same block, for example rotating the head
 
 		$levelName = $event->getPlayer()->getLevel()->getName();
 		if (!$this->plugin->isLevelLoaded($levelName))
@@ -245,45 +244,47 @@ class EventListener implements Listener
 
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
-		if ($plot !== null and $plot !== $plotFrom) {
+		if($plot instanceof Plot and $plotFrom === null) {
 			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerEnterPlotEvent($this->plugin, $event->getPlayer()->getName(), $plot, $event->getPlayer()));
 			if($ev->isCancelled()) {
 				$event->setCancelled();
 				return;
 			}
+		} elseif($plotFrom instanceof Plot and $plot === null) {
+			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerLeavePlotEvent($this->plugin, $event->getPlayer()->getName(), $plot, $event->getPlayer()));
+			if($ev->isCancelled()) {
+				$event->setCancelled();
+				return;
+			}
+		}
 
+		if($plot !== null) {
 			if($plot->isDenied($event->getPlayer()->getName())) {
 				$event->setCancelled();
 				return;
 			}
 
 			$plotName = TextFormat::GREEN . $plot;
-			$popup = $this->plugin->getLanguage()->translateString("popup", [$plotName]);
-			if(strpos($plot,"-0")) { // Jason, tell me WTF this is - strpos needs a string. $plot is not a string.
+			$popup    = $this->plugin->getLanguage()->translateString("popup", [$plotName]);
+			if(strpos($plot, "-0")) {
 				return;
 			}
 			if ($plot->owner != "") {
-				$owner = TextFormat::GREEN . $plot->owner;
-				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
-				$paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
-				$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
+				$owner             = TextFormat::GREEN . $plot->owner;
+				$ownerPopup        = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
+				$paddingSize       = floor((strlen($popup) - strlen($ownerPopup)) / 2);
+				$paddingPopup      = str_repeat(" ", max(0, -$paddingSize));
 				$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
-				$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
-					TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+				$popup             = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			} else {
-				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
-				$paddingSize = floor((strlen($popup) - strlen($ownerPopup)) / 2);
-				$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
+				$ownerPopup        = $this->plugin->getLanguage()->translateString("popup.available");
+				$paddingSize       = floor((strlen($popup) - strlen($ownerPopup)) / 2);
+				$paddingPopup      = str_repeat(" ", max(0, -$paddingSize));
 				$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
-				$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" .
-					TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+				$popup             = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			}
 			if ($this->plugin->getConfig()->get("ShowPlotPopup", true))
 				$event->getPlayer()->sendTip($popup);
-		}
-
-		if ($plotFrom !== null and ($plot === null or $plot !== $plotFrom)) {
-			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerLeavePlotEvent($this->plugin, $event->getPlayer()->getName(), $plotFrom, $event->getPlayer()));
 		}
 	}
 }
