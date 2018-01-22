@@ -23,7 +23,7 @@ class InfoSubCommand extends SubCommand
 	public function execute(CommandSender $sender, array $args) {
 		if(isset($args[0])) {
 			if(isset($args[1]) and is_numeric($args[1])) {
-				$key = (int) $args[1];
+				$key = (int) $args[1] - 1;
 				$plots = [];
 				foreach ($this->getPlugin()->getPlotLevels() as $levelName => $settings) {
 					$plots = array_merge($plots, $this->getPlugin()->getPlotsOfPlayer($args[0], $levelName));
