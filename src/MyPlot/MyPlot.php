@@ -243,7 +243,7 @@ class MyPlot extends PluginBase
 		}
 		$pos      = $this->getPlotPosition($plot);
 		$pos->x += floor($plotLevel->plotSize / 2);
-		$pos->y += 1;
+		$pos->y += 1.5;
 		$pos->z -= 1;
 		$player->teleport($pos);
 		return true;
