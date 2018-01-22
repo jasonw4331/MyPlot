@@ -1,20 +1,18 @@
 <?php
 namespace MyPlot;
 
-use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
-use pocketmine\event\player\PlayerMoveEvent;
-use pocketmine\Player;
-use pocketmine\event\block\BlockUpdateEvent;
+use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
-use pocketmine\event\Listener;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\level\LevelUnloadEvent;
-use pocketmine\utils\Config;
-use pocketmine\event\block\BlockPlaceEvent;
-use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\Player;
+use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 
 class EventListener implements Listener
@@ -147,28 +145,7 @@ class EventListener implements Listener
 			return;
 		}
 		$event->setCancelled();
-		$this->plugin->getLogger()->debug("Road block placement cancelled");
-	}
-
-	/**
-	 * @ignoreCancelled false
-	 * @priority LOWEST
-	 *
-	 * @param BlockUpdateEvent $event
-	 */
-	public function onBlockUpdate(BlockUpdateEvent $event) {
-		if($event->isCancelled()){
-			return;
-		}
-		$levelName = $event->getBlock()->getLevel()->getName();
-		if ($this->plugin->isLevelLoaded($levelName)) {
-			if ($event->getBlock() instanceof Liquid) {
-				if ($this->plugin->getLevelSettings($levelName)->updatePlotLiquids and is_null($this->plugin->getPlotByPosition($event->getBlock()))) {
-					$event->setCancelled();
-					$this->plugin->getLogger()->debug("Block update cancelled in ".$levelName);
-				}
-			}
-		}
+		$this->plugin->getLogger()->debug("Block placement cancelled");
 	}
 
 	/**

@@ -3,6 +3,8 @@ namespace MyPlot;
 
 use EssentialsPE\Loader;
 use ImagicalGamer\EconomyPlus\Main;
+use MyPlot\block\Lava;
+use MyPlot\block\Water;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyPlusProvider;
 use MyPlot\provider\EconomyProvider;
@@ -15,6 +17,7 @@ use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
 use onebone\economyapi\EconomyAPI;
+use pocketmine\block\BlockFactory;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\format\Chunk;
@@ -31,6 +34,8 @@ use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
 {
+	/** @var MyPlot $instance */
+	private static $instance;
 	/** @var PlotLevelSettings[] $levels */
 	private $levels = [];
 
@@ -42,6 +47,13 @@ class MyPlot extends PluginBase
 
 	/** @var BaseLang $baseLang */
 	private $baseLang = null;
+
+	/**
+	 * @return MyPlot
+	 */
+	public static function getInstance() : self {
+		return self::$instance;
+	}
 
 	/**
 	 * @api
@@ -430,6 +442,7 @@ class MyPlot extends PluginBase
 		@mkdir($this->getDataFolder()); // for spoon detector
 		SpoonDetector::printSpoon($this, "spoon.txt");
 
+		self::$instance = $this;
 		$this->getLogger()->notice(TF::BOLD . "Loading...");
 
 		$this->saveDefaultConfig();
@@ -500,6 +513,10 @@ class MyPlot extends PluginBase
 			$eventListener->onLevelLoad(new LevelLoadEvent($level));
 		}
 		$this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
+		$this->getLogger()->debug(TF::BOLD . "Loading Particles");
+		BlockFactory::registerBlock(new Water(), true);
+		BlockFactory::registerBlock(new Lava(), true);
+		$this->getLogger()->debug(TF::BOLD . "Registering Blocks");
 		$this->getLogger()->notice(TF::GREEN . "Enabled!");
 	}
 
