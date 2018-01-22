@@ -242,8 +242,9 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		$pos      = $this->getPlotPosition($plot);
-		$plotSize = $plotLevel->plotSize;
-		$pos->add(floor($plotSize / 2), 1, -1);
+		$pos->x += floor($plotLevel->plotSize / 2);
+		$pos->y += 1;
+		$pos->z -= 1;
 		$player->teleport($pos);
 		return true;
 	}
