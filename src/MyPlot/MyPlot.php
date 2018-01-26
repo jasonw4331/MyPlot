@@ -82,11 +82,12 @@ class MyPlot extends PluginBase
 	public function getEconomyProvider() {
 		return $this->economyProvider;
 	}
+
 	/**
 	 * Allows setting the economy provider to a custom provider or to null to disable economy mode
 	 *
 	 * @api
-	 * @param EconomyProvider $provider
+	 * @param EconomyProvider|null $provider
 	 */
 	public function setEconomyProvider(?EconomyProvider $provider) : void {
 		if($provider === null) {
