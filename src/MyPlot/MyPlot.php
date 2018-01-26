@@ -82,6 +82,22 @@ class MyPlot extends PluginBase
 	public function getEconomyProvider() {
 		return $this->economyProvider;
 	}
+	/**
+	 * Allows setting the economy provider to a custom provider or to null to disable economy mode
+	 *
+	 * @api
+	 * @param EconomyProvider $provider
+	 */
+	public function setEconomyProvider(?EconomyProvider $provider) : void {
+		if($provider === null) {
+			$this->getConfig()->set("UseEconomy", false);
+			$this->getLogger()->info("Economy mode disabled!");
+		}else{
+			$this->getLogger()->info("A custom economy provider has been registered. Economy mode now enabled!");
+			$this->getConfig()->set("UseEconomy", true);
+			$this->economyProvider = $provider;
+		}
+	}
 
 	/**
 	 * Returns a PlotLevelSettings object which contains all the settings of a level
