@@ -4,3 +4,8 @@ config.yml
 plots.db
 .idea/
 !/resources/config.yml
+.github/
+.poggit.yml
+icon.png
+.travis.yml
+.travis.pmcommands.txt

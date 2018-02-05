@@ -5,24 +5,33 @@ use EssentialsPE\Loader;
 use pocketmine\Player;
 
 class EssentialsPEProvider implements EconomyProvider {
-	/** @var Loader */
+	/** @var Loader $plugin */
 	private $plugin;
 
+	/**
+	 * EssentialsPEProvider constructor.
+	 *
+	 * @param Loader $plugin
+	 */
 	public function __construct(Loader $plugin) {
 		$this->plugin = $plugin;
 	}
 
-	public function reduceMoney(Player $player, $amount) {
-		if ($amount == 0) {
+	/**
+	 * @param Player $player
+	 * @param float $amount
+	 *
+	 * @return bool
+	 */
+	public function reduceMoney(Player $player, float $amount) {
+		if($amount === 0) {
 			return true;
 		} elseif ($amount < 0) {
-			$pre = $this->plugin->getAPI()->getPlayerBalance($player);
-			$this->plugin->getAPI()->addToPlayerBalance($player, $amount);
-		} else {
-			$pre = $this->plugin->getAPI()->getPlayerBalance($player);
-			$this->plugin->getAPI()->addToPlayerBalance($player, -$amount);
+			$amount = -$amount;
 		}
-		if($this->plugin->getAPI()->getPlayerBalance($player) == $pre - $amount) {
+		$pre = $this->plugin->getAPI()->getPlayerBalance($player);
+		$this->plugin->getAPI()->addToPlayerBalance($player, (int) -$amount);
+		if($this->plugin->getAPI()->getPlayerBalance($player) == $pre - (int) $amount) {
 			$this->plugin->getLogger()->debug("MyPlot reduced money of ".$player->getName());
 			return true;
 		}
