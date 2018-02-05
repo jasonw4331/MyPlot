@@ -17,7 +17,6 @@ softdepend:
 - EconomyAPI
 - PocketMoney
 - EssentialsPE
-- EconomyPlus
 extensions:
 - sqlite3
 - mysqli
