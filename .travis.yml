@@ -22,3 +22,6 @@ before_script:
 
 script:
 - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then wget -O - https://poggit.pmmp.io/res/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
+- cd "$TRAVIS_BUILD_DIR"/../PocketMine/
+- sed -i 's/world/Plots' server.properties
+- "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then wget -O - https://poggit.pmmp.io/res/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
