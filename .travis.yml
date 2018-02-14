@@ -15,7 +15,6 @@ before_script:
  - make install
  - cd ..
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
- - composer install
  - ./tests/travisInstall.sh || true
 
 script:
