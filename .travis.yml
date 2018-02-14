@@ -3,8 +3,20 @@ php: ["7.2"]
 sudo: false
 dist: trusty
 
-install:
-- "./tests/travisInstall.sh || true"
+before_script:
+# - pecl install channel://pecl.php.net/pthreads-3.1.6
+ - echo | pecl install channel://pecl.php.net/yaml-2.0.2
+ - git clone https://github.com/krakjoe/pthreads.git
+ - cd pthreads
+ - git checkout d32079fb4a88e6e008104d36dbbf0c2dd7deb403
+ - phpize
+ - ./configure
+ - make
+ - make install
+ - cd ..
+ - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+ - composer install
+ - ./tests/travisInstall.sh || true
 
 script:
 - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then wget -O - https://poggit.pmmp.io/res/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"

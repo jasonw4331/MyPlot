@@ -1,11 +1,12 @@
 .gitignore
-worlds/
+worlds/*
 config.yml
 plots.db
 .idea/
 !/resources/config.yml
-.github/
+.github/*
 .poggit.yml
 icon.png
 .travis.yml
 .travis.pmcommands.txt
+tests/*
