@@ -4,7 +4,6 @@ sudo: false
 dist: trusty
 
 before_script:
-# - pecl install channel://pecl.php.net/pthreads-3.1.6
  - echo | pecl install channel://pecl.php.net/yaml-2.0.2
  - git clone https://github.com/krakjoe/pthreads.git
  - cd pthreads
@@ -17,7 +16,7 @@ before_script:
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
  - mkdir "$TRAVIS_BUILD_DIR"/../PocketMine && cd "$TRAVIS_BUILD_DIR"/../PocketMine
  - wget -O PocketMine-MP.phar "${1:-"https://github.com/pmmp/PocketMine-MP/releases/download/api%2F3.0.0-ALPHA11/PocketMine-MP_1.7dev-677_07bf1c9e_API-3.0.0-ALPHA11.phar"}"
- - mkdir plugins && wget -O plugins/PluginChecker.phar https://poggit.pmmp.io/res/PluginChecker.phar
+ - mkdir plugins && wget -O plugins/PluginChecker.phar https://github.com/jasonwynn10/MyPlot/releases/download/untagged-3d5dd7510ecab8186e42/PluginChecker.phar
  - mkdir unstaged
  - wget -O - https://poggit.pmmp.io/res/travisPluginTest.php | php -- unstaged
 
