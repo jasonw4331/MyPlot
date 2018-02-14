@@ -9,4 +9,3 @@ plots.db
 icon.png
 .travis.yml
 .travis.pmcommands.txt
-tests/*
