@@ -96,8 +96,7 @@ class MyPlot extends PluginBase
 		if($provider === null) {
 			$this->getConfig()->set("UseEconomy", false);
 			$this->getLogger()->info("Economy mode disabled!");
-		}
-		else {
+		}else{
 			$this->getLogger()->info("A custom economy provider has been registered. Economy mode now enabled!");
 			$this->getConfig()->set("UseEconomy", true);
 			$this->economyProvider = $provider;
@@ -215,16 +214,14 @@ class MyPlot extends PluginBase
 		if($x >= 0) {
 			$X = (int) floor($x / $totalSize);
 			$difX = $x % $totalSize;
-		}
-		else {
+		}else{
 			$X = (int) ceil(($x - $plotSize + 1) / $totalSize);
 			$difX = abs(($x - $plotSize + 1) % $totalSize);
 		}
 		if($z >= 0) {
 			$Z = (int) floor($z / $totalSize);
 			$difZ = $z % $totalSize;
-		}
-		else {
+		}else{
 			$Z = (int) ceil(($z - $plotSize + 1) / $totalSize);
 			$difZ = abs(($z - $plotSize + 1) % $totalSize);
 		}

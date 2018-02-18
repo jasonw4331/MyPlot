@@ -53,8 +53,7 @@ class BiomeSubCommand extends SubCommand
 				return true;
 			}
 			$biome = Biome::getBiome($biome);
-		}
-		else {
+		}else{
 			if(!isset($this->biomes[$biome])) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
 				$biomes = implode(", ", array_keys($this->biomes));

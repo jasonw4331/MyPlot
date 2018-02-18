@@ -232,8 +232,7 @@ class EventListener implements Listener
 				$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
 				$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
 				$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
-			}
-			else {
+			}else{
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
 				$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
 				$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
