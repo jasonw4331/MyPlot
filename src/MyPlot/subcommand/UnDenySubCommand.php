@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -12,7 +13,7 @@ class UnDenySubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.undenyplayer");
 	}
 
@@ -22,7 +23,7 @@ class UnDenySubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
 			return false;
 		}
@@ -46,8 +47,7 @@ class UnDenySubCommand extends SubCommand
 			if($dplayer instanceof Player) {
 				$dplayer->sendMessage($this->translateString("undenyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
 			}
-		}
-		else {
+		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
 		return true;

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -11,7 +12,7 @@ class GenerateSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return $sender->hasPermission("myplot.command.generate");
 	}
 
@@ -21,7 +22,7 @@ class GenerateSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
 			return false;
 		}
@@ -32,8 +33,7 @@ class GenerateSubCommand extends SubCommand
 		}
 		if($this->getPlugin()->generateLevel($levelName)) {
 			$sender->sendMessage($this->translateString("generate.success", [$levelName]));
-		}
-		else {
+		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.error"));
 		}
 		return true;

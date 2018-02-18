@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot;
 
 class Plot
@@ -37,7 +38,7 @@ class Plot
 	 *
 	 * @return bool
 	 */
-	public function isHelper(string $username) {
+	public function isHelper(string $username) : bool {
 		return in_array($username, $this->helpers);
 	}
 
@@ -48,7 +49,7 @@ class Plot
 	 *
 	 * @return bool
 	 */
-	public function addHelper(string $username) {
+	public function addHelper(string $username) : bool {
 		if(!$this->isHelper($username)) {
 			$this->unDenyPlayer($username);
 			$this->helpers[] = $username;
@@ -64,7 +65,7 @@ class Plot
 	 *
 	 * @return bool
 	 */
-	public function removeHelper(string $username) {
+	public function removeHelper(string $username) : bool {
 		if(!$this->isHelper($username)) {
 			return false;
 		}
@@ -83,7 +84,7 @@ class Plot
 	 *
 	 * @return bool
 	 */
-	public function isDenied(string $username) {
+	public function isDenied(string $username) : bool {
 		return in_array($username, $this->denied);
 	}
 
@@ -94,7 +95,7 @@ class Plot
 	 *
 	 * @return bool
 	 */
-	public function denyPlayer(string $username) {
+	public function denyPlayer(string $username) : bool {
 		if(!$this->isDenied($username)) {
 			$this->removeHelper($username);
 			$this->denied[] = $username;
@@ -110,7 +111,7 @@ class Plot
 	 *
 	 * @return bool
 	 */
-	public function unDenyPlayer(string $username) {
+	public function unDenyPlayer(string $username) : bool {
 		if(!$this->isDenied($username)) {
 			return false;
 		}
@@ -125,7 +126,7 @@ class Plot
 	/**
 	 * @return string
 	 */
-	public function __toString() {
+	public function __toString() : string {
 		return "(" . $this->X . ";" . $this->Z . ")";
 	}
 }

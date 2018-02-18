@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot;
 
 use pocketmine\block\Sapling;
@@ -34,8 +35,8 @@ class EventListener implements Listener
 	 *
 	 * @param LevelLoadEvent $event
 	 */
-	public function onLevelLoad(LevelLoadEvent $event) {
-		if($event->getLevel()->getProvider()->getGenerator() == "myplot") {
+	public function onLevelLoad(LevelLoadEvent $event) : void {
+		if($event->getLevel()->getProvider()->getGenerator() === "myplot") {
 			$this->plugin->getLogger()->debug("MyPlot level " . $event->getLevel()->getFolderName() . " loaded!");
 			$settings = $event->getLevel()->getProvider()->getGeneratorOptions();
 			if(!isset($settings["preset"]) or empty($settings["preset"])) {
@@ -45,7 +46,7 @@ class EventListener implements Listener
 			if($settings === false) {
 				return;
 			}
-			$levelName = $event->getLevel()->getName();
+			$levelName = $event->getLevel()->getFolderName();
 			$filePath = $this->plugin->getDataFolder() . "worlds" . DIRECTORY_SEPARATOR . $levelName . ".yml";
 			$config = $this->plugin->getConfig();
 			$default = ["RestrictEntityMovement" => $config->getNested("DefaultWorld.RestrictEntityMovement", true), "UpdatePlotLiquids" => $config->getNested("DefaultWorld.UpdatePlotLiquids", false), "ClaimPrice" => $config->getNested("DefaultWorld.ClaimPrice", 0), "ClearPrice" => $config->getNested("DefaultWorld.ClearPrice", 0), "DisposePrice" => $config->getNested("DefaultWorld.DisposePrice", 0), "ResetPrice" => $config->getNested("DefaultWorld.ResetPrice", 0)];
@@ -63,11 +64,11 @@ class EventListener implements Listener
 	 *
 	 * @param LevelUnloadEvent $event
 	 */
-	public function onLevelUnload(LevelUnloadEvent $event) {
+	public function onLevelUnload(LevelUnloadEvent $event) : void {
 		if($event->isCancelled()) {
 			return;
 		}
-		$levelName = $event->getLevel()->getName();
+		$levelName = $event->getLevel()->getFolderName();
 		if($this->plugin->unloadLevelSettings($levelName)) {
 			$this->plugin->getLogger()->debug("Level " . $event->getLevel()->getFolderName() . " unloaded!");
 		}
@@ -79,7 +80,7 @@ class EventListener implements Listener
 	 *
 	 * @param BlockPlaceEvent $event
 	 */
-	public function onBlockPlace(BlockPlaceEvent $event) {
+	public function onBlockPlace(BlockPlaceEvent $event) : void {
 		$this->onEventOnBlock($event);
 	}
 
@@ -89,7 +90,7 @@ class EventListener implements Listener
 	 *
 	 * @param BlockBreakEvent $event
 	 */
-	public function onBlockBreak(BlockBreakEvent $event) {
+	public function onBlockBreak(BlockBreakEvent $event) : void {
 		$this->onEventOnBlock($event);
 	}
 
@@ -99,18 +100,18 @@ class EventListener implements Listener
 	 *
 	 * @param PlayerInteractEvent $event
 	 */
-	public function onPlayerInteract(PlayerInteractEvent $event) {
+	public function onPlayerInteract(PlayerInteractEvent $event) : void {
 		$this->onEventOnBlock($event);
 	}
 
 	/**
 	 * @param BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent $event
 	 */
-	private function onEventOnBlock($event) {
+	private function onEventOnBlock($event) : void {
 		if($event->isCancelled()) {
 			return;
 		}
-		$levelName = $event->getBlock()->getLevel()->getName();
+		$levelName = $event->getBlock()->getLevel()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName)) {
 			return;
 		}
@@ -118,9 +119,9 @@ class EventListener implements Listener
 		if($plot !== null) {
 			$username = $event->getPlayer()->getName();
 			if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot")) {
-				if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling)) {
+				if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
 					return;
-				}
+
 				/*
 				 * Prevent growing a tree near the edge of a plot
 				 * so the leaves won't go outside the plot
@@ -138,10 +139,8 @@ class EventListener implements Listener
 					return;
 				}
 			}
-		}
-		elseif($event->getPlayer()->hasPermission("myplot.admin.build.road")) {
+		}elseif($event->getPlayer()->hasPermission("myplot.admin.build.road"))
 			return;
-		}
 		$event->setCancelled();
 		$this->plugin->getLogger()->debug("Block placement cancelled");
 	}
@@ -152,14 +151,14 @@ class EventListener implements Listener
 	 *
 	 * @param EntityExplodeEvent $event
 	 */
-	public function onExplosion(EntityExplodeEvent $event) {
+	public function onExplosion(EntityExplodeEvent $event) : void {
 		if($event->isCancelled()) {
 			return;
 		}
-		$levelName = $event->getEntity()->getLevel()->getName();
-		if(!$this->plugin->isLevelLoaded($levelName)) {
+		$levelName = $event->getEntity()->getLevel()->getFolderName();
+		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
-		}
+
 		$plot = $this->plugin->getPlotByPosition($event->getPosition());
 		if($plot === null) {
 			$event->setCancelled();
@@ -185,14 +184,14 @@ class EventListener implements Listener
 	 *
 	 * @param EntityMotionEvent $event
 	 */
-	public function onEntityMotion(EntityMotionEvent $event) {
+	public function onEntityMotion(EntityMotionEvent $event) : void {
 		if($event->isCancelled()) {
 			return;
 		}
-		$levelName = $event->getEntity()->getLevel()->getName();
-		if(!$this->plugin->isLevelLoaded($levelName)) {
+		$levelName = $event->getEntity()->getLevel()->getFolderName();
+		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
-		}
+
 		$settings = $this->plugin->getLevelSettings($levelName);
 		if($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
 			$event->setCancelled();
@@ -206,17 +205,16 @@ class EventListener implements Listener
 	 *
 	 * @param PlayerMoveEvent $event
 	 */
-	public function onPlayerMove(PlayerMoveEvent $event) {
+	public function onPlayerMove(PlayerMoveEvent $event) : void {
 		if($event->isCancelled()) {
 			return;
 		}
-		if(!$this->plugin->getConfig()->get("ShowPlotPopup", true)) {
+		if(!$this->plugin->getConfig()->get("ShowPlotPopup", true))
 			return;
-		}
-		$levelName = $event->getPlayer()->getLevel()->getName();
-		if(!$this->plugin->isLevelLoaded($levelName)) {
+		$levelName = $event->getPlayer()->getLevel()->getFolderName();
+		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
-		}
+
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		if($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
 			if($plot->isDenied($event->getPlayer()->getName())) {

@@ -33,6 +33,7 @@ MySQLSettings:
   Username: default
   Password: password
   DatabaseName: MyPlot
+  ShutdownOnFailure: false
 
 # Use an economy with MyPlot. This will allow for plot pricing such as claiming, clearing, etc.
 # Currently supported economy plugins: Economy$, PocketMoney, EssentialsPE, EconomyPlus

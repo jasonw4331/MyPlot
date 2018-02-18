@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -12,7 +13,7 @@ class ClaimSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.claim");
 	}
 
@@ -22,7 +23,7 @@ class ClaimSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		$name = "";
 		if(isset($args[0])) {
 			$name = $args[0];
@@ -36,8 +37,7 @@ class ClaimSubCommand extends SubCommand
 		if($plot->owner != "") {
 			if($plot->owner === $sender->getName()) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("claim.yourplot"));
-			}
-			else {
+			}else{
 				$sender->sendMessage(TextFormat::RED . $this->translateString("claim.alreadyclaimed", [$plot->owner]));
 			}
 			return true;
@@ -47,7 +47,7 @@ class ClaimSubCommand extends SubCommand
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
 			$level = $this->getPlugin()->getServer()->getLevelByName($level);
 			if(!$level->isClosed()) {
-				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($player->getName(), $level->getName()));
+				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($player->getName(), $level->getFolderName()));
 			}
 		}
 		if($plotsOfPlayer >= $maxPlots) {
@@ -64,8 +64,7 @@ class ClaimSubCommand extends SubCommand
 		$plot->name = $name;
 		if($this->getPlugin()->savePlot($plot)) {
 			$sender->sendMessage($this->translateString("claim.success"));
-		}
-		else {
+		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
 		return true;

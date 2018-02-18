@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -12,7 +13,7 @@ class ResetSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.reset");
 	}
 
@@ -22,7 +23,7 @@ class ResetSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
@@ -43,12 +44,10 @@ class ResetSubCommand extends SubCommand
 			$maxBlocksPerTick = $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 256);
 			if($this->getPlugin()->resetPlot($plot, $maxBlocksPerTick)) {
 				$sender->sendMessage($this->translateString("reset.success"));
-			}
-			else {
+			}else{
 				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 			}
-		}
-		else {
+		}else{
 			$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
 			$sender->sendMessage($this->translateString("reset.confirm", [$plotId]));
 		}

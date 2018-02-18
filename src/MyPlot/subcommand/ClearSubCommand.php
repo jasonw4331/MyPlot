@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -12,7 +13,7 @@ class ClearSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.clear");
 	}
 
@@ -22,7 +23,7 @@ class ClearSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
@@ -40,15 +41,13 @@ class ClearSubCommand extends SubCommand
 				return true;
 			}
 			/** @var int $maxBlocksPerTick */
-			$maxBlocksPerTick = $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 256);
+			$maxBlocksPerTick = (int) $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 256);
 			if($this->getPlugin()->clearPlot($plot, $maxBlocksPerTick)) {
 				$sender->sendMessage($this->translateString("clear.success"));
-			}
-			else {
+			}else{
 				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 			}
-		}
-		else {
+		}else{
 			$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
 			$sender->sendMessage($this->translateString("clear.confirm", [$plotId]));
 		}

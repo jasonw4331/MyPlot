@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\task;
 
 use MyPlot\MyPlot;
@@ -20,7 +21,7 @@ class ClearPlotTask extends PluginTask {
 	 * @param Plot $plot
 	 * @param int $maxBlocksPerTick
 	 */
-	public function __construct(MyPlot $plugin, Plot $plot, $maxBlocksPerTick = 256) {
+	public function __construct(MyPlot $plugin, Plot $plot, int $maxBlocksPerTick = 256) {
 		parent::__construct($plugin);
 		$this->plot = $plot;
 		$this->plotBeginPos = $plugin->getPlotPosition($plot);
@@ -42,13 +43,12 @@ class ClearPlotTask extends PluginTask {
 	/**
 	 * @param int $currentTick
 	 */
-	public function onRun(int $currentTick) {
+	public function onRun(int $currentTick) : void {
 		foreach($this->level->getEntities() as $entity) {
 			if($this->plugin->getPlotBB($this->plot)->isVectorInXZ($entity)) {
 				if(!$entity instanceof Player) {
 					$entity->close();
-				}
-				else {
+				}else{
 					$this->plugin->teleportPlayerToPlot($entity, $this->plot);
 				}
 			}
@@ -56,17 +56,14 @@ class ClearPlotTask extends PluginTask {
 		$blocks = 0;
 		while($this->pos->x < $this->xMax) {
 			while($this->pos->z < $this->zMax) {
-				while($this->pos->y < 128) {
+				while($this->pos->y < $this->level->getWorldHeight()) {
 					if($this->pos->y === 0) {
 						$block = $this->bottomBlock;
-					}
-					elseif($this->pos->y < $this->height) {
+					}elseif($this->pos->y < $this->height) {
 						$block = $this->plotFillBlock;
-					}
-					elseif($this->pos->y === $this->height) {
+					}elseif($this->pos->y === $this->height) {
 						$block = $this->plotFloorBlock;
-					}
-					else {
+					}else{
 						$block = Block::get(0);
 					}
 					$this->level->setBlock($this->pos, $block, false, false);

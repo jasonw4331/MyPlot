@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\provider;
 
 use pocketmine\Player;
@@ -10,5 +11,5 @@ interface EconomyProvider {
 	 *
 	 * @return bool
 	 */
-	public function reduceMoney(Player $player, float $amount);
+	public function reduceMoney(Player $player, float $amount) : bool;
 }

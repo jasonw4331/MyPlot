@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -11,7 +12,7 @@ class ListSubCommand extends SubCommand {
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.list");
 	}
 
@@ -21,7 +22,7 @@ class ListSubCommand extends SubCommand {
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if($sender->hasPermission("myplot.admin.list")) {
 			if(!empty($args)) {
 				foreach($this->getPlugin()->getPlotLevels() as $levelName => $settings) {
@@ -33,8 +34,7 @@ class ListSubCommand extends SubCommand {
 						$sender->sendMessage(TF::YELLOW . $this->translateString("list.found", [$name, $x, $z]));
 					}
 				}
-			}
-			else {
+			}else{
 				foreach($this->getPlugin()->getPlotLevels() as $levelName => $settings) {
 					$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
 					foreach($plots as $plot) {
@@ -46,8 +46,7 @@ class ListSubCommand extends SubCommand {
 					return true;
 				}
 			}
-		}
-		elseif($sender->hasPermission("myplot.command.list")) {
+		}elseif($sender->hasPermission("myplot.command.list")) {
 			foreach($this->getPlugin()->getPlotLevels() as $levelName => $settings) {
 				$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
 				foreach($plots as $plot) {

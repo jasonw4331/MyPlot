@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
@@ -27,7 +28,7 @@ class YAMLDataProvider extends DataProvider {
 	 *
 	 * @return bool
 	 */
-	public function savePlot(Plot $plot){
+	public function savePlot(Plot $plot) : bool {
 		$plots = $this->yaml->get("plots", []);
 		$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome];
 		$this->yaml->set("plots", $plots);
@@ -40,7 +41,7 @@ class YAMLDataProvider extends DataProvider {
 	 *
 	 * @return bool
 	 */
-	public function deletePlot(Plot $plot){
+	public function deletePlot(Plot $plot) : bool {
 		$plots = $this->yaml->get("plots", []);
 		unset($plots[$plot->id]);
 		$this->yaml->set("plots", $plots);
@@ -55,8 +56,8 @@ class YAMLDataProvider extends DataProvider {
 	 *
 	 * @return Plot
 	 */
-	public function getPlot(string $levelName, int $X, int $Z) {
-		if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) != null) {
+	public function getPlot(string $levelName, int $X, int $Z) : Plot {
+		if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) !== null) {
 			return $plot;
 		}
 		$plots = $this->yaml->get("plots");
@@ -95,9 +96,8 @@ class YAMLDataProvider extends DataProvider {
 	 *
 	 * @return Plot[]
 	 */
-	public function getPlotsByOwner(string $owner, string $levelName = "") {
-
-		$plots = $this->yaml->get("plots");
+	public function getPlotsByOwner(string $owner, string $levelName = "") : array {
+		$plots = $this->yaml->get("plots", []);
 		$ownerPlots = [];
 		if($levelName != "") {
 			$levelKeys = array_keys($plots, $levelName);
@@ -116,8 +116,7 @@ class YAMLDataProvider extends DataProvider {
 					}
 				}
 			}
-		}
-		else {
+		}else{
 			$ownerKeys = array_keys($plots, $owner);
 			foreach($ownerKeys as $key) {
 				$levelName = $plots[$key]["level"];
@@ -140,7 +139,7 @@ class YAMLDataProvider extends DataProvider {
 	 *
 	 * @return Plot|null
 	 */
-	public function getNextFreePlot(string $levelName, int $limitXZ = 0) {
+	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?plot {
 		$plotsArr = $this->yaml->get("plots", []);
 		for($i = 0; $limitXZ <= 0 or $i < $limitXZ; $i++) {
 			$existing = [];
@@ -148,8 +147,7 @@ class YAMLDataProvider extends DataProvider {
 				if($data["level"] === $levelName) {
 					if(abs($data["x"]) === $i and abs($data["z"]) <= $i) {
 						$existing[] = [$data["x"], $data["z"]];
-					}
-					elseif(abs($data["z"]) === $i and abs($data["x"]) <= $i) {
+					}elseif(abs($data["z"]) === $i and abs($data["x"]) <= $i) {
 						$existing[] = [$data["x"], $data["z"]];
 					}
 				}
@@ -185,7 +183,7 @@ class YAMLDataProvider extends DataProvider {
 		return null;
 	}
 
-	public function close() {
+	public function close() : void {
 		unset($this->yaml);
 	}
 }

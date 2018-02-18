@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot;
 
 use MyPlot\subcommand\AddHelperSubCommand;
@@ -29,9 +30,9 @@ use pocketmine\utils\TextFormat;
 
 class Commands extends PluginCommand
 {
-	/** @var SubCommand[] */
+	/** @var SubCommand[] $subCommands */
 	private $subCommands = [];
-	/** @var SubCommand[] */
+	/** @var SubCommand[] $aliasSubCommands */
 	private $aliasSubCommands = [];
 
 	/**
@@ -72,14 +73,14 @@ class Commands extends PluginCommand
 	/**
 	 * @return SubCommand[]
 	 */
-	public function getCommands() {
+	public function getCommands() : array {
 		return $this->subCommands;
 	}
 
 	/**
 	 * @param SubCommand $command
 	 */
-	private function loadSubCommand(SubCommand $command) {
+	private function loadSubCommand(SubCommand $command) : void {
 		$this->subCommands[$command->getName()] = $command;
 		if($command->getAlias() != "") {
 			$this->aliasSubCommands[$command->getAlias()] = $command;
@@ -93,7 +94,7 @@ class Commands extends PluginCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, string $alias, array $args) {
+	public function execute(CommandSender $sender, string $alias, array $args) : bool {
 		if($this->getPlugin()->isDisabled()) {
 			/** @noinspection PhpUndefinedMethodInspection */
 			$sender->sendMessage($this->getPlugin()->getLanguage()->get("plugin.disabled"));
@@ -105,11 +106,9 @@ class Commands extends PluginCommand
 		$subCommand = strtolower(array_shift($args));
 		if(isset($this->subCommands[$subCommand])) {
 			$command = $this->subCommands[$subCommand];
-		}
-		elseif(isset($this->aliasSubCommands[$subCommand])) {
+		}elseif(isset($this->aliasSubCommands[$subCommand])) {
 			$command = $this->aliasSubCommands[$subCommand];
-		}
-		else {
+		}else{
 			/** @noinspection PhpUndefinedMethodInspection */
 			$sender->sendMessage(TextFormat::RED . $this->getPlugin()->getLanguage()->get("command.unknown"));
 			return true;
@@ -120,8 +119,7 @@ class Commands extends PluginCommand
 				$usage = $this->getPlugin()->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
 				$sender->sendMessage($usage);
 			}
-		}
-		else {
+		}else{
 			/** @noinspection PhpUndefinedMethodInspection */
 			$sender->sendMessage(TextFormat::RED . $this->getPlugin()->getLanguage()->get("command.unknown"));
 		}
