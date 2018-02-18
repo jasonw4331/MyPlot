@@ -1,6 +1,7 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/jasonwynn10/MyPlot
 projects:
   MyPlot:
+    icon: "icon.png"
     path: ""
     libs:
       - src: Falkirks/spoondetector/spoondetector
