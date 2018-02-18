@@ -10,8 +10,7 @@ class Water extends \pocketmine\block\Water {
 		$levelName = $this->getLevel()->getFolderName();
 		if($plugin->isLevelLoaded($levelName) and $plugin->getLevelSettings($levelName)->updatePlotLiquids and !is_null($plugin->getPlotByPosition($this))) {
 			return parent::onUpdate($type);
-		}
-		else {
+		}else{
 			return false;
 		}
 	}

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -12,7 +13,7 @@ class AutoSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.auto");
 	}
 
@@ -22,8 +23,8 @@ class AutoSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
-		$levelName = $sender->getLevel()->getName();
+	public function execute(CommandSender $sender, array $args) : bool {
+		$levelName = $sender->getLevel()->getFolderName();
 		if(!$this->getPlugin()->isLevelLoaded($levelName)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
 			return true;
@@ -35,8 +36,7 @@ class AutoSubCommand extends SubCommand
 			if(isset($args[0]) and strtolower($args[0]) == "true" and $cmd->canUse($sender)) {
 				$cmd->execute($sender, [$args[1]]);
 			}
-		}
-		else {
+		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.noplots"));
 		}
 		return true;

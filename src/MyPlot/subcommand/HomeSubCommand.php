@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use MyPlot\Plot;
@@ -13,7 +14,7 @@ class HomeSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.home");
 	}
 
@@ -23,17 +24,15 @@ class HomeSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
 			$plotNumber = 1;
-		}
-		elseif(is_numeric($args[0])) {
+		}elseif(is_numeric($args[0])) {
 			$plotNumber = (int) $args[0];
-		}
-		else {
+		}else{
 			return false;
 		}
-		$levelName = $args[1] ?? $sender->getLevel()->getName();
+		$levelName = $args[1] ?? $sender->getLevel()->getFolderName();
 		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
 		if(empty($plots)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));
@@ -52,8 +51,7 @@ class HomeSubCommand extends SubCommand
 		$plot = $plots[$plotNumber - 1];
 		if($this->getPlugin()->teleportPlayerToPlot($sender, $plot)) {
 			$sender->sendMessage($this->translateString("home.success", [$plot, $plot->levelName]));
-		}
-		else {
+		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.error"));
 		}
 		return true;

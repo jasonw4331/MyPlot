@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\provider;
 
 use onebone\economyapi\EconomyAPI;
@@ -24,11 +25,10 @@ class EconomySProvider implements EconomyProvider
 	 *
 	 * @return bool
 	 */
-	public function reduceMoney(Player $player, float $amount) {
-		if($amount == 0) {
+	public function reduceMoney(Player $player, float $amount) : bool {
+		if($amount === 0) {
 			return true;
-		}
-		elseif($amount < 0) {
+		}elseif($amount < 0) {
 			$amount = -$amount;
 		}
 		$ret = $this->plugin->reduceMoney($player, $amount, true, "MyPlot");

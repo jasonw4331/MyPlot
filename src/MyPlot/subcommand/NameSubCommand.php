@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -12,7 +13,7 @@ class NameSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.name");
 	}
 
@@ -22,7 +23,7 @@ class NameSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
 			return false;
 		}
@@ -39,8 +40,7 @@ class NameSubCommand extends SubCommand
 		$plot->name = $name;
 		if($this->getPlugin()->savePlot($plot)) {
 			$sender->sendMessage($this->translateString("name.success", [$name]));
-		}
-		else {
+		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
 		return true;

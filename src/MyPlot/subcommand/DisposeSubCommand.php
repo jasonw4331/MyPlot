@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -12,7 +13,7 @@ class DisposeSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.dispose");
 	}
 
@@ -22,7 +23,7 @@ class DisposeSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
 			return false;
 		}
@@ -44,12 +45,10 @@ class DisposeSubCommand extends SubCommand
 			}
 			if($this->getPlugin()->disposePlot($plot)) {
 				$sender->sendMessage($this->translateString("dispose.success"));
-			}
-			else {
+			}else{
 				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 			}
-		}
-		else {
+		}else{
 			$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
 			$sender->sendMessage($this->translateString("dispose.confirm", [$plotId]));
 		}

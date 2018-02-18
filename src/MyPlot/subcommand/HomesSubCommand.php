@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -12,7 +13,7 @@ class HomesSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.homes");
 	}
 
@@ -22,8 +23,8 @@ class HomesSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
-		$levelName = $args[0] ?? $sender->getLevel()->getName();
+	public function execute(CommandSender $sender, array $args) : bool {
+		$levelName = $args[0] ?? $sender->getLevel()->getFolderName();
 		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
 		if(empty($plots)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("homes.noplots"));

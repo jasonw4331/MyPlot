@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
@@ -27,7 +28,7 @@ abstract class DataProvider
 	/**
 	 * @param Plot $plot
 	 */
-	protected final function cachePlot(Plot $plot) {
+	protected final function cachePlot(Plot $plot) : void {
 		if($this->cacheSize > 0) {
 			$key = $plot->levelName . ';' . $plot->X . ';' . $plot->Z;
 			if(isset($this->cache[$key])) {
@@ -48,7 +49,7 @@ abstract class DataProvider
 	 *
 	 * @return Plot|null
 	 */
-	protected final function getPlotFromCache(string $levelName, int $X, int $Z) {
+	protected final function getPlotFromCache(string $levelName, int $X, int $Z) : ?Plot {
 		if($this->cacheSize > 0) {
 			$key = $levelName . ';' . $X . ';' . $Z;
 			if(isset($this->cache[$key])) {
@@ -64,14 +65,14 @@ abstract class DataProvider
 	 *
 	 * @return bool
 	 */
-	public abstract function savePlot(Plot $plot);
+	public abstract function savePlot(Plot $plot) : bool;
 
 	/**
 	 * @param Plot $plot
 	 *
 	 * @return bool
 	 */
-	public abstract function deletePlot(Plot $plot);
+	public abstract function deletePlot(Plot $plot) : bool;
 
 	/**
 	 * @param string $levelName
@@ -80,7 +81,7 @@ abstract class DataProvider
 	 *
 	 * @return Plot
 	 */
-	public abstract function getPlot(string $levelName, int $X, int $Z);
+	public abstract function getPlot(string $levelName, int $X, int $Z) : Plot;
 
 	/**
 	 * @param string $owner
@@ -88,7 +89,7 @@ abstract class DataProvider
 	 *
 	 * @return Plot[]
 	 */
-	public abstract function getPlotsByOwner(string $owner, string $levelName = "");
+	public abstract function getPlotsByOwner(string $owner, string $levelName = "") : array;
 
 	/**
 	 * @param string $levelName
@@ -96,9 +97,9 @@ abstract class DataProvider
 	 *
 	 * @return Plot|null
 	 */
-	public abstract function getNextFreePlot(string $levelName, int $limitXZ = 0);
+	public abstract function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?Plot;
 
-	public abstract function close();
+	public abstract function close() : void;
 
 	/**
 	 * @param int $a
@@ -107,7 +108,7 @@ abstract class DataProvider
 	 *
 	 * @return array|null
 	 */
-	protected static function findEmptyPlotSquared(int $a, int $b, array $plots) {
+	protected static function findEmptyPlotSquared(int $a, int $b, array $plots) : ?array {
 		if(!isset($plots[$a][$b]))
 			return [$a, $b];
 		if(!isset($plots[$b][$a]))

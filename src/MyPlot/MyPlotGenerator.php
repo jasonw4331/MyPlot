@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot;
 
 use pocketmine\block\Block;
@@ -21,14 +22,18 @@ class MyPlotGenerator extends Generator {
 	const ROAD = 1;
 	const WALL = 2;
 
+	/**
+	 * MyPlotGenerator constructor.
+	 *
+	 * @param array $settings
+	 */
 	public function __construct(array $settings = []) {
 		if(isset($settings["preset"])) {
 			$settings = json_decode($settings["preset"], true);
 			if($settings === false) {
 				$settings = [];
 			}
-		}
-		else {
+		}else{
 			$settings = [];
 		}
 		$this->roadBlock = PlotLevelSettings::parseBlock($settings, "RoadBlock", Block::get(Block::PLANKS));
@@ -93,11 +98,9 @@ class MyPlotGenerator extends Generator {
 				$type = $shape[($Z << 4) | $X];
 				if($type === self::PLOT) {
 					$chunk->setBlock($X, $groundHeight, $Z, $plotFloorBlockId, $plotFloorBlockMeta);
-				}
-				elseif($type === self::ROAD) {
+				}elseif($type === self::ROAD) {
 					$chunk->setBlock($X, $groundHeight, $Z, $roadBlockId, $roadBlockMeta);
-				}
-				else {
+				}else{
 					$chunk->setBlock($X, $groundHeight, $Z, $roadBlockId, $roadBlockMeta);
 					$chunk->setBlock($X, $groundHeight + 1, $Z, $wallBlockId, $wallBlockMeta);
 				}
@@ -119,14 +122,12 @@ class MyPlotGenerator extends Generator {
 		$totalSize = $this->plotSize + $this->roadWidth;
 		if($x >= 0) {
 			$X = $x % $totalSize;
-		}
-		else {
+		}else{
 			$X = $totalSize - abs($x % $totalSize);
 		}
 		if($z >= 0) {
 			$Z = $z % $totalSize;
-		}
-		else {
+		}else{
 			$Z = $totalSize - abs($z % $totalSize);
 		}
 		$startX = $X;
@@ -137,11 +138,9 @@ class MyPlotGenerator extends Generator {
 			}
 			if($Z < $this->plotSize) {
 				$typeZ = self::PLOT;
-			}
-			elseif($Z === $this->plotSize or $Z === ($totalSize - 1)) {
+			}elseif($Z === $this->plotSize or $Z === ($totalSize - 1)) {
 				$typeZ = self::WALL;
-			}
-			else {
+			}else{
 				$typeZ = self::ROAD;
 			}
 			for($x = 0, $X = $startX; $x < 16; $x++, $X++) {
@@ -150,23 +149,18 @@ class MyPlotGenerator extends Generator {
 				}
 				if($X < $this->plotSize) {
 					$typeX = self::PLOT;
-				}
-				elseif($X === $this->plotSize or $X === ($totalSize - 1)) {
+				}elseif($X === $this->plotSize or $X === ($totalSize - 1)) {
 					$typeX = self::WALL;
-				}
-				else {
+				}else{
 					$typeX = self::ROAD;
 				}
 				if($typeX === $typeZ) {
 					$type = $typeX;
-				}
-				elseif($typeX === self::PLOT) {
+				}elseif($typeX === self::PLOT) {
 					$type = $typeZ;
-				}
-				elseif($typeZ === self::PLOT) {
+				}elseif($typeZ === self::PLOT) {
 					$type = $typeX;
-				}
-				else {
+				}else{
 					$type = self::ROAD;
 				}
 				$shape[($z << 4) | $x] = $type;

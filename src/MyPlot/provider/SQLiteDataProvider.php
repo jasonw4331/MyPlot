@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
@@ -47,14 +48,13 @@ class SQLiteDataProvider extends DataProvider
 	 *
 	 * @return bool
 	 */
-	public function savePlot(Plot $plot) {
+	public function savePlot(Plot $plot) : bool {
 		$helpers = implode(",", $plot->helpers);
 		$denied = implode(",", $plot->denied);
 		if($plot->id >= 0) {
 			$stmt = $this->sqlSavePlotById;
 			$stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
-		}
-		else {
+		}else{
 			$stmt = $this->sqlSavePlot;
 			$stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
 			$stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
@@ -79,12 +79,11 @@ class SQLiteDataProvider extends DataProvider
 	 *
 	 * @return bool
 	 */
-	public function deletePlot(Plot $plot) {
+	public function deletePlot(Plot $plot) : bool {
 		if($plot->id >= 0) {
 			$stmt = $this->sqlRemovePlotById;
 			$stmt->bindValue(":id", $plot->id, SQLITE3_INTEGER);
-		}
-		else {
+		}else{
 			$stmt = $this->sqlRemovePlot;
 			$stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
 			$stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
@@ -107,7 +106,7 @@ class SQLiteDataProvider extends DataProvider
 	 *
 	 * @return Plot
 	 */
-	public function getPlot(string $levelName, int $X, int $Z) {
+	public function getPlot(string $levelName, int $X, int $Z) : Plot {
 		if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) !== null) {
 			return $plot;
 		}
@@ -119,19 +118,16 @@ class SQLiteDataProvider extends DataProvider
 		if($val = $result->fetchArray(SQLITE3_ASSOC)) {
 			if($val["helpers"] === null or $val["helpers"] === "") {
 				$helpers = [];
-			}
-			else {
+			}else{
 				$helpers = explode(",", (string) $val["helpers"]);
 			}
 			if($val["denied"] === null or $val["denied"] === "") {
 				$denied = [];
-			}
-			else {
+			}else{
 				$denied = explode(",", (string) $val["denied"]);
 			}
 			$plot = new Plot($levelName, $X, $Z, (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], (int) $val["id"]);
-		}
-		else {
+		}else{
 			$plot = new Plot($levelName, $X, $Z);
 		}
 		$this->cachePlot($plot);
@@ -144,11 +140,10 @@ class SQLiteDataProvider extends DataProvider
 	 *
 	 * @return array
 	 */
-	public function getPlotsByOwner(string $owner, string $levelName = "") {
+	public function getPlotsByOwner(string $owner, string $levelName = "") : array {
 		if($levelName === "") {
 			$stmt = $this->sqlGetPlotsByOwner;
-		}
-		else {
+		}else{
 			$stmt = $this->sqlGetPlotsByOwnerAndLevel;
 			$stmt->bindValue(":level", $levelName, SQLITE3_TEXT);
 		}
@@ -178,7 +173,7 @@ class SQLiteDataProvider extends DataProvider
 	 *
 	 * @return Plot|null
 	 */
-	public function getNextFreePlot(string $levelName, int $limitXZ = 0) {
+	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?Plot {
 		$this->sqlGetExistingXZ->bindValue(":level", $levelName, SQLITE3_TEXT);
 		$i = 0;
 		$this->sqlGetExistingXZ->bindParam(":number", $i, SQLITE3_INTEGER);
@@ -216,7 +211,7 @@ class SQLiteDataProvider extends DataProvider
 		return null;
 	}
 
-	public function close() {
+	public function close() : void {
 		$this->db->close();
 		$this->plugin->getLogger()->debug("SQLite database closed!");
 	}

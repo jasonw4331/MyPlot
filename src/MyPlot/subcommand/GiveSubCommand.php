@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -12,7 +13,7 @@ class GiveSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.give");
 	}
 
@@ -22,7 +23,7 @@ class GiveSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
 			return false;
 		}
@@ -40,8 +41,7 @@ class GiveSubCommand extends SubCommand
 		if(!$newOwner instanceof Player) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("give.notonline"));
 			return true;
-		}
-		elseif($newOwner->getName() === $sender->getName()) {
+		}elseif($newOwner->getName() === $sender->getName()) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("give.toself"));
 			return true;
 		}
@@ -59,12 +59,10 @@ class GiveSubCommand extends SubCommand
 				$newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;
 				$sender->sendMessage($this->translateString("give.success", [$newOwnerName]));
 				$newOwner->sendMessage($this->translateString("give.received", [$oldOwnerName, $plotId]));
-			}
-			else {
+			}else{
 				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 			}
-		}
-		else {
+		}else{
 			$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
 			$newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;
 			$sender->sendMessage($this->translateString("give.confirm", [$plotId, $newOwnerName]));

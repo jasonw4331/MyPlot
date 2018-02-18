@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use MyPlot\Commands;
@@ -11,7 +12,14 @@ class HelpSubCommand extends SubCommand
 	/** @var Commands $cmds */
 	private $cmds;
 
-	public function __construct(MyPlot $plugin, $name, $cmds) {
+	/**
+	 * HelpSubCommand constructor.
+	 *
+	 * @param MyPlot $plugin
+	 * @param string $name
+	 * @param Commands $cmds
+	 */
+	public function __construct(MyPlot $plugin, string $name, Commands $cmds) {
 		parent::__construct($plugin, $name);
 		$this->cmds = $cmds;
 	}
@@ -21,7 +29,7 @@ class HelpSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return $sender->hasPermission("myplot.command.help");
 	}
 
@@ -30,15 +38,15 @@ class HelpSubCommand extends SubCommand
 	 * @param string[] $args
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
 			$pageNumber = 1;
-		} elseif (is_numeric($args[0])) {
+		}elseif(is_numeric($args[0])) {
 			$pageNumber = (int) array_shift($args);
 			if ($pageNumber <= 0) {
 				$pageNumber = 1;
 			}
-		} else {
+		}else{
 			return false;
 		}
 

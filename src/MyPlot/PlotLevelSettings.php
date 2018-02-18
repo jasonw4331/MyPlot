@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot;
 
 use pocketmine\block\Block;
@@ -47,23 +48,20 @@ class PlotLevelSettings
 	 *
 	 * @return Block
 	 */
-	public static function parseBlock(array &$array, $key, Block $default) {
+	public static function parseBlock(array &$array, $key, Block $default) : Block {
 		if(isset($array[$key])) {
 			$id = $array[$key];
 			if(is_numeric($id)) {
 				$block = Block::get((int) $id);
-			}
-			else {
+			}else{
 				$split = explode(":", $id);
 				if(count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
 					$block = Block::get((int) $split[0], (int) $split[1]);
-				}
-				else {
+				}else{
 					$block = $default;
 				}
 			}
-		}
-		else {
+		}else{
 			$block = $default;
 		}
 		return $block;
@@ -76,11 +74,10 @@ class PlotLevelSettings
 	 *
 	 * @return int
 	 */
-	public static function parseNumber(array &$array, $key, int $default) {
+	public static function parseNumber(array &$array, $key, int $default) : int {
 		if(isset($array[$key]) and is_numeric($array[$key])) {
 			return (int) $array[$key];
-		}
-		else {
+		}else{
 			return $default;
 		}
 	}
@@ -92,11 +89,10 @@ class PlotLevelSettings
 	 *
 	 * @return bool
 	 */
-	public static function parseBool(array &$array, $key, bool $default) {
+	public static function parseBool(array &$array, $key, bool $default) : bool {
 		if(isset($array[$key]) and is_bool($array[$key])) {
 			return (bool) $array[$key];
-		}
-		else {
+		}else{
 			return $default;
 		}
 	}

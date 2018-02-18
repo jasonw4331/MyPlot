@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot;
 
 use EssentialsPE\Loader;
@@ -47,7 +48,7 @@ class MyPlot extends PluginBase
 	/**
 	 * @return MyPlot
 	 */
-	public static function getInstance() {
+	public static function getInstance() : self {
 		return self::$instance;
 	}
 
@@ -58,7 +59,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return BaseLang
 	 */
-	public function getLanguage() {
+	public function getLanguage() : BaseLang {
 		return $this->baseLang;
 	}
 
@@ -69,7 +70,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return DataProvider
 	 */
-	public function getProvider() {
+	public function getProvider() : DataProvider {
 		return $this->dataProvider;
 	}
 
@@ -80,7 +81,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return EconomyProvider|null
 	 */
-	public function getEconomyProvider() {
+	public function getEconomyProvider() : ?EconomyProvider {
 		return $this->economyProvider;
 	}
 
@@ -91,12 +92,11 @@ class MyPlot extends PluginBase
 	 *
 	 * @param EconomyProvider|null $provider
 	 */
-	public function setEconomyProvider(?EconomyProvider $provider) {
+	public function setEconomyProvider(?EconomyProvider $provider) : void {
 		if($provider === null) {
 			$this->getConfig()->set("UseEconomy", false);
 			$this->getLogger()->info("Economy mode disabled!");
-		}
-		else {
+		}else{
 			$this->getLogger()->info("A custom economy provider has been registered. Economy mode now enabled!");
 			$this->getConfig()->set("UseEconomy", true);
 			$this->economyProvider = $provider;
@@ -112,7 +112,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return PlotLevelSettings|null
 	 */
-	public function getLevelSettings(string $levelName) {
+	public function getLevelSettings(string $levelName) : ?PlotLevelSettings {
 		return $this->levels[$levelName] ?? null;
 	}
 
@@ -125,7 +125,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function isLevelLoaded(string $levelName) {
+	public function isLevelLoaded(string $levelName) : bool {
 		return isset($this->levels[$levelName]);
 	}
 
@@ -139,12 +139,12 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function generateLevel(string $levelName, array $settings = []) {
+	public function generateLevel(string $levelName, array $settings = []) : bool {
 		if($this->getServer()->isLevelGenerated($levelName) === true) {
 			return false;
 		}
 		if(empty($settings)) {
-			$settings = $this->getConfig()->get("DefaultWorld");
+			$settings = $this->getConfig()->get("DefaultWorld", []);
 		}
 		$settings = ["preset" => json_encode($settings)];
 		return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $settings);
@@ -159,7 +159,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function savePlot(Plot $plot) {
+	public function savePlot(Plot $plot) : bool {
 		return $this->dataProvider->savePlot($plot);
 	}
 
@@ -173,7 +173,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Plot[]
 	 */
-	public function getPlotsOfPlayer(string $username, string $levelName) {
+	public function getPlotsOfPlayer(string $username, string $levelName) : array {
 		return $this->dataProvider->getPlotsByOwner($username, $levelName);
 	}
 
@@ -187,7 +187,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Plot|null
 	 */
-	public function getNextFreePlot(string $levelName, int $limitXZ = 0) {
+	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?Plot {
 		return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
 	}
 
@@ -200,30 +200,28 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Plot|null
 	 */
-	public function getPlotByPosition(Position $position) {
+	public function getPlotByPosition(Position $position) : ?Plot {
 		$x = $position->x;
 		$z = $position->z;
-		$levelName = $position->level->getName();
+		$levelName = $position->level->getFolderName();
+
 		$plotLevel = $this->getLevelSettings($levelName);
-		if($plotLevel === null) {
+		if($plotLevel === null)
 			return null;
-		}
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
 		if($x >= 0) {
 			$X = (int) floor($x / $totalSize);
 			$difX = $x % $totalSize;
-		}
-		else {
+		}else{
 			$X = (int) ceil(($x - $plotSize + 1) / $totalSize);
 			$difX = abs(($x - $plotSize + 1) % $totalSize);
 		}
 		if($z >= 0) {
 			$Z = (int) floor($z / $totalSize);
 			$difZ = $z % $totalSize;
-		}
-		else {
+		}else{
 			$Z = (int) ceil(($z - $plotSize + 1) / $totalSize);
 			$difZ = abs(($z - $plotSize + 1) % $totalSize);
 		}
@@ -234,7 +232,7 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 *  Get the begin position of a plot
+	 * Get the begin position of a plot
 	 *
 	 * @api
 	 *
@@ -242,11 +240,10 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Position|null
 	 */
-	public function getPlotPosition(Plot $plot) {
+	public function getPlotPosition(Plot $plot) : ?Position {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		if($plotLevel === null) {
+		if($plotLevel === null)
 			return null;
-		}
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
@@ -265,11 +262,10 @@ class MyPlot extends PluginBase
 	 *
 	 * @return AxisAlignedBB|null
 	 */
-	public function getPlotBB(Plot $plot) {
+	public function getPlotBB(Plot $plot) : ?AxisAlignedBB {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		if($plotLevel === null) {
+		if($plotLevel === null)
 			return null;
-		}
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
@@ -291,17 +287,15 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function teleportPlayerToPlot(Player $player, Plot $plot, bool $center = false) {
-		if($center) {
+	public function teleportPlayerToPlot(Player $player, Plot $plot, bool $center = false) : bool {
+		if($center)
 			return $this->teleportMiddle($player, $plot);
-		}
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		if($plotLevel === null) {
+		if($plotLevel === null)
 			return false;
-		}
 		$pos = $this->getPlotPosition($plot);
 		$pos->x += floor($plotLevel->plotSize / 2);
-		$pos->y += 1;
+		$pos->y += 1.5;
 		$pos->z -= 1;
 		return $player->teleport($pos);
 	}
@@ -316,7 +310,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 256) {
+	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
 		if(!$this->isLevelLoaded($plot->levelName)) {
 			return false;
 		}
@@ -343,7 +337,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function disposePlot(Plot $plot) {
+	public function disposePlot(Plot $plot) : bool {
 		return $this->dataProvider->deletePlot($plot);
 	}
 
@@ -357,7 +351,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 256) {
+	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
 		if($this->disposePlot($plot)) {
 			return $this->clearPlot($plot, $maxBlocksPerTick);
 		}
@@ -374,7 +368,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function setPlotBiome(Plot $plot, Biome $biome) {
+	public function setPlotBiome(Plot $plot, Biome $biome) : bool {
 		foreach($this->getPlotChunks($plot) as $chunk) {
 			if($chunk instanceof Chunk) {
 				for($x = 0; $x <= 16; $x++) {
@@ -384,6 +378,7 @@ class MyPlot extends PluginBase
 						foreach($chunk->getEntities() as $entity) {
 							if($entity instanceof Player) {
 								$entity->onChunkChanged($chunk);
+								$entity->sendChunk($x, $z, $chunk);
 							}
 						}
 					}
@@ -402,7 +397,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return PlotLevelSettings[]
 	 */
-	public function getPlotLevels() {
+	public function getPlotLevels() : array {
 		return $this->levels;
 	}
 
@@ -415,7 +410,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Chunk[]
 	 */
-	public function getPlotChunks(Plot $plot) {
+	public function getPlotChunks(Plot $plot) : array {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$level = $this->getServer()->getLevelByName($plot->levelName);
 		$pos = $this->getPlotPosition($plot);
@@ -452,19 +447,17 @@ class MyPlot extends PluginBase
 	 *
 	 * @return int
 	 */
-	public function getMaxPlotsOfPlayer(Player $player) {
-		if($player->hasPermission("myplot.claimplots.unlimited")) {
+	public function getMaxPlotsOfPlayer(Player $player) : int {
+		if($player->hasPermission("myplot.claimplots.unlimited"))
 			return PHP_INT_MAX;
-		}
 		/** @var Permission[] $perms */
 		$perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
 		$perms = array_filter($perms, function($name) {
 			return (substr($name, 0, 18) === "myplot.claimplots.");
 		}, ARRAY_FILTER_USE_KEY);
-		if(count($perms) === 0) {
+		if(count($perms) === 0)
 			return 0;
-		}
-		krsort($perms, SORT_FLAG_CASE | SORT_NATURAL);
+		krsort(array_map("intval", $perms), SORT_NUMERIC);
 		foreach($perms as $name => $perm) {
 			$maxPlots = substr($name, 18);
 			if(is_numeric($maxPlots)) {
@@ -483,14 +476,14 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Position|null
 	 */
-	public function getPlotMid(Plot $plot) {
+	public function getPlotMid(Plot $plot) : ?Position {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		if($plotLevel === null) {
 			return null;
 		}
 		$plotSize = $plotLevel->plotSize;
 		$pos = $this->getPlotPosition($plot);
-		$pos = new Position($pos->getFloorX() + ($plotSize / 2) + 0.5, $pos->getFloorY() + 1, $pos->getFloorZ() + ($plotSize / 2) + 0.5);
+		$pos = new Position($pos->x + ($plotSize / 2), $pos->y + 1, $pos->z + ($plotSize / 2));
 		return $pos;
 	}
 
@@ -504,7 +497,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function teleportMiddle(Player $player, Plot $plot) {
+	public function teleportMiddle(Player $player, Plot $plot) : bool {
 		$mid = $this->getPlotMid($plot);
 		if($mid === null) {
 			return false;
@@ -513,7 +506,7 @@ class MyPlot extends PluginBase
 	}
 
 	/* -------------------------- Non-API part -------------------------- */
-	public function onLoad() {
+	public function onLoad() : void {
 		$this->getLogger()->notice(TF::BOLD . "Loading...");
 		self::$instance = $this;
 		$this->getLogger()->debug(TF::BOLD . "Loading Config");
@@ -531,7 +524,7 @@ class MyPlot extends PluginBase
 		// Initialize DataProvider
 		/** @var int $cacheSize */
 		$cacheSize = $this->getConfig()->get("PlotCacheSize", 256);
-		switch(strtolower($this->getConfig()->get("DataProvider"))) {
+		switch(strtolower($this->getConfig()->get("DataProvider", "sqlite3"))) {
 			case "mysql":
 				$settings = $this->getConfig()->get("MySQLSettings");
 				$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
@@ -553,7 +546,7 @@ class MyPlot extends PluginBase
 		$this->getServer()->getCommandMap()->register("myplot", new Commands($this));
 	}
 
-	public function onEnable() {
+	public function onEnable() : void {
 		SpoonDetector::printSpoon($this, "spoon.txt");
 		if($this->isDisabled()) {
 			return;
@@ -608,7 +601,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function addLevelSettings(string $levelName, PlotLevelSettings $settings) {
+	public function addLevelSettings(string $levelName, PlotLevelSettings $settings) : bool {
 		$this->levels[$levelName] = $settings;
 		return true;
 	}
@@ -618,7 +611,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function unloadLevelSettings(string $levelName) {
+	public function unloadLevelSettings(string $levelName) : bool {
 		if(isset($this->levels[$levelName])) {
 			unset($this->levels[$levelName]);
 			$this->getLogger()->debug("Level " . $levelName . " settings unloaded!");
@@ -627,9 +620,8 @@ class MyPlot extends PluginBase
 		return false;
 	}
 
-	public function onDisable() {
-		if($this->dataProvider !== null) {
+	public function onDisable() : void {
+		if($this->dataProvider !== null)
 			$this->dataProvider->close();
-		}
 	}
 }

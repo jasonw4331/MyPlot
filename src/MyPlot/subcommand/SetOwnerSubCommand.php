@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -11,7 +12,7 @@ class SetOwnerSubCommand extends SubCommand {
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.admin.setowner");
 	}
 
@@ -21,7 +22,7 @@ class SetOwnerSubCommand extends SubCommand {
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
 			return false;
 		}
@@ -35,7 +36,7 @@ class SetOwnerSubCommand extends SubCommand {
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
 			$level = $this->getPlugin()->getServer()->getLevelByName($level);
 			if(!$level->isClosed()) {
-				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getName()));
+				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
 			}
 		}
 		if($plotsOfPlayer >= $maxPlots) {
@@ -46,8 +47,7 @@ class SetOwnerSubCommand extends SubCommand {
 		$plot->name = "";
 		if($this->getPlugin()->savePlot($plot)) {
 			$sender->sendMessage($this->translateString("setowner.success", [$plot->owner]));
-		}
-		else {
+		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
 		return true;

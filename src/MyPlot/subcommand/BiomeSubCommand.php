@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -16,7 +17,7 @@ class BiomeSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) {
+	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.biome");
 	}
 
@@ -26,7 +27,7 @@ class BiomeSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
 			$biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
 			$sender->sendMessage($this->translateString("biome.possible", [$biomes]));
@@ -52,8 +53,7 @@ class BiomeSubCommand extends SubCommand
 				return true;
 			}
 			$biome = Biome::getBiome($biome);
-		}
-		else {
+		}else{
 			if(!isset($this->biomes[$biome])) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
 				$biomes = implode(", ", array_keys($this->biomes));
@@ -64,8 +64,7 @@ class BiomeSubCommand extends SubCommand
 		}
 		if($this->getPlugin()->setPlotBiome($plot, $biome)) {
 			$sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
-		}
-		else {
+		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
 		return true;
