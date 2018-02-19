@@ -457,7 +457,7 @@ class MyPlot extends PluginBase
 		}, ARRAY_FILTER_USE_KEY);
 		if(count($perms) === 0)
 			return 0;
-		krsort(array_map("intval", $perms), SORT_NUMERIC);
+		krsort($perms, SORT_FLAG_CASE | SORT_NATURAL);
 		foreach($perms as $name => $perm) {
 			$maxPlots = substr($name, 18);
 			if(is_numeric($maxPlots)) {
