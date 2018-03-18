@@ -5,6 +5,7 @@ namespace MyPlot;
 use pocketmine\block\Sapling;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
 use pocketmine\event\level\LevelLoadEvent;
@@ -105,7 +106,17 @@ class EventListener implements Listener
 	}
 
 	/**
-	 * @param BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent $event
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param SignChangeEvent $event
+	 */
+	public function onSignChange(SignChangeEvent $event) : void {
+		$this->onEventOnBlock($event);
+	}
+
+	/**
+	 * @param BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent|SignChangeEvent $event
 	 */
 	private function onEventOnBlock($event) : void {
 		if($event->isCancelled()) {
