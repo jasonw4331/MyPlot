@@ -5,17 +5,27 @@ namespace MyPlot\block;
 use MyPlot\MyPlot;
 
 class Lava extends \pocketmine\block\Lava {
-	public function onUpdate(int $type) {
+	public function onScheduledUpdate() : void {
 		$plugin = MyPlot::getInstance();
 		$levelName = $this->getLevel()->getFolderName();
 		if($plugin->isLevelLoaded($levelName)) {
 			if($plugin->getLevelSettings($levelName)->updatePlotLiquids and !is_null($plugin->getPlotByPosition($this))) {
-				return parent::onUpdate($type);
-			}else{
-				return false;
+				parent::onScheduledUpdate();
 			}
 		}else{
-			return parent::onUpdate($type);
+			parent::onScheduledUpdate();
+		}
+	}
+
+	public function onNearbyBlockChange() : void {
+		$plugin = MyPlot::getInstance();
+		$levelName = $this->getLevel()->getFolderName();
+		if($plugin->isLevelLoaded($levelName)) {
+			if($plugin->getLevelSettings($levelName)->updatePlotLiquids and !is_null($plugin->getPlotByPosition($this))) {
+				parent::onNearbyBlockChange();
+			}
+		}else{
+			parent::onNearbyBlockChange();
 		}
 	}
 }
