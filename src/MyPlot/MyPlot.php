@@ -507,7 +507,7 @@ class MyPlot extends PluginBase
 
 	/* -------------------------- Non-API part -------------------------- */
 	public function onLoad() : void {
-		$this->getLogger()->notice(TF::BOLD . "Loading...");
+		$this->getLogger()->debug(TF::BOLD."Loading...");
 		self::$instance = $this;
 		$this->getLogger()->debug(TF::BOLD . "Loading Config");
 		$this->saveDefaultConfig();
@@ -592,7 +592,7 @@ class MyPlot extends PluginBase
 		BlockFactory::registerBlock(new Water(), true);
 		BlockFactory::registerBlock(new Lava(), true);
 		$this->getLogger()->debug(TF::BOLD . "Registering Blocks");
-		$this->getLogger()->notice(TF::BOLD . TF::GREEN . "Enabled!");
+		$this->getLogger()->debug(TF::BOLD.TF::GREEN."Enabled!");
 	}
 
 	/**
