@@ -526,8 +526,13 @@ class MyPlot extends PluginBase
 		$cacheSize = $this->getConfig()->get("PlotCacheSize", 256);
 		switch(strtolower($this->getConfig()->get("DataProvider", "sqlite3"))) {
 			case "mysql":
-				$settings = $this->getConfig()->get("MySQLSettings");
-				$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
+			    if(extension_loaded("mysqli")) {
+                    $settings = $this->getConfig()->get("MySQLSettings");
+                    $this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
+                }else{
+			        $this->getLogger()->info("MySQLi is not installed in your php build! SQLite will be used instead.");
+                    $this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
+                }
 			break;
 			case "yaml":
 				$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
