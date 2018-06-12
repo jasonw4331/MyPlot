@@ -19,9 +19,9 @@ use onebone\economyapi\EconomyAPI;
 use pocketmine\block\BlockFactory;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
+use pocketmine\level\biome\Biome;
 use pocketmine\level\format\Chunk;
-use pocketmine\level\generator\biome\Biome;
-use pocketmine\level\generator\Generator;
+use pocketmine\level\generator\GeneratorManager;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
@@ -324,7 +324,7 @@ class MyPlot extends PluginBase
 				}
 			}
 		}
-		$this->getServer()->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
+		$this->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
 		return true;
 	}
 
@@ -514,7 +514,7 @@ class MyPlot extends PluginBase
 		$this->reloadConfig();
 		@mkdir($this->getDataFolder() . "worlds");
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Generator");
-		Generator::addGenerator(MyPlotGenerator::class, "myplot");
+		GeneratorManager::addGenerator(MyPlotGenerator::class, "myplot");
 		$this->getLogger()->debug(TF::BOLD . "Loading Languages");
 		// Loading Languages
 		/** @var string $lang */

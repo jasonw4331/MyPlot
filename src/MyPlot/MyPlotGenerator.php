@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use pocketmine\block\Block;
+use pocketmine\level\biome\Biome;
 use pocketmine\level\ChunkManager;
-use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\generator\Generator;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
@@ -66,7 +66,7 @@ class MyPlotGenerator extends Generator {
 	 * @param ChunkManager $level
 	 * @param Random $random
 	 */
-	public function init(ChunkManager $level, Random $random) {
+	public function init(ChunkManager $level, Random $random) : void {
 		$this->level = $level;
 	}
 
@@ -74,7 +74,7 @@ class MyPlotGenerator extends Generator {
 	 * @param int $chunkX
 	 * @param int $chunkZ
 	 */
-	public function generateChunk(int $chunkX, int $chunkZ) {
+	public function generateChunk(int $chunkX, int $chunkZ) : void {
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
 		$chunk = $this->level->getChunk($chunkX, $chunkZ);
 		$bottomBlockId = $this->bottomBlock->getId();
@@ -173,7 +173,7 @@ class MyPlotGenerator extends Generator {
 	 * @param int $chunkX
 	 * @param int $chunkZ
 	 */
-	public function populateChunk(int $chunkX, int $chunkZ) {
+	public function populateChunk(int $chunkX, int $chunkZ) : void {
 	}
 
 	/**

@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\level\generator\biome\Biome;
+use pocketmine\level\biome\Biome;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 

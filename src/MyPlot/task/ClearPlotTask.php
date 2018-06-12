@@ -7,9 +7,9 @@ use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 
-class ClearPlotTask extends PluginTask {
+class ClearPlotTask extends Task {
 	/** @var MyPlot $plugin */
 	private $plugin;
 	private $plot, $level, $height, $bottomBlock, $plotFillBlock, $plotFloorBlock, $plotBeginPos, $xMax, $zMax, $maxBlocksPerTick, $pos;
@@ -22,7 +22,7 @@ class ClearPlotTask extends PluginTask {
 	 * @param int $maxBlocksPerTick
 	 */
 	public function __construct(MyPlot $plugin, Plot $plot, int $maxBlocksPerTick = 256) {
-		parent::__construct($plugin);
+		$this->plugin = $plugin;
 		$this->plot = $plot;
 		$this->plotBeginPos = $plugin->getPlotPosition($plot);
 		$this->level = $this->plotBeginPos->getLevel();
@@ -69,7 +69,7 @@ class ClearPlotTask extends PluginTask {
 					$this->level->setBlock($this->pos, $block, false, false);
 					$blocks++;
 					if($blocks >= $this->maxBlocksPerTick) {
-						$this->getOwner()->getServer()->getScheduler()->scheduleDelayedTask($this, 1);
+						$this->plugin->getScheduler()->scheduleDelayedTask($this, 1);
 						return;
 					}
 					$this->pos->y++;
