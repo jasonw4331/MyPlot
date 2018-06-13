@@ -11,7 +11,7 @@ use pocketmine\utils\Random;
 
 class MyPlotGenerator extends Generator {
 	/** @var ChunkManager $level */
-	private $level;
+	protected $level;
 	/** @var string[] $settings */
 	private $settings;
 	/** @var Block */
