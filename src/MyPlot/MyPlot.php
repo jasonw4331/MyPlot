@@ -144,6 +144,7 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		if(empty($settings)) {
+			$this->getConfig()->reload();
 			$settings = $this->getConfig()->get("DefaultWorld", []);
 		}
 		$settings = ["preset" => json_encode($settings)];
