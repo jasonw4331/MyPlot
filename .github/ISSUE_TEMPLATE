@@ -21,5 +21,5 @@ PHP version: 7.2.1 (default)
 <!-- OPTIONAL INFORMATION - use this section for posting crash dumps, backtraces or other files(please use code markdown!) -->
 ## Optional information
 ```
-Put a console error here
+Put a console error here, but please make sure you have your debug level set to 2 in your pocketmine.yml
 ```
