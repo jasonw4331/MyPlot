@@ -2,7 +2,7 @@
 [![Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/EjgedSY)
 [![Poggit-Ci](https://poggit.pmmp.io/ci.shield/jasonwynn10/MyPlot/MyPlot)](https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot)
 [![Download count](https://poggit.pmmp.io/shield.dl.total/MyPlot)](https://poggit.pmmp.io/p/MyPlot)
-[![Build Status](https://travis-ci.org/jasonwynn10/MyPlot.svg?branch=API3)](https://travis-ci.org/jasonwynn10/MyPlot)
+[![Build Status](https://travis-ci.org/jasonwynn10/MyPlot.svg?branch=master)](https://travis-ci.org/jasonwynn10/MyPlot)
 ### **Create, manage, and build in protected plots. Keep your builds safe from griefers!**
 
 #### Official MyPlot precompiled builds can be found on [Poggit](https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot) at https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot
