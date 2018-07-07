@@ -27,7 +27,7 @@ class AutoSubCommand extends SubCommand
      */
     public function execute(CommandSender $sender, array $args): bool
     {
-        $levelName = $sender->getLevel()->getFolderName();
+        $levelName = $sender->getServer()->getLevelByName("plot")->getFolderName();
         if (!$this->getPlugin()->isLevelLoaded($levelName)) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
             return true;
