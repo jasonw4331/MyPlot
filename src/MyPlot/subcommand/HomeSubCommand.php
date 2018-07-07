@@ -35,7 +35,7 @@ class HomeSubCommand extends SubCommand
         } else {
             return false;
         }
-        $levelName = $args[1] ?? "plot";
+        $levelName = "plot";
         $plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
         if (empty($plots)) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));
