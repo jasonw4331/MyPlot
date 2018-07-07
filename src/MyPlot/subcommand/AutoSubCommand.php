@@ -28,7 +28,7 @@ class AutoSubCommand extends SubCommand
     public function execute(CommandSender $sender, array $args): bool
     {
         $levelName = "plot";
-        if (!$this->getPlugin()->isLevelLoaded($levelName)) {
+        if ($this->getPlugin()->getServer()->getLevelByName($levelName) == null) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
             return true;
         }
