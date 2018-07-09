@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot;
 
 use MyPlot\subcommand\AddHelperSubCommand;
@@ -30,99 +31,104 @@ use pocketmine\utils\TextFormat;
 
 class Commands extends PluginCommand
 {
-	/** @var SubCommand[] $subCommands */
-	private $subCommands = [];
-	/** @var SubCommand[] $aliasSubCommands */
-	private $aliasSubCommands = [];
+    /** @var SubCommand[] $subCommands */
+    private $subCommands = [];
+    /** @var SubCommand[] $aliasSubCommands */
+    private $aliasSubCommands = [];
 
-	/**
-	 * Commands constructor.
-	 *
-	 * @param MyPlot $plugin
-	 */
-	public function __construct(MyPlot $plugin) {
-		parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);
-		$this->setPermission("myplot.command");
-		$this->setAliases([$plugin->getLanguage()->get("command.alias")]);
-		$this->setDescription($plugin->getLanguage()->get("command.desc"));
-		$this->setUsage($plugin->getLanguage()->get("command.usage"));
-		$this->loadSubCommand(new HelpSubCommand($plugin, "help", $this));
-		$this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
-		$this->loadSubCommand(new GenerateSubCommand($plugin, "generate"));
-		$this->loadSubCommand(new InfoSubCommand($plugin, "info"));
-		$this->loadSubCommand(new AddHelperSubCommand($plugin, "addhelper"));
-		$this->loadSubCommand(new RemoveHelperSubCommand($plugin, "removehelper"));
-		$this->loadSubCommand(new AutoSubCommand($plugin, "auto"));
-		$this->loadSubCommand(new ClearSubCommand($plugin, "clear"));
-		$this->loadSubCommand(new DisposeSubCommand($plugin, "dispose"));
-		$this->loadSubCommand(new ResetSubCommand($plugin, "reset"));
-		$this->loadSubCommand(new BiomeSubCommand($plugin, "biome"));
-		$this->loadSubCommand(new HomeSubCommand($plugin, "home"));
-		$this->loadSubCommand(new HomesSubCommand($plugin, "homes"));
-		$this->loadSubCommand(new NameSubCommand($plugin, "name"));
-		$this->loadSubCommand(new GiveSubCommand($plugin, "give"));
-		$this->loadSubCommand(new WarpSubCommand($plugin, "warp"));
-		$this->loadSubCommand(new MiddleSubCommand($plugin, "middle"));
-		$this->loadSubCommand(new DenyPlayerSubCommand($plugin, "denyplayer"));
-		$this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));
-		$this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
-		$this->loadSubCommand(new ListSubCommand($plugin, "list"));
-		$plugin->getLogger()->debug("Commands Registered to MyPlot");
-	}
+    /**
+     * Commands constructor.
+     *
+     * @param MyPlot $plugin
+     */
+    public function __construct(MyPlot $plugin)
+    {
+        parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);
+        $this->setPermission("myplot.command");
+        $this->setAliases([$plugin->getLanguage()->get("command.alias")]);
+        $this->setDescription($plugin->getLanguage()->get("command.desc"));
+        $this->setUsage($plugin->getLanguage()->get("command.usage"));
+        $this->loadSubCommand(new HelpSubCommand($plugin, "help", $this));
+        $this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
+        $this->loadSubCommand(new GenerateSubCommand($plugin, "generate"));
+        $this->loadSubCommand(new InfoSubCommand($plugin, "info"));
+        $this->loadSubCommand(new AddHelperSubCommand($plugin, "addhelper"));
+        $this->loadSubCommand(new RemoveHelperSubCommand($plugin, "removehelper"));
+        $this->loadSubCommand(new AutoSubCommand($plugin, "auto"));
+        $this->loadSubCommand(new ClearSubCommand($plugin, "clear"));
+        $this->loadSubCommand(new DisposeSubCommand($plugin, "dispose"));
+        $this->loadSubCommand(new ResetSubCommand($plugin, "reset"));
+        $this->loadSubCommand(new BiomeSubCommand($plugin, "biome"));
+        $this->loadSubCommand(new HomeSubCommand($plugin, "home"));
+        $this->loadSubCommand(new HomesSubCommand($plugin, "homes"));
+        $this->loadSubCommand(new NameSubCommand($plugin, "name"));
+        $this->loadSubCommand(new GiveSubCommand($plugin, "give"));
+        $this->loadSubCommand(new WarpSubCommand($plugin, "warp"));
+        $this->loadSubCommand(new MiddleSubCommand($plugin, "middle"));
+        $this->loadSubCommand(new DenyPlayerSubCommand($plugin, "denyplayer"));
+        $this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));
+        $this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
+        $this->loadSubCommand(new ListSubCommand($plugin, "list"));
+        $plugin->getLogger()->debug("Commands Registered to MyPlot");
+    }
 
-	/**
-	 * @return SubCommand[]
-	 */
-	public function getCommands() : array {
-		return $this->subCommands;
-	}
+    /**
+     * @param SubCommand $command
+     */
+    private function loadSubCommand(SubCommand $command): void
+    {
+        $this->subCommands[$command->getName()] = $command;
+        if ($command->getAlias() != "") {
+            $this->aliasSubCommands[$command->getAlias()] = $command;
+        }
+    }
 
-	/**
-	 * @param SubCommand $command
-	 */
-	private function loadSubCommand(SubCommand $command) : void {
-		$this->subCommands[$command->getName()] = $command;
-		if($command->getAlias() != "") {
-			$this->aliasSubCommands[$command->getAlias()] = $command;
-		}
-	}
+    /**
+     * @return SubCommand[]
+     */
+    public function getCommands(): array
+    {
+        return $this->subCommands;
+    }
 
-	/**
-	 * @param CommandSender $sender
-	 * @param string $alias
-	 * @param string[] $args
-	 *
-	 * @return bool
-	 */
-	public function execute(CommandSender $sender, string $alias, array $args) : bool {
-		if($this->getPlugin()->isDisabled()) {
-			/** @noinspection PhpUndefinedMethodInspection */
-			$sender->sendMessage($this->getPlugin()->getLanguage()->get("plugin.disabled"));
-			return true;
-		}
-		if(!isset($args[0])) {
-			return false;
-		}
-		$subCommand = strtolower(array_shift($args));
-		if(isset($this->subCommands[$subCommand])) {
-			$command = $this->subCommands[$subCommand];
-		}elseif(isset($this->aliasSubCommands[$subCommand])) {
-			$command = $this->aliasSubCommands[$subCommand];
-		}else{
-			/** @noinspection PhpUndefinedMethodInspection */
-			$sender->sendMessage(TextFormat::RED . $this->getPlugin()->getLanguage()->get("command.unknown"));
-			return true;
-		}
-		if($command->canUse($sender)) {
-			if(!$command->execute($sender, $args)) {
-				/** @noinspection PhpUndefinedMethodInspection */
-				$usage = $this->getPlugin()->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
-				$sender->sendMessage($usage);
-			}
-		}else{
-			/** @noinspection PhpUndefinedMethodInspection */
-			$sender->sendMessage(TextFormat::RED . $this->getPlugin()->getLanguage()->get("command.unknown"));
-		}
-		return true;
-	}
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param string[] $args
+     *
+     * @return bool
+     */
+    public function execute(CommandSender $sender, string $alias, array $args): bool
+    {
+        if ($this->getPlugin()->isDisabled()) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $sender->sendMessage($this->getPlugin()->getLanguage()->get("plugin.disabled"));
+            return true;
+        }
+        if (!isset($args[0])) {
+            $this->getPlugin()->getServer()->dispatchCommand($sender, "p help");
+            return true;
+        }
+        $subCommand = strtolower(array_shift($args));
+        if (isset($this->subCommands[$subCommand])) {
+            $command = $this->subCommands[$subCommand];
+        } elseif (isset($this->aliasSubCommands[$subCommand])) {
+            $command = $this->aliasSubCommands[$subCommand];
+        } else {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $sender->sendMessage(TextFormat::RED . $this->getPlugin()->getLanguage()->get("command.unknown"));
+            return true;
+        }
+        if ($command->canUse($sender)) {
+            if (!$command->execute($sender, $args)) {
+                /** @noinspection PhpUndefinedMethodInspection */
+                $usage = $this->getPlugin()->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
+                $sender->sendMessage($usage);
+            }
+        } else {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $sender->sendMessage(TextFormat::RED . $this->getPlugin()->getLanguage()->get("command.unknown"));
+        }
+        return true;
+    }
 }
