@@ -32,6 +32,7 @@ class MySQLProvider extends DataProvider {
 		$this->settings = $settings;
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
 		$this->db->query("CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INT);");
+		$this->db->query("ALTER TABLE plots ADD pvp INT;");
 		$this->prepare();
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
