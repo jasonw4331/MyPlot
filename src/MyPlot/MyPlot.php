@@ -28,6 +28,7 @@ use pocketmine\math\AxisAlignedBB;
 use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 use PocketMoney\PocketMoney;
 use spoondetector\SpoonDetector;
@@ -135,20 +136,25 @@ class MyPlot extends PluginBase
 	 * @api
 	 *
 	 * @param string $levelName
+	 * @param string $generator
 	 * @param array $settings
 	 *
 	 * @return bool
 	 */
-	public function generateLevel(string $levelName, array $settings = []) : bool {
+	public function generateLevel(string $levelName, string $generator = "myplot", array $settings = []) : bool {
 		if($this->getServer()->isLevelGenerated($levelName) === true) {
 			return false;
 		}
+		$generator = GeneratorManager::getGenerator($generator);
 		if(empty($settings)) {
 			$this->getConfig()->reload();
 			$settings = $this->getConfig()->get("DefaultWorld", []);
 		}
+		$pluginConfig = $this->getConfig();
+		$default = ["RestrictEntityMovement" => $pluginConfig->getNested("DefaultWorld.RestrictEntityMovement", true), "UpdatePlotLiquids" => $pluginConfig->getNested("DefaultWorld.UpdatePlotLiquids", false), "ClaimPrice" => $pluginConfig->getNested("DefaultWorld.ClaimPrice", 0), "ClearPrice" => $pluginConfig->getNested("DefaultWorld.ClearPrice", 0), "DisposePrice" => $pluginConfig->getNested("DefaultWorld.DisposePrice", 0), "ResetPrice" => $pluginConfig->getNested("DefaultWorld.ResetPrice", 0)];
+		new Config($this->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML, $default);
 		$settings = ["preset" => json_encode($settings)];
-		return $this->getServer()->generateLevel($levelName, null, MyPlotGenerator::class, $settings);
+		return $this->getServer()->generateLevel($levelName, null, $generator, $settings);
 	}
 
 	/**
@@ -379,7 +385,6 @@ class MyPlot extends PluginBase
 						foreach($chunk->getEntities() as $entity) {
 							if($entity instanceof Player) {
 								$entity->onChunkChanged($chunk);
-								$entity->sendChunk($x, $z, $chunk);
 							}
 						}
 					}
@@ -515,7 +520,7 @@ class MyPlot extends PluginBase
 		$this->reloadConfig();
 		@mkdir($this->getDataFolder() . "worlds");
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Generator");
-		GeneratorManager::addGenerator(MyPlotGenerator::class, "myplot");
+		GeneratorManager::addGenerator(MyPlotGenerator::class, "myplot", true);
 		$this->getLogger()->debug(TF::BOLD . "Loading Languages");
 		// Loading Languages
 		/** @var string $lang */
