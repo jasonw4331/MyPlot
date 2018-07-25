@@ -88,7 +88,7 @@ class YAMLDataProvider extends DataProvider {
 		$count = $this->yaml->get("count", 0);
 		$this->yaml->set("count", (int) $count++);
 		$this->yaml->save(true);
-		return new Plot($levelName, $X, $Z, "", "", [], [], "PLAINS", false, (int) $count);
+		return new Plot($levelName, $X, $Z, "", "", [], [], "PLAINS", true, (int) $count);
 	}
 
 	/**
