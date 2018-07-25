@@ -6,6 +6,8 @@ use pocketmine\block\Sapling;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\SignChangeEvent;
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
 use pocketmine\event\level\LevelLoadEvent;
@@ -50,7 +52,7 @@ class EventListener implements Listener
 			$levelName = $event->getLevel()->getFolderName();
 			$filePath = $this->plugin->getDataFolder() . "worlds" . DIRECTORY_SEPARATOR . $levelName . ".yml";
 			$config = $this->plugin->getConfig();
-			$default = ["RestrictEntityMovement" => $config->getNested("DefaultWorld.RestrictEntityMovement", true), "UpdatePlotLiquids" => $config->getNested("DefaultWorld.UpdatePlotLiquids", false), "ClaimPrice" => $config->getNested("DefaultWorld.ClaimPrice", 0), "ClearPrice" => $config->getNested("DefaultWorld.ClearPrice", 0), "DisposePrice" => $config->getNested("DefaultWorld.DisposePrice", 0), "ResetPrice" => $config->getNested("DefaultWorld.ResetPrice", 0)];
+			$default = ["RestrictEntityMovement" => $config->getNested("DefaultWorld.RestrictEntityMovement", true), "RestrictPVP" => $config->get("DefaultWorld.RestrictPVP", false), "UpdatePlotLiquids" => $config->getNested("DefaultWorld.UpdatePlotLiquids", false), "ClaimPrice" => $config->getNested("DefaultWorld.ClaimPrice", 0), "ClearPrice" => $config->getNested("DefaultWorld.ClearPrice", 0), "DisposePrice" => $config->getNested("DefaultWorld.DisposePrice", 0), "ResetPrice" => $config->getNested("DefaultWorld.ResetPrice", 0)];
 			$config = new Config($filePath, Config::YAML, $default);
 			foreach(array_keys($default) as $key) {
 				$settings[$key] = $config->get($key);
@@ -251,6 +253,29 @@ class EventListener implements Listener
 				$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			}
 			$event->getPlayer()->sendTip($popup);
+		}
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param EntityDamageEvent $event
+	 */
+	public function onEntityDamage(EntityDamageEvent $event) : void {
+		if($event->isCancelled()) {
+			return;
+		}
+		if($event instanceof EntityDamageByEntityEvent and $event->getEntity() instanceof Player and $event->getDamager() instanceof Player) {
+			$levelName = $event->getEntity()->getLevel()->getFolderName();
+			if(!$this->plugin->isLevelLoaded($levelName)) {
+				return;
+			}
+			$settings = $this->plugin->getLevelSettings($levelName);
+			if($settings->restrictPVP) {
+				$event->setCancelled();
+				$this->plugin->getLogger()->debug("Cancelled pvp event on ".$levelName);
+			}
 		}
 	}
 }

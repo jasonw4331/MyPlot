@@ -13,7 +13,7 @@ class PlotLevelSettings
 	/** @var int */
 	public $roadWidth = 7, $plotSize = 32, $groundHeight = 64, $claimPrice = 0, $clearPrice = 0, $disposePrice = 0, $resetPrice = 0;
 	/** @var bool */
-	public $restrictEntityMovement = true, $updatePlotLiquids = false, $displayDoneNametags = false;
+	public $restrictEntityMovement = true, $restrictPVP = false, $updatePlotLiquids = false, $displayDoneNametags = false;
 
 	/**
 	 * PlotLevelSettings constructor.
@@ -37,6 +37,7 @@ class PlotLevelSettings
 			$this->disposePrice = self::parseNumber($settings, "DisposePrice", 0);
 			$this->resetPrice = self::parseNumber($settings, "ResetPrice", 0);
 			$this->restrictEntityMovement = self::parseBool($settings, "RestrictEntityMovement", true);
+			$this->restrictPVP = self::parseBool($settings, "RestrictPVP", false);
 			$this->updatePlotLiquids = self::parseBool($settings, "UpdatePlotLiquids", false);
 		}
 	}
