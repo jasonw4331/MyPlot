@@ -23,12 +23,12 @@ class SQLiteDataProvider extends DataProvider
 		$this->db = new \SQLite3($this->plugin->getDataFolder() . "plots.db");
 		$this->db->exec("CREATE TABLE IF NOT EXISTS plots
 			(id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
-			 owner TEXT, helpers TEXT, denied TEXT, biome TEXT);");
-		$this->sqlGetPlot = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
-		$this->sqlSavePlot = $this->db->prepare("INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome) VALUES
+			 owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INTEGER);");
+		$this->sqlGetPlot = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome, pvp FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
+		$this->sqlSavePlot = $this->db->prepare("INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome, pvp) VALUES
 			((SELECT id FROM plots WHERE level = :level AND X = :X AND Z = :Z),
-			 :level, :X, :Z, :name, :owner, :helpers, :denied, :biome);");
-		$this->sqlSavePlotById = $this->db->prepare("UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome WHERE id = :id;");
+			 :level, :X, :Z, :name, :owner, :helpers, :denied, :biome, :pvp);");
+		$this->sqlSavePlotById = $this->db->prepare("UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome, pvp = :pvp WHERE id = :id;");
 		$this->sqlRemovePlot = $this->db->prepare("DELETE FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
 		$this->sqlRemovePlotById = $this->db->prepare("DELETE FROM plots WHERE id = :id;");
 		$this->sqlGetPlotsByOwner = $this->db->prepare("SELECT * FROM plots WHERE owner = :owner;");
@@ -40,6 +40,11 @@ class SQLiteDataProvider extends DataProvider
 					(abs(Z) = :number AND abs(X) <= :number)
 				)
 			);");
+		try{
+			$this->db->exec("ALTER TABLE plots ADD pvp INTEGER;");
+		}catch(\Exception $e) {
+			// nothing :P
+		}
 		$this->plugin->getLogger()->debug("SQLite data provider registered");
 	}
 
@@ -65,6 +70,7 @@ class SQLiteDataProvider extends DataProvider
 		$stmt->bindValue(":helpers", $helpers, SQLITE3_TEXT);
 		$stmt->bindValue(":denied", $denied, SQLITE3_TEXT);
 		$stmt->bindValue(":biome", $plot->biome, SQLITE3_TEXT);
+		$stmt->bindValue(":pvp", $plot->pvp, SQLITE3_INTEGER);
 		$stmt->reset();
 		$result = $stmt->execute();
 		if($result === false) {
@@ -126,7 +132,7 @@ class SQLiteDataProvider extends DataProvider
 			}else{
 				$denied = explode(",", (string) $val["denied"]);
 			}
-			$plot = new Plot($levelName, $X, $Z, (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], (int) $val["id"]);
+			$plot = new Plot($levelName, $X, $Z, (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], (bool) $val["pvp"], (int) $val["id"]);
 		}else{
 			$plot = new Plot($levelName, $X, $Z);
 		}
@@ -154,7 +160,7 @@ class SQLiteDataProvider extends DataProvider
 		while($val = $result->fetchArray(SQLITE3_ASSOC)) {
 			$helpers = explode(",", (string) $val["helpers"]);
 			$denied = explode(",", (string) $val["denied"]);
-			$plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], (int) $val["id"]);
+			$plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], (bool) $val["pvp"], (int) $val["id"]);
 		}
 		// Remove unloaded plots
 		$plots = array_filter($plots, function($plot) {

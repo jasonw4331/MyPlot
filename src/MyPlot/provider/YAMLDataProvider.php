@@ -30,7 +30,7 @@ class YAMLDataProvider extends DataProvider {
 	 */
 	public function savePlot(Plot $plot) : bool {
 		$plots = $this->yaml->get("plots", []);
-		$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome];
+		$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
 		$this->yaml->set("plots", $plots);
 		$this->cachePlot($plot);
 		return $this->yaml->save();
@@ -82,12 +82,13 @@ class YAMLDataProvider extends DataProvider {
 			$helpers = $plots[$key]["helpers"] == [] ? [] : $plots[$key]["helpers"];
 			$denied = $plots[$key]["denied"] == [] ? [] : $plots[$key]["denied"];
 			$biome = strtoupper($plots[$key]["biome"]) == "PLAINS" ? "PLAINS" : strtoupper($plots[$key]["biome"]);
-			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $key);
+			$pvp = $plot[$key]["pvp"] == null ? false : $plot[$key]["pvp"];
+			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
 		}
 		$count = $this->yaml->get("count", 0);
 		$this->yaml->set("count", (int) $count++);
 		$this->yaml->save(true);
-		return new Plot($levelName, $X, $Z, "", "", [], [], "PLAINS", (int) $count);
+		return new Plot($levelName, $X, $Z, "", "", [], [], "PLAINS", false, (int) $count);
 	}
 
 	/**
@@ -112,7 +113,8 @@ class YAMLDataProvider extends DataProvider {
 						$helpers = $plots[$levelKey]["helpers"] == [] ? [] : $plots[$levelKey]["helpers"];
 						$denied = $plots[$levelKey]["denied"] == [] ? [] : $plots[$levelKey]["denied"];
 						$biome = strtoupper($plots[$levelKey]["biome"]) == "PLAINS" ? "PLAINS" : strtoupper($plots[$levelKey]["biome"]);
-						$ownerPlots[] = new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $levelKey);
+						$pvp = $plots[$levelKey]["pvp"] == null ? false : $plots[$levelKey]["pvp"];
+						$ownerPlots[] = new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $levelKey);
 					}
 				}
 			}
@@ -127,7 +129,8 @@ class YAMLDataProvider extends DataProvider {
 				$helpers = $plots[$key]["helpers"] == [] ? [] : $plots[$key]["helpers"];
 				$denied = $plots[$key]["denied"] == [] ? [] : $plots[$key]["denied"];
 				$biome = strtoupper($plots[$key]["biome"]) == "PLAINS" ? "PLAINS" : strtoupper($plots[$key]["biome"]);
-				$ownerPlots[] = new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $key);
+				$pvp = $plots[$key]["pvp"] == null ? false : $plots[$key]["pvp"];
+				$ownerPlots[] = new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
 			}
 		}
 		return $ownerPlots;
