@@ -18,6 +18,7 @@ use MyPlot\subcommand\InfoSubCommand;
 use MyPlot\subcommand\ListSubCommand;
 use MyPlot\subcommand\MiddleSubCommand;
 use MyPlot\subcommand\NameSubCommand;
+use MyPlot\subcommand\PvpSubCommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\ResetSubCommand;
 use MyPlot\subcommand\SetOwnerSubCommand;
@@ -67,6 +68,7 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));
 		$this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
 		$this->loadSubCommand(new ListSubCommand($plugin, "list"));
+		$this->loadSubCommand(new PvpSubCommand($plugin, "pvp"));
 		$plugin->getLogger()->debug("Commands Registered to MyPlot");
 	}
 
