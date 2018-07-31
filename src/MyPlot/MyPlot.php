@@ -31,7 +31,6 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 use PocketMoney\PocketMoney;
-use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
 {
@@ -571,7 +570,7 @@ class MyPlot extends PluginBase
 	}
 
 	public function onEnable() : void {
-		SpoonDetector::printSpoon($this, "spoon.txt");
+		//SpoonDetector::printSpoon($this, "spoon.txt");
 		if($this->isDisabled()) {
 			return;
 		}
