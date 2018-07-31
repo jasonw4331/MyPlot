@@ -30,7 +30,7 @@ class MyPlotGenerator extends Generator {
 	public function __construct(array $settings = []) {
 		if(isset($settings["preset"])) {
 			$settings = json_decode($settings["preset"], true);
-			if($settings === false) {
+			if($settings === false or is_null($settings)) {
 				$settings = [];
 			}
 		}else{
