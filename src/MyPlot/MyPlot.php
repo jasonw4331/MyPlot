@@ -375,20 +375,33 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function setPlotBiome(Plot $plot, Biome $biome) : bool {
-		foreach($this->getPlotChunks($plot) as $chunk) {
-			if($chunk instanceof Chunk) {
-				for($x = 0; $x <= 16; $x++) {
-					for($z = 0; $z <= 16; $z++) {
-						$chunk->setBiomeId($x, $z, $biome->getId());
-						$chunk->setChanged(true);
-						foreach($chunk->getEntities() as $entity) {
-							if($entity instanceof Player) {
-								$entity->onChunkChanged($chunk);
-							}
-						}
-					}
+	public function setPlotBiome(Plot $plot, Biome $biome) {
+		$plotLevel = $this->getLevelSettings($plot->levelName);
+		if($plotLevel === null) {
+			return false;
+		}
+		$level = $this->getServer()->getLevelByName($plot->levelName);
+		$pos = $this->getPlotPosition($plot);
+		$plotSize = $plotLevel->plotSize;
+		$xMax = $pos->x + $plotSize;
+		$zMax = $pos->z + $plotSize;
+		$chunkIndexes = [];
+		for($x = $pos->x; $x < $xMax; $x++) {
+			for($z = $pos->z; $z < $zMax; $z++) {
+				$index = Level::chunkHash($x >> 4, $z >> 4);
+				if(!in_array($index, $chunkIndexes)) {
+					$chunkIndexes[] = $index;
 				}
+				Level::getXZ($index, $plot->X, $plot->Z);
+				$chunk = $level->getChunk($plot->X, $plot->Z);
+				$chunk->setBiomeId($x, $z, $biome->getId());
+			}
+		}
+		foreach($chunkIndexes as $index) {
+			Level::getXZ($index, $plot->X, $plot->Z);
+			$chunk = $level->getChunk($plot->X, $plot->Z);
+			foreach($level->getChunkPlayers($plot->X, $plot->Z) as $player) {
+				$player->onChunkChanged($chunk);
 			}
 		}
 		$plot->biome = $biome->getName();
@@ -532,13 +545,13 @@ class MyPlot extends PluginBase
 		$cacheSize = $this->getConfig()->get("PlotCacheSize", 256);
 		switch(strtolower($this->getConfig()->get("DataProvider", "sqlite3"))) {
 			case "mysql":
-			    if(extension_loaded("mysqli")) {
-                    $settings = $this->getConfig()->get("MySQLSettings");
-                    $this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
-                }else{
-			        $this->getLogger()->info("MySQLi is not installed in your php build! SQLite will be used instead.");
-                    $this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
-                }
+				if(extension_loaded("mysqli")) {
+					$settings = $this->getConfig()->get("MySQLSettings");
+					$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
+				}else {
+					$this->getLogger()->info("MySQLi is not installed in your php build! SQLite3 will be used instead.");
+					$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
+				}
 			break;
 			case "yaml":
 				$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
