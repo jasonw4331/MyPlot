@@ -274,7 +274,16 @@ class EventListener implements Listener
 			$settings = $this->plugin->getLevelSettings($levelName);
 			if($settings->restrictPVP) {
 				$event->setCancelled();
+				/** @noinspection PhpUndefinedMethodInspection */
+				$event->getDamager()->sendMessage(TextFormat::RED."Pvp is not enabled in this world!");
 				$this->plugin->getLogger()->debug("Cancelled pvp event on ".$levelName);
+			}
+			$plot = $this->plugin->getPlotByPosition($event->getEntity());
+			if($plot !== null and !$plot->pvp) {
+				$event->setCancelled();
+				/** @noinspection PhpUndefinedMethodInspection */
+				$event->getDamager()->sendMessage(TextFormat::RED."Pvp is not enabled in this plot!");
+				$this->plugin->getLogger()->debug("Cancelled pvp event in plot ".$plot->X.";".$plot->Z." on level '".$levelName."'");
 			}
 		}
 	}
