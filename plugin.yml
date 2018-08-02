@@ -1,6 +1,6 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.3.5
+version: 1.3.6
 api:
 - 3.0.0
 authors:
@@ -86,9 +86,10 @@ permissions:
         default: op
       myplot.admin.denyplayer:
         default: op
+        children:
+          myplot.admin.denyplayer.bypass:
+            default: op
       myplot.admin.undenyplayer:
-        default: op
-      myplot.admin.bypassdeny:
         default: op
       myplot.admin.build:
         default: op
@@ -109,6 +110,9 @@ permissions:
         default: op
       myplot.admin.pvp:
         default: op
+        children:
+          myplot.admin.pvp.bypass:
+            default: op
   myplot.claimplots:
     default: op
     children:

@@ -42,7 +42,7 @@ class DenyPlayerSubCommand extends SubCommand
 			$sender->sendMessage($this->translateString("denyplayer.notaplayer"));
 			return true;
 		}
-		if($dplayer->hasPermission("myplot.admin.bypassdeny") or $dplayer->getName() === $plot->owner) {
+		if($dplayer->hasPermission("myplot.admin.denyplayer.bypass") or $dplayer->getName() === $plot->owner) {
 			$sender->sendMessage($this->translateString("denyplayer.cannotdeny", [$dplayer->getName()]));
 			if($dplayer instanceof Player)
 				$dplayer->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));

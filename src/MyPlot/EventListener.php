@@ -268,7 +268,8 @@ class EventListener implements Listener
 		}
 		if($event instanceof EntityDamageByEntityEvent and $event->getEntity() instanceof Player and $event->getDamager() instanceof Player) {
 			$levelName = $event->getEntity()->getLevel()->getFolderName();
-			if(!$this->plugin->isLevelLoaded($levelName)) {
+			/** @noinspection PhpUndefinedMethodInspection */
+			if(!$this->plugin->isLevelLoaded($levelName) or $event->getDamager()->hasPermission("myplot.admin.pvp.bypass")) {
 				return;
 			}
 			$settings = $this->plugin->getLevelSettings($levelName);
