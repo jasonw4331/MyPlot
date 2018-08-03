@@ -392,13 +392,13 @@ class MyPlot extends PluginBase
 					$chunkIndexes[] = $index;
 				}
 				Level::getXZ($index, $plot->X, $plot->Z);
-				$chunk = $level->getChunk($plot->X, $plot->Z);
+				$chunk = $level->getChunk($plot->X, $plot->Z, true);
 				$chunk->setBiomeId($x, $z, $biome->getId());
 			}
 		}
 		foreach($chunkIndexes as $index) {
 			Level::getXZ($index, $plot->X, $plot->Z);
-			$chunk = $level->getChunk($plot->X, $plot->Z);
+			$chunk = $level->getChunk($plot->X, $plot->Z, true);
 			foreach($level->getChunkPlayers($plot->X, $plot->Z) as $player) {
 				$player->onChunkChanged($chunk);
 			}
@@ -448,10 +448,8 @@ class MyPlot extends PluginBase
 		$chunks = [];
 		foreach($chunkIndexes as $index) {
 			Level::getXZ($index, $plot->X, $plot->Z);
-			$chunk = $level->getChunk($plot->X, $plot->Z);
-			if($chunk !== null) {
-				$chunks[] = $chunk;
-			}
+			$chunk = $level->getChunk($plot->X, $plot->Z, true);
+			$chunks[] = $chunk;
 		}
 		return $chunks;
 	}
