@@ -24,6 +24,11 @@ class SQLiteDataProvider extends DataProvider
 		$this->db->exec("CREATE TABLE IF NOT EXISTS plots
 			(id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
 			 owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INTEGER);");
+		try{
+			$this->db->exec("ALTER TABLE plots ADD pvp INTEGER;");
+		}catch(\Exception $e) {
+			// nothing :P
+		}
 		$this->sqlGetPlot = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome, pvp FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
 		$this->sqlSavePlot = $this->db->prepare("INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome, pvp) VALUES
 			((SELECT id FROM plots WHERE level = :level AND X = :X AND Z = :Z),
@@ -40,11 +45,6 @@ class SQLiteDataProvider extends DataProvider
 					(abs(Z) = :number AND abs(X) <= :number)
 				)
 			);");
-		try{
-			$this->db->exec("ALTER TABLE plots ADD pvp INTEGER;");
-		}catch(\Exception $e) {
-			// nothing :P
-		}
 		$this->plugin->getLogger()->debug("SQLite data provider registered");
 	}
 
