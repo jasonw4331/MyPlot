@@ -10,7 +10,7 @@
 #########################################
 
 # The language that should be used in MyPlot
-# Available languages: eng, nl, vi, spa, chs, zho, deu, cze
+# Available languages: eng, nl, vi, spa, chs, zho, deu, cze, tur
 #
 # English language pack by @jasonwynn10
 # Dutch language pack by @Wies
@@ -20,6 +20,7 @@
 # Chinese ( PRC ) pack by @jerryzooyoyo
 # German language pack by @morpheusTP and @SalmonGER
 # Czech language pack by @GamakCZ
+# Turkish language pack by @Eren5960
 language: eng
 
 # The data provider where plot data is stored.
@@ -91,4 +92,4 @@ DefaultWorld:
   # The block that fills the rest of the plot (Default is Dirt)
   PlotFillBlock: '3:0'
   # The block at the bottom (Default is Bedrock)
-  BottomBlock: '7:0'
+  BottomBlock: '7:0
