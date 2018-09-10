@@ -92,4 +92,4 @@ DefaultWorld:
   # The block that fills the rest of the plot (Default is Dirt)
   PlotFillBlock: '3:0'
   # The block at the bottom (Default is Bedrock)
-  BottomBlock: '7:0
+  BottomBlock: '7:0'
