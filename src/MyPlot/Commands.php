@@ -103,7 +103,7 @@ class Commands extends PluginCommand
 			return true;
 		}
 		if(!isset($args[0])) {
-			return false;
+			$args[0] = "help";
 		}
 		$subCommand = strtolower(array_shift($args));
 		if(isset($this->subCommands[$subCommand])) {
