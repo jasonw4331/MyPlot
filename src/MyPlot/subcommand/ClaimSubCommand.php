@@ -45,7 +45,7 @@ class ClaimSubCommand extends SubCommand
 		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($player);
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
-			$level = $this->getPlugin()->getServer()->getLevelByName($level);
+			$level = $this->getPlugin()->getServer()->getLevelByName((string)$level);
 			if(!$level->isClosed()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($player->getName(), $level->getFolderName()));
 			}
