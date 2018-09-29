@@ -18,7 +18,7 @@ use MyPlot\task\ClearPlotTask;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\block\BlockFactory;
 use pocketmine\event\level\LevelLoadEvent;
-use pocketmine\lang\BaseLang;
+use pocketmine\lang\Language as BaseLang;
 use pocketmine\level\biome\Biome;
 use pocketmine\level\format\Chunk;
 use pocketmine\level\generator\GeneratorManager;
