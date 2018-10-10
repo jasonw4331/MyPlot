@@ -47,7 +47,7 @@ class ClearPlotTask extends Task {
 		foreach($this->level->getEntities() as $entity) {
 			if($this->plugin->getPlotBB($this->plot)->isVectorInXZ($entity)) {
 				if(!$entity instanceof Player) {
-					$entity->close();
+					$entity->flagForDespawn();
 				}else{
 					$this->plugin->teleportPlayerToPlot($entity, $this->plot);
 				}

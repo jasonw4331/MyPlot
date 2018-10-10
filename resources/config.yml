@@ -60,7 +60,7 @@ DefaultWorld:
   RestrictEntityMovement: true
 
   # Restrict battles between players in plot worlds
-  # This setting overrides the settings of individual plots (to be implemented)
+  # This setting overrides the settings of individual plots on world generation
   RestrictPVP: false
 
   # Update liquids (e.g. Water) from updating and moving

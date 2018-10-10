@@ -30,7 +30,12 @@ class Plot
 		$this->helpers = $helpers;
 		$this->denied = $denied;
 		$this->biome = strtoupper($biome);
-		$this->pvp = $pvp;
+		$settings = MyPlot::getInstance()->getLevelSettings($levelName);
+		if($settings !== null) {
+			$this->pvp = !$settings->restrictPVP;
+		}else{
+			$this->pvp = $pvp;
+		}
 		$this->id = $id;
 	}
 

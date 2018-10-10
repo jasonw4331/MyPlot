@@ -276,23 +276,36 @@ class MyPlot extends PluginBase
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
-		$directionalX = $totalSize * $plot->X;
-		$directionalZ = $totalSize * $plot->Z;
-		if($directionalX >= 0) {
+		$directionalX = $totalSize * $plot->X; // x closest to 0
+		$directionalZ = $totalSize * $plot->Z; // z closest to 0
+
+		$x = $directionalX + $totalSize - 1; // -1 should put us within plot area
+		$z = $directionalZ + $totalSize - 1; // -1 should put us within plot area
+		if($x >= 0) {
+			$difX = $x % $totalSize;
+		}else{
+			$difX = abs(($x - $plotSize + 1) % $totalSize);
+		}
+		if($z >= 0) {
+			$difZ = $z % $totalSize;
+		}else{
+			$difZ = abs(($z - $plotSize + 1) % $totalSize);
+		}
+		if($difX > $plotSize - 1) {
 			$minX = $directionalX;
-			$maxX = $minX + $plotSize;
+			$maxX = $directionalX + $totalSize;
 		}else{
+			$minX = $directionalX - $totalSize;
 			$maxX = $directionalX;
-			$minX = $maxX - $plotSize;
 		}
-		if($directionalZ >= 0) {
+		if($difZ > $plotSize - 1) {
 			$minZ = $directionalZ;
-			$maxZ = $minZ + $plotSize;
+			$maxZ = $directionalZ + $totalSize;
 		}else{
+			$minZ = $directionalZ - $totalSize;
 			$maxZ = $directionalZ;
-			$minZ = $maxZ - $plotSize;
 		}
-		// TODO: improve math
+
 		return new AxisAlignedBB($minX, 0, $minZ, $maxX, Level::Y_MAX, $maxZ);
 	}
 
