@@ -276,10 +276,25 @@ class MyPlot extends PluginBase
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
-		$minX = $totalSize * $plot->X;
-		$minZ = $totalSize * $plot->Z;
-		$maxX = $minX >= 0 ? $minX + $plotSize : $minX - $plotSize;
-		$maxZ = $minZ >= 0 ? $minZ + $plotSize : $minZ - $plotSize;
+		$directionalX = $totalSize * $plot->X;
+		$directionalZ = $totalSize * $plot->Z;
+		$minX = 0;
+		$minZ = 0;
+		if($directionalX >= 0) {
+			$minX = $directionalX;
+			$maxX = $minX + $plotSize;
+		}else{
+			$maxX = $directionalX;
+			$minX = $minX - $plotSize;
+		}
+		if($directionalZ >= 0) {
+			$minZ = $directionalZ;
+			$maxZ = $minZ + $plotSize;
+		}else{
+			$maxZ = $directionalZ;
+			$minZ = $minZ - $plotSize;
+		}
+		// TODO: improve math
 		return new AxisAlignedBB($minX, 0, $minZ, $maxX, Level::Y_MAX, $maxZ);
 	}
 
