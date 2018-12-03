@@ -3,8 +3,6 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use EssentialsPE\Loader;
-use MyPlot\block\Lava;
-use MyPlot\block\Water;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
@@ -16,7 +14,6 @@ use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
 use onebone\economyapi\EconomyAPI;
-use pocketmine\block\BlockFactory;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\biome\Biome;
@@ -637,9 +634,6 @@ class MyPlot extends PluginBase
 			$eventListener->onLevelLoad(new LevelLoadEvent($level));
 		}
 		$this->getLogger()->debug(TF::BOLD . "Loading Particles");
-		BlockFactory::registerBlock(new Water(), true);
-		BlockFactory::registerBlock(new Lava(), true);
-		$this->getLogger()->debug(TF::BOLD . "Registering Blocks");
 		$this->getLogger()->debug(TF::BOLD.TF::GREEN."Enabled!");
 	}
 

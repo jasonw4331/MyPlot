@@ -5,6 +5,7 @@ namespace MyPlot;
 use pocketmine\block\Sapling;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -209,6 +210,27 @@ class EventListener implements Listener
 		if($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
 			$event->setCancelled();
 			$this->plugin->getLogger()->debug("Cancelled entity motion on " . $levelName);
+		}
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param BlockSpreadEvent $event
+	 */
+	public function onBlockSpread(BlockSpreadEvent $event) : void {
+		if($event->isCancelled()) {
+			return;
+		}
+		$levelName = $event->getBlock()->getLevel()->getFolderName();
+		if(!$this->plugin->isLevelLoaded($levelName))
+			return;
+
+		$settings = $this->plugin->getLevelSettings($levelName);
+		if(!$settings->updatePlotLiquids) {
+			$event->setCancelled();
+			$this->plugin->getLogger()->debug("Cancelled block spread on " . $levelName);
 		}
 	}
 
