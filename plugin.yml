@@ -1,8 +1,8 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.3.7
+version: 1.3.8
 api:
-- 3.0.0
+- 3.4.0
 authors:
 - Wiez
 - Exxarion
