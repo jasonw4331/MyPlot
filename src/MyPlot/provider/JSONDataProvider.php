@@ -87,7 +87,7 @@ class JSONDataProvider extends DataProvider {
 		}
 		$count = $this->json->get("count", 0);
 		$this->json->set("count", (int) $count++);
-		$this->json->save(true);
+		$this->json->save();
 		return new Plot($levelName, $X, $Z, "", "", [], [], "PLAINS", (int) $count);
 	}
 

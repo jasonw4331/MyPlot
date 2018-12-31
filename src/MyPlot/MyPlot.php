@@ -23,6 +23,7 @@ use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\permission\Permission;
+use pocketmine\permission\PermissionManager;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
@@ -491,7 +492,7 @@ class MyPlot extends PluginBase
 		if($player->hasPermission("myplot.claimplots.unlimited"))
 			return PHP_INT_MAX;
 		/** @var Permission[] $perms */
-		$perms = array_merge($this->getServer()->getPluginManager()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
+		$perms = array_merge(PermissionManager::getInstance()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
 		$perms = array_filter($perms, function($name) {
 			return (substr($name, 0, 18) === "myplot.claimplots.");
 		}, ARRAY_FILTER_USE_KEY);
