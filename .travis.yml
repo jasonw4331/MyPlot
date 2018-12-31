@@ -15,7 +15,7 @@ before_script:
  - cd ..
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
  - mkdir "$TRAVIS_BUILD_DIR"/../PocketMine && cd "$TRAVIS_BUILD_DIR"/../PocketMine
- - wget -O PocketMine-MP.phar "${1:-"https://github.com/pmmp/PocketMine-MP/releases/download/3.1.1/PocketMine-MP.phar"}"
+ - wget -O PocketMine-MP.phar "${1:-"https://github.com/pmmp/PocketMine-MP/releases/download/3.5.3/PocketMine-MP.phar"}"
  - mkdir plugins && wget -O plugins/PluginChecker.phar https://github.com/jasonwynn10/MyPlot/releases/download/1.1.9/PluginChecker_v1.0.2.phar
  - mkdir unstaged
  - wget -O - https://poggit.pmmp.io/res/travisPluginTest.php | php -- unstaged
