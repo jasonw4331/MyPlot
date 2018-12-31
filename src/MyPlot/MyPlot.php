@@ -633,7 +633,6 @@ class MyPlot extends PluginBase
 		foreach($this->getServer()->getLevels() as $level) {
 			$eventListener->onLevelLoad(new LevelLoadEvent($level));
 		}
-		$this->getLogger()->debug(TF::BOLD . "Loading Particles");
 		$this->getLogger()->debug(TF::BOLD.TF::GREEN."Enabled!");
 	}
 
