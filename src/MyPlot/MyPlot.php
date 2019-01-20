@@ -458,23 +458,13 @@ class MyPlot extends PluginBase
 		$level = $this->getServer()->getLevelByName($plot->levelName);
 		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize;
-		$xMax = $pos->x + $plotSize;
-		$zMax = $pos->z + $plotSize;
-		$chunkIndexes = [];
-		for($x = $pos->x; $x < $xMax; $x++) {
-			for($z = $pos->z; $z < $zMax; $z++) {
-				$index = Level::chunkHash($x >> 4, $z >> 4);
-				if(!in_array($index, $chunkIndexes)) {
-					$chunkIndexes[] = $index;
-				}
-				Level::getXZ($index, $pos->x, $pos->z);
-			}
-		}
+		$xMax = ($pos->x + $plotSize) >> 4;
+		$zMax = ($pos->z + $plotSize) >> 4;
 		$chunks = [];
-		foreach($chunkIndexes as $index) {
-			Level::getXZ($index, $plot->X, $plot->Z);
-			$chunk = $level->getChunk($plot->X, $plot->Z, true);
-			$chunks[] = $chunk;
+		for($x = $pos->x >> 4; $x < $xMax; $x++) {
+			for($z = $pos->z >> 4; $z < $zMax; $z++) {
+				$chunks[] = $level->getChunk($x, $z, true);
+			}
 		}
 		return $chunks;
 	}
