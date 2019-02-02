@@ -24,9 +24,6 @@ class DisposeSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
-			return false;
-		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
