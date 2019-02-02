@@ -1,15 +1,16 @@
 language: php
-php: ["7.2.13"]
+php:
+ - 7.2
 sudo: false
 dist: trusty
 
 before_script:
  # - pecl install channel://pecl.php.net/pthreads-3.1.6
- - echo | pecl install channel://pecl.php.net/yaml-2.0.2
+ - echo | pecl install channel://pecl.php.net/yaml-2.0.4
  - pecl install channel://pecl.php.net/crypto-0.3.1
  - git clone https://github.com/pmmp/pthreads.git
  - cd pthreads
- - git checkout c8cfacda84f21032d6014b53e72bf345ac901dac
+ - git checkout 6ca019c58b4fa09ee2ff490f2444e34bef0773d0
  - phpize
  - ./configure
  - make
@@ -17,7 +18,7 @@ before_script:
  - cd ..
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
  - mkdir "$TRAVIS_BUILD_DIR"/../PocketMine && cd "$TRAVIS_BUILD_DIR"/../PocketMine
- - wget -O PocketMine-MP.phar "${1:-"https://github.com/pmmp/PocketMine-MP/releases/download/3.5.3/PocketMine-MP.phar"}"
+ - wget -O PocketMine-MP.phar "${1:-"https://jenkins.pmmp.io/job/PocketMine-MP/Stable/artifact/PocketMine-MP.phar"}"
  - mkdir plugins && wget -O plugins/PluginChecker.phar https://github.com/jasonwynn10/MyPlot/releases/download/1.1.9/PluginChecker_v1.0.2.phar
  - mkdir unstaged
  - wget -O - https://poggit.pmmp.io/res/travisPluginTest.php | php -- unstaged
