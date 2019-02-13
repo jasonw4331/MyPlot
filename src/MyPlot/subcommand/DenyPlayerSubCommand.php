@@ -37,7 +37,7 @@ class DenyPlayerSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		$dplayer = $this->getPlugin()->getServer()->getOfflinePlayer($dplayer)->getPlayer() ?? $this->getPlugin()->getServer()->getOfflinePlayer($dplayer);
+		$dplayer = $this->getPlugin()->getServer()->getPlayer($dplayer) ?? $this->getPlugin()->getServer()->getOfflinePlayer($dplayer);
 		if(!$dplayer instanceof Player) {
 			$sender->sendMessage($this->translateString("denyplayer.notaplayer"));
 			return true;
