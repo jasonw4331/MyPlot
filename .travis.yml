@@ -28,3 +28,15 @@ script:
  - cd "$TRAVIS_BUILD_DIR"/../PocketMine/
  - sed -i 's/world/Plots/' server.properties
  - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then wget -O - https://github.com/jasonwynn10/MyPlot/releases/download/1.1.9/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
+
+before_deploy:
+ - cd "$TRAVIS_BUILD_DIR"/../PocketMine/
+ - cp unstaged/MyPlot.phar "$TRAVIS_BUILD_DIR"
+
+deploy:
+ provider: releases
+ api_key: "hCpF8sE6VBPHULLj5sbxhQ"
+ file_glob: true
+ file: "MyPlot.phar"
+ skip_cleanup: true
+ draft: true
