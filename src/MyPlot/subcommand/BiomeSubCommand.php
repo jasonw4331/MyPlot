@@ -54,13 +54,13 @@ class BiomeSubCommand extends SubCommand
 			}
 			$biome = Biome::getBiome($biome);
 		}else{
-			if(!isset($this->biomes[$biome])) {
+			if(constant(Biome::class."::".$biome) === null) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
 				$biomes = implode(", ", array_keys($this->biomes));
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
 				return true;
 			}
-			$biome = Biome::getBiome($this->biomes[$biome]);
+			$biome = Biome::getBiome(constant(Biome::class."::".$biome));
 		}
 		if($this->getPlugin()->setPlotBiome($plot, $biome)) {
 			$sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));

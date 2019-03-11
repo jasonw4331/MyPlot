@@ -51,10 +51,8 @@ class EventListener implements Listener
 				return;
 			}
 			$levelName = $event->getLevel()->getFolderName();
-			$filePath = $this->plugin->getDataFolder() . "worlds" . DIRECTORY_SEPARATOR . $levelName . ".yml";
-			$config = $this->plugin->getConfig();
-			$default = ["RestrictEntityMovement" => $config->getNested("DefaultWorld.RestrictEntityMovement", true), "RestrictPVP" => $config->get("DefaultWorld.RestrictPVP", false), "UpdatePlotLiquids" => $config->getNested("DefaultWorld.UpdatePlotLiquids", false), "ClaimPrice" => $config->getNested("DefaultWorld.ClaimPrice", 0), "ClearPrice" => $config->getNested("DefaultWorld.ClearPrice", 0), "DisposePrice" => $config->getNested("DefaultWorld.DisposePrice", 0), "ResetPrice" => $config->getNested("DefaultWorld.ResetPrice", 0)];
-			$config = new Config($filePath, Config::YAML, $default);
+			$default = $this->plugin->getConfig()->get("DefaultWorld", []);
+			$config = new Config($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML, $default);
 			foreach(array_keys($default) as $key) {
 				$settings[$key] = $config->get($key);
 			}

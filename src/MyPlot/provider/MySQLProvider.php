@@ -22,7 +22,7 @@ class MySQLProvider extends DataProvider {
 	 * @param int $cacheSize
 	 * @param array $settings
 	 */
-	public function __construct(MyPlot $plugin, int $cacheSize = 0, $settings) {
+	public function __construct(MyPlot $plugin, int $cacheSize = 0, array $settings = []) {
 		ini_set("mysqli.reconnect", "1");
 		ini_set('mysqli.allow_persistent', "1");
 		ini_set('mysql.connect_timeout', "300");
