@@ -52,8 +52,7 @@ class GiveSubCommand extends SubCommand
 			return true;
 		}
 		if(count($args) == 2 and $args[1] == $this->translateString("confirm")) {
-			$plot->owner = $newOwner->getName();
-			if($this->getPlugin()->savePlot($plot)) {
+			if($this->getPlugin()->claimPlot($plot, $newOwner->getName())) {
 				$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
 				$oldOwnerName = TextFormat::GREEN . $sender->getName() . TextFormat::WHITE;
 				$newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;

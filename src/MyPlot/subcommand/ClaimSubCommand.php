@@ -60,9 +60,7 @@ class ClaimSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("claim.nomoney"));
 			return true;
 		}
-		$plot->owner = $sender->getName();
-		$plot->name = $name;
-		if($this->getPlugin()->savePlot($plot)) {
+		if($this->getPlugin()->claimPlot($plot, $sender->getName(), $name)) {
 			$sender->sendMessage($this->translateString("claim.success"));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));

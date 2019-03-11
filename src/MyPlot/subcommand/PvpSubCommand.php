@@ -38,8 +38,7 @@ class PvpSubCommand extends SubCommand {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("pvp.world"));
 			return true;
 		}
-		$plot->pvp = !$plot->pvp;
-		if($this->getPlugin()->savePlot($plot)) {
+		if($this->getPlugin()->setPlotPvp($plot, !$plot->pvp)) {
 			$sender->sendMessage($this->translateString("pvp.success", [$plot->pvp ? "enabled" : "disabled"]));
 		}else {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("error"));
