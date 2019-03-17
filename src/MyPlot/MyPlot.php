@@ -22,6 +22,7 @@ use pocketmine\level\generator\GeneratorManager;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
+use pocketmine\math\Vector3;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 use pocketmine\Player;
@@ -423,7 +424,7 @@ class MyPlot extends PluginBase
 		foreach($chunkIndexes as $index) {
 			Level::getXZ($index, $plot->X, $plot->Z);
 			$chunk = $level->getChunk($plot->X, $plot->Z, true);
-			foreach($level->getChunkPlayers($plot->X, $plot->Z) as $player) {
+			foreach($level->getViewersForPosition(new Vector3($plot->X, 0, $plot->Z)) as $player) {
 				$player->onChunkChanged($chunk);
 			}
 		}

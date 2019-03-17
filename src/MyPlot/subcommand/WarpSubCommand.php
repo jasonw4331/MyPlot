@@ -43,9 +43,12 @@ class WarpSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("warp.unclaimed"));
 			return true;
 		}
-		$this->getPlugin()->teleportPlayerToPlot($sender, $plot);
-		$plot = TextFormat::GREEN . $plot . TextFormat::WHITE;
-		$sender->sendMessage($this->translateString("warp.success", [$plot]));
+		if($this->getPlugin()->teleportPlayerToPlot($sender, $plot)) {
+			$plot = TextFormat::GREEN . $plot . TextFormat::WHITE;
+			$sender->sendMessage($this->translateString("warp.success", [$plot]));
+		}else{
+			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.error"));
+		}
 		return true;
 	}
 }
