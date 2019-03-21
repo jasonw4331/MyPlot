@@ -3,6 +3,12 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use EssentialsPE\Loader;
+use MyPlot\events\MyPlotClearEvent;
+use MyPlot\events\MyPlotDisposeEvent;
+use MyPlot\events\MyPlotGenerationEvent;
+use MyPlot\events\MyPlotResetEvent;
+use MyPlot\events\MyPlotSettingEvent;
+use MyPlot\events\MyPlotTeleportEvent;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
@@ -141,7 +147,9 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function generateLevel(string $levelName, string $generator = "myplot", array $settings = []) : bool {
-		if($this->getServer()->isLevelGenerated($levelName) === true) {
+		$ev = new MyPlotGenerationEvent($levelName, $generator, $settings);
+		$ev->call();
+		if($ev->isCancelled() or $this->getServer()->isLevelGenerated($levelName)) {
 			return false;
 		}
 		$generator = GeneratorManager::getGenerator($generator);
@@ -319,6 +327,11 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function teleportPlayerToPlot(Player $player, Plot $plot, bool $center = false) : bool {
+		$ev = new MyPlotTeleportEvent($plot, $player, $center);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
 		if($center)
 			return $this->teleportMiddle($player, $plot);
 		$plotLevel = $this->getLevelSettings($plot->levelName);
@@ -332,6 +345,49 @@ class MyPlot extends PluginBase
 	}
 
 	/**
+	 * Claims a plot in a players name
+	 *
+	 * @api
+	 *
+	 * @param Plot $plot
+	 * @param string $claimer
+	 * @param string $plotName
+	 *
+	 * @return bool
+	 */
+	public function claimPlot(Plot $plot, string $claimer, string $plotName = "") : bool {
+		$newPlot = clone $plot;
+		$newPlot->owner = $claimer;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		$plot = $ev->getPlot();
+		if(!empty($plotName)) {
+			$this->renamePlot($plot, $plotName);
+		}
+		return $this->savePlot($plot);
+	}
+
+	/**
+	 * @param Plot $plot
+	 * @param string $newName
+	 *
+	 * @return bool
+	 */
+	public function renamePlot(Plot $plot, string $newName = "") : bool {
+		$newPlot = clone $plot;
+		$newPlot->name = $newName;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		return $this->savePlot($ev->getPlot());
+	}
+
+	/**
 	 * Reset all the blocks inside a plot
 	 *
 	 * @api
@@ -342,6 +398,13 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+		$ev = new MyPlotClearEvent($plot, $maxBlocksPerTick);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		$plot = $ev->getPlot();
+		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
 		if(!$this->isLevelLoaded($plot->levelName)) {
 			return false;
 		}
@@ -369,6 +432,11 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function disposePlot(Plot $plot) : bool {
+		$ev = new MyPlotDisposeEvent($plot);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
 		return $this->dataProvider->deletePlot($plot);
 	}
 
@@ -383,6 +451,10 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+		$ev = new MyPlotResetEvent($plot);
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
 		if($this->disposePlot($plot)) {
 			return $this->clearPlot($plot, $maxBlocksPerTick);
 		}
@@ -399,7 +471,16 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function setPlotBiome(Plot $plot, Biome $biome) {
+	public function setPlotBiome(Plot $plot, Biome $biome) : bool {
+		$newPlot = clone $plot;
+		$newPlot->biome = strtoupper($biome->getName());
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		$plot = $ev->getPlot();
+		$biome = Biome::getBiome(constant(Biome::class . "::" . $plot->biome) ?? Biome::PLAINS);
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		if($plotLevel === null) {
 			return false;
@@ -428,9 +509,93 @@ class MyPlot extends PluginBase
 				$player->onChunkChanged($chunk);
 			}
 		}
-		$plot->biome = $biome->getName();
 		$this->savePlot($plot);
 		return true;
+	}
+
+	/**
+	 * @param Plot $plot
+	 * @param bool $pvp
+	 *
+	 * @return bool
+	 */
+	public function setPlotPvp(Plot $plot, bool $pvp) : bool {
+		$newPlot = clone $plot;
+		$newPlot->pvp = $pvp;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		return $this->savePlot($ev->getPlot());
+	}
+
+	/**
+	 * @param Plot $plot
+	 * @param string $player
+	 *
+	 * @return bool
+	 */
+	public function addPlotHelper(Plot $plot, string $player) : bool {
+		$newPlot = clone $plot;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->setCancelled(!$newPlot->addHelper($player));
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		return $this->savePlot($ev->getPlot());
+	}
+
+	/**
+	 * @param Plot $plot
+	 * @param string $player
+	 *
+	 * @return bool
+	 */
+	public function removePlotHelper(Plot $plot, string $player) : bool {
+		$newPlot = clone $plot;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->setCancelled(!$newPlot->removeHelper($player));
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		return $this->savePlot($ev->getPlot());
+	}
+
+	/**
+	 * @param Plot $plot
+	 * @param string $player
+	 *
+	 * @return bool
+	 */
+	public function addPlotDenied(Plot $plot, string $player) : bool {
+		$newPlot = clone $plot;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->setCancelled(!$newPlot->denyPlayer($player));
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		return $this->savePlot($ev->getPlot());
+	}
+
+	/**
+	 * @param Plot $plot
+	 * @param string $player
+	 *
+	 * @return bool
+	 */
+	public function removePlotDenied(Plot $plot, string $player) : bool {
+		$newPlot = clone $plot;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->setCancelled(!$newPlot->unDenyPlayer($player));
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		return $this->savePlot($ev->getPlot());
 	}
 
 	/**
@@ -521,14 +686,14 @@ class MyPlot extends PluginBase
 	/**
 	 * Teleports the player to the exact center of the plot at nearest open space to the ground level
 	 *
-	 * @api
+	 * @internal
 	 *
 	 * @param Plot $plot
 	 * @param Player $player
 	 *
 	 * @return bool
 	 */
-	public function teleportMiddle(Player $player, Plot $plot) : bool {
+	private function teleportMiddle(Player $player, Plot $plot) : bool {
 		$mid = $this->getPlotMid($plot);
 		if($mid === null) {
 			return false;

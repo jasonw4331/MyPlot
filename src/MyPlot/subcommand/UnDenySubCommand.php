@@ -42,7 +42,7 @@ class UnDenySubCommand extends SubCommand
 			return true;
 		}
 		$dplayer = $this->getPlugin()->getServer()->getPlayer($dplayer) ?? $this->getPlugin()->getServer()->getOfflinePlayer($dplayer);
-		if($this->getPlugin()->savePlot($plot)) {
+		if($this->getPlugin()->removePlotDenied($plot, $dplayer->getName())) {
 			$sender->sendMessage($this->translateString("undenyplayer.success1", [$dplayer->getName()]));
 			if($dplayer instanceof Player) {
 				$dplayer->sendMessage($this->translateString("undenyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));

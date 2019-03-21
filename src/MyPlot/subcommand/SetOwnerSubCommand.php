@@ -43,9 +43,7 @@ class SetOwnerSubCommand extends SubCommand {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("setowner.maxplots", [$maxPlots]));
 			return true;
 		}
-		$plot->owner = $args[0];
-		$plot->name = "";
-		if($this->getPlugin()->savePlot($plot)) {
+		if($this->getPlugin()->claimPlot($plot, $args[0])) {
 			$sender->sendMessage($this->translateString("setowner.success", [$plot->owner]));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));

@@ -36,10 +36,8 @@ class NameSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		$name = $args[0];
-		$plot->name = $name;
-		if($this->getPlugin()->savePlot($plot)) {
-			$sender->sendMessage($this->translateString("name.success", [$name]));
+		if($this->getPlugin()->renamePlot($plot, $args[0])) {
+			$sender->sendMessage($this->translateString("name.success"));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
