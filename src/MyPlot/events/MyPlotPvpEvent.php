@@ -3,10 +3,11 @@ declare(strict_types=1);
 namespace MyPlot\events;
 
 use MyPlot\Plot;
+use pocketmine\event\Cancellable;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\Player;
 
-class MyPlotPvpEvent extends MyPlotPlotEvent {
+class MyPlotPvpEvent extends MyPlotPlotEvent implements Cancellable {
 	/** @var Player $attacker */
 	private $attacker;
 	/** @var Player $damaged */
