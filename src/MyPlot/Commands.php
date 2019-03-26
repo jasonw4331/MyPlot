@@ -90,6 +90,17 @@ class Commands extends PluginCommand
 	}
 
 	/**
+	 * @param string $name
+	 */
+	public function unloadSubCommand(string $name) : void {
+		$subcommand = $this->subCommands[$name] ?? $this->aliasSubCommands[$name] ?? null;
+		if($subcommand !== null) {
+			unset($this->subCommands[$subcommand->getName()]);
+			unset($this->aliasSubCommands[$subcommand->getAlias()]);
+		}
+	}
+
+	/**
 	 * @param CommandSender $sender
 	 * @param string $alias
 	 * @param string[] $args
