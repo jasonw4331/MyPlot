@@ -34,7 +34,7 @@ class GenerateSubCommand extends SubCommand
 			return true;
 		}
 		if($this->getPlugin()->generateLevel($levelName, $args[1] ?? "myplot")) {
-			if($args[2] == true and $sender instanceof Player) {
+			if(isset($args[2]) and $args[2] == true and $sender instanceof Player) {
 				$this->getPlugin()->teleportPlayerToPlot($sender, new Plot($levelName, 0, 0));
 			}
 			$sender->sendMessage($this->translateString("generate.success", [$levelName]));

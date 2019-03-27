@@ -157,7 +157,9 @@ class MyPlot extends PluginBase
 			$this->getConfig()->reload();
 			$settings = $this->getConfig()->get("DefaultWorld", []);
 		}
-		$default = $this->getConfig()->get("DefaultWorld", []);
+		$default = array_filter($this->getConfig()->get("DefaultWorld", []), function($key){
+			return !in_array($key, ["PlotSize", "GroundHeight", "RoadWidth", "RoadBlock", "WallBlock", "PlotFloorBlock", "PlotFillBlock", "BottomBlock"]);
+		}, ARRAY_FILTER_USE_KEY);
 		new Config($this->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML, $default);
 		$settings = ["preset" => json_encode($settings)];
 		return $this->getServer()->generateLevel($levelName, null, $generator, $settings);
