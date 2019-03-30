@@ -132,7 +132,7 @@ class EventListener implements Listener
 		if($plot !== null) {
 			$ev = new MyPlotBlockEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
 			if($event->isCancelled()) {
-				$ev->setCancelled($event->setCancelled());
+				$ev->setCancelled($event->isCancelled());
 			}
 			$ev->call();
 			$event->setCancelled($ev->isCancelled());
