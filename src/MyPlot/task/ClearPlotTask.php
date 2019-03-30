@@ -64,7 +64,7 @@ class ClearPlotTask extends Task {
 					}elseif($this->pos->y === $this->height) {
 						$block = $this->plotFloorBlock;
 					}else{
-						$block = Block::get(0);
+						$block = Block::get(Block::AIR);
 					}
 					$this->level->setBlock($this->pos, $block, false, false);
 					$blocks++;

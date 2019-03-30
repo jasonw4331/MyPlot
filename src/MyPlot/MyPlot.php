@@ -281,40 +281,17 @@ class MyPlot extends PluginBase
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		if($plotLevel === null)
 			return null;
-		$plotSize = $plotLevel->plotSize;
-		$roadWidth = $plotLevel->roadWidth;
-		$totalSize = $plotSize + $roadWidth;
-		$directionalX = $totalSize * $plot->X; // x closest to 0
-		$directionalZ = $totalSize * $plot->Z; // z closest to 0
+		$pos = $this->getPlotPosition($plot);
+		$plotSize = $plotLevel->plotSize-1;
 
-		$x = $directionalX + $totalSize - 1; // -1 should put us within plot area
-		$z = $directionalZ + $totalSize - 1; // -1 should put us within plot area
-		if($x >= 0) {
-			$difX = $x % $totalSize;
-		}else{
-			$difX = abs(($x - $plotSize + 1) % $totalSize);
-		}
-		if($z >= 0) {
-			$difZ = $z % $totalSize;
-		}else{
-			$difZ = abs(($z - $plotSize + 1) % $totalSize);
-		}
-		if($difX > $plotSize - 1) {
-			$minX = $directionalX;
-			$maxX = $directionalX + $totalSize;
-		}else{
-			$minX = $directionalX - $totalSize;
-			$maxX = $directionalX;
-		}
-		if($difZ > $plotSize - 1) {
-			$minZ = $directionalZ;
-			$maxZ = $directionalZ + $totalSize;
-		}else{
-			$minZ = $directionalZ - $totalSize;
-			$maxZ = $directionalZ;
-		}
-
-		return new AxisAlignedBB($minX, 0, $minZ, $maxX, Level::Y_MAX, $maxZ);
+		return new AxisAlignedBB(
+			min($pos->x, $pos->x + $plotSize),
+			0,
+			min($pos->z, $pos->z + $plotSize),
+			max($pos->x, $pos->x + $plotSize),
+			Level::Y_MAX,
+			max($pos->z, $pos->z + $plotSize)
+		);
 	}
 
 	/**
