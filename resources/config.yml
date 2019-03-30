@@ -50,7 +50,10 @@ PlotCacheSize: 256
 # When a player enters a plot, a popup with basic info will be shown
 ShowPlotPopup: true
 
-# Amount of blocks to reset per tick.
+# If WorldStyler is installed, MyPlot will use that to clear the entire plot at once
+FastClearing: false
+
+# Amount of blocks to reset per tick. This only applies if FastClearing is disabled
 # Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
 ClearBlocksPerTick: 256
 

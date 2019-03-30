@@ -3,6 +3,8 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use EssentialsPE\Loader;
+use muqsit\worldstyler\shapes\Cuboid;
+use muqsit\worldstyler\WorldStyler;
 use MyPlot\events\MyPlotClearEvent;
 use MyPlot\events\MyPlotDisposeEvent;
 use MyPlot\events\MyPlotGenerationEvent;
@@ -20,6 +22,7 @@ use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearPlotTask;
 use onebone\economyapi\EconomyAPI;
+use pocketmine\block\Block;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
 use pocketmine\level\biome\Biome;
@@ -400,6 +403,9 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+		if(!$this->isLevelLoaded($plot->levelName)) {
+			return false;
+		}
 		$ev = new MyPlotClearEvent($plot, $maxBlocksPerTick);
 		$ev->call();
 		if($ev->isCancelled()) {
@@ -407,18 +413,67 @@ class MyPlot extends PluginBase
 		}
 		$plot = $ev->getPlot();
 		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
-		if(!$this->isLevelLoaded($plot->levelName)) {
-			return false;
-		}
 		foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
-			$plotB = $this->getPlotByPosition($entity);
-			if($plotB != null) {
-				if($plotB === $plot) {
-					if(!$entity instanceof Player) {
-						$entity->close();
-					}
+			if($this->getPlotBB($plot)->isVectorInXZ($entity)) {
+				if(!$entity instanceof Player) {
+					$entity->flagForDespawn();
+				}else{
+					$this->teleportPlayerToPlot($entity, $plot);
 				}
 			}
+		}
+		if($this->getConfig()->get("FastClearing", false)){
+			/** @var WorldStyler $styler */
+			$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
+			$plotLevel = $this->getLevelSettings($plot->levelName);
+			$plotSize = $plotLevel->plotSize-1;
+			$plotBeginPos = $this->getPlotPosition($plot);
+			$plugin = $this;
+			// Above ground
+			$selection = $styler->getSelection(99998);
+			$plotBeginPos->y = $plotLevel->groundHeight+1;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX, $plotBeginPos->z + $plotSize));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->level, Block::get(Block::AIR), function (float $time, int $changed) use ($plugin) : void {
+				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			// Ground Surface
+			$selection = $styler->getSelection(99998);
+			$plotBeginPos->y = $plotLevel->groundHeight;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, $plotLevel->groundHeight, $plotBeginPos->z + $plotSize));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->level, $plotLevel->plotFloorBlock, function (float $time, int $changed) use ($plugin) : void {
+				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			// Ground
+			$selection = $styler->getSelection(99998);
+			$plotBeginPos->y = 1;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, $plotLevel->groundHeight-1, $plotBeginPos->z + $plotSize));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->level, $plotLevel->plotFillBlock, function (float $time, int $changed) use ($plugin) : void {
+				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			// Bottom of world
+			$selection = $styler->getSelection(99998);
+			$plotBeginPos->y = 0;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, 0, $plotBeginPos->z + $plotSize));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->level, $plotLevel->bottomBlock, function (float $time, int $changed) use ($plugin) : void {
+				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			return true;
 		}
 		$this->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
 		return true;
