@@ -1,8 +1,8 @@
 language: php
 php:
  - 7.2
+ - 7.3
 sudo: false
-dist: trusty
 
 before_script:
  # - pecl install channel://pecl.php.net/pthreads-3.1.6
@@ -32,11 +32,14 @@ script:
 before_deploy:
  - cd "$TRAVIS_BUILD_DIR"/../PocketMine/
  - cp unstaged/MyPlot.phar "$TRAVIS_BUILD_DIR"
+ - ls
 
 deploy:
  provider: releases
- api_key: "hCpF8sE6VBPHULLj5sbxhQ"
+ api_key: $GITHUB_TOKEN
  file_glob: true
  file: "MyPlot.phar"
  skip_cleanup: true
  draft: true
+ on:
+  tags: true
