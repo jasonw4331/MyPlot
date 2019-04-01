@@ -242,8 +242,6 @@ class EventListener implements Listener
 	 * @param PlayerMoveEvent $event
 	 */
 	public function onPlayerMove(PlayerMoveEvent $event) : void {
-		if(!$this->plugin->getConfig()->get("ShowPlotPopup", true))
-			return;
 		$levelName = $event->getPlayer()->getLevel()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
@@ -263,6 +261,8 @@ class EventListener implements Listener
 			if($event->isCancelled()) {
 				return;
 			}
+			if(!$this->plugin->getConfig()->get("ShowPlotPopup", true))
+				return;
 			$popup = $this->plugin->getLanguage()->translateString("popup", [TextFormat::GREEN . $plot]);
 			if($plot->owner !== "") {
 				$owner = TextFormat::GREEN . $plot->owner;
