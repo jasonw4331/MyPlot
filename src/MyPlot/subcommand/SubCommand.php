@@ -50,7 +50,7 @@ abstract class SubCommand implements PluginIdentifiableCommand
     /**
      * @return string
      */
-	public final function getUsage() : string {
+	public function getUsage() : string {
         $usage = $this->getPlugin()->getLanguage()->get($this->name . ".usage");
         return ($usage == $this->name . ".usage") ? "" : $usage;
     }
@@ -58,7 +58,7 @@ abstract class SubCommand implements PluginIdentifiableCommand
     /**
      * @return string
      */
-	public final function getName() : string {
+	public function getName() : string {
         $name = $this->getPlugin()->getLanguage()->get($this->name . ".name");
         return ($name == $this->name . ".name") ? "" : $name;
     }
@@ -66,7 +66,7 @@ abstract class SubCommand implements PluginIdentifiableCommand
     /**
      * @return string
      */
-	public final function getDescription() : string {
+	public function getDescription() : string {
         $desc = $this->getPlugin()->getLanguage()->get($this->name . ".desc");
         return ($desc == $this->name . ".desc") ? "" : $desc;
     }
@@ -74,7 +74,7 @@ abstract class SubCommand implements PluginIdentifiableCommand
     /**
      * @return string
      */
-	public final function getAlias() : string {
+	public function getAlias() : string {
         $alias = $this->getPlugin()->getLanguage()->get($this->name . ".alias");
         return ($alias == $this->name . ".alias") ? "" : $alias;
     }
