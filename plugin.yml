@@ -1,6 +1,6 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.5.2
+version: 1.5.3
 api:
 - 3.4.0
 authors:
