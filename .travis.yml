@@ -1,7 +1,6 @@
 language: php
 php:
  - 7.2
- - 7.3
 sudo: false
 
 before_script:
@@ -29,16 +28,11 @@ script:
  - sed -i 's/world/Plots/' server.properties
  - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then wget -O - https://github.com/jasonwynn10/MyPlot/releases/download/1.1.9/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
 
-before_deploy:
- - cd "$TRAVIS_BUILD_DIR"/../PocketMine/
- - cp unstaged/MyPlot.phar "$TRAVIS_BUILD_DIR"
- - ls
-
 deploy:
  provider: releases
  api_key: $GITHUB_TOKEN
  file_glob: true
- file: "MyPlot.phar"
+ file: $TRAVIS_BUILD_DIR/../PocketMine/unstaged/MyPlot.phar
  skip_cleanup: true
  draft: true
  on:
