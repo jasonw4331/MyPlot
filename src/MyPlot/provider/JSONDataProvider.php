@@ -20,6 +20,7 @@ class JSONDataProvider extends DataProvider {
 	 */
 	public function __construct(MyPlot $plugin, int $cacheSize = 0) {
 		parent::__construct($plugin, $cacheSize);
+		@mkdir($this->plugin->getDataFolder() . "Data");
 		$this->json = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::JSON, ["count" => 0, "plots" => []]);
 	}
 

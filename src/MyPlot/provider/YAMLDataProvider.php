@@ -20,6 +20,7 @@ class YAMLDataProvider extends DataProvider {
 	 */
 	public function __construct(MyPlot $plugin, int $cacheSize = 0) {
 		parent::__construct($plugin, $cacheSize);
+		@mkdir($this->plugin->getDataFolder() . "Data");
 		$this->yaml = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::YAML, ["count" => 0, "plots" => []]);
 	}
 
