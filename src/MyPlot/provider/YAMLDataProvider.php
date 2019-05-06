@@ -37,7 +37,8 @@ class YAMLDataProvider extends DataProvider {
 		}
 		$this->yaml->set("plots", $plots);
 		$this->cachePlot($plot);
-		return $this->yaml->save();
+		$this->yaml->save();
+		return true;
 	}
 
 	public function deletePlot(Plot $plot) : bool {
@@ -46,7 +47,8 @@ class YAMLDataProvider extends DataProvider {
 		$this->yaml->set("plots", $plots);
 		$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
 		$this->cachePlot($plot);
-		return $this->yaml->save();
+		$this->yaml->save();
+		return true;
 	}
 
 	public function getPlot(string $levelName, int $X, int $Z) : Plot {
