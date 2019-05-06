@@ -253,7 +253,7 @@ class EventListener implements Listener
 		if($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
 			$ev = new MyPlotPlayerEnterPlotEvent($plot, $event->getPlayer());
 			$ev->setCancelled($event->isCancelled());
-			if($plot->isDenied($event->getPlayer()->getName())) {
+			if($plot->isDenied($event->getPlayer()->getName()) || $plot->isDenied("*")) {
 				$ev->setCancelled();
 				return;
 			}
