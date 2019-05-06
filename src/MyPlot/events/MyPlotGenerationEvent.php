@@ -3,9 +3,12 @@ declare(strict_types=1);
 namespace MyPlot\events;
 
 use pocketmine\event\Cancellable;
+use pocketmine\event\CancellableTrait;
 use pocketmine\event\Event;
 
 class MyPlotGenerationEvent extends Event implements Cancellable {
+	use CancellableTrait;
+
 	/** @var string $levelName */
 	private $levelName;
 	/** @var string $generator */

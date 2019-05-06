@@ -2,7 +2,7 @@ name: MyPlot
 main: MyPlot\MyPlot
 version: 1.7.0
 api:
-- 3.4.0
+- 4.0.0
 authors:
 - Wiez
 - Exxarion

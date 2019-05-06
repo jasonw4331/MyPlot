@@ -29,7 +29,7 @@ class GenerateSubCommand extends SubCommand
 			return false;
 		}
 		$levelName = $args[0];
-		if($sender->getServer()->isLevelGenerated($levelName)) {
+		if($sender->getServer()->getLevelManager()->isLevelGenerated($levelName)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.exists", [$levelName]));
 			return true;
 		}

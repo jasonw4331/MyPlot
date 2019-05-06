@@ -41,7 +41,8 @@ class YAMLDataProvider extends DataProvider {
 		}
 		$this->yaml->set("plots", $plots);
 		$this->cachePlot($plot);
-		return $this->yaml->save();
+		$this->yaml->save();
+		return true;
 	}
 
 	/**
@@ -55,7 +56,8 @@ class YAMLDataProvider extends DataProvider {
 		$this->yaml->set("plots", $plots);
 		$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
 		$this->cachePlot($plot);
-		return $this->yaml->save();
+		$this->yaml->save();
+		return true;
 	}
 
 	/**

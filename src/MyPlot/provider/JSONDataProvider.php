@@ -40,7 +40,8 @@ class JSONDataProvider extends DataProvider {
 			$this->json->set("count", $id);
 		}
 		$this->cachePlot($plot);
-		return $this->json->save();
+		$this->json->save();
+		return true;
 	}
 
 	/**
@@ -54,7 +55,8 @@ class JSONDataProvider extends DataProvider {
 		$this->json->set("plots", $plots);
 		$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
 		$this->cachePlot($plot);
-		return $this->json->save();
+		$this->json->save();
+		return true;
 	}
 
 	/**
