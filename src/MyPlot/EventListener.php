@@ -253,7 +253,8 @@ class EventListener implements Listener
 		if($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
 			$ev = new MyPlotPlayerEnterPlotEvent($plot, $event->getPlayer());
 			$ev->setCancelled($event->isCancelled());
-			if($plot->isDenied($event->getPlayer()->getName())) {
+			$username = $event->getPlayer()->getName();
+			if($plot->owner !== $username and ($plot->isDenied($username) or $plot->isDenied("*")) and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
 				$ev->setCancelled();
 				return;
 			}
