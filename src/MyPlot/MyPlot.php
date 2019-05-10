@@ -296,7 +296,7 @@ class MyPlot extends PluginBase
 			0,
 			min($pos->z, $pos->z + $plotSize),
 			max($pos->x, $pos->x + $plotSize),
-			Level::Y_MAX,
+			$pos->getLevel()->getWorldHeight(),
 			max($pos->z, $pos->z + $plotSize)
 		);
 	}
@@ -779,6 +779,11 @@ class MyPlot extends PluginBase
 			default:
 				$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
 			break;
+		}
+		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings");
+		if($this->getConfig()->get("FastClearing", false) and $this->getServer()->getPluginManager()->getplugin("WorldStyler") === null) {
+			$this->getConfig()->set("FastClearing", false);
+			$this->getLogger()->info(TF::BOLD . "WorldStyler not found. Legacy clearing will be used.");
 		}
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Commands");
 		// Register command
