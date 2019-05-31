@@ -4,6 +4,7 @@ namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\Server;
 
 class MySQLProvider extends DataProvider {
 	/** @var MyPlot $plugin */
@@ -239,7 +240,7 @@ class MySQLProvider extends DataProvider {
 				foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
 					$level = $this->plugin->getServer()->getLevelByName($levelName);
 					$level->save(); // don't force in case owner doesn't want it saved
-					$level->unload(true); // force unload to prevent possible griefing
+					Server::getInstance()->unloadLevel($level, true); // force unload to prevent possible griefing
 				}
 				if($this->plugin->getConfig()->getNested("MySQLSettings.ShutdownOnFailure", false)) {
 					$this->plugin->getServer()->shutdown();
