@@ -251,7 +251,7 @@ class MySQLProvider extends DataProvider {
 	}
 
 	private function prepare() : void {
-		$this->sqlGetPlot = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome FROM plots WHERE level = ? AND X = ? AND Z = ?;");
+		$this->sqlGetPlot = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome, pvp FROM plots WHERE level = ? AND X = ? AND Z = ?;");
 		$this->sqlSavePlot = $this->db->prepare("INSERT INTO plots (`id`, `level`, `X`, `Z`, `name`, `owner`, `helpers`, `denied`, `biome`, `pvp`) VALUES((SELECT id FROM plots p WHERE p.level = ? AND X = ? AND Z = ?),?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name = VALUES(name), owner = VALUES(owner), helpers = VALUES(helpers), denied = VALUES(denied), biome = VALUES(biome), pvp = VALUES(pvp);");
 		$this->sqlSavePlotById = $this->db->prepare("UPDATE plots SET id = ?, level = ?, X = ?, Z = ?, name = ?, owner = ?, helpers = ?, denied = ?, biome = ?, pvp = ? WHERE id = VALUES(id);");
 		$this->sqlRemovePlot = $this->db->prepare("DELETE FROM plots WHERE id = ?;");
