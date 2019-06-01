@@ -28,8 +28,7 @@ class ClaimSubCommand extends SubCommand
 		if(isset($args[0])) {
 			$name = $args[0];
 		}
-		$player = $sender->getServer()->getPlayer($sender->getName());
-		$plot = $this->getPlugin()->getPlotByPosition($player);
+		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
@@ -42,12 +41,12 @@ class ClaimSubCommand extends SubCommand
 			}
 			return true;
 		}
-		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($player);
+		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($sender);
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
 			$level = $this->getPlugin()->getServer()->getLevelByName((string)$level);
 			if(!$level->isClosed()) {
-				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($player->getName(), $level->getFolderName()));
+				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
 			}
 		}
 		if($plotsOfPlayer >= $maxPlots) {
@@ -56,7 +55,7 @@ class ClaimSubCommand extends SubCommand
 		}
 		$plotLevel = $this->getPlugin()->getLevelSettings($plot->levelName);
 		$economy = $this->getPlugin()->getEconomyProvider();
-		if($economy !== null and !$economy->reduceMoney($player, $plotLevel->claimPrice)) {
+		if($economy !== null and !$economy->reduceMoney($sender, $plotLevel->claimPrice)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("claim.nomoney"));
 			return true;
 		}
