@@ -56,7 +56,9 @@ class EventListener implements Listener
 				return;
 			}
 			$levelName = $event->getLevel()->getFolderName();
-			$default = $this->plugin->getConfig()->get("DefaultWorld", []);
+			$default = array_filter($this->plugin->getConfig()->get("DefaultWorld", []), function($key){
+				return !in_array($key, ["PlotSize", "GroundHeight", "RoadWidth", "RoadBlock", "WallBlock", "PlotFloorBlock", "PlotFillBlock", "BottomBlock"]);
+			}, ARRAY_FILTER_USE_KEY);
 			$config = new Config($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML, $default);
 			foreach(array_keys($default) as $key) {
 				$settings[$key] = $config->get($key);
