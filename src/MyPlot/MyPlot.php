@@ -761,12 +761,14 @@ class MyPlot extends PluginBase
 					fclose($resource);
 				}
 				$this->saveResource(BaseLang::FALLBACK_LANGUAGE.".ini", true);
+				$this->getLogger()->debug("Custom Language ini created");
 			}
 			$this->baseLang = new BaseLang("lang", $this->getDataFolder());
 		}else{
 			if(is_dir($this->getDataFolder()."lang.ini")) {
-				rmdir($this->getDataFolder()."lang.ini");
-				rmdir($this->getDataFolder().BaseLang::FALLBACK_LANGUAGE.".ini");
+				unlink($this->getDataFolder()."lang.ini");
+				unlink($this->getDataFolder().BaseLang::FALLBACK_LANGUAGE.".ini");
+				$this->getLogger()->debug("Custom Language ini deleted");
 			}
 			$this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
 		}
