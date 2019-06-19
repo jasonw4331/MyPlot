@@ -753,7 +753,15 @@ class MyPlot extends PluginBase
 		// Loading Languages
 		/** @var string $lang */
 		$lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
-		$this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
+		if($this->getConfig()->get("language editing mode", false)) {
+			if(!is_dir($this->getDataFolder()."lang.ini")) {
+				file_put_contents($this->getDataFolder()."lang.ini", file_get_contents($this->getFile()."resources/".$lang.".ini"));
+				file_put_contents($this->getDataFolder()."fallback.ini", file_get_contents($this->getFile()."resources/".BaseLang::FALLBACK_LANGUAGE.".ini"));
+			}
+			$this->baseLang = new BaseLang("lang", $this->getDataFolder());
+		}else{
+			$this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
+		}
 		$this->getLogger()->debug(TF::BOLD . "Loading Data Provider settings");
 		// Initialize DataProvider
 		/** @var int $cacheSize */
