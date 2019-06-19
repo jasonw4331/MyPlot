@@ -752,14 +752,22 @@ class MyPlot extends PluginBase
 		$this->getLogger()->debug(TF::BOLD . "Loading Languages");
 		// Loading Languages
 		/** @var string $lang */
-		$lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
-		if($this->getConfig()->get("language editing mode", false)) {
+		$lang = $this->getConfig()->get("Language", BaseLang::FALLBACK_LANGUAGE);
+		if($this->getConfig()->get("Custom Messages", false)) {
 			if(!is_dir($this->getDataFolder()."lang.ini")) {
-				file_put_contents($this->getDataFolder()."lang.ini", file_get_contents($this->getFile()."resources/".$lang.".ini"));
-				file_put_contents($this->getDataFolder()."fallback.ini", file_get_contents($this->getFile()."resources/".BaseLang::FALLBACK_LANGUAGE.".ini"));
+				$resource = $this->getResource($lang.".ini") ?? file_get_contents($this->getFile()."resources/".BaseLang::FALLBACK_LANGUAGE.".ini");
+				file_put_contents($this->getDataFolder()."lang.ini", $resource);
+				if(!is_string($resource)) {
+					fclose($resource);
+				}
+				$this->saveResource(BaseLang::FALLBACK_LANGUAGE.".ini", true);
 			}
 			$this->baseLang = new BaseLang("lang", $this->getDataFolder());
 		}else{
+			if(is_dir($this->getDataFolder()."lang.ini")) {
+				rmdir($this->getDataFolder()."lang.ini");
+				rmdir($this->getDataFolder().BaseLang::FALLBACK_LANGUAGE.".ini");
+			}
 			$this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
 		}
 		$this->getLogger()->debug(TF::BOLD . "Loading Data Provider settings");
