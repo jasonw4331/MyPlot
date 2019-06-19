@@ -122,7 +122,7 @@ class MySQLProvider extends DataProvider {
 			}else{
 				$denied = explode(",", (string) $val["denied"]);
 			}
-			$plot = new Plot($levelName, $X, $Z, (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], (bool) $val["pvp"], (int) $val["id"]);
+			$plot = new Plot($levelName, $X, $Z, (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], $val["pvp"], (int) $val["id"]);
 		}else{
 			$plot = new Plot($levelName, $X, $Z);
 		}
@@ -155,7 +155,7 @@ class MySQLProvider extends DataProvider {
 		while($val = $result->fetch_array()) {
 			$helpers = explode(",", (string) $val["helpers"]);
 			$denied = explode(",", (string) $val["denied"]);
-			$plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], (bool) $val["pvp"], (int) $val["id"]);
+			$plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], $val["pvp"], (int) $val["id"]);
 		}
 		// Remove unloaded plots
 		$plots = array_filter($plots, function($plot) {

@@ -78,18 +78,18 @@ class YAMLDataProvider extends DataProvider {
 			}
 		}
 		if($key != null) {
-			$plotName = $plots[$key]["name"] == "" ? "" : $plots[$key]["name"];
-			$owner = $plots[$key]["owner"] == "" ? "" : $plots[$key]["owner"];
-			$helpers = $plots[$key]["helpers"] == [] ? [] : $plots[$key]["helpers"];
-			$denied = $plots[$key]["denied"] == [] ? [] : $plots[$key]["denied"];
-			$biome = strtoupper($plots[$key]["biome"]) == "PLAINS" ? "PLAINS" : strtoupper($plots[$key]["biome"]);
-			$pvp = $plot[$key]["pvp"] == null ? false : $plot[$key]["pvp"];
+			$plotName = (string)$plots[$key]["name"];
+			$owner = (string)$plots[$key]["owner"];
+			$helpers = (array)$plots[$key]["helpers"];
+			$denied = (array)$plots[$key]["denied"];
+			$biome = strtoupper($plots[$key]["biome"]);
+			$pvp = $plot[$key]["pvp"];
 			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
 		}
 		$count = $this->yaml->get("count", 0);
 		$this->yaml->set("count", (int) $count++);
 		$this->yaml->save();
-		return new Plot($levelName, $X, $Z, "", "", [], [], "PLAINS", true, (int) $count);
+		return new Plot($levelName, $X, $Z, "", "", [], [], "PLAINS", null, (int) $count);
 	}
 
 	/**

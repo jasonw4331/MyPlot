@@ -18,10 +18,10 @@ class Plot
 	 * @param array $helpers
 	 * @param array $denied
 	 * @param string $biome
-	 * @param bool $pvp
+	 * @param bool|null $pvp
 	 * @param int $id
 	 */
-	public function __construct(string $levelName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", $pvp = true, int $id = -1) {
+	public function __construct(string $levelName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, int $id = -1) {
 		$this->levelName = $levelName;
 		$this->X = $X;
 		$this->Z = $Z;
@@ -31,7 +31,7 @@ class Plot
 		$this->denied = $denied;
 		$this->biome = strtoupper($biome);
 		$settings = MyPlot::getInstance()->getLevelSettings($levelName);
-		if($settings !== null) {
+		if(!isset($pvp) and $settings !== null) {
 			$this->pvp = !$settings->restrictPVP;
 		}else{
 			$this->pvp = $pvp;
