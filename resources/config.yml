@@ -23,7 +23,11 @@
 # Turkish language pack by @Eren5960
 # Korean language pack by @Johnmacrocraft
 # French language pack by @ad5001
-language: eng
+Language: eng
+
+# Allows editing language file as a config
+# This is not recommended unless you have a good text editor!
+Custom Messages: false
 
 # The data provider where plot data is stored.
 # Current providers are: sqlite, mysql, json, and yaml.
