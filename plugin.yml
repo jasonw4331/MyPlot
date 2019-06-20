@@ -15,9 +15,6 @@ softdepend:
 - EssentialsPE
 - DEVirion
 - WorldStyler
-extensions:
-- sqlite3
-- yaml
 permissions:
   myplot.command:
     default: op

@@ -777,31 +777,37 @@ class MyPlot extends PluginBase
 		/** @var int $cacheSize */
 		$cacheSize = $this->getConfig()->get("PlotCacheSize", 256);
 		switch(strtolower($this->getConfig()->get("DataProvider", "sqlite3"))) {
+			case "mysqli":
 			case "mysql":
 				if(extension_loaded("mysqli")) {
 					$settings = $this->getConfig()->get("MySQLSettings");
 					$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
 				}else {
-					$this->getLogger()->info("MySQLi is not installed in your php build! SQLite3 will be used instead.");
-					$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
+					$this->getLogger()->info("MySQLi is not installed in your php build! JSON will be used instead.");
+					$this->dataProvider = new JSONDataProvider($this, $cacheSize);
 				}
 			break;
 			case "yaml":
-				$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
-			break;
-			case "json":
-				$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+				if(extension_loaded("yaml")) {
+					$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
+				}else {
+					$this->getLogger()->info("YAML is not installed in your php build! JSON will be used instead.");
+					$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+				}
 			break;
 			case "sqlite3":
 			case "sqlite":
-			default:
-				$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
+				if(extension_loaded("sqlite3")) {
+					$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
+				}else {
+					$this->getLogger()->info("SQLite3 is not installed in your php build! JSON will be used instead.");
+					$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+				}
 			break;
-		}
-		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings");
-		if($this->getConfig()->get("FastClearing", false) and $this->getServer()->getPluginManager()->getplugin("WorldStyler") === null) {
-			$this->getConfig()->set("FastClearing", false);
-			$this->getLogger()->info(TF::BOLD . "WorldStyler not found. Legacy clearing will be used.");
+			case "json":
+			default:
+				$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+			break;
 		}
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Commands");
 		// Register command
