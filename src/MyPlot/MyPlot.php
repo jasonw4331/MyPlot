@@ -754,7 +754,7 @@ class MyPlot extends PluginBase
 		/** @var string $lang */
 		$lang = $this->getConfig()->get("Language", BaseLang::FALLBACK_LANGUAGE);
 		if($this->getConfig()->get("Custom Messages", false)) {
-			if(!is_dir($this->getDataFolder()."lang.ini")) {
+			if(!file_exists($this->getDataFolder()."lang.ini")) {
 				$resource = $this->getResource($lang.".ini") ?? file_get_contents($this->getFile()."resources/".BaseLang::FALLBACK_LANGUAGE.".ini");
 				file_put_contents($this->getDataFolder()."lang.ini", $resource);
 				if(!is_string($resource)) {
@@ -765,7 +765,7 @@ class MyPlot extends PluginBase
 			}
 			$this->baseLang = new BaseLang("lang", $this->getDataFolder());
 		}else{
-			if(is_dir($this->getDataFolder()."lang.ini")) {
+			if(file_exists($this->getDataFolder()."lang.ini")) {
 				unlink($this->getDataFolder()."lang.ini");
 				unlink($this->getDataFolder().BaseLang::FALLBACK_LANGUAGE.".ini");
 				$this->getLogger()->debug("Custom Language ini deleted");
