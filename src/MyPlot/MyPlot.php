@@ -743,8 +743,7 @@ class MyPlot extends PluginBase
 	public function onLoad() : void {
 		$this->getLogger()->debug(TF::BOLD."Loading...");
 		self::$instance = $this;
-		$this->getLogger()->debug(TF::BOLD . "Loading Config");
-		$this->saveDefaultConfig();
+		$this->getLogger()->debug(TF::BOLD . "Loading Configs");
 		$this->reloadConfig();
 		@mkdir($this->getDataFolder() . "worlds");
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Generator");
@@ -808,6 +807,11 @@ class MyPlot extends PluginBase
 			default:
 				$this->dataProvider = new JSONDataProvider($this, $cacheSize);
 			break;
+		}
+		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings");
+		if($this->getConfig()->get("FastClearing", false) and $this->getServer()->getPluginManager()->getplugin("WorldStyler") === null) {
+			$this->getConfig()->set("FastClearing", false);
+			$this->getLogger()->info(TF::BOLD . "WorldStyler not found. Legacy clearing will be used.");
 		}
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Commands");
 		// Register command
