@@ -830,21 +830,21 @@ class MyPlot extends PluginBase
 				if($plugin instanceof EconomyAPI) {
 					$this->economyProvider = new EconomySProvider($plugin);
 					$this->getLogger()->debug("Eco set to EconomySProvider");
-				}
+				}else
 				$this->getLogger()->debug("Eco not instance of EconomyAPI");
 			}
 			elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("EssentialsPE")) !== null) {
 				if($plugin instanceof Loader) {
 					$this->economyProvider = new EssentialsPEProvider($plugin);
 					$this->getLogger()->debug("Eco set to EssentialsPE");
-				}
+				}else
 				$this->getLogger()->debug("Eco not instance of EssentialsPE");
 			}
 			elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
 				if($plugin instanceof PocketMoney) {
 					$this->economyProvider = new PocketMoneyProvider($plugin);
 					$this->getLogger()->debug("Eco set to PocketMoney");
-				}
+				}else
 				$this->getLogger()->debug("Eco not instance of PocketMoney");
 			}
 			if(!isset($this->economyProvider)) {
