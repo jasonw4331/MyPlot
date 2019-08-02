@@ -46,7 +46,7 @@ class AddHelperSubCommand extends SubCommand
 			}elseif($player instanceof OfflinePlayer){
 				return $name;
 			}
-		}
+		};
 		if($this->getPlugin()->addPlotHelper($plot, $function($helper, $name))) {
 			$sender->sendMessage($this->translateString("addhelper.success", [$helper->getName()]));
 		}else{
