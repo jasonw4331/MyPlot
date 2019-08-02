@@ -44,10 +44,10 @@ class AddHelperSubCommand extends SubCommand
             }
         };
 		if($this->getPlugin()->addPlotHelper($plot, $function($helper, $name))) {
-            $sender->sendMessage($this->translateString("addhelper.success", [$function($helper, $name)]));
+		    $sender->sendMessage($this->translateString("addhelper.success", [$function($helper, $name)]));
         }else{
             $sender->sendMessage(TextFormat::RED . $this->translateString("error"));
         }
-		return true;
+		    return true;
 	}
 }
