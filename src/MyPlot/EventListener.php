@@ -252,15 +252,16 @@ class EventListener implements Listener
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
-		if($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
+		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
+		if($plot !== null and !$plot->isSame($plotFrom)) {
+			if(strpos((string) $plot, "-0")) {
+				return;
+			}
 			$ev = new MyPlotPlayerEnterPlotEvent($plot, $event->getPlayer());
 			$ev->setCancelled($event->isCancelled());
 			$username = $event->getPlayer()->getName();
 			if($plot->owner !== $username and ($plot->isDenied($username) or $plot->isDenied("*")) and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
 				$ev->setCancelled();
-				return;
-			}
-			if(strpos((string) $plot, "-0")) {
 				return;
 			}
 			$ev->call();
@@ -271,23 +272,22 @@ class EventListener implements Listener
 			if(!$this->plugin->getConfig()->get("ShowPlotPopup", true))
 				return;
 			$popup = $this->plugin->getLanguage()->translateString("popup", [TextFormat::GREEN . $plot]);
-			if($plot->owner !== "") {
+			if(!empty($plot->owner)) {
 				$owner = TextFormat::GREEN . $plot->owner;
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
-				$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
-				$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
-				$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
-				$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			}else{
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
-				$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
-				$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
-				$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
-				$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			}
+			$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
+			$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
+			$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
+			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			$event->getPlayer()->sendTip($popup);
-		}elseif($plot === null and ($plot = $this->plugin->getPlotByPosition($event->getFrom())) !== null) {
-			$ev = new MyPlotPlayerLeavePlotEvent($plot, $event->getPlayer());
+		}elseif($plot === null and $plotFrom !== null) {
+			if(strpos((string) $plotFrom, "-0")) {
+				return;
+			}
+			$ev = new MyPlotPlayerLeavePlotEvent($plotFrom, $event->getPlayer());
 			$ev->setCancelled($event->isCancelled());
 			$ev->call();
 			$event->setCancelled($ev->isCancelled());

@@ -132,6 +132,17 @@ class Plot
 	}
 
 	/**
+	 * @api
+	 *
+	 * @param Plot $plot
+	 *
+	 * @return bool
+	 */
+	public function isSame(Plot $plot) : bool {
+		return $this->X === $plot->X and $this->Z === $plot->Z and $this->levelName === $plot->levelName;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function __toString() : string {
