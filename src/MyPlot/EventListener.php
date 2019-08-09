@@ -262,7 +262,6 @@ class EventListener implements Listener
 			$username = $event->getPlayer()->getName();
 			if($plot->owner !== $username and ($plot->isDenied($username) or $plot->isDenied("*")) and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
 				$ev->setCancelled();
-				return;
 			}
 			$ev->call();
 			$event->setCancelled($ev->isCancelled());
@@ -301,7 +300,7 @@ class EventListener implements Listener
 	 * @param EntityDamageByEntityEvent $event
 	 */
 	public function onEntityDamage(EntityDamageByEntityEvent $event) : void {
-		if($event->getEntity() instanceof Player and $event->getDamager() instanceof Player) {
+		if($event->getEntity() instanceof Player and $event->getDamager() instanceof Player and !$event->isCancelled()) {
 			$levelName = $event->getEntity()->getLevel()->getFolderName();
 			if(!$this->plugin->isLevelLoaded($levelName)) {
 				return;
@@ -311,7 +310,6 @@ class EventListener implements Listener
 			if($plot !== null) {
 				/** @noinspection PhpParamsInspection */
 				$ev = new MyPlotPvpEvent($plot, $event->getDamager(), $event->getEntity(), $event);
-				$ev->setCancelled($event->isCancelled());
 				/** @noinspection PhpUndefinedMethodInspection */
 				if(($settings->restrictPVP or !$plot->pvp) and !$event->getDamager()->hasPermission("myplot.admin.pvp.bypass")) {
 					$ev->setCancelled();
@@ -325,7 +323,7 @@ class EventListener implements Listener
 				return;
 			}
 			/** @noinspection PhpUndefinedMethodInspection */
-			if($event->isCancelled() or $event->getDamager()->hasPermission("myplot.admin.pvp.bypass")) {
+			if($event->getDamager()->hasPermission("myplot.admin.pvp.bypass")) {
 				return;
 			}
 			if($settings->restrictPVP) {
