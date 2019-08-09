@@ -253,7 +253,7 @@ class EventListener implements Listener
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
-		if($plot !== null and !$plot->isSame($plotFrom)) {
+		if($plot !== null and ($plotFrom === null or !$plot->isSame($plotFrom))) {
 			if(strpos((string) $plot, "-0")) {
 				return;
 			}
@@ -283,7 +283,7 @@ class EventListener implements Listener
 			$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
 			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			$event->getPlayer()->sendTip($popup);
-		}elseif($plot === null and $plotFrom !== null) {
+		}elseif($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
 			if(strpos((string) $plotFrom, "-0")) {
 				return;
 			}
