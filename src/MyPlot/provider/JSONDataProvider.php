@@ -46,6 +46,7 @@ class JSONDataProvider extends DataProvider {
 		$plots = $this->json->get("plots", []);
 		unset($plots[$plot->id]);
 		$this->json->set("plots", $plots);
+		$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
 		$this->cachePlot($plot);
 		return $this->json->save();
 	}

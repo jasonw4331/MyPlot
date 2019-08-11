@@ -46,6 +46,7 @@ class YAMLDataProvider extends DataProvider {
 		$plots = $this->yaml->get("plots", []);
 		unset($plots[$plot->id]);
 		$this->yaml->set("plots", $plots);
+		$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
 		$this->cachePlot($plot);
 		return $this->yaml->save();
 	}
