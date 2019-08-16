@@ -163,7 +163,7 @@ class EventListener implements Listener
 		}elseif($event->getPlayer()->hasPermission("myplot.admin.build.road"))
 			return;
 		$event->setCancelled();
-		$this->plugin->getLogger()->debug("Block placement/interaction of {$event->getBlock()->getName()} was cancelled");
+		$this->plugin->getLogger()->debug("Block placement/break/interaction of {$event->getBlock()->getName()} was cancelled at ".$event->getBlock()->asPosition()->__toString());
 	}
 
 	/**
