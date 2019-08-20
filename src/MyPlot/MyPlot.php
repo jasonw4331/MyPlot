@@ -374,6 +374,20 @@ class MyPlot extends PluginBase
 	}
 
 	/**
+	 * @param Plot $copyPlot
+	 * @param Plot $pastePlot
+	 *
+	 * @return bool
+	 */
+	public function copyPlot(Plot $copyPlot, Plot $pastePlot) : bool {
+		$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
+		if($styler === null) {
+			return false;
+		}
+		//
+	}
+
+	/**
 	 * Reset all the blocks inside a plot
 	 *
 	 * @api
