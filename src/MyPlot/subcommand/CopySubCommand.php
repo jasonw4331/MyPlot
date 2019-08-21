@@ -44,7 +44,10 @@ class CopySubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		// TODO
+		if($pastePlot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.copy")) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			return true;
+		}
 		$plotLevel = $this->getPlugin()->getLevelSettings($copyPlot->levelName);
 		$economy = $this->getPlugin()->getEconomyProvider();
 		if($economy !== null and !$economy->reduceMoney($sender, $plotLevel->copyPrice)) {
