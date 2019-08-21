@@ -393,25 +393,23 @@ class MyPlot extends PluginBase
 		$plugin = $this;
 		$selection = $styler->getSelection(99998);
 		$selection->setPosition(1, $plotBeginPos);
-		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX, $plotBeginPos->z + $plotSize);
+		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX - 1, $plotBeginPos->z + $plotSize);
 		$selection->setPosition(2, $vec2);
 		$cuboid = Cuboid::fromSelection($selection);
-		//$cuboid = $cuboid->async();
+		$cuboid = $cuboid->async();
 		$cuboid->copy($plotBeginPos->level, $vec2, function (float $time, int $changed) use ($plugin) : void {
-			$plugin->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's into your clipboard.');
+			$plugin->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's to the MyPlot clipboard.');
 		});
-		$styler->removeSelection(99998);
 		$plotLevel = $this->getLevelSettings($pastePlot->levelName);
 		$plotSize = $plotLevel->plotSize-1;
 		$plotBeginPos = $this->getPlotPosition($pastePlot);
-		$selection = $styler->getSelection(99998);
 		$selection->setPosition(1, $plotBeginPos);
-		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX, $plotBeginPos->z + $plotSize);
+		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX - 1, $plotBeginPos->z + $plotSize);
 		$selection->setPosition(2, $vec2);
 		$commonShape = CommonShape::fromSelection($selection);
-		//$commonShape = $cuboid->async();
+		$commonShape = $commonShape->async();
 		$commonShape->paste($plotBeginPos->level, $vec2, true, function (float $time, int $changed) use ($plugin) : void {
-			$plugin->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from your clipboard.');
+			$plugin->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from the MyPlot clipboard.');
 		});
 		$styler->removeSelection(99998);
 		return true;
