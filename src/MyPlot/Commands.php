@@ -7,6 +7,7 @@ use MyPlot\subcommand\AutoSubCommand;
 use MyPlot\subcommand\BiomeSubCommand;
 use MyPlot\subcommand\ClaimSubCommand;
 use MyPlot\subcommand\ClearSubCommand;
+use MyPlot\subcommand\CopySubCommand;
 use MyPlot\subcommand\DenyPlayerSubCommand;
 use MyPlot\subcommand\DisposeSubCommand;
 use MyPlot\subcommand\GenerateSubCommand;
@@ -69,6 +70,10 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
 		$this->loadSubCommand(new ListSubCommand($plugin, "list"));
 		$this->loadSubCommand(new PvpSubCommand($plugin, "pvp"));
+		$styler = $this->getPlugin()->getServer()->getPluginManager()->getPlugin("WorldStyler");
+		if($styler !== null) {
+			$this->loadSubCommand(new CopySubCommand($plugin, "copy"));
+		}
 		$plugin->getLogger()->debug("Commands Registered to MyPlot");
 	}
 

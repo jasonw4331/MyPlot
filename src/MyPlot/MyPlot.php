@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use EssentialsPE\Loader;
+use muqsit\worldstyler\shapes\CommonShape;
 use muqsit\worldstyler\shapes\Cuboid;
 use muqsit\worldstyler\WorldStyler;
 use MyPlot\events\MyPlotClearEvent;
@@ -380,11 +381,40 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function copyPlot(Plot $copyPlot, Plot $pastePlot) : bool {
+		/** @var WorldStyler $styler */
 		$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
 		if($styler === null) {
 			return false;
 		}
-		//
+		$plotLevel = $this->getLevelSettings($copyPlot->levelName);
+		$plotSize = $plotLevel->plotSize-1;
+		$plotBeginPos = $this->getPlotPosition($copyPlot);
+		$plotBeginPos->y = 0;
+		$plugin = $this;
+		$selection = $styler->getSelection(99998);
+		$selection->setPosition(1, $plotBeginPos);
+		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX, $plotBeginPos->z + $plotSize);
+		$selection->setPosition(2, $vec2);
+		$cuboid = Cuboid::fromSelection($selection);
+		//$cuboid = $cuboid->async();
+		$cuboid->copy($plotBeginPos->level, $vec2, function (float $time, int $changed) use ($plugin) : void {
+			$plugin->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's into your clipboard.');
+		});
+		$styler->removeSelection(99998);
+		$plotLevel = $this->getLevelSettings($pastePlot->levelName);
+		$plotSize = $plotLevel->plotSize-1;
+		$plotBeginPos = $this->getPlotPosition($pastePlot);
+		$selection = $styler->getSelection(99998);
+		$selection->setPosition(1, $plotBeginPos);
+		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX, $plotBeginPos->z + $plotSize);
+		$selection->setPosition(2, $vec2);
+		$commonShape = CommonShape::fromSelection($selection);
+		//$commonShape = $cuboid->async();
+		$commonShape->paste($plotBeginPos->level, $vec2, true, function (float $time, int $changed) use ($plugin) : void {
+			$plugin->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from your clipboard.');
+		});
+		$styler->removeSelection(99998);
+		return true;
 	}
 
 	/**
