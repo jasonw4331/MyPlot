@@ -384,15 +384,15 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
-		if(!$this->isLevelLoaded($plot->levelName)) {
-			return false;
-		}
 		$ev = new MyPlotClearEvent($plot, $maxBlocksPerTick);
 		$ev->call();
 		if($ev->isCancelled()) {
 			return false;
 		}
 		$plot = $ev->getPlot();
+		if(!$this->isLevelLoaded($plot->levelName)) {
+			return false;
+		}
 		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
 		foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
 			if($this->getPlotBB($plot)->isVectorInXZ($entity)) {
