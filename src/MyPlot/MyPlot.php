@@ -7,6 +7,7 @@ use muqsit\worldstyler\shapes\CommonShape;
 use muqsit\worldstyler\shapes\Cuboid;
 use muqsit\worldstyler\WorldStyler;
 use MyPlot\events\MyPlotClearEvent;
+use MyPlot\events\MyPlotCloneEvent;
 use MyPlot\events\MyPlotDisposeEvent;
 use MyPlot\events\MyPlotGenerationEvent;
 use MyPlot\events\MyPlotResetEvent;
@@ -391,7 +392,17 @@ class MyPlot extends PluginBase
 	public function clonePlot(Plot $originPlot, Plot $clonePlot) : bool {
 		/** @var WorldStyler $styler */
 		$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
-		if($styler === null or !$this->isLevelLoaded($originPlot->levelName) or !$this->isLevelLoaded($clonePlot->levelName)) {
+		if($styler === null) {
+			return false;
+		}
+		$ev = new MyPlotCloneEvent($originPlot, $clonePlot);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		$originPlot = $ev->getPlot();
+		$clonePlot = $ev->getClonePlot();
+		if(!$this->isLevelLoaded($originPlot->levelName) or !$this->isLevelLoaded($clonePlot->levelName)) {
 			return false;
 		}
 		$plotLevel = $this->getLevelSettings($originPlot->levelName);
