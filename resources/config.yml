@@ -84,8 +84,8 @@ DefaultWorld:
   DisposePrice: 0
   # How much it costs to reset a plot (Economy must be set to 'true')
   ResetPrice: 0
-  # How much it costs to copy a plot's blocks to another plot (Economy must be set to 'true')
-  CopyPrice: 0
+  # How much it costs to clone a plot (Economy must be set to 'true')
+  ClonePrice: 0
 
   # The size of a plot
   PlotSize: 32

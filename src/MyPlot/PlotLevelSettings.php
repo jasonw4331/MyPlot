@@ -11,7 +11,7 @@ class PlotLevelSettings
 	/** @var Block */
 	public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
 	/** @var int */
-	public $roadWidth = 7, $plotSize = 32, $groundHeight = 64, $claimPrice = 0, $clearPrice = 0, $disposePrice = 0, $resetPrice = 0, $copyPrice = 0;
+	public $roadWidth = 7, $plotSize = 32, $groundHeight = 64, $claimPrice = 0, $clearPrice = 0, $disposePrice = 0, $resetPrice = 0, $clonePrice = 0;
 	/** @var bool */
 	public $restrictEntityMovement = true, $restrictPVP = false, $updatePlotLiquids = false, $displayDoneNametags = false;
 
@@ -36,7 +36,7 @@ class PlotLevelSettings
 			$this->clearPrice = self::parseNumber($settings, "ClearPrice", 0);
 			$this->disposePrice = self::parseNumber($settings, "DisposePrice", 0);
 			$this->resetPrice = self::parseNumber($settings, "ResetPrice", 0);
-			$this->copyPrice = self::parseNumber($settings, "CopyPrice", 0);
+			$this->clonePrice = self::parseNumber($settings, "ClonePrice", 0);
 			$this->restrictEntityMovement = self::parseBool($settings, "RestrictEntityMovement", true);
 			$this->restrictPVP = self::parseBool($settings, "RestrictPVP", false);
 			$this->updatePlotLiquids = self::parseBool($settings, "UpdatePlotLiquids", false);
