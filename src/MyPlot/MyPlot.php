@@ -358,6 +358,10 @@ class MyPlot extends PluginBase
 	}
 
 	/**
+	 * Renames a plot
+	 *
+	 * @api
+	 *
 	 * @param Plot $plot
 	 * @param string $newName
 	 *
@@ -375,20 +379,24 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * @param Plot $copyPlot
-	 * @param Plot $pastePlot
+	 * Clones a plot to another location
+	 *
+	 * @api
+	 *
+	 * @param Plot $originPlot
+	 * @param Plot $clonePlot
 	 *
 	 * @return bool
 	 */
-	public function copyPlot(Plot $copyPlot, Plot $pastePlot) : bool {
+	public function clonePlot(Plot $originPlot, Plot $clonePlot) : bool {
 		/** @var WorldStyler $styler */
 		$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
-		if($styler === null) {
+		if($styler === null or !$this->isLevelLoaded($originPlot->levelName) or !$this->isLevelLoaded($clonePlot->levelName)) {
 			return false;
 		}
-		$plotLevel = $this->getLevelSettings($copyPlot->levelName);
+		$plotLevel = $this->getLevelSettings($originPlot->levelName);
 		$plotSize = $plotLevel->plotSize-1;
-		$plotBeginPos = $this->getPlotPosition($copyPlot);
+		$plotBeginPos = $this->getPlotPosition($originPlot);
 		$plotBeginPos->y = 0;
 		$plugin = $this;
 		$selection = $styler->getSelection(99998);
@@ -400,9 +408,9 @@ class MyPlot extends PluginBase
 		$cuboid->copy($plotBeginPos->level, $vec2, function (float $time, int $changed) use ($plugin) : void {
 			$plugin->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's to the MyPlot clipboard.');
 		});
-		$plotLevel = $this->getLevelSettings($pastePlot->levelName);
+		$plotLevel = $this->getLevelSettings($clonePlot->levelName);
 		$plotSize = $plotLevel->plotSize-1;
-		$plotBeginPos = $this->getPlotPosition($pastePlot);
+		$plotBeginPos = $this->getPlotPosition($clonePlot);
 		$selection->setPosition(1, $plotBeginPos);
 		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX - 1, $plotBeginPos->z + $plotSize);
 		$selection->setPosition(2, $vec2);
