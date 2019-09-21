@@ -1,5 +1,5 @@
 # MyPlot
-[![Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/WrtbWTx)
+[![Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/Qqcpp9Q)
 [![Poggit-Ci](https://poggit.pmmp.io/ci.shield/jasonwynn10/MyPlot/MyPlot)](https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot)
 [![Download count](https://poggit.pmmp.io/shield.dl.total/MyPlot)](https://poggit.pmmp.io/p/MyPlot)
 [![Build Status](https://travis-ci.org/jasonwynn10/MyPlot.svg?branch=master)](https://travis-ci.org/jasonwynn10/MyPlot)
