@@ -11,6 +11,9 @@ Have you ever seen those Java servers with the PlotSquared plugin and thought "H
 
 A list of commands and permissions can be found in the [MyPlot Wiki](https://github.com/jasonwynn10/MyPlot/wiki) along with a helpful config guide [here](https://github.com/jasonwynn10/MyPlot/wiki/Config-File-Setup).
 
+### Video Example
+[![Youtube Video Example](https://img.youtube.com/vi/EiVQpI_G8sY/0.jpg)](https://youtu.be/EiVQpI_G8sY?t=60)
+
 Want to help create language packs? If you know a language that is not created yet, you can create a new language pack by opening a pull request! If the language you know is already created, you can help improve it by editing it. Many of the current resource packs are outdated anyway :P
 
 ###### *NOTE:* MyPlot is designed to only support pmmp's version of the PocketMine-MP server software and will not work with third party builds. Any changes to the code in custom installations will not be supported. This includes removing SpoonDetector.
