@@ -4,12 +4,13 @@ namespace MyPlot\task;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\block\Block;
+use pocketmine\block\BlockFactory;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 
 class ClearPlotTask extends Task {
@@ -50,6 +51,8 @@ class ClearPlotTask extends Task {
 	public function __construct(MyPlot $plugin, Plot $plot, int $maxBlocksPerTick = 256) {
 		$this->plugin = $plugin;
 		$this->plot = $plot;
+		$this->plotBeginPos = $plugin->getPlotPosition($plot);
+		$this->level = $this->plotBeginPos->getWorld();
 		$plotLevel = $plugin->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
 		$this->height = $plotLevel->groundHeight;
@@ -99,7 +102,7 @@ class ClearPlotTask extends Task {
 					}elseif($this->pos->y === $this->height) {
 						$block = $this->plotFloorBlock;
 					}else{
-						$block = Block::get(Block::AIR);
+						$block = BlockFactory::get(BlockLegacyIds::AIR);
 					}
 					$this->level->setBlock($this->pos, $block, false);
 					$blocks++;

@@ -4,7 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat as TF;
 
 class ListSubCommand extends SubCommand {

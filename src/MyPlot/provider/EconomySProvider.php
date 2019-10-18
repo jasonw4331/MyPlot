@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace MyPlot\provider;
 
 use onebone\economyapi\EconomyAPI;
-use pocketmine\IPlayer;
-use pocketmine\Player;
+use pocketmine\player\IPlayer;
+use pocketmine\player\Player;
 
 class EconomySProvider implements EconomyProvider {
 	/** @var EconomyAPI $plugin */

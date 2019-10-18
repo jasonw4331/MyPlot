@@ -5,7 +5,7 @@ namespace MyPlot\subcommand;
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\WarpForm;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class WarpSubCommand extends SubCommand
@@ -24,7 +24,7 @@ class WarpSubCommand extends SubCommand
 		if(count($args) === 0) {
 			return false;
 		}
-		$levelName = $args[1] ?? $sender->getLevelNonNull()->getFolderName();
+		$levelName = $args[1] ?? $sender->getWorld()->getFolderName();
 		if(!$this->getPlugin()->isLevelLoaded($levelName)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("warp.notinplotworld"));
 			return true;

@@ -3,12 +3,12 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use pocketmine\block\Block;
-use pocketmine\level\biome\Biome;
-use pocketmine\level\ChunkManager;
+use pocketmine\block\BlockFactory;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\level\format\Chunk;
-use pocketmine\level\generator\Generator;
-use pocketmine\math\Vector3;
-use pocketmine\utils\Random;
+use pocketmine\world\biome\Biome;
+use pocketmine\world\ChunkManager;
+use pocketmine\world\generator\Generator;
 
 class MyPlotGenerator extends Generator {
 	/** @var ChunkManager $level */
@@ -39,9 +39,12 @@ class MyPlotGenerator extends Generator {
 	/**
 	 * MyPlotGenerator constructor.
 	 *
+	 * @param ChunkManager $world
+	 * @param int $seed
 	 * @param string[] $settings
 	 */
-	public function __construct(array $settings = []) {
+	public function __construct(ChunkManager $world, int $seed, array $settings = []) {
+		parent::__construct($world, $seed, $settings);
 		if(isset($settings["preset"])) {
 			$settings = json_decode($settings["preset"], true);
 			if($settings === false or is_null($settings)) {
@@ -50,11 +53,11 @@ class MyPlotGenerator extends Generator {
 		}else{
 			$settings = [];
 		}
-		$this->roadBlock = PlotLevelSettings::parseBlock($settings, "RoadBlock", Block::get(Block::PLANKS));
-		$this->wallBlock = PlotLevelSettings::parseBlock($settings, "WallBlock", Block::get(Block::STONE_SLAB));
-		$this->plotFloorBlock = PlotLevelSettings::parseBlock($settings, "PlotFloorBlock", Block::get(Block::GRASS));
-		$this->plotFillBlock = PlotLevelSettings::parseBlock($settings, "PlotFillBlock", Block::get(Block::DIRT));
-		$this->bottomBlock = PlotLevelSettings::parseBlock($settings, "BottomBlock", Block::get(Block::BEDROCK));
+		$this->roadBlock = PlotLevelSettings::parseBlock($settings, "RoadBlock", BlockFactory::get(BlockLegacyIds::PLANKS));
+		$this->wallBlock = PlotLevelSettings::parseBlock($settings, "WallBlock", BlockFactory::get(BlockLegacyIds::STONE_SLAB));
+		$this->plotFloorBlock = PlotLevelSettings::parseBlock($settings, "PlotFloorBlock", BlockFactory::get(BlockLegacyIds::GRASS));
+		$this->plotFillBlock = PlotLevelSettings::parseBlock($settings, "PlotFillBlock", BlockFactory::get(BlockLegacyIds::DIRT));
+		$this->bottomBlock = PlotLevelSettings::parseBlock($settings, "BottomBlock", BlockFactory::get(BlockLegacyIds::BEDROCK));
 		$this->roadWidth = PlotLevelSettings::parseNumber($settings, "RoadWidth", 7);
 		$this->plotSize = PlotLevelSettings::parseNumber($settings, "PlotSize", 32);
 		$this->groundHeight = PlotLevelSettings::parseNumber($settings, "GroundHeight", 64);
@@ -71,22 +74,10 @@ class MyPlotGenerator extends Generator {
 		]);
 	}
 
-	public function getName() : string {
-		return self::NAME;
-	}
-
 	/**
-	 * @return mixed[]
-	 * @phpstan-return array<string, mixed>
+	 * @param int $chunkX
+	 * @param int $chunkZ
 	 */
-	public function getSettings() : array {
-		return $this->settings;
-	}
-
-	public function init(ChunkManager $level, Random $random) : void {
-		$this->level = $level;
-	}
-
 	public function generateChunk(int $chunkX, int $chunkZ) : void {
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
 		$chunk = $this->level->getChunk($chunkX, $chunkZ) ?? new Chunk($chunkX, $chunkZ);
@@ -179,9 +170,5 @@ class MyPlotGenerator extends Generator {
 	}
 
 	public function populateChunk(int $chunkX, int $chunkZ) : void {
-	}
-
-	public function getSpawn() : Vector3 {
-		return new Vector3(0, $this->groundHeight + 1, 0);
 	}
 }

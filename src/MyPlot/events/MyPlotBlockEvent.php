@@ -11,7 +11,7 @@ use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
 use pocketmine\event\Event;
 use pocketmine\event\player\PlayerInteractEvent;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class MyPlotBlockEvent extends MyPlotPlotEvent implements Cancellable {
 	use CancellableTrait;

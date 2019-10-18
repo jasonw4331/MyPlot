@@ -6,7 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\GiveForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class GiveSubCommand extends SubCommand
@@ -26,7 +26,7 @@ class GiveSubCommand extends SubCommand
 			return false;
 		}
 		$newOwner = $args[0];
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;

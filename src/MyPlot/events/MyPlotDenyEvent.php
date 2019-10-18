@@ -5,7 +5,7 @@ namespace MyPlot\events;
 use MyPlot\Plot;
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
-use pocketmine\IPlayer;
+use pocketmine\player\IPlayer;
 
 class MyPlotDenyEvent extends MyPlotPlotEvent implements Cancellable {
 	use CancellableTrait;

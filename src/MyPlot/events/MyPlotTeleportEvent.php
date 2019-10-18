@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\events;
 
 use MyPlot\Plot;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class MyPlotTeleportEvent extends MyPlotPlayerEnterPlotEvent {
 	/** @var bool $center */

@@ -6,7 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\HomeForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class HomeSubCommand extends SubCommand
@@ -29,7 +29,7 @@ class HomeSubCommand extends SubCommand
 		}else{
 			return false;
 		}
-		$levelName = $args[1] ?? $sender->getLevelNonNull()->getFolderName();
+		$levelName = $args[1] ?? $sender->getWorld()->getFolderName();
 		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
 		if(count($plots) === 0) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));

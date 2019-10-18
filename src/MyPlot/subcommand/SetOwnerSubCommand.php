@@ -6,6 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\OwnerForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class SetOwnerSubCommand extends SubCommand {
@@ -23,7 +24,7 @@ class SetOwnerSubCommand extends SubCommand {
 		if(count($args) === 0) {
 			return false;
 		}
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
@@ -31,7 +32,7 @@ class SetOwnerSubCommand extends SubCommand {
 		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($sender);
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
-			$level = $this->getPlugin()->getServer()->getLevelManager()->getLevelByName($level);
+			$level = $this->getPlugin()->getServer()->getWorldManager()->getWorldByName($level);
 			if($level !== null and !$level->isClosed()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
 			}

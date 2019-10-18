@@ -6,9 +6,9 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\BiomeForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\level\biome\Biome;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\biome\Biome;
 
 class BiomeSubCommand extends SubCommand
 {
@@ -34,7 +34,7 @@ class BiomeSubCommand extends SubCommand
 		if($player === null)
 			return true;
 		$biome = strtoupper($args[0]);
-		$plot = $this->getPlugin()->getPlotByPosition($player);
+		$plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;

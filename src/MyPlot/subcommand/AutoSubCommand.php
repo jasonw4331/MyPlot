@@ -4,7 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class AutoSubCommand extends SubCommand
@@ -20,12 +20,12 @@ class AutoSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		$levelName = $sender->getLevelNonNull()->getFolderName();
-		if(!$this->getPlugin()->isLevelLoaded($levelName)) {
+		$worldName = $sender->getWorld()->getFolderName();
+		if(!$this->getPlugin()->isLevelLoaded($worldName)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
 			return true;
 		}
-		if(($plot = $this->getPlugin()->getNextFreePlot($levelName)) !== null) {
+		if(($plot = $this->getPlugin()->getNextFreePlot($worldName)) !== null) {
 			if($this->getPlugin()->teleportPlayerToPlot($sender, $plot, true)) {
 				$sender->sendMessage($this->translateString("auto.success", [$plot->X, $plot->Z]));
 				$cmd = new ClaimSubCommand($this->getPlugin(), "claim");
