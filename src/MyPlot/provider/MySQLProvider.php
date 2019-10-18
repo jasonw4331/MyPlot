@@ -256,9 +256,9 @@ class MySQLProvider extends DataProvider {
 				$this->plugin->getLogger()->critical("The MySQL connection could not be re-established!");
 				$this->plugin->getLogger()->critical("Closing level to prevent griefing!");
 				foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
-					$level = $this->plugin->getServer()->getLevelManager()->getLevelByName($levelName);
-					$level->save(); // don't force in case owner doesn't want it saved
-					Server::getInstance()->getLevelManager()->unloadLevel($level, true); // force unload to prevent possible griefing
+					$world = $this->plugin->getServer()->getWorldManager()->getWorldByName($levelName);
+					$world->save(); // don't force in case owner doesn't want it saved
+					Server::getInstance()->getWorldManager()->unloadWorld($world, true); // force unload to prevent possible griefing
 				}
 				if($this->db->connect_error)
 					$this->plugin->getLogger()->critical("Failed to connect to the MySQL database: " . $this->db->connect_error);

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot\provider;
 
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 interface EconomyProvider {
 	/**

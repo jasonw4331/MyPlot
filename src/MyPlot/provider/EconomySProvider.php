@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\provider;
 
 use onebone\economyapi\EconomyAPI;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class EconomySProvider implements EconomyProvider
 {

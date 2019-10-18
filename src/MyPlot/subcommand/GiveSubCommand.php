@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class GiveSubCommand extends SubCommand
@@ -28,7 +28,7 @@ class GiveSubCommand extends SubCommand
 			return false;
 		}
 		$newOwner = $args[0];
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
@@ -46,7 +46,7 @@ class GiveSubCommand extends SubCommand
 			return true;
 		}
 		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($newOwner);
-		$plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(), $newOwner->getLevel()->getFolderName()));
+		$plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(), $newOwner->getWorld()->getFolderName()));
 		if($plotsOfPlayer >= $maxPlots) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
 			return true;

@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class ClaimSubCommand extends SubCommand
@@ -43,8 +43,8 @@ class ClaimSubCommand extends SubCommand
 		}
 		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($sender);
 		$plotsOfPlayer = 0;
-		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
-			$level = $this->getPlugin()->getServer()->getLevelManager()->getLevelByName((string)$level);
+		foreach($this->getPlugin()->getPlotlevels() as $level => $settings) {
+			$level = $this->getPlugin()->getServer()->getWorldManager()->getWorldByName((string)$level);
 			if(!$level->isClosed()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
 			}
@@ -53,9 +53,9 @@ class ClaimSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxplots", [$maxPlots]));
 			return true;
 		}
-		$plotLevel = $this->getPlugin()->getLevelSettings($plot->levelName);
+		$plotWorld = $this->getPlugin()->getlevelSettings($plot->levelName);
 		$economy = $this->getPlugin()->getEconomyProvider();
-		if($economy !== null and !$economy->reduceMoney($sender, $plotLevel->claimPrice)) {
+		if($economy !== null and !$economy->reduceMoney($sender, $plotWorld->claimPrice)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("claim.nomoney"));
 			return true;
 		}

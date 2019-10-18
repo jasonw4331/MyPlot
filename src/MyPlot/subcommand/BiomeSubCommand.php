@@ -3,9 +3,9 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\level\biome\Biome;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\biome\Biome;
 
 class BiomeSubCommand extends SubCommand
 {
@@ -35,7 +35,7 @@ class BiomeSubCommand extends SubCommand
 		}
 		$player = $sender->getServer()->getPlayer($sender->getName());
 		$biome = strtoupper($args[0]);
-		$plot = $this->getPlugin()->getPlotByPosition($player);
+		$plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;

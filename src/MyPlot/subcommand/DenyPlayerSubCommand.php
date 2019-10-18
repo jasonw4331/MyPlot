@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\OfflinePlayer;
-use pocketmine\Player;
+use pocketmine\player\OfflinePlayer;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
@@ -30,7 +30,7 @@ class DenyPlayerSubCommand extends SubCommand
 			return false;
 		}
 		$dplayer = $args[0];
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;

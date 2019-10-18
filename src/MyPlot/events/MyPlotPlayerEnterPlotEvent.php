@@ -5,7 +5,7 @@ namespace MyPlot\events;
 use MyPlot\Plot;
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class MyPlotPlayerEnterPlotEvent extends MyPlotPlotEvent implements Cancellable {
 	use CancellableTrait;

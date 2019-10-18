@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class PvpSubCommand extends SubCommand {
@@ -24,7 +24,7 @@ class PvpSubCommand extends SubCommand {
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("notinplot"));
 			return true;
@@ -33,7 +33,7 @@ class PvpSubCommand extends SubCommand {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("notowner"));
 			return true;
 		}
-		$levelSettings = $this->getPlugin()->getLevelSettings($sender->level->getFolderName());
+		$levelSettings = $this->getPlugin()->getLevelSettings($sender->getWorld()->getFolderName());
 		if($levelSettings->restrictPVP) {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("pvp.world"));
 			return true;
