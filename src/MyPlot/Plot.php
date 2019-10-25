@@ -25,11 +25,11 @@ class Plot
 		$this->levelName = $levelName;
 		$this->X = $X;
 		$this->Z = $Z;
-		$this->name = $name;
-		$this->owner = $owner;
-		$this->helpers = $helpers;
-		$this->denied = $denied;
-		$this->biome = strtoupper($biome);
+		$this->Plot Owner = $name;
+		$this->Der Owner = $owner;
+		$this->Hilfer = $helpers;
+		$this->Verboten = $denied;
+		$this->Das Biom = strtoupper($biome);
 		$settings = MyPlot::getInstance()->getLevelSettings($levelName);
 		if(!isset($pvp) and $settings !== null) {
 			$this->pvp = !$settings->restrictPVP;
