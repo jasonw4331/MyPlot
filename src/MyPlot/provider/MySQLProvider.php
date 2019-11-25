@@ -32,6 +32,8 @@ class MySQLProvider extends DataProvider {
 		parent::__construct($plugin, $cacheSize);
 		$this->settings = $settings;
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
+		if($this->db->connect_error)
+			throw new \RuntimeException("Failed to connect to the MySQL database: " . $this->db->connect_error);
 		$this->db->query("CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INT);");
 		try{
 			$this->db->query("ALTER TABLE plots ADD COLUMN pvp INT AFTER biome;");
@@ -244,6 +246,8 @@ class MySQLProvider extends DataProvider {
 					$level->save(); // don't force in case owner doesn't want it saved
 					Server::getInstance()->unloadLevel($level, true); // force unload to prevent possible griefing
 				}
+				if($this->db->connect_error)
+					$this->plugin->getLogger()->critical("Failed to connect to the MySQL database: " . $this->db->connect_error);
 				if($this->plugin->getConfig()->getNested("MySQLSettings.ShutdownOnFailure", false)) {
 					$this->plugin->getServer()->shutdown();
 				}
