@@ -17,15 +17,15 @@ before_script:
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
  - mkdir "$TRAVIS_BUILD_DIR"/../PocketMine && cd "$TRAVIS_BUILD_DIR"/../PocketMine
  - wget -O PocketMine-MP.phar "${1:-"https://jenkins.pmmp.io/job/PocketMine-MP/Stable/artifact/PocketMine-MP.phar"}"
- - mkdir plugins && wget -O plugins/PluginChecker.phar https://github.com/jasonwynn10/MyPlot/releases/download/v0.0.0/PluginChecker_v1.0.2.phar
+ - mkdir plugins && cp ${TRAVIS_BUILD_DIR}/tests/PluginChecker.phar plugins/PluginChecker.phar
  - mkdir unstaged
- - wget -O - https://poggit.pmmp.io/res/travisPluginTest.php | php -- unstaged
+ - php ${TRAVIS_BUILD_DIR}/tests/travisPluginTest.php unstaged
 
 script:
- - wget -O - https://github.com/jasonwynn10/MyPlot/releases/download/v0.0.0/travisScript.sh | bash -s - MyPlot MyPlot
+ - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot
  - cd "$TRAVIS_BUILD_DIR"/../PocketMine/
  - sed -i 's/world/Plots/' server.properties
- - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then wget -O - https://github.com/jasonwynn10/MyPlot/releases/download/v0.0.0/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
+ - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
 
 deploy:
  provider: releases
