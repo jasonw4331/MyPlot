@@ -25,7 +25,7 @@ script:
  - wget -O - https://github.com/jasonwynn10/MyPlot/releases/download/v0.0.0/travisScript.sh | bash -s - MyPlot MyPlot
  - cd "$TRAVIS_BUILD_DIR"/../PocketMine/
  - sed -i 's/world/Plots/' server.properties
- - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then wget -O - https://github.com/jasonwynn10/MyPlot/releases/download/1.1.9/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
+ - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then wget -O - https://github.com/jasonwynn10/MyPlot/releases/download/v0.0.0/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
 
 deploy:
  provider: releases

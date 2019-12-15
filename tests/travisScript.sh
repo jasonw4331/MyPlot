@@ -4,6 +4,9 @@
 php phpstan.phar analyze --no-progress --memory-limit=2G || exit 1
 echo "PHPStan scan succeeded"
 
+[ ! -f phpunit.phar ] && echo "Downloading PHPUnit..." && curl https://phar.phpunit.de/phpunit-7.phar --silent --location -o phpunit.phar
+"$PHP_BINARY" phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 1
+
 if [ "$1" == "" ]; then
     echo Usage: travisScript.sh '<name of plugin to be tested> <name of project to be tested>'
     exit 2
