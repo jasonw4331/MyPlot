@@ -1,11 +1,7 @@
 #!/bin/bash
 
-[ ! -f phpstan.phar ] && echo "Downloading PHPStan..." && curl -sSLO https://github.com/phpstan/phpstan/releases/download/0.12.3/phpstan.phar
-php phpstan.phar analyze --no-progress --memory-limit=2G || exit 1
-echo "PHPStan scan succeeded"
-
-[ ! -f phpunit.phar ] && echo "Downloading PHPUnit..." && curl https://phar.phpunit.de/phpunit-7.phar --silent --location -o phpunit.phar
-php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 1
+php phpstan.phar analyze --no-progress --memory-limit=2G || exit 2
+php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 2
 
 if [ "$1" == "" ]; then
     echo Usage: travisScript.sh '<name of plugin to be tested> <name of project to be tested>'

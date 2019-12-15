@@ -21,6 +21,8 @@ before_script:
  - mkdir unstaged
  - php ${TRAVIS_BUILD_DIR}/tests/travisPluginTest.php unstaged
  - chmod 777 ${TRAVIS_BUILD_DIR}/tests/travisScript.sh
+ - curl -sSLO https://github.com/phpstan/phpstan/releases/download/0.12.3/phpstan.phar
+ - curl https://phar.phpunit.de/phpunit-7.phar --silent --location -o phpunit.phar
 
 script:
  - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot
