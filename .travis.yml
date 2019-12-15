@@ -15,11 +15,12 @@ before_script:
  - make install
  - cd ..
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
- - mkdir "$TRAVIS_BUILD_DIR"/../PocketMine && cd "$TRAVIS_BUILD_DIR"/../PocketMine
+ - mkdir ${TRAVIS_BUILD_DIR}/../PocketMine && cd ${TRAVIS_BUILD_DIR}/../PocketMine
  - wget -O PocketMine-MP.phar "${1:-"https://jenkins.pmmp.io/job/PocketMine-MP/Stable/artifact/PocketMine-MP.phar"}"
  - mkdir plugins && cp ${TRAVIS_BUILD_DIR}/tests/PluginChecker.phar plugins/PluginChecker.phar
  - mkdir unstaged
  - php ${TRAVIS_BUILD_DIR}/tests/travisPluginTest.php unstaged
+ - cd ${TRAVIS_BUILD_DIR}
  - chmod 777 ${TRAVIS_BUILD_DIR}/tests/travisScript.sh
  - chmod 777 ${TRAVIS_BUILD_DIR}/tests/lint.sh
  - curl -sSLO https://github.com/phpstan/phpstan/releases/download/0.12.3/phpstan.phar
@@ -29,7 +30,7 @@ script:
  - ${TRAVIS_BUILD_DIR}/tests/lint.sh -p php -d ${TRAVIS_BUILD_DIR}/src/MyPlot
  - (php phpstan.phar analyze -l 4 -c tests/phpstan.neon.dist --no-progress --memory-limit=2G || exit 2) | bash -s -
  - (php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 2) | bash -s -
- - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot
+ - cd ${TRAVIS_BUILD_DIR}/../PocketMine && (${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot)
  - cd "$TRAVIS_BUILD_DIR"/../PocketMine/
  - sed -i 's/world/Plots/' server.properties
  - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
