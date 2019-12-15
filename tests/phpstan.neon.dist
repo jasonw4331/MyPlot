@@ -1,0 +1,7 @@
+parameters:
+	level: 1
+	autoload_files:
+		- tests/phpstan/bootstrap.php
+		- src/MyPlot/MyPlot.php
+	paths:
+		- src
