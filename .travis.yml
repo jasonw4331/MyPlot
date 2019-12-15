@@ -22,6 +22,7 @@ before_script:
  - php ${TRAVIS_BUILD_DIR}/tests/travisPluginTest.php unstaged
 
 script:
+ - chmod 777 ${TRAVIS_BUILD_DIR}/tests/travisScript.sh
  - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot
  - cd "$TRAVIS_BUILD_DIR"/../PocketMine/
  - sed -i 's/world/Plots/' server.properties
