@@ -1,10 +1,4 @@
 #!/bin/bash
-
-"$TRAVIS_BUILD_DIR"/tests/lint.sh -p php -d "$TRAVIS_BUILD_DIR"/src/MyPlot
-
-php phpstan.phar analyze -l 4 -c tests/phpstan.neon.dist --no-progress --memory-limit=2G || exit 2
-php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 2
-
 if [ "$1" == "" ]; then
     echo Usage: travisScript.sh '<name of plugin to be tested> <name of project to be tested>'
     exit 2
