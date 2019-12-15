@@ -1,6 +1,8 @@
 #!/bin/bash
 
-php phpstan.phar analyze --no-progress --memory-limit=2G || exit 2
+./tests/lint.sh -p php -d ./src/MyPlot
+
+php phpstan.phar analyze -l 4 -c tests/phpstan.neon.dist --no-progress --memory-limit=2G || exit 2
 php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 2
 
 if [ "$1" == "" ]; then
