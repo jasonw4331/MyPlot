@@ -1,6 +1,6 @@
 parameters:
 	level: 1
 	autoload_files:
-		- src/MyPlot/MyPlot.php
+		- ../src/MyPlot/MyPlot.php
 	paths:
 		- src

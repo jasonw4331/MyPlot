@@ -15,6 +15,7 @@ before_script:
  - make install
  - cd ..
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+ - composer install
  - mkdir ${TRAVIS_BUILD_DIR}/../PocketMine && cd ${TRAVIS_BUILD_DIR}/../PocketMine
  - wget -O PocketMine-MP.phar "${1:-"https://jenkins.pmmp.io/job/PocketMine-MP/Stable/artifact/PocketMine-MP.phar"}"
  - mkdir plugins && cp ${TRAVIS_BUILD_DIR}/tests/PluginChecker.phar plugins/PluginChecker.phar
