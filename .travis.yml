@@ -23,10 +23,10 @@ before_script:
  - chmod 777 ${TRAVIS_BUILD_DIR}/tests/travisScript.sh
 
 script:
- - bash -s ${TRAVIS_BUILD_DIR}/tests/travisScript.sh MyPlot MyPlot | echo
+ - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot
  - cd "$TRAVIS_BUILD_DIR"/../PocketMine/
  - sed -i 's/world/Plots/' server.properties
- - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then bash -s ${TRAVIS_BUILD_DIR}/tests/travisScript.sh MyPlot MyPlot | echo ; else true ; fi"
+ - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
 
 deploy:
  provider: releases
