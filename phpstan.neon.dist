@@ -1,6 +1,6 @@
 parameters:
 	paths:
-		- src/MyPlot/MyPlot.php
+		- src
 	level: 1
 	autoload_files:
 		- phar://%currentWorkingDirectory%/../PocketMine/PocketMine-MP.phar/vendor/autoload.php
