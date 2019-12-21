@@ -7,36 +7,36 @@ parameters:
 	autoload_directories:
 		- src
 	ignoreErrors:
-    		-
-    			message: "#^Call to static method fromSelection() on an unknown class\\\\muqsit\\\\worldstyler\\\\shapes\\\\Cuboid\\.$#"
-    			count: 4
-    			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Call to static method fromSelection() on an unknown class\\\\muqsit\\\\worldstyler\\\\shapes\\\\Cuboid\\.$#"
+			count: 4
+			path: src/MyPlot/MyPlot.php
 
-    		-
-    			message: "#^Call to static method printSpoon() on an unknown class\\\\spoondetector\\\\SpoonDetector\\.$#"
-    			count: 1
-    			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Call to static method printSpoon() on an unknown class\\\\spoondetector\\\\SpoonDetector\\.$#"
+			count: 1
+			path: src/MyPlot/MyPlot.php
 
-    		-
-    			message: "#^Class onebone\\\\economyapi\\\\EconomyAPI not found\\.$#"
-    			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Class onebone\\\\economyapi\\\\EconomyAPI not found\\.$#"
+			path: src/MyPlot/MyPlot.php
 
-    		-
-    			message: "#^Class EssentialsPE\\\\Loader not found\\.$#"
-    			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Class EssentialsPE\\\\Loader not found\\.$#"
+			path: src/MyPlot/MyPlot.php
 
-    		-
-    			message: "#^Class PocketMoney\\\\PocketMoney not found\\.$#"
-    			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Class PocketMoney\\\\PocketMoney not found\\.$#"
+			path: src/MyPlot/MyPlot.php
 
-    		-
-    			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\EconomySProvider\\:\\:__construct\\(\\) has invalid typehint type onebone\\\\economyapi\\\\EconomyAPI\\.$#"
-    			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\EconomySProvider\\:\\:__construct\\(\\) has invalid typehint type onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			path: src/MyPlot/MyPlot.php
 
-    		-
-    			message: "#^Access to constant RET_SUCCESS on an unknown class\\\\onebone\\\\economyapi\\\\EconomyAPI\\.$#"
-    			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Access to constant RET_SUCCESS on an unknown class\\\\onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			path: src/MyPlot/MyPlot.php
 
-    		-
-    			message: "#^Class onebone\\\\economyapi\\\\EconomyAPI not found\\.$#"
-    			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Class onebone\\\\economyapi\\\\EconomyAPI not found\\.$#"
+			path: src/MyPlot/MyPlot.php
