@@ -29,7 +29,7 @@ before_script:
 script:
  - ${TRAVIS_BUILD_DIR}/tests/lint.sh -p php -d ${TRAVIS_BUILD_DIR}/src/MyPlot
  - php phpstan.phar analyze --no-progress --memory-limit=2G || exit 2
- - (php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 2) | bash -s -
+# - (php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 2) | bash -s -
  - cd ${TRAVIS_BUILD_DIR}/../PocketMine && (${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot)
  - cd ${TRAVIS_BUILD_DIR}/../PocketMine/
  - sed -i 's/world/Plots/' server.properties
