@@ -110,7 +110,7 @@ class MySQLProvider extends DataProvider {
 		$result = $stmt->execute();
 		if($result === false) {
 			$this->plugin->getLogger()->error($stmt->error);
-			return null;
+			return new Plot($levelName, $X, $Z);
 		}
 		$result = $stmt->get_result();
 		if($val = $result->fetch_array(MYSQLI_ASSOC)) {

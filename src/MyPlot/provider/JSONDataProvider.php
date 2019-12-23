@@ -84,7 +84,7 @@ class JSONDataProvider extends DataProvider {
 			$helpers = (array)$plots[$key]["helpers"];
 			$denied = (array)$plots[$key]["denied"];
 			$biome = strtoupper($plots[$key]["biome"]);
-			$pvp = $plot[$key]["pvp"];
+			$pvp = (bool)$plot[$key]["pvp"];
 			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
 		}
 		$count = $this->json->get("count", 0);
