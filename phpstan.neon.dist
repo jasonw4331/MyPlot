@@ -103,3 +103,21 @@ parameters:
 		-
 			message: "#^Call to method getLogger\\(\\) on an unknown class PocketMoney\\\\PocketMoney\\.$#"
 			path: src/MyPlot/provider/PocketMoneyProvider.php
+# level 7
+		-
+			message: "#^Cannot cast pocketmine\\\\level\\\\generator\\\\Generator\\|string to string\\.$#"
+			path: src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Parameter \\#2 \\$y of class pocketmine\\\\level\\\\Position constructor expects int, float\\|int given\\.$#"
+			path: src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Cannot call method fetch_array\\(\\) on mysqli_result\\|false\\.$#"
+			count: 3
+			path: src/MyPlot/provider/MySQLProvider.php
+
+		-
+			message: "#^Property MyPlot\\\\provider\\\\MySQLProvider\\:\\:\\$sqlSavePlot \\(mysqli_stmt\\) does not accept mysqli_stmt\\|false\\.$#"
+			count: 3
+			path: src/MyPlot/provider/MySQLProvider.php

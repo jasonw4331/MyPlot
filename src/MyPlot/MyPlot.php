@@ -155,7 +155,7 @@ class MyPlot extends PluginBase
 		if($ev->isCancelled() or $this->getServer()->isLevelGenerated($levelName)) {
 			return false;
 		}
-		$generator = (string) GeneratorManager::getGenerator($generator);
+		$generator = GeneratorManager::getGenerator($generator);
 		if(empty($settings)) {
 			$this->getConfig()->reload();
 			$settings = $this->getConfig()->get("DefaultWorld", []);
@@ -758,10 +758,11 @@ class MyPlot extends PluginBase
 		$lang = $this->getConfig()->get("Language", BaseLang::FALLBACK_LANGUAGE);
 		if($this->getConfig()->get("Custom Messages", false)) {
 			if(!file_exists($this->getDataFolder()."lang.ini")) {
-				/** @var resource $resource */
+				/** @var string|resource $resource */
 				$resource = $this->getResource($lang.".ini") ?? file_get_contents($this->getFile()."resources/".BaseLang::FALLBACK_LANGUAGE.".ini");
 				file_put_contents($this->getDataFolder()."lang.ini", $resource);
 				if(!is_string($resource)) {
+					/** @var resource $resource */
 					fclose($resource);
 				}
 				$this->saveResource(BaseLang::FALLBACK_LANGUAGE.".ini", true);
