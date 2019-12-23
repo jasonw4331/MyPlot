@@ -50,11 +50,25 @@ parameters:
 		-
 			message: "#^PHPDoc tag @var for variable \\$styler contains unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
 			path: src/MyPlot/MyPlot.php
+
 		-
 			message: "#^Call to method getSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
 			count: 4
 			path: src/MyPlot/MyPlot.php
+
 		-
 			message: "#^Call to method removeSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
 			count: 4
 			path: src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Property MyPlot\\\\provider\\\\EconomySProvider\\:\\:\\$plugin has unknown class onebone\\\\economyapi\\\\EconomyAPI as its type\\.$#"
+			path: src/MyPlot/provider/EconomySProvider.php
+
+		-
+			message: "#^Call to method reduceMoney\\(\\) on an unknown class onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			path: src/MyPlot/provider/EconomySProvider.php
+
+		-
+			message: "#^Call to method getLogger\\(\\) on an unknown class onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			path: src/MyPlot/provider/EconomySProvider.php
