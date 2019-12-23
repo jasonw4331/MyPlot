@@ -9,8 +9,22 @@ class SQLiteDataProvider extends DataProvider
 {
 	/** @var \SQLite3 $db */
 	private $db;
-	/** @var \SQLite3Stmt */
-	private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot, $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel, $sqlGetExistingXZ;
+	/** @var \SQLite3Stmt $sqlGetPlot */
+	protected $sqlGetPlot;
+	/** @var \SQLite3Stmt $sqlSavePlot */
+	protected $sqlSavePlot;
+	/** @var \SQLite3Stmt $sqlSavePlotById */
+	protected $sqlSavePlotById;
+	/** @var \SQLite3Stmt $sqlRemovePlot */
+	protected $sqlRemovePlot;
+	/** @var \SQLite3Stmt $sqlRemovePlotById */
+	protected $sqlRemovePlotById;
+	/** @var \SQLite3Stmt $sqlGetPlotsByOwner */
+	protected $sqlGetPlotsByOwner;
+	/** @var \SQLite3Stmt $sqlGetPlotsByOwnerAndLevel */
+	protected $sqlGetPlotsByOwnerAndLevel;
+	/** @var \SQLite3Stmt $sqlGetExistingXZ */
+	protected $sqlGetExistingXZ;
 
 	/**
 	 * SQLiteDataProvider constructor.
@@ -196,21 +210,21 @@ class SQLiteDataProvider extends DataProvider
 				continue;
 			}
 			if($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
-				list($X, $Z) = $ret;
+				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;
 			}
 			for($a = 1; $a < $i; $a++) {
 				if($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
-					list($X, $Z) = $ret;
+					[$X, $Z] = $ret;
 					$plot = new Plot($levelName, $X, $Z);
 					$this->cachePlot($plot);
 					return $plot;
 				}
 			}
 			if($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
-				list($X, $Z) = $ret;
+				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;
