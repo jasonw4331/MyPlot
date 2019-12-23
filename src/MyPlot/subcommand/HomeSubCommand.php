@@ -48,9 +48,10 @@ class HomeSubCommand extends SubCommand
 			}
 			return ($plot1->levelName < $plot2->levelName) ? -1 : 1;
 		});
+		/** @var Plot $plot */
 		$plot = $plots[$plotNumber - 1];
 		if($this->getPlugin()->teleportPlayerToPlot($sender, $plot)) {
-			$sender->sendMessage($this->translateString("home.success", [$plot, $plot->levelName]));
+			$sender->sendMessage($this->translateString("home.success", [$plot->__toString(), $plot->levelName]));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.error"));
 		}
