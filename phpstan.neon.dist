@@ -8,7 +8,7 @@ parameters:
 		- src
 	excludes_analyse:
 		- src/provider/EconomySProvider.php
-		- src/provider/EssestialsPEProvider.php
+		- src/provider/EssentialsPEProvider.php
 		- src/provider/PocketMoneyProvider.php
 	ignoreErrors:
 # level 1
