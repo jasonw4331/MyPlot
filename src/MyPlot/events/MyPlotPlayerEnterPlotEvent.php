@@ -30,8 +30,11 @@ class MyPlotPlayerEnterPlotEvent extends MyPlotPlotEvent implements Cancellable 
 
 	/**
 	 * @param Player $player
+	 *
+	 * @return self
 	 */
-	public function setPlayer(Player $player) {
+	public function setPlayer(Player $player) : self {
 		$this->player = $player;
+		return $this;
 	}
 }

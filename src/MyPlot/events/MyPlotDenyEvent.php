@@ -36,9 +36,12 @@ class MyPlotDenyEvent extends MyPlotPlotEvent implements Cancellable {
 
 	/**
 	 * @param int $type
+	 *
+	 * @return self
 	 */
-	public function setType(int $type) : void {
+	public function setType(int $type) : self {
 		$this->type = $type;
+		return $this;
 	}
 
 	/**
@@ -50,12 +53,15 @@ class MyPlotDenyEvent extends MyPlotPlotEvent implements Cancellable {
 
 	/**
 	 * @param IPlayer|string $player
+	 *
+	 * @return self
 	 */
-	public function setDenied($player) : void {
+	public function setDenied($player) : self {
 		if($player instanceof IPlayer) {
 			$this->player = $player->getName();
 		}elseif(is_string($player)) {
 			$this->player = $player;
 		}
+		return $this;
 	}
 }

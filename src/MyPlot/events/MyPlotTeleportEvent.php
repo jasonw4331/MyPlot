@@ -23,8 +23,11 @@ class MyPlotTeleportEvent extends MyPlotPlayerEnterPlotEvent {
 
 	/**
 	 * @param bool $center
+	 *
+	 * @return self
 	 */
-	public function setToCenter(bool $center) : void {
+	public function setToCenter(bool $center) : self {
 		$this->center = $center;
+		return $this;
 	}
 }
