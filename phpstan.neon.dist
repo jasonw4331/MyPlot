@@ -8,12 +8,12 @@ parameters:
 		- src
 	ignoreErrors:
 		-
-			message: "#^Call to static method fromSelection() on an unknown classmuqsit\\\\worldstyler\\\\shapes\\\\Cuboid\\.$#"
+			message: "#^Call to static method fromSelection\\(\\) on an unknown class\\\\muqsit\\\\worldstyler\\\\shapes\\\\Cuboid\\.$#"
 			count: 4
 			path: src/MyPlot/MyPlot.php
 
 		-
-			message: "#^Call to static method printSpoon() on an unknown classspoondetector\\\\SpoonDetector\\.$#"
+			message: "#^Call to static method printSpoon\\(\\) on an unknown class\\\\spoondetector\\\\SpoonDetector\\.$#"
 			count: 1
 			path: src/MyPlot/MyPlot.php
 
