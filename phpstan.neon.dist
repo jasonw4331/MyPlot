@@ -42,5 +42,5 @@ parameters:
 			path: src/MyPlot/provider/EssentialsPEProvider.php
 
 		-
-			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\PocketMoneyProvider\\:\\:__construct\\(\\) has invalid typehint\\.$#"
+			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\PocketMoneyProvider\\:\\:__construct\\(\\) has invalid typehint type PocketMoney\\\\PocketMoney\\.$#"
 			path: src/MyPlot/provider/PocketMoneyProvider.php
