@@ -28,8 +28,8 @@ before_script:
 
 script:
  - ${TRAVIS_BUILD_DIR}/tests/lint.sh -p php -d ${TRAVIS_BUILD_DIR}/src/MyPlot
- - php phpstan.phar analyze --no-progress --memory-limit=2G || exit 2
-# - (php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 2) | bash -s -
+ - php phpstan.phar analyze --no-progress --memory-limit=2G || exit 1
+# - (php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 1) | bash -s -
  - cd ${TRAVIS_BUILD_DIR}/../PocketMine && (${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot)
  - sed -i 's/world/Plots/' ${TRAVIS_BUILD_DIR}/../PocketMine/server.properties
  - "if [ -f ${TRAVIS_BUILD_DIR}/../PocketMine/unstaged/MyPlot.phar ] ; then ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
