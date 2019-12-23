@@ -108,9 +108,10 @@ class Commands extends PluginCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, string $alias, array $args) : bool {
-		if($this->getPlugin()->isDisabled()) {
-			/** @noinspection PhpUndefinedMethodInspection */
-			$sender->sendMessage($this->getPlugin()->getLanguage()->get("plugin.disabled"));
+		/** @var MyPlot $plugin */
+		$plugin = $this->getPlugin();
+		if($plugin->isDisabled()) {
+			$sender->sendMessage($plugin->getLanguage()->get("plugin.disabled"));
 			return true;
 		}
 		if(!isset($args[0])) {
@@ -122,19 +123,16 @@ class Commands extends PluginCommand
 		}elseif(isset($this->aliasSubCommands[$subCommand])) {
 			$command = $this->aliasSubCommands[$subCommand];
 		}else{
-			/** @noinspection PhpUndefinedMethodInspection */
-			$sender->sendMessage(TextFormat::RED . $this->getPlugin()->getLanguage()->get("command.unknown"));
+			$sender->sendMessage(TextFormat::RED . $plugin->getLanguage()->get("command.unknown"));
 			return true;
 		}
 		if($command->canUse($sender)) {
 			if(!$command->execute($sender, $args)) {
-				/** @noinspection PhpUndefinedMethodInspection */
-				$usage = $this->getPlugin()->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
+				$usage = $plugin->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]);
 				$sender->sendMessage($usage);
 			}
 		}else{
-			/** @noinspection PhpUndefinedMethodInspection */
-			$sender->sendMessage(TextFormat::RED . $this->getPlugin()->getLanguage()->get("command.unknown"));
+			$sender->sendMessage(TextFormat::RED . $plugin->getLanguage()->get("command.unknown"));
 		}
 		return true;
 	}
