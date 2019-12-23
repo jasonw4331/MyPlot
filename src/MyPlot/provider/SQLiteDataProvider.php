@@ -87,7 +87,7 @@ class SQLiteDataProvider extends DataProvider
 		$stmt->bindValue(":pvp", $plot->pvp, SQLITE3_INTEGER);
 		$stmt->reset();
 		$result = $stmt->execute();
-		if($result === false) {
+		if(!$result instanceof \SQLite3Result) {
 			return false;
 		}
 		$this->cachePlot($plot);
@@ -111,7 +111,7 @@ class SQLiteDataProvider extends DataProvider
 		}
 		$stmt->reset();
 		$result = $stmt->execute();
-		if($result === false) {
+		if(!$result instanceof \SQLite3Result) {
 			return false;
 		}
 		$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
