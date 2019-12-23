@@ -9,7 +9,6 @@ use pocketmine\IPlayer;
 class MyPlotDenyEvent extends MyPlotPlotEvent implements Cancellable {
 	const ADD = 0;
 	const REMOVE = 1;
-	public static $handlerList = null;
 	/** @var int $type */
 	private $type;
 	/** @var string $player */

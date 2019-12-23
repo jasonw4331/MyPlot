@@ -6,7 +6,6 @@ use MyPlot\Plot;
 use pocketmine\event\Cancellable;
 
 class MyPlotClearEvent extends MyPlotPlotEvent implements Cancellable {
-	public static $handlerList = null;
 	/** @var int $maxBlocksPerTick */
 	private $maxBlocksPerTick = 256;
 
