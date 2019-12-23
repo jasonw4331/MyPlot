@@ -33,7 +33,7 @@ script:
  - php phpstan.phar analyze --no-progress --memory-limit=2G || exit 1
 # - (php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 1) | bash -s -
  - cd ${TRAVIS_BUILD_DIR}/../PocketMine && ls
- - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot
+ - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh MyPlot MyPlot
  - sed -i 's/world/Plots/' server.properties
  - "if [ -f unstaged/MyPlot.phar ] ; then ${TRAVIS_BUILD_DIR}/tests/travisScript.sh | bash -s - MyPlot MyPlot ; else true ; fi"
 
