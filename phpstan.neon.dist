@@ -6,10 +6,7 @@ parameters:
 		- phar://%currentWorkingDirectory%/../PocketMine/PocketMine-MP.phar/vendor/autoload.php
 	autoload_directories:
 		- src
-	excludes_analyse:
-		- src/MyPlot/provider/EconomySProvider.php
-		- src/MyPlot/provider/EssentialsPEProvider.php
-		- src/MyPlot/provider/PocketMoneyProvider.php
+	reportUnmatchedIgnoredErrors: false
 	ignoreErrors:
 # level 1
 		-
