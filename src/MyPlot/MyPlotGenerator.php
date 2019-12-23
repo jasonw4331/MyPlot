@@ -14,10 +14,22 @@ class MyPlotGenerator extends Generator {
 	protected $level;
 	/** @var string[] $settings */
 	private $settings;
-	/** @var Block */
-	public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
-	/** @var int */
-	public $roadWidth = 7, $plotSize = 32, $groundHeight = 64;
+	/** @var Block $roadBlock */
+	protected $roadBlock;
+	/** @var Block $bottomBlock */
+	protected $bottomBlock;
+	/** @var Block $plotFillBlock */
+	protected $plotFillBlock;
+	/** @var Block $plotFloorBlock */
+	protected $plotFloorBlock;
+	/** @var Block $wallBlock */
+	protected $wallBlock;
+	/** @var int $roadWidth */
+	protected $roadWidth = 7;
+	/** @var int $groundHeight */
+	protected $groundHeight = 64;
+	/** @var int $plotSize */
+	protected $plotSize = 32;
 	const PLOT = 0;
 	const ROAD = 1;
 	const WALL = 2;
