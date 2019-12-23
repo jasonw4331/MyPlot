@@ -11,8 +11,29 @@ use pocketmine\scheduler\Task;
 
 class ClearPlotTask extends Task {
 	/** @var MyPlot $plugin */
-	private $plugin;
-	private $plot, $level, $height, $bottomBlock, $plotFillBlock, $plotFloorBlock, $plotBeginPos, $xMax, $zMax, $maxBlocksPerTick, $pos;
+	protected $plugin;
+	/** @var Plot $plot */
+	protected $plot;
+	/** @var \pocketmine\level\Level|null $level */
+	protected $level;
+	/** @var int $height */
+	protected $height;
+	/** @var Block $bottomBlock */
+	protected $bottomBlock;
+	/** @var Block $plotFillBlock */
+	protected $plotFillBlock;
+	/** @var Block $plotFloorBlock */
+	protected $plotFloorBlock;
+	/** @var \pocketmine\level\Position|null $plotBeginPos */
+	protected $plotBeginPos;
+	/** @var int $xMax */
+	protected $xMax;
+	/** @var int $zMax */
+	protected $zMax;
+	/** @var int $maxBlocksPerTick */
+	protected $maxBlocksPerTick;
+	/** @var Vector3 $pos */
+	protected $pos;
 
 	/**
 	 * ClearPlotTask constructor.
