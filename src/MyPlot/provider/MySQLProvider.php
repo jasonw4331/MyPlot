@@ -254,6 +254,7 @@ class MySQLProvider extends DataProvider {
 				return false;
 			}
 		}
+		return true;
 	}
 
 	private function prepare() : void {
