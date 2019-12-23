@@ -7,6 +7,7 @@ parameters:
 	autoload_directories:
 		- src
 	ignoreErrors:
+# level 1
 		-
 			message: "#^Call to static method fromSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\shapes\\\\Cuboid\\.$#"
 			count: 4
@@ -44,3 +45,15 @@ parameters:
 		-
 			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\PocketMoneyProvider\\:\\:__construct\\(\\) has invalid typehint type PocketMoney\\\\PocketMoney\\.$#"
 			path: src/MyPlot/provider/PocketMoneyProvider.php
+# level 3
+		-
+			message: "#^PHPDoc tag @var for variable \\$styler contains unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
+			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Call to method getSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
+			count: 4
+			path: src/MyPlot/MyPlot.php
+		-
+			message: "#^Call to method removeSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
+			count: 4
+			path: src/MyPlot/MyPlot.php
