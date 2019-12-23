@@ -686,7 +686,7 @@ class MyPlot extends PluginBase
 			return PHP_INT_MAX;
 		/** @var Permission[] $perms */
 		$perms = array_merge(PermissionManager::getInstance()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
-		$perms = array_filter($perms, function($name) {
+		$perms = array_filter($perms, function(string $name) {
 			return (substr($name, 0, 18) === "myplot.claimplots.");
 		}, ARRAY_FILTER_USE_KEY);
 		if(count($perms) === 0)
