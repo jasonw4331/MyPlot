@@ -7,9 +7,9 @@ parameters:
 	autoload_directories:
 		- src
 	excludes_analyse:
-		- src/provider/EconomySProvider.php
-		- src/provider/EssentialsPEProvider.php
-		- src/provider/PocketMoneyProvider.php
+		- src/MyPlot/provider/EconomySProvider.php
+		- src/MyPlot/provider/EssentialsPEProvider.php
+		- src/MyPlot/provider/PocketMoneyProvider.php
 	ignoreErrors:
 # level 1
 		-
