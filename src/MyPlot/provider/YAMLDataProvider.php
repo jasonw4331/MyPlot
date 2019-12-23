@@ -84,7 +84,7 @@ class YAMLDataProvider extends DataProvider {
 			$helpers = (array)$plots[$key]["helpers"];
 			$denied = (array)$plots[$key]["denied"];
 			$biome = strtoupper($plots[$key]["biome"]);
-			$pvp = (bool)$plot[$key]["pvp"];
+			$pvp = (bool)$plots[$key]["pvp"];
 			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
 		}
 		$count = $this->yaml->get("count", 0);
