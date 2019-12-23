@@ -12,7 +12,7 @@ use pocketmine\utils\Random;
 class MyPlotGenerator extends Generator {
 	/** @var ChunkManager $level */
 	protected $level;
-	/** @var string[] $settings */
+	/** @var (string|int|bool)[] $settings */
 	private $settings;
 	/** @var Block $roadBlock */
 	protected $roadBlock;

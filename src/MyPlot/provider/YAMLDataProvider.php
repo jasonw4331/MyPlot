@@ -78,7 +78,8 @@ class YAMLDataProvider extends DataProvider {
 				}
 			}
 		}
-		if($key != null) {
+		/** @var int $key */
+		if(is_int($key)) {
 			$plotName = (string)$plots[$key]["name"];
 			$owner = (string)$plots[$key]["owner"];
 			$helpers = (array)$plots[$key]["helpers"];
