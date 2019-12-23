@@ -72,3 +72,33 @@ parameters:
 		-
 			message: "#^Call to method getLogger\\(\\) on an unknown class onebone\\\\economyapi\\\\EconomyAPI\\.$#"
 			path: src/MyPlot/provider/EconomySProvider.php
+
+		-
+			message: "#^Property MyPlot\\\\provider\\\\EssentialsPEProvider\\:\\:\\$plugin has unknown class EssentialsPE\\\\Loader as its type\\.$#"
+			path: src/MyPlot/provider/EssentialsPEProvider.php
+
+		-
+			message: "#^Call to method getAPI\\(\\) on an unknown class EssentialsPE\\\\Loader\\.$#"
+			count: 3
+			path: src/MyPlot/provider/EssentialsPEProvider.php
+
+		-
+			message: "#^Call to method getLogger\\(\\) on an unknown class EssentialsPE\\\\Loader\\.$#"
+			count: 2
+			path: src/MyPlot/provider/EssentialsPEProvider.php
+
+		-
+			message: "#^Property MyPlot\\\\provider\\\\PocketMoneyProvider\\:\\:\\$plugin has unknown class PocketMoney\\\\PocketMoney as its type\\.$#"
+			path: src/MyPlot/provider/PocketMoneyProvider.php
+
+		-
+			message: "#^Call to method getMoney\\(\\) on an unknown class PocketMoney\\\\PocketMoney\\.$#"
+			path: src/MyPlot/provider/PocketMoneyProvider.php
+
+		-
+			message: "#^Call to method setMoney\\(\\) on an unknown class PocketMoney\\\\PocketMoney\\.$#"
+			path: src/MyPlot/provider/PocketMoneyProvider.php
+
+		-
+			message: "#^Call to method getLogger\\(\\) on an unknown class PocketMoney\\\\PocketMoney\\.$#"
+			path: src/MyPlot/provider/PocketMoneyProvider.php
