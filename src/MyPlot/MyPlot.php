@@ -165,7 +165,7 @@ class MyPlot extends PluginBase
 		}, ARRAY_FILTER_USE_KEY);
 		new Config($this->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML, $default);
 		$settings = ["preset" => json_encode($settings)];
-		$return = $this->getServer()->generateLevel($levelName, null, $generator, $settings);
+		$return = $this->getServer()->generateLevel($levelName, null, (string)$generator, $settings);
 		$level = $this->getServer()->getLevelByName($levelName);
 		if($level !== null)
 			$level->setSpawnLocation(new Vector3(0,(int)$this->getConfig()->getNested("DefaultWorld.GroundHeight", 64) + 1,0));

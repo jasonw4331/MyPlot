@@ -61,7 +61,7 @@ class EventListener implements Listener
 			}, ARRAY_FILTER_USE_KEY);
 			$config = new Config($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML, $default);
 			foreach(array_keys($default) as $key) {
-				$settings[$key] = $config->get($key);
+				$settings[$key] = $config->get((string)$key);
 			}
 			$this->plugin->addLevelSettings($levelName, new PlotLevelSettings($levelName, $settings));
 		}
