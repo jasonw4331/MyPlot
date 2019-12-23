@@ -31,12 +31,16 @@ parameters:
 
 		-
 			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\EconomySProvider\\:\\:__construct\\(\\) has invalid typehint type onebone\\\\economyapi\\\\EconomyAPI\\.$#"
-			path: src/MyPlot/MyPlot.php
+			path: src/MyPlot/provider/EconomySProvider.php
 
 		-
-			message: "#^Access to constant RET_SUCCESS on an unknown class\\\\onebone\\\\economyapi\\\\EconomyAPI\\.$#"
-			path: src/MyPlot/MyPlot.php
+			message: "#^Access to constant RET_SUCCESS on an unknown class onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			path: src/MyPlot/provider/EconomySProvider.php
 
 		-
-			message: "#^Class onebone\\\\economyapi\\\\EconomyAPI not found\\.$#"
-			path: src/MyPlot/MyPlot.php
+			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\EssentialsPEProvider\\:\\:__construct\\(\\) has invalid typehint type EssentialsPE\\\\Loader\\.$#"
+			path: src/MyPlot/provider/EssentialsPEProvider.php
+
+		-
+			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\PocketMoneyProvider\\:\\:__construct\\(\\) has invalid typehint\\.$#"
+			path: src/MyPlot/provider/PocketMoneyProvider.php
