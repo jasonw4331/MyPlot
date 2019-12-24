@@ -55,7 +55,7 @@ class BiomeSubCommand extends SubCommand
 			$biome = Biome::getBiome($biome);
 		}else{
 			$biome = $biome === "NETHER" ? "HELL" : $biome;
-			if(constant(Biome::class."::".$biome) === null) {
+			if(!defined(Biome::class."::".$biome)) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
 				$biomes = implode(", ", array_keys($this->biomes));
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
