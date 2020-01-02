@@ -103,6 +103,7 @@ class YAMLDataProvider extends DataProvider {
 		$plots = $this->yaml->get("plots", []);
 		$ownerPlots = [];
 		if($levelName != "") {
+			/** @var int[] $levelKeys */
 			$levelKeys = array_keys($plots, $levelName);
 			$ownerKeys = array_keys($plots, $owner);
 			foreach($levelKeys as $levelKey) {
@@ -121,6 +122,7 @@ class YAMLDataProvider extends DataProvider {
 				}
 			}
 		}else{
+			/** @var int[] $ownerKeys */
 			$ownerKeys = array_keys($plots, $owner);
 			foreach($ownerKeys as $key) {
 				$levelName = $plots[$key]["level"];
