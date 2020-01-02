@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class BiomeSubCommand extends SubCommand
 {
 	/** @var int[] $biomes */
-	private $biomes = ["PLAINS" => Biome::PLAINS, "DESERT" => Biome::DESERT, "MOUNTAINS" => Biome::MOUNTAINS, "FOREST" => Biome::FOREST, "TAIGA" => Biome::TAIGA, "SWAMP" => Biome::SWAMP, "NETHER" => Biome::HELL, "HELL" => Biome::HELL, "ICE" => Biome::ICE_PLAINS];
+	private $biomes = ["PLAINS" => Biome::PLAINS, "DESERT" => Biome::DESERT, "MOUNTAINS" => Biome::MOUNTAINS, "FOREST" => Biome::FOREST, "TAIGA" => Biome::TAIGA, "SWAMP" => Biome::SWAMP, "NETHER" => Biome::HELL, "HELL" => Biome::HELL, "ICE_PLAINS" => Biome::ICE_PLAINS];
 
 	/**
 	 * @param CommandSender $sender

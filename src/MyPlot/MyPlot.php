@@ -511,7 +511,7 @@ class MyPlot extends PluginBase
 	 */
 	public function setPlotBiome(Plot $plot, Biome $biome) : bool {
 		$newPlot = clone $plot;
-		$newPlot->biome = strtoupper($biome->getName());
+		$newPlot->biome = str_replace(" ", "_", strtoupper($biome->getName()));
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
 		$ev->call();
 		if($ev->isCancelled()) {
