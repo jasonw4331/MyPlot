@@ -156,5 +156,19 @@ parameters:
 			path: src/MyPlot/EventListener.php
 
 		-
-			message: "#^Cannot access property \\$plotSize on pocketmine\\\\level\\\\Position\\|null\\.$#"
+			message: "#^Cannot access property \\$plotSize on MyPlot\\\\PlotLevelSettings\\|null\\.$#"
+			count: 2
+			path: src/MyPlot/EventListener.php
+
+		-
+			message: "#^Cannot access property \\$restrictEntityMovement on MyPlot\\\\PlotLevelSettings\\|null\\.$#"
+			path: src/MyPlot/EventListener.php
+
+		-
+			message: "#^Cannot access property \\$updatePlotLiquids on MyPlot\\\\PlotLevelSettings\\|null\\.$#"
+			path: src/MyPlot/EventListener.php
+
+		-
+			message: "#^Cannot access property \\$restrictPVP on MyPlot\\\\PlotLevelSettings\\|null\\.$#"
+			count: 2
 			path: src/MyPlot/EventListener.php
