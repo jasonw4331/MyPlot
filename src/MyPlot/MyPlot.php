@@ -518,8 +518,7 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		$plot = $ev->getPlot();
-		$biome = $plot->biome === "ICE PLAINS" ? "ICE_PLAINS" : $plot->biome;
-		$biome = Biome::getBiome(defined(Biome::class . "::" . $biome) ? constant(Biome::class . "::" . $biome) : Biome::PLAINS);
+		$biome = Biome::getBiome(defined(Biome::class . "::" . $plot->biome) ? constant(Biome::class . "::" . $plot->biome) : Biome::PLAINS);
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		if($plotLevel === null) {
 			return false;
