@@ -57,13 +57,14 @@ class HelpSubCommand extends SubCommand
 			}
 		}
 		ksort($commands, SORT_NATURAL | SORT_FLAG_CASE);
-		$commands = array_chunk($commands, $sender->getScreenLineHeight());
+		$commands = array_chunk($commands, (int) ($sender->getScreenLineHeight()/2));
 		/** @var SubCommand[][] $commands */
 		$pageNumber = (int) min(count($commands), $pageNumber);
 
 		$sender->sendMessage($this->translateString("help.header", [$pageNumber, count($commands)]));
 		foreach($commands[$pageNumber - 1] as $command) {
 			$sender->sendMessage(TextFormat::DARK_GREEN . $command->getName() . ": " . TextFormat::WHITE . $command->getDescription());
+			$sender->sendMessage(TextFormat::YELLOW . "Usage: " . TextFormat::WHITE . $command->getUsage());
 		}
 		return true;
 	}

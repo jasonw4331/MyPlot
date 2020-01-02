@@ -1,25 +1,30 @@
-<!-- put an 'x' in the brackets -->
-- [x] This issue isn't duplicated - you can check if it is by using the search bar located at the top left hand corner and select "Issues" on the left.
-- [x] This issue includes appropriate markdown for sections - e.g. code blocks for crash dumps.
-- [x] This issue is understandable - feel free to use your native language to write issues if you are not comfortable with English.
+### Issue description
 
-<!-- ISSUE DESCRIPTION - write a SHORT title about what problem you're having. -->
-## Issue description
-What problem do you have?
+- Expected result: What were you expecting to happen?
+- Actual result: What actually happened?
 
-<!-- REPRODUCE ISSUE STEPS - how can this issue be reproduced? -->
-## Reproducing the issue
+### Steps to reproduce the issue
 1. ...
 2. ...
 
-<!-- CLIENT INFORMATION - what is the plugin version, PHP version, and server build you're running? -->
-## Client information
-PocketMine-MP Version: <!-- use the 'version' command in PocketMine-MP. "LATEST" is not a valid version -->
-Plugin Version: 
-PHP version: 7.2.1 (default)
+### OS and versions
+<!-- try the `version` command | LATEST IS NOT A VALID VERSION -->
+* PocketMine-MP:
+* PHP:
+* MyPlot:
+* Data Provider:
 
-<!-- OPTIONAL INFORMATION - use this section for posting crash dumps, backtraces or other files(please use code markdown!) -->
-## Optional information
+### Other Plugins
+<!--- use the `plugins` command and paste the output below -->
+
+- If you remove all other plugins, does the issue still occur?
+- If the issue is **not** reproducible without other plugins:
+  - Have you asked for help in the PM discord before creating an issue?
+  - Can you provide sample, *minimal* reproducing code for the issue? If so, paste it in the bottom section
+
+### Crashdump, backtrace or other files
+<!--- Submit crashdumps at https://crash.pmmp.io and paste a link -->
+<!--- Use gist or anything else to add other files and add links here -->
 ```
 Put a console error here, but please make sure you have your debug level set to 2 in your pocketmine.yml
 ```
