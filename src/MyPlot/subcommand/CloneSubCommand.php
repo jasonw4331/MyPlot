@@ -50,7 +50,7 @@ class CloneSubCommand extends SubCommand
 		}
 		$plotLevel = $this->getPlugin()->getLevelSettings($originPlot->levelName);
 		$economy = $this->getPlugin()->getEconomyProvider();
-		if($economy !== null and !$economy->reduceMoney($sender, $plotLevel->copyPrice)) {
+		if($economy !== null and !$economy->reduceMoney($sender, $plotLevel->clonePrice)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("clone.nomoney"));
 			return true;
 		}
