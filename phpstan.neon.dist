@@ -134,3 +134,27 @@ parameters:
 		-
 			message: "#^Parameter \\#2 \\$params of method pocketmine\\\\lang\\\\BaseLang\\:\\:translateString\\(\\) expects array<string>, array<float\\|int\\|string> given\\.$#"
 			path: src/MyPlot/subcommand/SubCommand.php
+#level 8
+		-
+			message: "#^Parameter \\#1 \\$str of function strtolower expects string, string\\|null given\\.$#"
+			path: src/MyPlot/Commands.php
+
+		-
+			message: "#^Cannot call method getFolderName\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			path: src/MyPlot/EventListener.php
+
+		-
+			message: "#^Cannot clone non-object variable \\$beginPos of type pocketmine\\\\level\\\\Position\\|null\\.$#"
+			path: src/MyPlot/EventListener.php
+
+		-
+			message: "#^Cannot access property \\$x on pocketmine\\\\level\\\\Position\\|null\\.$#"
+			path: src/MyPlot/EventListener.php
+
+		-
+			message: "#^Cannot access property \\$z on pocketmine\\\\level\\\\Position\\|null\\.$#"
+			path: src/MyPlot/EventListener.php
+
+		-
+			message: "#^Cannot access property \\$plotSize on pocketmine\\\\level\\\\Position\\|null\\.$#"
+			path: src/MyPlot/EventListener.php
