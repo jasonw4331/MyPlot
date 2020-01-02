@@ -7,7 +7,6 @@ use pocketmine\event\Cancellable;
 use pocketmine\Player;
 
 class MyPlotPlayerEnterPlotEvent extends MyPlotPlotEvent implements Cancellable {
-	public static $handlerList = null;
 	/** @var Player $player */
 	private $player;
 
@@ -31,8 +30,11 @@ class MyPlotPlayerEnterPlotEvent extends MyPlotPlotEvent implements Cancellable 
 
 	/**
 	 * @param Player $player
+	 *
+	 * @return self
 	 */
-	public function setPlayer(Player $player) {
+	public function setPlayer(Player $player) : self {
 		$this->player = $player;
+		return $this;
 	}
 }

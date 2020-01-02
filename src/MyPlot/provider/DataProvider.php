@@ -43,9 +43,9 @@ abstract class DataProvider
 	}
 
 	/**
-	 * @param $levelName
-	 * @param $X
-	 * @param $Z
+	 * @param string $levelName
+	 * @param int $X
+	 * @param int $Z
 	 *
 	 * @return Plot|null
 	 */

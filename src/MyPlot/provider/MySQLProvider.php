@@ -10,11 +10,25 @@ class MySQLProvider extends DataProvider {
 	/** @var MyPlot $plugin */
 	protected $plugin;
 	/** @var \mysqli $db */
-	private $db;
+	protected $db;
 	/** @var array $settings */
-	private $settings;
-	/** @var \mysqli_stmt */
-	private $sqlGetPlot, $sqlSavePlot, $sqlSavePlotById, $sqlRemovePlot, $sqlRemovePlotById, $sqlGetPlotsByOwner, $sqlGetPlotsByOwnerAndLevel, $sqlGetExistingXZ;
+	protected $settings;
+	/** @var \mysqli_stmt $sqlGetPlot */
+	protected $sqlGetPlot;
+	/** @var \mysqli_stmt $sqlSavePlot */
+	protected $sqlSavePlot;
+	/** @var \mysqli_stmt $sqlSavePlotById */
+	protected $sqlSavePlotById;
+	/** @var \mysqli_stmt $sqlRemovePlot */
+	protected $sqlRemovePlot;
+	/** @var \mysqli_stmt $sqlRemovePlotById */
+	protected $sqlRemovePlotById;
+	/** @var \mysqli_stmt $sqlGetPlotsByOwner */
+	protected $sqlGetPlotsByOwner;
+	/** @var \mysqli_stmt $sqlGetPlotsByOwnerAndLevel */
+	protected $sqlGetPlotsByOwnerAndLevel;
+	/** @var \mysqli_stmt $sqlGetExistingXZ */
+	protected $sqlGetExistingXZ;
 
 	/**
 	 * MySQLProvider constructor.
@@ -110,7 +124,7 @@ class MySQLProvider extends DataProvider {
 		$result = $stmt->execute();
 		if($result === false) {
 			$this->plugin->getLogger()->error($stmt->error);
-			return null;
+			return new Plot($levelName, $X, $Z);
 		}
 		$result = $stmt->get_result();
 		if($val = $result->fetch_array(MYSQLI_ASSOC)) {
@@ -198,21 +212,21 @@ class MySQLProvider extends DataProvider {
 				continue;
 			}
 			if($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
-				list($X, $Z) = $ret;
+				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;
 			}
 			for($a = 1; $a < $i; $a++) {
 				if($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
-					list($X, $Z) = $ret;
+					[$X, $Z] = $ret;
 					$plot = new Plot($levelName, $X, $Z);
 					$this->cachePlot($plot);
 					return $plot;
 				}
 			}
 			if($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
-				list($X, $Z) = $ret;
+				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;
@@ -254,6 +268,7 @@ class MySQLProvider extends DataProvider {
 				return false;
 			}
 		}
+		return true;
 	}
 
 	private function prepare() : void {

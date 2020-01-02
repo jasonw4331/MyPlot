@@ -15,11 +15,19 @@ use pocketmine\Player;
 class MyPlotBlockEvent extends MyPlotPlotEvent implements Cancellable {
 	/** @var Block $block */
 	private $block;
-	/** @var Event $event */
+	/** @var BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent|SignChangeEvent $event */
 	private $event;
 	/** @var Player $player */
 	private $player;
 
+	/**
+	 * MyPlotBlockEvent constructor.
+	 *
+	 * @param Plot $plot
+	 * @param Block $block
+	 * @param Player $player
+	 * @param BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent|SignChangeEvent $event
+	 */
 	public function __construct(Plot $plot, Block $block, Player $player, Event $event) {
 		$this->block = $block;
 		$this->player = $player;

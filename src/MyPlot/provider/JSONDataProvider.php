@@ -78,13 +78,13 @@ class JSONDataProvider extends DataProvider {
 				}
 			}
 		}
-		if($key != null) {
+		if(is_int($key)) {
 			$plotName = (string)$plots[$key]["name"];
 			$owner = (string)$plots[$key]["owner"];
 			$helpers = (array)$plots[$key]["helpers"];
 			$denied = (array)$plots[$key]["denied"];
 			$biome = strtoupper($plots[$key]["biome"]);
-			$pvp = $plot[$key]["pvp"];
+			$pvp = (bool)$plots[$key]["pvp"];
 			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
 		}
 		$count = $this->json->get("count", 0);
@@ -103,11 +103,13 @@ class JSONDataProvider extends DataProvider {
 		$plots = $this->json->get("plots", []);
 		$ownerPlots = [];
 		if($levelName != "") {
+			/** @var int[] $levelKeys */
 			$levelKeys = array_keys($plots, $levelName);
+			/** @var int[] $ownerKeys */
 			$ownerKeys = array_keys($plots, $owner);
 			foreach($levelKeys as $levelKey) {
 				foreach($ownerKeys as $ownerKey) {
-					if($levelKey == $ownerKey) {
+					if($levelKey === $ownerKey) {
 						$X = $plots[$levelKey]["x"];
 						$Z = $plots[$levelKey]["z"];
 						$plotName = $plots[$levelKey]["name"] == "" ? "" : $plots[$levelKey]["name"];
@@ -121,6 +123,7 @@ class JSONDataProvider extends DataProvider {
 				}
 			}
 		}else{
+			/** @var int[] $ownerKeys */
 			$ownerKeys = array_keys($plots, $owner);
 			foreach($ownerKeys as $key) {
 				$levelName = $plots[$key]["level"];

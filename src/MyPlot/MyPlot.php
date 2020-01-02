@@ -590,8 +590,8 @@ class MyPlot extends PluginBase
 		$xMax = $pos->x + $plotSize;
 		$zMax = $pos->z + $plotSize;
 		$chunkIndexes = [];
-		for($x = $pos->x; $x < $xMax; $x++) {
-			for($z = $pos->z; $z < $zMax; $z++) {
+		for($x = (int)$pos->x; $x < $xMax; $x++) {
+			for($z = (int)$pos->z; $z < $zMax; $z++) {
 				$index = Level::chunkHash($x >> 4, $z >> 4);
 				if(!in_array($index, $chunkIndexes)) {
 					$chunkIndexes[] = $index;
@@ -747,12 +747,16 @@ class MyPlot extends PluginBase
 			return PHP_INT_MAX;
 		/** @var Permission[] $perms */
 		$perms = array_merge(PermissionManager::getInstance()->getDefaultPermissions($player->isOp()), $player->getEffectivePermissions());
-		$perms = array_filter($perms, function($name) {
+		$perms = array_filter($perms, function(string $name) {
 			return (substr($name, 0, 18) === "myplot.claimplots.");
 		}, ARRAY_FILTER_USE_KEY);
 		if(count($perms) === 0)
 			return 0;
 		krsort($perms, SORT_FLAG_CASE | SORT_NATURAL);
+		/**
+		 * @var string $name
+		 * @var Permission $perm
+		 */
 		foreach($perms as $name => $perm) {
 			$maxPlots = substr($name, 18);
 			if(is_numeric($maxPlots)) {
@@ -815,9 +819,11 @@ class MyPlot extends PluginBase
 		$lang = $this->getConfig()->get("Language", BaseLang::FALLBACK_LANGUAGE);
 		if($this->getConfig()->get("Custom Messages", false)) {
 			if(!file_exists($this->getDataFolder()."lang.ini")) {
+				/** @var string|resource $resource */
 				$resource = $this->getResource($lang.".ini") ?? file_get_contents($this->getFile()."resources/".BaseLang::FALLBACK_LANGUAGE.".ini");
 				file_put_contents($this->getDataFolder()."lang.ini", $resource);
 				if(!is_string($resource)) {
+					/** @var resource $resource */
 					fclose($resource);
 				}
 				$this->saveResource(BaseLang::FALLBACK_LANGUAGE.".ini", true);

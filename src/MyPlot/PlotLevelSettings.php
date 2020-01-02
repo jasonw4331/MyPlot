@@ -8,12 +8,40 @@ class PlotLevelSettings
 {
 	/** @var string $name */
 	public $name;
-	/** @var Block */
-	public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
-	/** @var int */
-	public $roadWidth = 7, $plotSize = 32, $groundHeight = 64, $claimPrice = 0, $clearPrice = 0, $disposePrice = 0, $resetPrice = 0, $clonePrice = 0;
-	/** @var bool */
-	public $restrictEntityMovement = true, $restrictPVP = false, $updatePlotLiquids = false, $displayDoneNametags = false;
+	/** @var Block $roadBlock */
+	public $roadBlock;
+	/** @var Block $bottomBlock */
+	public $bottomBlock;
+	/** @var Block $plotFillBlock */
+	public $plotFillBlock;
+	/** @var Block $plotFloorBlock */
+	public $plotFloorBlock;
+	/** @var Block $wallBlock */
+	public $wallBlock;
+	/** @var int $roadWidth */
+	public $roadWidth = 7;
+	/** @var int $plotSize */
+	public $plotSize = 32;
+	/** @var int $groundHeight */
+	public $groundHeight = 64;
+	/** @var int $claimPrice */
+	public $claimPrice = 0;
+	/** @var int $clearPrice */
+	public $clearPrice = 0;
+	/** @var int $disposePrice */
+	public $disposePrice = 0;
+	/** @var int $resetPrice */
+	public $resetPrice = 0;
+	/** @var int $clonePrice */
+	public $clonePrice = 0;
+	/** @var bool $restrictEntityMovement */
+	public $restrictEntityMovement = true;
+	/** @var bool $restrictPVP */
+	public $restrictPVP = false;
+	/** @var bool $updatePlotLiquids */
+	public $updatePlotLiquids = false;
+	/** @var bool $displayDoneNametags */
+	public $displayDoneNametags = false;
 
 	/**
 	 * PlotLevelSettings constructor.
