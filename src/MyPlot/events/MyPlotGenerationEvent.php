@@ -28,9 +28,12 @@ class MyPlotGenerationEvent extends Event implements Cancellable {
 
 	/**
 	 * @param string $levelName
+	 *
+	 * @return self
 	 */
-	public function setLevelName(string $levelName) : void {
+	public function setLevelName(string $levelName) : self {
 		$this->levelName = $levelName;
+		return $this;
 	}
 
 	/**
@@ -42,9 +45,12 @@ class MyPlotGenerationEvent extends Event implements Cancellable {
 
 	/**
 	 * @param string $generator
+	 *
+	 * @return self
 	 */
-	public function setGenerator(string $generator) : void {
+	public function setGenerator(string $generator) : self {
 		$this->generator = $generator;
+		return $this;
 	}
 
 	/**
@@ -56,9 +62,12 @@ class MyPlotGenerationEvent extends Event implements Cancellable {
 
 	/**
 	 * @param array $settings
+	 *
+	 * @return self
 	 */
-	public function setSettings(array $settings) : void {
+	public function setSettings(array $settings) : self {
 		$this->settings = $settings;
 		$this->settings["preset"] = json_encode($settings);
+		return $this;
 	}
 }

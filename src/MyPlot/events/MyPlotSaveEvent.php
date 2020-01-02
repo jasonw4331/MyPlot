@@ -11,7 +11,6 @@ class MyPlotSaveEvent extends MyPlotPlotEvent implements Cancellable {
 	const JSON = 2;
 	const YAML = 3;
 	const OTHER = -1;
-	public static $handlerList = null;
 	/** @var int $type */
 	private $type;
 

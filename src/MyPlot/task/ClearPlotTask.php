@@ -11,8 +11,29 @@ use pocketmine\scheduler\Task;
 
 class ClearPlotTask extends Task {
 	/** @var MyPlot $plugin */
-	private $plugin;
-	private $plot, $level, $height, $bottomBlock, $plotFillBlock, $plotFloorBlock, $plotBeginPos, $xMax, $zMax, $maxBlocksPerTick, $pos;
+	protected $plugin;
+	/** @var Plot $plot */
+	protected $plot;
+	/** @var \pocketmine\level\Level|null $level */
+	protected $level;
+	/** @var int $height */
+	protected $height;
+	/** @var Block $bottomBlock */
+	protected $bottomBlock;
+	/** @var Block $plotFillBlock */
+	protected $plotFillBlock;
+	/** @var Block $plotFloorBlock */
+	protected $plotFloorBlock;
+	/** @var \pocketmine\level\Position|null $plotBeginPos */
+	protected $plotBeginPos;
+	/** @var int $xMax */
+	protected $xMax;
+	/** @var int $zMax */
+	protected $zMax;
+	/** @var int $maxBlocksPerTick */
+	protected $maxBlocksPerTick;
+	/** @var Vector3 $pos */
+	protected $pos;
 
 	/**
 	 * ClearPlotTask constructor.
@@ -28,8 +49,8 @@ class ClearPlotTask extends Task {
 		$this->level = $this->plotBeginPos->getLevel();
 		$plotLevel = $plugin->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
-		$this->xMax = $this->plotBeginPos->x + $plotSize;
-		$this->zMax = $this->plotBeginPos->z + $plotSize;
+		$this->xMax = (int)($this->plotBeginPos->x + $plotSize);
+		$this->zMax = (int)($this->plotBeginPos->z + $plotSize);
 		$this->height = $plotLevel->groundHeight;
 		$this->bottomBlock = $plotLevel->bottomBlock;
 		$this->plotFillBlock = $plotLevel->plotFillBlock;

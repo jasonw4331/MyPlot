@@ -26,7 +26,7 @@ class PocketMoneyProvider implements EconomyProvider
 	 * @return bool
 	 */
 	public function reduceMoney(Player $player, float $amount) : bool {
-		if($amount === 0) {
+		if($amount == 0) {
 			return true;
 		}elseif($amount < 0) {
 			$amount = -$amount;

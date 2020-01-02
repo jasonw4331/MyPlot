@@ -61,7 +61,7 @@ class EventListener implements Listener
 			}, ARRAY_FILTER_USE_KEY);
 			$config = new Config($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML, $default);
 			foreach(array_keys($default) as $key) {
-				$settings[$key] = $config->get($key);
+				$settings[$key] = $config->get((string)$key);
 			}
 			$this->plugin->addLevelSettings($levelName, new PlotLevelSettings($levelName, $settings));
 		}
@@ -127,6 +127,8 @@ class EventListener implements Listener
 	 * @param BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent|SignChangeEvent $event
 	 */
 	private function onEventOnBlock($event) : void {
+		if(!$event->getBlock()->isValid())
+			return;
 		$levelName = $event->getBlock()->getLevel()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName)) {
 			return;
@@ -300,18 +302,18 @@ class EventListener implements Listener
 	 * @param EntityDamageByEntityEvent $event
 	 */
 	public function onEntityDamage(EntityDamageByEntityEvent $event) : void {
-		if($event->getEntity() instanceof Player and $event->getDamager() instanceof Player and !$event->isCancelled()) {
-			$levelName = $event->getEntity()->getLevel()->getFolderName();
+		$damaged = $event->getEntity();
+		$damager = $event->getDamager();
+		if($damaged instanceof Player and $damager instanceof Player and !$event->isCancelled()) {
+			$levelName = $damaged->getLevel()->getFolderName();
 			if(!$this->plugin->isLevelLoaded($levelName)) {
 				return;
 			}
 			$settings = $this->plugin->getLevelSettings($levelName);
-			$plot = $this->plugin->getPlotByPosition($event->getEntity());
+			$plot = $this->plugin->getPlotByPosition($damaged);
 			if($plot !== null) {
-				/** @noinspection PhpParamsInspection */
-				$ev = new MyPlotPvpEvent($plot, $event->getDamager(), $event->getEntity(), $event);
-				/** @noinspection PhpUndefinedMethodInspection */
-				if(($settings->restrictPVP or !$plot->pvp) and !$event->getDamager()->hasPermission("myplot.admin.pvp.bypass")) {
+				$ev = new MyPlotPvpEvent($plot, $damager, $damaged, $event);
+				if(($settings->restrictPVP or !$plot->pvp) and !$damager->hasPermission("myplot.admin.pvp.bypass")) {
 					$ev->setCancelled();
 					$this->plugin->getLogger()->debug("Cancelled pvp event in plot ".$plot->X.";".$plot->Z." on level '" . $levelName . "'");
 				}
@@ -322,14 +324,12 @@ class EventListener implements Listener
 				}
 				return;
 			}
-			/** @noinspection PhpUndefinedMethodInspection */
-			if($event->getDamager()->hasPermission("myplot.admin.pvp.bypass")) {
+			if($damager->hasPermission("myplot.admin.pvp.bypass")) {
 				return;
 			}
 			if($settings->restrictPVP) {
 				$event->setCancelled();
-				/** @noinspection PhpUndefinedMethodInspection */
-				$event->getDamager()->sendMessage(TextFormat::RED.$this->plugin->getLanguage()->translateString("pvp.world"));
+				$damager->sendMessage(TextFormat::RED.$this->plugin->getLanguage()->translateString("pvp.world"));
 				$this->plugin->getLogger()->debug("Cancelled pvp event on ".$levelName);
 			}
 		}

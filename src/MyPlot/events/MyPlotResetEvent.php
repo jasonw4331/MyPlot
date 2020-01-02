@@ -6,7 +6,6 @@ use MyPlot\Plot;
 use pocketmine\event\Cancellable;
 
 class MyPlotResetEvent extends MyPlotPlotEvent implements Cancellable {
-	public static $handlerList = null;
 
 	/**
 	 * MyPlotClearEvent constructor.

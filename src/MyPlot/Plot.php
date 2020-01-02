@@ -6,8 +6,26 @@ use pocketmine\math\Vector3;
 
 class Plot
 {
-
-	public $levelName = "", $X = -0, $Z = -0, $name = "", $owner = "", $helpers = [], $denied = [], $biome = "PLAINS", $pvp = true, $id = -1;
+	/** @var string $levelName */
+	public $levelName = "";
+	/** @var int $X */
+	public $X = -0;
+	/** @var int $Z */
+	public $Z = -0;
+	/** @var string $name */
+	public $name = "";
+	/** @var string $owner */
+	public $owner = "";
+	/** @var array $helpers */
+	public $helpers = [];
+	/** @var array $denied */
+	public $denied = [];
+	/** @var string $biome */
+	public $biome = "PLAINS";
+	/** @var bool $pvp */
+	public $pvp = true;
+	/** @var int $id */
+	public $id = -1;
 
 	/**
 	 * Plot constructor.

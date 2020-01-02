@@ -78,13 +78,13 @@ class YAMLDataProvider extends DataProvider {
 				}
 			}
 		}
-		if($key != null) {
+		if(is_int($key)) {
 			$plotName = (string)$plots[$key]["name"];
 			$owner = (string)$plots[$key]["owner"];
 			$helpers = (array)$plots[$key]["helpers"];
 			$denied = (array)$plots[$key]["denied"];
 			$biome = strtoupper($plots[$key]["biome"]);
-			$pvp = $plot[$key]["pvp"];
+			$pvp = (bool)$plots[$key]["pvp"];
 			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
 		}
 		$count = $this->yaml->get("count", 0);
@@ -103,6 +103,7 @@ class YAMLDataProvider extends DataProvider {
 		$plots = $this->yaml->get("plots", []);
 		$ownerPlots = [];
 		if($levelName != "") {
+			/** @var int[] $levelKeys */
 			$levelKeys = array_keys($plots, $levelName);
 			$ownerKeys = array_keys($plots, $owner);
 			foreach($levelKeys as $levelKey) {
@@ -121,6 +122,7 @@ class YAMLDataProvider extends DataProvider {
 				}
 			}
 		}else{
+			/** @var int[] $ownerKeys */
 			$ownerKeys = array_keys($plots, $owner);
 			foreach($ownerKeys as $key) {
 				$levelName = $plots[$key]["level"];

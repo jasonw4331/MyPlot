@@ -22,8 +22,11 @@ class MyPlotPlotEvent extends Event {
 
 	/**
 	 * @param Plot $plot
+	 *
+	 * @return self
 	 */
-	public function setPlot(Plot $plot) : void {
+	public function setPlot(Plot $plot) : self {
 		$this->plot = $plot;
+		return $this;
 	}
 }

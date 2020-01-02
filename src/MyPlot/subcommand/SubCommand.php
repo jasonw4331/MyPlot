@@ -32,7 +32,7 @@ abstract class SubCommand implements PluginIdentifiableCommand
 
     /**
      * @param string $str
-     * @param string[] $params
+     * @param (float|int|string)[] $params
      *
      * @param string $onlyPrefix
      * @return string

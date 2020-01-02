@@ -14,10 +14,22 @@ class MyPlotGenerator extends Generator {
 	protected $level;
 	/** @var string[] $settings */
 	private $settings;
-	/** @var Block */
-	public $roadBlock, $wallBlock, $plotFloorBlock, $plotFillBlock, $bottomBlock;
-	/** @var int */
-	public $roadWidth = 7, $plotSize = 32, $groundHeight = 64;
+	/** @var Block $roadBlock */
+	protected $roadBlock;
+	/** @var Block $bottomBlock */
+	protected $bottomBlock;
+	/** @var Block $plotFillBlock */
+	protected $plotFillBlock;
+	/** @var Block $plotFloorBlock */
+	protected $plotFloorBlock;
+	/** @var Block $wallBlock */
+	protected $wallBlock;
+	/** @var int $roadWidth */
+	protected $roadWidth = 7;
+	/** @var int $groundHeight */
+	protected $groundHeight = 64;
+	/** @var int $plotSize */
+	protected $plotSize = 32;
 	const PLOT = 0;
 	const ROAD = 1;
 	const WALL = 2;
@@ -45,7 +57,16 @@ class MyPlotGenerator extends Generator {
 		$this->plotSize = PlotLevelSettings::parseNumber($settings, "PlotSize", 32);
 		$this->groundHeight = PlotLevelSettings::parseNumber($settings, "GroundHeight", 64);
 		$this->settings = [];
-		$this->settings["preset"] = json_encode(["RoadBlock" => $this->roadBlock->getId() . (($meta = $this->roadBlock->getDamage()) === 0 ? '' : ':' . $meta), "WallBlock" => $this->wallBlock->getId() . (($meta = $this->wallBlock->getDamage()) === 0 ? '' : ':' . $meta), "PlotFloorBlock" => $this->plotFloorBlock->getId() . (($meta = $this->plotFloorBlock->getDamage()) === 0 ? '' : ':' . $meta), "PlotFillBlock" => $this->plotFillBlock->getId() . (($meta = $this->plotFillBlock->getDamage()) === 0 ? '' : ':' . $meta), "BottomBlock" => $this->bottomBlock->getId() . (($meta = $this->bottomBlock->getDamage()) === 0 ? '' : ':' . $meta), "RoadWidth" => $this->roadWidth, "PlotSize" => $this->plotSize, "GroundHeight" => $this->groundHeight]);
+		$this->settings["preset"] = (string)json_encode([
+			"RoadBlock" => $this->roadBlock->getId() . (($meta = $this->roadBlock->getDamage()) === 0 ? '' : ':' . $meta),
+			"WallBlock" => $this->wallBlock->getId() . (($meta = $this->wallBlock->getDamage()) === 0 ? '' : ':' . $meta),
+			"PlotFloorBlock" => $this->plotFloorBlock->getId() . (($meta = $this->plotFloorBlock->getDamage()) === 0 ? '' : ':' . $meta),
+			"PlotFillBlock" => $this->plotFillBlock->getId() . (($meta = $this->plotFillBlock->getDamage()) === 0 ? '' : ':' . $meta),
+			"BottomBlock" => $this->bottomBlock->getId() . (($meta = $this->bottomBlock->getDamage()) === 0 ? '' : ':' . $meta),
+			"RoadWidth" => $this->roadWidth,
+			"PlotSize" => $this->plotSize,
+			"GroundHeight" => $this->groundHeight
+		]);
 	}
 
 	/**
