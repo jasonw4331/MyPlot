@@ -58,7 +58,7 @@ class ClearPlotTask extends Task {
 		$this->maxBlocksPerTick = $maxBlocksPerTick;
 		$this->pos = new Vector3($this->plotBeginPos->x, 0, $this->plotBeginPos->z);
 		$this->plugin = $plugin;
-		$plugin->getLogger()->debug("Clear Task started at plot {$plot->X};{$plot->Z}");
+		$plugin->getLogger()->debug("Plot Clear Task started at plot {$plot->X};{$plot->Z}");
 	}
 
 	/**
@@ -108,6 +108,7 @@ class ClearPlotTask extends Task {
 				}
 			}
 		}
-		$this->plugin->getLogger()->debug("Clear task completed at {$this->plotBeginPos->x};{$this->plotBeginPos->z}");
+		$this->plugin->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this->plugin, $this->plot), 1);
+		$this->plugin->getLogger()->debug("Plot Clear task completed at {$this->plotBeginPos->x};{$this->plotBeginPos->z}");
 	}
 }
