@@ -5,6 +5,7 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
+use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
 
@@ -19,7 +20,7 @@ class ClearBorderTask extends Task {
 	protected $height;
 	/** @var Block $plotWallBlock */
 	protected $plotWallBlock;
-	/** @var \pocketmine\level\Position|null $plotBeginPos */
+	/** @var Position|Vector3|null $plotBeginPos */
 	protected $plotBeginPos;
 	/** @var int $xMax */
 	protected $xMax;
@@ -40,8 +41,8 @@ class ClearBorderTask extends Task {
 		$this->plotBeginPos = $this->plotBeginPos->subtract(1,0,1);
 		$plotLevel = $plugin->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
-		$this->xMax = $this->plotBeginPos->x + $plotSize + 1;
-		$this->zMax = $this->plotBeginPos->z + $plotSize + 1;
+		$this->xMax = (int)($this->plotBeginPos->x + $plotSize + 1);
+		$this->zMax = (int)($this->plotBeginPos->z + $plotSize + 1);
 		$this->height = $plotLevel->groundHeight;
 		$this->plotWallBlock = $plotLevel->wallBlock;
 		$plugin->getLogger()->debug("Border Clear Task started at plot {$plot->X};{$plot->Z}");
