@@ -37,6 +37,10 @@ parameters:
 			path: src/MyPlot/MyPlot.php
 
 		-
+			message: "#^Class muqsit\\\\worldstyler\\\\WorldStyler not found\\.$#"
+			path: src/MyPlot/MyPlot.php
+
+		-
 			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\EconomySProvider\\:\\:__construct\\(\\) has invalid typehint type onebone\\\\economyapi\\\\EconomyAPI\\.$#"
 			path: src/MyPlot/provider/EconomySProvider.php
 
