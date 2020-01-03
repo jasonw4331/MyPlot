@@ -12,7 +12,11 @@ parameters:
 # level 1
 		-
 			message: "#^Call to static method fromSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\shapes\\\\Cuboid\\.$#"
-			count: 4
+			count: 5
+			path: src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Call to static method fromSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\shapes\\\\CommonShape\\.$#"
 			path: src/MyPlot/MyPlot.php
 
 		-
@@ -54,12 +58,12 @@ parameters:
 
 		-
 			message: "#^Call to method getSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
-			count: 4
+			count: 6
 			path: src/MyPlot/MyPlot.php
 
 		-
 			message: "#^Call to method removeSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
-			count: 4
+			count: 5
 			path: src/MyPlot/MyPlot.php
 
 		-

@@ -486,9 +486,8 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function clonePlot(Plot $originPlot, Plot $clonePlot) : bool {
-		/** @var WorldStyler $styler */
 		$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
-		if($styler === null) {
+		if(!$styler instanceof WorldStyler) {
 			return false;
 		}
 		$ev = new MyPlotCloneEvent($originPlot, $clonePlot);
