@@ -20,6 +20,7 @@ use MyPlot\provider\MySQLProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
+use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Block;
@@ -550,6 +551,7 @@ class MyPlot extends PluginBase
 				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
 			});
 			$styler->removeSelection(99998);
+			$this->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this, $plot), 1);
 			return true;
 		}
 		$this->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
