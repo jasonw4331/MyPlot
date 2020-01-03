@@ -501,8 +501,10 @@ class MyPlot extends PluginBase
 			}
 		}
 		if($this->getConfig()->get("FastClearing", false)) {
-			/** @var WorldStyler $styler */
 			$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
+			if(!$styler instanceof WorldStyler) {
+				return false;
+			}
 			$plotLevel = $this->getLevelSettings($plot->levelName);
 			$plotSize = $plotLevel->plotSize-1;
 			$plotBeginPos = $this->getPlotPosition($plot);
