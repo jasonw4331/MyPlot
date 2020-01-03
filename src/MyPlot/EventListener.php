@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use MyPlot\events\MyPlotBlockEvent;
+use MyPlot\events\MyPlotBorderChangeEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
@@ -164,6 +165,19 @@ class EventListener implements Listener
 			}
 		}elseif($event->getPlayer()->hasPermission("myplot.admin.build.road"))
 			return;
+		elseif($this->plugin->isPositionBorderingPlot($event->getBlock()) and $event->getBlock()->getY() === $this->plugin->getLevelSettings($levelName)->groundHeight + 1) {
+			$plot = $this->plugin->getPlotBorderingPosition($event->getBlock());
+			$ev = new MyPlotBorderChangeEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
+			if($event->isCancelled()) {
+				$ev->setCancelled($event->isCancelled());
+			}
+			$ev->call();
+			$event->setCancelled($ev->isCancelled());
+			$username = $event->getPlayer()->getName();
+			if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot"))
+				if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
+					return;
+		}
 		$event->setCancelled();
 		$this->plugin->getLogger()->debug("Block placement/break/interaction of {$event->getBlock()->getName()} was cancelled at ".$event->getBlock()->asPosition()->__toString());
 	}

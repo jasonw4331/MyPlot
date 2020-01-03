@@ -63,8 +63,8 @@ class HelpSubCommand extends SubCommand
 
 		$sender->sendMessage($this->translateString("help.header", [$pageNumber, count($commands)]));
 		foreach($commands[$pageNumber - 1] as $command) {
-			$sender->sendMessage(TextFormat::DARK_GREEN . $command->getName() . ": " . TextFormat::WHITE . $command->getDescription());
 			$sender->sendMessage(TextFormat::YELLOW . "Usage: " . TextFormat::WHITE . $command->getUsage());
+			$sender->sendMessage(TextFormat::YELLOW . "Description: " . TextFormat::WHITE . $command->getDescription());
 		}
 		return true;
 	}

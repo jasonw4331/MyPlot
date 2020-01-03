@@ -31,8 +31,10 @@ class YAMLDataProvider extends DataProvider {
 	 */
 	public function savePlot(Plot $plot) : bool {
 		$plots = $this->yaml->get("plots", []);
-		$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+		$id = $this->yaml->get("count", 0) + 1;
+		$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
 		$this->yaml->set("plots", $plots);
+		$this->yaml->set("count", $id);
 		$this->cachePlot($plot);
 		return $this->yaml->save();
 	}
@@ -63,9 +65,15 @@ class YAMLDataProvider extends DataProvider {
 			return $plot;
 		}
 		$plots = $this->yaml->get("plots");
-		$levelKeys = array_keys($plots, $levelName);
-		$xKeys = array_keys($plots, $X);
-		$zKeys = array_keys($plots, $Z);
+		$levelKeys = $xKeys = $zKeys = [];
+		foreach($plots as $key => $plotData) {
+			if($plotData["level"] === $levelName)
+				$levelKeys[] = $key;
+			if($plotData["x"] === $X)
+				$xKeys[] = $key;
+			if($plotData["z"] === $Z)
+				$zKeys[] = $key;
+		}
 		/** @var int|null $key */
 		$key = null;
 		foreach($levelKeys as $levelKey) {
@@ -87,10 +95,7 @@ class YAMLDataProvider extends DataProvider {
 			$pvp = (bool)$plots[$key]["pvp"];
 			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
 		}
-		$count = $this->yaml->get("count", 0);
-		$this->yaml->set("count", (int) $count++);
-		$this->yaml->save();
-		return new Plot($levelName, $X, $Z, "", "", [], [], "PLAINS", null, (int) $count);
+		return new Plot($levelName, $X, $Z);
 	}
 
 	/**
