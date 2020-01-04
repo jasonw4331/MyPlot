@@ -60,6 +60,13 @@ class DenyPlayerSubCommand extends SubCommand
 			if($dplayer instanceof Player) {
 				$dplayer->sendMessage($this->translateString("denyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
 			}
+			if($dplayer->getName() === "*") {
+				foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
+					if($this->getPlugin()->getPlotBB($plot)->isVectorInside($player))
+						$this->getPlugin()->teleportPlayerToPlot($player, $plot);
+				}
+			}elseif($this->getPlugin()->getPlotBB($plot)->isVectorInside($dplayer))
+				$this->getPlugin()->teleportPlayerToPlot($dplayer, $plot);
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
