@@ -31,10 +31,14 @@ class JSONDataProvider extends DataProvider {
 	 */
 	public function savePlot(Plot $plot) : bool {
 		$plots = $this->json->get("plots", []);
-		$id = $this->json->get("count", 0) + 1;
-		$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
-		$this->json->set("plots", $plots);
-		$this->json->set("count", $id);
+		if($plot->id > -1) {
+			$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+		}else{
+			$id = $this->json->get("count", 0) + 1;
+			$plot->id = $id;
+			$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+			$this->json->set("count", $id);
+		}
 		$this->cachePlot($plot);
 		return $this->json->save();
 	}

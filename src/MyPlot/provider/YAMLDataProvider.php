@@ -31,10 +31,15 @@ class YAMLDataProvider extends DataProvider {
 	 */
 	public function savePlot(Plot $plot) : bool {
 		$plots = $this->yaml->get("plots", []);
-		$id = $this->yaml->get("count", 0) + 1;
-		$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+		if($plot->id > -1) {
+			$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+		}else{
+			$id = $this->yaml->get("count", 0) + 1;
+			$plot->id = $id;
+			$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+			$this->yaml->set("count", $id);
+		}
 		$this->yaml->set("plots", $plots);
-		$this->yaml->set("count", $id);
 		$this->cachePlot($plot);
 		return $this->yaml->save();
 	}
