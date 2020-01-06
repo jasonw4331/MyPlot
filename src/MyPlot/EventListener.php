@@ -165,7 +165,7 @@ class EventListener implements Listener
 			}
 		}elseif($event->getPlayer()->hasPermission("myplot.admin.build.road"))
 			return;
-		elseif($this->plugin->isPositionBorderingPlot($event->getBlock())) {
+		elseif($this->plugin->isPositionBorderingPlot($event->getBlock()) and $this->plugin->getLevelSettings($levelName)->editBorderBlocks) {
 			$plot = $this->plugin->getPlotBorderingPosition($event->getBlock());
 			$ev = new MyPlotBorderChangeEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
 			if($event->isCancelled()) {
