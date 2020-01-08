@@ -21,7 +21,7 @@ class YAMLDataProvider extends DataProvider {
 	public function __construct(MyPlot $plugin, int $cacheSize = 0) {
 		parent::__construct($plugin, $cacheSize);
 		@mkdir($this->plugin->getDataFolder() . "Data");
-		$this->yaml = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::YAML, ["count" => 0, "plots" => []]);
+		$this->yaml = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::YAML, ["count" => -1, "plots" => []]);
 	}
 
 	/**
@@ -31,10 +31,15 @@ class YAMLDataProvider extends DataProvider {
 	 */
 	public function savePlot(Plot $plot) : bool {
 		$plots = $this->yaml->get("plots", []);
-		$id = $this->yaml->get("count", 0) + 1;
-		$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+		if($plot->id > -1) {
+			$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+		}else{
+			$id = $this->yaml->get("count", 0) + 1;
+			$plot->id = $id;
+			$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+			$this->yaml->set("count", $id);
+		}
 		$this->yaml->set("plots", $plots);
-		$this->yaml->set("count", $id);
 		$this->cachePlot($plot);
 		return $this->yaml->save();
 	}

@@ -1,6 +1,6 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.6.7
+version: 1.6.9
 api:
 - 3.4.0
 authors:
@@ -15,6 +15,7 @@ softdepend:
 - EssentialsPE
 - DEVirion
 - WorldStyler
+- EasyCommandAutofill
 permissions:
   myplot.command:
     default: op

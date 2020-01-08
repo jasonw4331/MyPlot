@@ -38,10 +38,6 @@ class UnDenySubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		if(!$plot->unDenyPlayer($dplayerName)) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("undenyplayer.failure", [$dplayerName]));
-			return true;
-		}
 		$dplayer = $this->getPlugin()->getServer()->getPlayer($dplayerName);
 		if($dplayer === null)
 			$dplayer = new OfflinePlayer($this->getPlugin()->getServer(), $dplayerName);

@@ -76,6 +76,10 @@ DefaultWorld:
   # This will allow things like water to lag the server in plot worlds
   UpdatePlotLiquids: false
 
+  # Edit Border Blocks (Any block immediately adjacent to a plot space)
+  # This will allow players to break and place their own border blocks
+  EditBorderBlocks: true
+
   # How much it costs to claim a plot (Economy must be set to 'true')
   ClaimPrice: 0
   # How much it costs to clear a plot (Economy must be set to 'true')

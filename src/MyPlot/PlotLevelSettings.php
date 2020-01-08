@@ -42,6 +42,8 @@ class PlotLevelSettings
 	public $updatePlotLiquids = false;
 	/** @var bool $displayDoneNametags */
 	public $displayDoneNametags = false;
+	/** @var bool $editBorderBlocks */
+	public $editBorderBlocks = true;
 
 	/**
 	 * PlotLevelSettings constructor.
@@ -68,6 +70,7 @@ class PlotLevelSettings
 			$this->restrictEntityMovement = self::parseBool($settings, "RestrictEntityMovement", true);
 			$this->restrictPVP = self::parseBool($settings, "RestrictPVP", false);
 			$this->updatePlotLiquids = self::parseBool($settings, "UpdatePlotLiquids", false);
+			$this->editBorderBlocks = self::parseBool($settings, "EditBorderBlocks", true);
 		}
 	}
 

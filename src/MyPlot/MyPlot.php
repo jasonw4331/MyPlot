@@ -22,6 +22,7 @@ use MyPlot\provider\MySQLProvider;
 use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
+use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Block;
@@ -322,6 +323,43 @@ class MyPlot extends PluginBase
 			if($plot !== null)
 				return true;
 		}
+		for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+			for($n = Vector3::SIDE_NORTH; $n <= Vector3::SIDE_EAST; ++$n) {
+				if($i === $n or Vector3::getOppositeSide($i) === $n)
+					continue;
+				$pos = $position->getSide($i)->getSide($n);
+				$x = $pos->x;
+				$z = $pos->z;
+				$levelName = $pos->level->getFolderName();
+
+				$plotLevel = $this->getLevelSettings($levelName);
+				if($plotLevel === null)
+					return false;
+				$plotSize = $plotLevel->plotSize;
+				$roadWidth = $plotLevel->roadWidth;
+				$totalSize = $plotSize + $roadWidth;
+				if($x >= 0) {
+					$X = (int) floor($x / $totalSize);
+					$difX = $x % $totalSize;
+				}else{
+					$X = (int) ceil(($x - $plotSize + 1) / $totalSize);
+					$difX = abs(($x - $plotSize + 1) % $totalSize);
+				}
+				if($z >= 0) {
+					$Z = (int) floor($z / $totalSize);
+					$difZ = $z % $totalSize;
+				}else{
+					$Z = (int) ceil(($z - $plotSize + 1) / $totalSize);
+					$difZ = abs(($z - $plotSize + 1) % $totalSize);
+				}
+				if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
+					continue;
+				}
+				$plot = $this->dataProvider->getPlot($levelName, $X, $Z);
+				if($plot !== null)
+					return true;
+			}
+		}
 		return false;
 	}
 
@@ -560,8 +598,10 @@ class MyPlot extends PluginBase
 			}
 		}
 		if($this->getConfig()->get("FastClearing", false)) {
-			/** @var WorldStyler $styler */
 			$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
+			if(!$styler instanceof WorldStyler) {
+				return false;
+			}
 			$plotLevel = $this->getLevelSettings($plot->levelName);
 			$plotSize = $plotLevel->plotSize-1;
 			$plotBeginPos = $this->getPlotPosition($plot);
@@ -610,6 +650,7 @@ class MyPlot extends PluginBase
 				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
 			});
 			$styler->removeSelection(99998);
+			$this->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this, $plot), 1);
 			return true;
 		}
 		$this->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
@@ -937,42 +978,38 @@ class MyPlot extends PluginBase
 		// Initialize DataProvider
 		/** @var int $cacheSize */
 		$cacheSize = $this->getConfig()->get("PlotCacheSize", 256);
-		try{
-			switch(strtolower($this->getConfig()->get("DataProvider", "sqlite3"))) {
-				case "mysqli":
-				case "mysql":
-					if(extension_loaded("mysqli")) {
-						$settings = $this->getConfig()->get("MySQLSettings");
-						$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
-					}else {
-						$this->getLogger()->info("MySQLi is not installed in your php build! JSON will be used instead.");
-						$this->dataProvider = new JSONDataProvider($this, $cacheSize);
-					}
-				break;
-				case "yaml":
-					if(extension_loaded("yaml")) {
-						$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
-					}else {
-						$this->getLogger()->info("YAML is not installed in your php build! JSON will be used instead.");
-						$this->dataProvider = new JSONDataProvider($this, $cacheSize);
-					}
-				break;
-				case "sqlite3":
-				case "sqlite":
-					if(extension_loaded("sqlite3")) {
-						$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
-					}else {
-						$this->getLogger()->info("SQLite3 is not installed in your php build! JSON will be used instead.");
-						$this->dataProvider = new JSONDataProvider($this, $cacheSize);
-					}
-				break;
-				case "json":
-				default:
+		switch(strtolower($this->getConfig()->get("DataProvider", "sqlite3"))) {
+			case "mysqli":
+			case "mysql":
+				if(extension_loaded("mysqli")) {
+					$settings = $this->getConfig()->get("MySQLSettings");
+					$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
+				}else {
+					$this->getLogger()->warning("MySQLi is not installed in your php build! JSON will be used instead.");
 					$this->dataProvider = new JSONDataProvider($this, $cacheSize);
-				break;
-			}
-		}catch(\Exception $e) {
-			$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+				}
+			break;
+			case "yaml":
+				if(extension_loaded("yaml")) {
+					$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
+				}else {
+					$this->getLogger()->warning("YAML is not installed in your php build! JSON will be used instead.");
+					$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+				}
+			break;
+			case "sqlite3":
+			case "sqlite":
+				if(extension_loaded("sqlite3")) {
+					$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
+				}else {
+					$this->getLogger()->warning("SQLite3 is not installed in your php build! JSON will be used instead.");
+					$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+				}
+			break;
+			case "json":
+			default:
+				$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+			break;
 		}
 		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings");
 		if($this->getConfig()->get("FastClearing", false) and $this->getServer()->getPluginManager()->getplugin("WorldStyler") === null) {

@@ -21,7 +21,7 @@ class JSONDataProvider extends DataProvider {
 	public function __construct(MyPlot $plugin, int $cacheSize = 0) {
 		parent::__construct($plugin, $cacheSize);
 		@mkdir($this->plugin->getDataFolder() . "Data");
-		$this->json = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::JSON, ["count" => 0, "plots" => []]);
+		$this->json = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::JSON, ["count" => -1, "plots" => []]);
 	}
 
 	/**
@@ -31,10 +31,14 @@ class JSONDataProvider extends DataProvider {
 	 */
 	public function savePlot(Plot $plot) : bool {
 		$plots = $this->json->get("plots", []);
-		$id = $this->json->get("count", 0) + 1;
-		$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
-		$this->json->set("plots", $plots);
-		$this->json->set("count", $id);
+		if($plot->id > -1) {
+			$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+		}else{
+			$id = $this->json->get("count", 0) + 1;
+			$plot->id = $id;
+			$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+			$this->json->set("count", $id);
+		}
 		$this->cachePlot($plot);
 		return $this->json->save();
 	}
