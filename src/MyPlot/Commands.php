@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot;
 
+use jasonwynn10\EasyCommandAutofill\Main;
 use MyPlot\subcommand\AddHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
 use MyPlot\subcommand\BiomeSubCommand;
@@ -27,6 +28,10 @@ use MyPlot\subcommand\UnDenySubCommand;
 use MyPlot\subcommand\WarpSubCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use pocketmine\network\mcpe\protocol\types\CommandData;
+use pocketmine\network\mcpe\protocol\types\CommandEnum;
+use pocketmine\network\mcpe\protocol\types\CommandParameter;
 use pocketmine\utils\TextFormat;
 
 class Commands extends PluginCommand
@@ -70,6 +75,96 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new ListSubCommand($plugin, "list"));
 		$this->loadSubCommand(new PvpSubCommand($plugin, "pvp"));
 		$plugin->getLogger()->debug("Commands Registered to MyPlot");
+
+		$autofill = $plugin->getServer()->getPluginManager()->getPlugin("EasyCommandAutofill");
+		if($autofill instanceof Main) {
+			$data = new CommandData();
+			$data->commandName = $this->getName();
+			$data->commandDescription = $this->getDescription();
+			$enumCount = 0;
+			$tree = 0;
+			ksort($this->subCommands, SORT_NATURAL | SORT_FLAG_CASE);
+			foreach($this->subCommands as $subCommandName => $subCommand) {
+				$parameter = new CommandParameter();
+				$parameter->paramName = "MyPlotSubCommand";
+				$parameter->paramType = AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_FLAG_VALID | $enumCount++;
+				$enum = new CommandEnum();
+				$enum->enumName = $subCommandName;
+				$enum->enumValues = [$subCommandName];
+				$parameter->enum = $enum;
+				$parameter->flags = 1;
+				$parameter->isOptional = false;
+				$data->overloads[$tree][0] = $parameter;
+
+				$usage = $subCommand->getUsage();
+				$commandString = explode(" ", $usage)[0];
+				preg_match_all('/(\s?[<\[]?\s*)([a-zA-Z0-9|]+)(?:\s*:?\s*)(string|int|x y z|float|mixed|target|message|text|json|command|boolean|bool)?(?:\s*[>\]]?\s?)/iu', $usage, $matches, PREG_PATTERN_ORDER, strlen($commandString));
+				$argumentCount = count($matches[0])-1;
+				for($argNumber = 1; $argNumber <= $argumentCount; ++$argNumber) {
+					$optional = empty($matches[1][$argNumber]) ? false : ($matches[1][$argNumber] === '[');
+					$paramName = strtolower($matches[2][$argNumber]);
+					if(stripos($paramName, "|") === false) {
+						switch(strtolower($matches[3][$argNumber])) {
+							default:
+							case "string":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
+							break;
+							case "int":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_INT;
+							break;
+							case "x y z":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_POSITION;
+							break;
+							case "float":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_FLOAT;
+							break;
+							case "target":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_TARGET;
+							break;
+							case "message":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_MESSAGE;
+							break;
+							case "json":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_JSON;
+							break;
+							case "command":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_COMMAND;
+							break;
+							case "boolean":
+							case "mixed":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_VALUE;
+							break;
+							case "text":
+								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_RAWTEXT;
+							break;
+						}
+						$parameter = new CommandParameter();
+						$parameter->paramName = $paramName;
+						$parameter->paramType = $paramType;
+						$parameter->isOptional = $optional;
+						$data->overloads[$tree][$argNumber] = $parameter;
+					}else{
+						$enumValues = explode("|", $paramName);
+						$parameter = new CommandParameter();
+						$parameter->paramName = $paramName;
+						$parameter->paramType = AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_FLAG_VALID | $enumCount++;
+						$enum = new CommandEnum();
+						$enum->enumName = $data->commandName." Enum#".$enumCount; // TODO: change to readable name
+						$enum->enumValues = $enumValues;
+						$parameter->enum = $enum;
+						$parameter->flags = 1;
+						$parameter->isOptional = $optional;
+						$data->overloads[$tree][$argNumber] = $parameter;
+					}
+				}
+				$tree++;
+			}
+			$data->aliases = new CommandEnum();
+			$data->aliases->enumName = ucfirst($this->getName()) . "Aliases";
+			$data->aliases->enumValues = array_merge([$this->getName()], $this->getAliases());
+			$autofill->addManualOverride($this->getName(), $data);
+			$plugin->getLogger()->debug("Command Autofill Enabled");
+		}
 	}
 
 	/**
