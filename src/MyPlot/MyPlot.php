@@ -3,9 +3,11 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use EssentialsPE\Loader;
+use muqsit\worldstyler\shapes\CommonShape;
 use muqsit\worldstyler\shapes\Cuboid;
 use muqsit\worldstyler\WorldStyler;
 use MyPlot\events\MyPlotClearEvent;
+use MyPlot\events\MyPlotCloneEvent;
 use MyPlot\events\MyPlotDisposeEvent;
 use MyPlot\events\MyPlotGenerationEvent;
 use MyPlot\events\MyPlotResetEvent;
@@ -491,6 +493,10 @@ class MyPlot extends PluginBase
 	}
 
 	/**
+	 * Renames a plot
+	 *
+	 * @api
+	 *
 	 * @param Plot $plot
 	 * @param string $newName
 	 *
@@ -505,6 +511,60 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		return $this->savePlot($ev->getPlot());
+	}
+
+	/**
+	 * Clones a plot to another location
+	 *
+	 * @api
+	 *
+	 * @param Plot $originPlot
+	 * @param Plot $clonePlot
+	 *
+	 * @return bool
+	 */
+	public function clonePlot(Plot $originPlot, Plot $clonePlot) : bool {
+		$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
+		if(!$styler instanceof WorldStyler) {
+			return false;
+		}
+		$ev = new MyPlotCloneEvent($originPlot, $clonePlot);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		$originPlot = $ev->getPlot();
+		$clonePlot = $ev->getClonePlot();
+		if(!$this->isLevelLoaded($originPlot->levelName) or !$this->isLevelLoaded($clonePlot->levelName)) {
+			return false;
+		}
+		$plotLevel = $this->getLevelSettings($originPlot->levelName);
+		$plotSize = $plotLevel->plotSize-1;
+		$plotBeginPos = $this->getPlotPosition($originPlot);
+		$plotBeginPos->y = 0;
+		$plugin = $this;
+		$selection = $styler->getSelection(99998);
+		$selection->setPosition(1, $plotBeginPos);
+		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX - 1, $plotBeginPos->z + $plotSize);
+		$selection->setPosition(2, $vec2);
+		$cuboid = Cuboid::fromSelection($selection);
+		$cuboid = $cuboid->async();
+		$cuboid->copy($plotBeginPos->level, $vec2, function (float $time, int $changed) use ($plugin) : void {
+			$plugin->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's to the MyPlot clipboard.');
+		});
+		$plotLevel = $this->getLevelSettings($clonePlot->levelName);
+		$plotSize = $plotLevel->plotSize-1;
+		$plotBeginPos = $this->getPlotPosition($clonePlot);
+		$selection->setPosition(1, $plotBeginPos);
+		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX - 1, $plotBeginPos->z + $plotSize);
+		$selection->setPosition(2, $vec2);
+		$commonShape = CommonShape::fromSelection($selection);
+		$commonShape = $commonShape->async();
+		$commonShape->paste($plotBeginPos->level, $vec2, true, function (float $time, int $changed) use ($plugin) : void {
+			$plugin->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from the MyPlot clipboard.');
+		});
+		$styler->removeSelection(99998);
+		return true;
 	}
 
 	/**

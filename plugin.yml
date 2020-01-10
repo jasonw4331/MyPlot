@@ -66,6 +66,8 @@ permissions:
         default: true
       myplot.command.pvp:
         default: true
+      myplot.command.clone:
+        default: true
   myplot.admin:
     default: op
     children:
@@ -112,6 +114,8 @@ permissions:
         children:
           myplot.admin.pvp.bypass:
             default: op
+      myplot.admin.clone:
+        default: op
   myplot.claimplots:
     default: op
     children:

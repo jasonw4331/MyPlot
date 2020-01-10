@@ -32,6 +32,8 @@ class PlotLevelSettings
 	public $disposePrice = 0;
 	/** @var int $resetPrice */
 	public $resetPrice = 0;
+	/** @var int $clonePrice */
+	public $clonePrice = 0;
 	/** @var bool $restrictEntityMovement */
 	public $restrictEntityMovement = true;
 	/** @var bool $restrictPVP */
@@ -64,6 +66,7 @@ class PlotLevelSettings
 			$this->clearPrice = self::parseNumber($settings, "ClearPrice", 0);
 			$this->disposePrice = self::parseNumber($settings, "DisposePrice", 0);
 			$this->resetPrice = self::parseNumber($settings, "ResetPrice", 0);
+			$this->clonePrice = self::parseNumber($settings, "ClonePrice", 0);
 			$this->restrictEntityMovement = self::parseBool($settings, "RestrictEntityMovement", true);
 			$this->restrictPVP = self::parseBool($settings, "RestrictPVP", false);
 			$this->updatePlotLiquids = self::parseBool($settings, "UpdatePlotLiquids", false);
