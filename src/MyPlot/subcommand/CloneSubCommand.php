@@ -40,7 +40,7 @@ class CloneSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
 		}
-		if($originPlot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.copy")) {
+		if($originPlot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.clone")) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
