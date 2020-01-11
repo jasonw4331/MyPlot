@@ -715,37 +715,25 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		$plot = $ev->getPlot();
-		$biome = Biome::getBiome(constant(Biome::class . "::" . $plot->biome) ?? Biome::PLAINS);
+		$biome = Biome::getBiome(defined(Biome::class."::".$plot->biome) ? constant(Biome::class . "::" . $plot->biome) : Biome::PLAINS);
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		if($plotLevel === null) {
 			return false;
 		}
 		$level = $this->getServer()->getLevelByName($plot->levelName);
-		$pos = $this->getPlotPosition($plot);
-		$plotSize = $plotLevel->plotSize;
-		$xMax = $pos->x + $plotSize;
-		$zMax = $pos->z + $plotSize;
-		$chunkIndexes = [];
-		for($x = (int)$pos->x; $x < $xMax; $x++) {
-			for($z = (int)$pos->z; $z < $zMax; $z++) {
-				$index = Level::chunkHash($x >> 4, $z >> 4);
-				if(!in_array($index, $chunkIndexes)) {
-					$chunkIndexes[] = $index;
+		$chunks = $this->getPlotChunks($plot);
+		foreach($chunks as $chunk) {
+			for($x = 0; $x < 16; ++$x) {
+				for($z = 0; $z < 16; ++$z) {
+					$chunkPlot = $this->getPlotByPosition(new Position(($chunk->getX() << 4) + $x, $plotLevel->groundHeight, ($chunk->getZ() << 4) + $z, $level));
+					if($chunkPlot instanceof Plot and $chunkPlot->isSame($plot)) {
+						$chunk->setBiomeId($x, $z, $biome->getId());
+					}
 				}
-				Level::getXZ($index, $cx, $cz);
-				$chunk = $level->getChunk($cx, $cz, true);
-				$chunk->setBiomeId($x, $z, $biome->getId());
 			}
+			$level->setChunk($chunk->getX(), $chunk->getZ(), $chunk, false);
 		}
-		foreach($chunkIndexes as $index) {
-			Level::getXZ($index, $cx, $cz);
-			$chunk = $level->getChunk($cx, $cz, true);
-			foreach($level->getViewersForPosition(new Vector3($cx, 0, $cz)) as $player) {
-				$player->onChunkChanged($chunk);
-			}
-		}
-		$this->savePlot($plot);
-		return true;
+		return $this->savePlot($plot);
 	}
 
 	/**
