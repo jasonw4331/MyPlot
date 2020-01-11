@@ -843,6 +843,9 @@ class MyPlot extends PluginBase
 	 */
 	public function getPlotChunks(Plot $plot) : array {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
+		if($plotLevel === null) {
+			return [];
+		}
 		$level = $this->getServer()->getLevelByName($plot->levelName);
 		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize;
