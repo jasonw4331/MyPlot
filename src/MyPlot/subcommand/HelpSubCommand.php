@@ -61,10 +61,10 @@ class HelpSubCommand extends SubCommand
 		/** @var SubCommand[][] $commands */
 		$pageNumber = (int) min(count($commands), $pageNumber);
 
-		$sender->sendMessage($this->translateString("help.header", [$pageNumber, count($commands)]));
+		$sender->sendMessage(TextFormat::GREEN.$this->translateString("help.header", [$pageNumber, count($commands)]));
 		foreach($commands[$pageNumber - 1] as $command) {
-			$sender->sendMessage(TextFormat::YELLOW . "Usage: " . TextFormat::WHITE . $command->getUsage());
-			$sender->sendMessage(TextFormat::YELLOW . "Description: " . TextFormat::WHITE . $command->getDescription());
+			$sender->sendMessage(TextFormat::BLUE . $command->getUsage().TextFormat::WHITE.":");
+			$sender->sendMessage(TextFormat::AQUA . $command->getDescription());
 		}
 		return true;
 	}
