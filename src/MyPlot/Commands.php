@@ -77,7 +77,7 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new PvpSubCommand($plugin, "pvp"));
 		$styler = $this->getPlugin()->getServer()->getPluginManager()->getPlugin("WorldStyler");
 		if($styler !== null) {
-			$this->loadSubCommand(new CloneSubCommand($plugin, "copy"));
+			$this->loadSubCommand(new CloneSubCommand($plugin, "clone"));
 		}
 		$plugin->getLogger()->debug("Commands Registered to MyPlot");
 
