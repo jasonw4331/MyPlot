@@ -518,52 +518,70 @@ class MyPlot extends PluginBase
 	 *
 	 * @api
 	 *
-	 * @param Plot $originPlot
-	 * @param Plot $clonePlot
+	 * @param Plot $plotFrom
+	 * @param Plot $plotTo
 	 *
 	 * @return bool
 	 */
-	public function clonePlot(Plot $originPlot, Plot $clonePlot) : bool {
+	public function clonePlot(Plot $plotFrom, Plot $plotTo) : bool {
 		$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
 		if(!$styler instanceof WorldStyler) {
 			return false;
 		}
-		$ev = new MyPlotCloneEvent($originPlot, $clonePlot);
+		foreach($this->getPlotChunks($plotTo) as $chunk) {
+			foreach($chunk->getEntities() as $entity) {
+				if($this->getPlotBB($plotTo)->isVectorInXZ($entity)) {
+					if($entity instanceof Player){
+						$this->teleportPlayerToPlot($entity, $plotTo);
+					}
+				}
+			}
+		}
+		$ev = new MyPlotCloneEvent($plotFrom, $plotTo);
 		$ev->call();
 		if($ev->isCancelled()) {
 			return false;
 		}
-		$originPlot = $ev->getPlot();
-		$clonePlot = $ev->getClonePlot();
-		if(!$this->isLevelLoaded($originPlot->levelName) or !$this->isLevelLoaded($clonePlot->levelName)) {
+		$plotFrom = $ev->getPlot();
+		$plotTo = $ev->getClonePlot();
+		if(!$this->isLevelLoaded($plotFrom->levelName) or !$this->isLevelLoaded($plotTo->levelName)) {
 			return false;
 		}
-		$plotLevel = $this->getLevelSettings($originPlot->levelName);
+		$plotLevel = $this->getLevelSettings($plotFrom->levelName);
 		$plotSize = $plotLevel->plotSize-1;
-		$plotBeginPos = $this->getPlotPosition($originPlot);
+		$plotBeginPos = $this->getPlotPosition($plotFrom);
+		$level = $plotBeginPos->level;
+		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
 		$plotBeginPos->y = 0;
 		$plugin = $this;
-		$selection = $styler->getSelection(99998);
+		$selection = $styler->getSelection(99997);
 		$selection->setPosition(1, $plotBeginPos);
-		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX - 1, $plotBeginPos->z + $plotSize);
+		$vec2 = new Vector3($plotBeginPos->x + $plotSize + 1, $level->getWorldHeight() - 1, $plotBeginPos->z + $plotSize + 1);
 		$selection->setPosition(2, $vec2);
 		$cuboid = Cuboid::fromSelection($selection);
-		$cuboid = $cuboid->async();
-		$cuboid->copy($plotBeginPos->level, $vec2, function (float $time, int $changed) use ($plugin) : void {
+		//$cuboid = $cuboid->async(); // do not use async because WorldStyler async is very broken right now
+		$cuboid->copy($level, $vec2, function (float $time, int $changed) use ($plugin) : void {
 			$plugin->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's to the MyPlot clipboard.');
 		});
-		$plotLevel = $this->getLevelSettings($clonePlot->levelName);
+
+		$plotLevel = $this->getLevelSettings($plotTo->levelName);
 		$plotSize = $plotLevel->plotSize-1;
-		$plotBeginPos = $this->getPlotPosition($clonePlot);
+		$plotBeginPos = $this->getPlotPosition($plotTo);
+		$level = $plotBeginPos->level;
+		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
+		$plotBeginPos->y = 0;
 		$selection->setPosition(1, $plotBeginPos);
-		$vec2 = new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX - 1, $plotBeginPos->z + $plotSize);
+		$vec2 = new Vector3($plotBeginPos->x + $plotSize + 1, $level->getWorldHeight() - 1, $plotBeginPos->z + $plotSize + 1);
 		$selection->setPosition(2, $vec2);
 		$commonShape = CommonShape::fromSelection($selection);
-		$commonShape = $commonShape->async();
-		$commonShape->paste($plotBeginPos->level, $vec2, true, function (float $time, int $changed) use ($plugin) : void {
+		//$commonShape = $commonShape->async(); // do not use async because WorldStyler async is very broken right now
+		$commonShape->paste($level, $vec2, true, function (float $time, int $changed) use ($plugin) : void {
 			$plugin->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from the MyPlot clipboard.');
 		});
-		$styler->removeSelection(99998);
+		$styler->removeSelection(99997);
+		foreach($this->getPlotChunks($plotTo) as $chunk) {
+			$level->setChunk($chunk->getX(), $chunk->getZ(), $chunk, false);
+		}
 		return true;
 	}
 
@@ -650,6 +668,9 @@ class MyPlot extends PluginBase
 				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
 			});
 			$styler->removeSelection(99998);
+			foreach($this->getPlotChunks($plot) as $chunk) {
+				$plotBeginPos->level->setChunk($chunk->getX(), $chunk->getZ(), $chunk, false);
+			}
 			$this->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this, $plot), 1);
 			return true;
 		}
