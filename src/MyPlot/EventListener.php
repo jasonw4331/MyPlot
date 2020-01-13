@@ -167,16 +167,18 @@ class EventListener implements Listener
 			return;
 		elseif($this->plugin->isPositionBorderingPlot($event->getBlock()) and $this->plugin->getLevelSettings($levelName)->editBorderBlocks) {
 			$plot = $this->plugin->getPlotBorderingPosition($event->getBlock());
-			$ev = new MyPlotBorderChangeEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
-			if($event->isCancelled()) {
-				$ev->setCancelled($event->isCancelled());
+			if($plot instanceof Plot) {
+				$ev = new MyPlotBorderChangeEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
+				if($event->isCancelled()) {
+					$ev->setCancelled($event->isCancelled());
+				}
+				$ev->call();
+				$event->setCancelled($ev->isCancelled());
+				$username = $event->getPlayer()->getName();
+				if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot"))
+					if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
+						return;
 			}
-			$ev->call();
-			$event->setCancelled($ev->isCancelled());
-			$username = $event->getPlayer()->getName();
-			if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot"))
-				if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
-					return;
 		}
 		$event->setCancelled();
 		$this->plugin->getLogger()->debug("Block placement/break/interaction of {$event->getBlock()->getName()} was cancelled at ".$event->getBlock()->asPosition()->__toString());
