@@ -7,8 +7,6 @@ use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -84,7 +82,7 @@ class ClearPlotTask extends Task {
 
 	public function onRun(int $currentTick) : void {
 		foreach($this->level->getEntities() as $entity) {
-			if($this->plotBB->isVectorInXZ($entity)) {
+			if($this->plotBB->isVectorInXZ($entity->getPosition())) {
 				if(!$entity instanceof Player) {
 					$entity->flagForDespawn();
 				}else{
@@ -122,7 +120,7 @@ class ClearPlotTask extends Task {
 		}
 		foreach($this->plugin->getPlotChunks($this->plot) as $chunk) {
 			foreach($chunk->getTiles() as $tile) {
-				if(($plot = $this->plugin->getPlotByPosition($tile)) != null) {
+				if(($plot = $this->plugin->getPlotByPosition($tile->getPos())) != null) {
 					if($this->plot->isSame($plot)) {
 						$tile->close();
 					}
