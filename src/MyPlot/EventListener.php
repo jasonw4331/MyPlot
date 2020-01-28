@@ -7,6 +7,7 @@ use MyPlot\events\MyPlotBorderChangeEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
+use pocketmine\block\Block;
 use pocketmine\block\Sapling;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -210,8 +211,8 @@ class EventListener implements Listener
 		$plotSize = $this->plugin->getLevelSettings($levelName)->plotSize;
 		$endPos->x += $plotSize;
 		$endPos->z += $plotSize;
-		$blocks = array_filter($event->getBlockList(), function($block) use ($beginPos, $endPos) {
-			if($block->x >= $beginPos->x and $block->z >= $beginPos->z and $block->x < $endPos->x and $block->z < $endPos->z) {
+		$blocks = array_filter($event->getBlockList(), function(Block $block) use ($beginPos, $endPos) {
+			if($block->getPos()->x >= $beginPos->x and $block->getPos()->z >= $beginPos->z and $block->getPos()->x < $endPos->x and $block->getPos()->z < $endPos->z) {
 				return true;
 			}
 			return false;
