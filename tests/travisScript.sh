@@ -31,7 +31,7 @@ echo ===
 
 echo Server plugins directory:
 ls plugins/*.phar
-php PocketMine-MP.phar --no-wizard --enable-ansi --settings.asyncworker=2 --debug.level=2 --debug.commands=true --disable-readline --settings.enable-dev-builds=1 --pluginchecker.target="$PLUGIN_NAME" < "$pmcommands_file" | tee stdout.log
+php PocketMine-MP.phar --no-wizard --enable-ansi --settings.asyncworker=4 --debug.level=2 --debug.commands=true --disable-readline --settings.enable-dev-builds=1 --pluginchecker.target="$PLUGIN_NAME" < "$pmcommands_file" | tee stdout.log
 
 rm plugins/"$PROJECT_NAME".phar
 
