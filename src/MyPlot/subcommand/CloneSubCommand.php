@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class CloneSubCommand extends SubCommand
@@ -33,9 +33,9 @@ class CloneSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("clone.wrongid"));
 			return true;
 		}
-		$levelName = $args[1] ?? $sender->getLevel()->getFolderName();
+		$levelName = $args[1] ?? $sender->getWorld()->getFolderName();
 		$selectedPlot = $this->getPlugin()->getProvider()->getPlot($levelName, (int) $plotIdArray[0], (int) $plotIdArray[1]);
-		$standingPlot = $this->getPlugin()->getPlotByPosition($sender);
+		$standingPlot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($standingPlot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;

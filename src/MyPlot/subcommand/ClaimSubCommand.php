@@ -28,7 +28,7 @@ class ClaimSubCommand extends SubCommand
 		if(isset($args[0])) {
 			$name = $args[0];
 		}
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;

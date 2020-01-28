@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot;
 
-use pocketmine\math\Vector3;
+use pocketmine\math\Facing;
 
 class Plot
 {
@@ -175,16 +175,16 @@ class Plot
 		$sidePlot = MyPlot::getInstance()->getPlotByPosition($sidePos);
 		if($sidePlot === null) {
 			switch($side) {
-				case Vector3::SIDE_NORTH:
+				case Facing::NORTH:
 					$sidePlot = new self($this->levelName, $this->X, $this->Z - $step);
 				break;
-				case Vector3::SIDE_SOUTH:
+				case Facing::SOUTH:
 					$sidePlot = new self($this->levelName, $this->X, $this->Z + $step);
 				break;
-				case Vector3::SIDE_WEST:
+				case Facing::WEST:
 					$sidePlot = new self($this->levelName, $this->X - $step, $this->Z);
 				break;
-				case Vector3::SIDE_EAST:
+				case Facing::EAST:
 					$sidePlot = new self($this->levelName, $this->X + $step, $this->Z);
 				break;
 				default:

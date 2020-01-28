@@ -65,7 +65,7 @@ class DenyPlayerSubCommand extends SubCommand
 					if($this->getPlugin()->getPlotBB($plot)->isVectorInside($player) and !($player->getName() === $plot->owner) and !$plot->isHelper($player->getName()))
 						$this->getPlugin()->teleportPlayerToPlot($player, $plot);
 				}
-			}elseif($this->getPlugin()->getPlotBB($plot)->isVectorInside($dplayer))
+			}elseif($this->getPlugin()->getPlotBB($plot)->isVectorInside($dplayer->getPosition()))
 				$this->getPlugin()->teleportPlayerToPlot($dplayer, $plot);
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
