@@ -718,7 +718,7 @@ class MyPlot extends PluginBase
 		$aabb = $this->getPlotBB($plotTo);
 		foreach($this->getPlotChunks($plotTo) as $chunk) {
 			foreach($chunk->getEntities() as $entity) {
-				if($aabb->isVectorInXZ($entity)) {
+				if($aabb->isVectorInXZ($entity->getPosition())) {
 					if($entity instanceof Player){
 						$this->teleportPlayerToPlot($entity, $plotTo);
 					}
