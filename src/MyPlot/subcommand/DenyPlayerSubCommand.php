@@ -62,7 +62,7 @@ class DenyPlayerSubCommand extends SubCommand
 			}
 			if($dplayer->getName() === "*") {
 				foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
-					if($this->getPlugin()->getPlotBB($plot)->isVectorInside($player) and !($player->getName() === $plot->owner) and !$plot->isHelper($player->getName()))
+					if($this->getPlugin()->getPlotBB($plot)->isVectorInside($player->getPosition()) and !($player->getName() === $plot->owner) and !$plot->isHelper($player->getName()))
 						$this->getPlugin()->teleportPlayerToPlot($player, $plot);
 				}
 			}elseif($this->getPlugin()->getPlotBB($plot)->isVectorInside($dplayer->getPosition()))
