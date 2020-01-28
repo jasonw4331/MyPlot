@@ -4,6 +4,7 @@ namespace MyPlot\task;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\level\Level;
@@ -18,7 +19,7 @@ class ClearPlotTask extends Task {
 	protected $plugin;
 	/** @var Plot $plot */
 	protected $plot;
-	/** @var Level $level */
+	/** @var \pocketmine\world\World|null $level */
 	protected $level;
 	/** @var int $height */
 	protected $height;
@@ -28,7 +29,7 @@ class ClearPlotTask extends Task {
 	protected $plotFillBlock;
 	/** @var Block $plotFloorBlock */
 	protected $plotFloorBlock;
-	/** @var Position $plotBeginPos */
+	/** @var \pocketmine\world\Position|null $plotBeginPos */
 	protected $plotBeginPos;
 	/** @var int $xMax */
 	protected $xMax;

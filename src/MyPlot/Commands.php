@@ -32,16 +32,18 @@ use MyPlot\subcommand\SetOwnerSubCommand;
 use MyPlot\subcommand\SubCommand;
 use MyPlot\subcommand\UnDenySubCommand;
 use MyPlot\subcommand\WarpSubCommand;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
+use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
-use pocketmine\network\mcpe\protocol\types\CommandData;
-use pocketmine\network\mcpe\protocol\types\CommandEnum;
-use pocketmine\network\mcpe\protocol\types\CommandParameter;
-use pocketmine\Player;
+use pocketmine\network\mcpe\protocol\types\command\CommandData;
+use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
+use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
+use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat;
 
-class Commands extends PluginCommand
+class Commands extends Command implements PluginIdentifiableCommand
 {
 	/** @var SubCommand[] $subCommands */
 	private $subCommands = [];
@@ -54,11 +56,12 @@ class Commands extends PluginCommand
 	 * @param MyPlot $plugin
 	 */
 	public function __construct(MyPlot $plugin) {
-		parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);
+		parent::__construct($plugin->getLanguage()->get("command.name"),
+			$plugin->getLanguage()->get("command.desc"),
+			$plugin->getLanguage()->get("command.usage"),
+			[$plugin->getLanguage()->get("command.alias")]
+		);
 		$this->setPermission("myplot.command");
-		$this->setAliases([$plugin->getLanguage()->get("command.alias")]);
-		$this->setDescription($plugin->getLanguage()->get("command.desc"));
-		$this->setUsage($plugin->getLanguage()->get("command.usage"));
 		$this->loadSubCommand(new HelpSubCommand($plugin, "help", $this));
 		$this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
 		$this->loadSubCommand(new GenerateSubCommand($plugin, "generate"));
@@ -95,9 +98,7 @@ class Commands extends PluginCommand
 
 		$autofill = $plugin->getServer()->getPluginManager()->getPlugin("EasyCommandAutofill");
 		if($autofill instanceof Main) {
-			$data = new CommandData();
-			$data->commandName = $this->getName();
-			$data->commandDescription = $this->getDescription();
+			$overloads = [];
 			$enumCount = 0;
 			$tree = 0;
 			ksort($this->subCommands, SORT_NATURAL | SORT_FLAG_CASE);
@@ -105,13 +106,11 @@ class Commands extends PluginCommand
 				$parameter = new CommandParameter();
 				$parameter->paramName = "MyPlotSubCommand";
 				$parameter->paramType = AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_FLAG_VALID | $enumCount++;
-				$enum = new CommandEnum();
-				$enum->enumName = $subCommandName;
-				$enum->enumValues = [$subCommandName];
+				$enum = new CommandEnum($subCommandName, [$subCommandName]);
 				$parameter->enum = $enum;
 				$parameter->flags = 1;
 				$parameter->isOptional = false;
-				$data->overloads[$tree][0] = $parameter;
+				$overloads[$tree][0] = $parameter;
 
 				$usage = $subCommand->getUsage();
 				$commandString = explode(" ", $usage)[0];
@@ -159,26 +158,28 @@ class Commands extends PluginCommand
 						$parameter->paramName = $paramName;
 						$parameter->paramType = $paramType;
 						$parameter->isOptional = $optional;
-						$data->overloads[$tree][$argNumber] = $parameter;
+						$overloads[$tree][$argNumber] = $parameter;
 					}else{
 						$enumValues = explode("|", $paramName);
 						$parameter = new CommandParameter();
 						$parameter->paramName = $paramName;
 						$parameter->paramType = AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_FLAG_VALID | $enumCount++;
-						$enum = new CommandEnum();
-						$enum->enumName = $data->commandName." Enum#".$enumCount; // TODO: change to readable name
-						$enum->enumValues = $enumValues;
+						$enum = new CommandEnum($this->getName()." Enum#".$enumCount, $enumValues);
 						$parameter->enum = $enum;
 						$parameter->flags = 1;
 						$parameter->isOptional = $optional;
-						$data->overloads[$tree][$argNumber] = $parameter;
+						$overloads[$tree][$argNumber] = $parameter;
 					}
 				}
 				$tree++;
 			}
-			$data->aliases = new CommandEnum();
-			$data->aliases->enumName = ucfirst($this->getName()) . "Aliases";
-			$data->aliases->enumValues = array_merge([$this->getName()], $this->getAliases());
+			$data = new CommandData($this->getName(),
+				$this->getDescription(),
+				0,
+				1,
+				new CommandEnum(ucfirst($this->getName()) . "Aliases", array_merge([$this->getName()], $this->getAliases())),
+				$overloads
+			);
 			$autofill->addManualOverride($this->getName(), $data);
 			$plugin->getLogger()->debug("Command Autofill Enabled");
 		}
@@ -246,5 +247,9 @@ class Commands extends PluginCommand
 			$sender->sendMessage(TextFormat::RED . $plugin->getLanguage()->get("command.unknown"));
 		}
 		return true;
+	}
+
+	public function getPlugin() : Plugin {
+		return MyPlot::getInstance();
 	}
 }
