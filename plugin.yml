@@ -67,7 +67,7 @@ permissions:
       myplot.command.pvp:
         default: true
       myplot.command.clone:
-        default: true
+        default: op
   myplot.admin:
     default: op
     children:
