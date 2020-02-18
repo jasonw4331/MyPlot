@@ -329,7 +329,7 @@ class EventListener implements Listener
 			$plot = $this->plugin->getPlotByPosition($damaged);
 			if($plot !== null) {
 				$ev = new MyPlotPvpEvent($plot, $damager, $damaged, $event);
-				if(($settings->restrictPVP or !$plot->pvp) and !$damager->hasPermission("myplot.admin.pvp.bypass")) {
+				if(!$plot->pvp and !$damager->hasPermission("myplot.admin.pvp.bypass")) {
 					$ev->setCancelled();
 					$this->plugin->getLogger()->debug("Cancelled pvp event in plot ".$plot->X.";".$plot->Z." on level '" . $levelName . "'");
 				}
