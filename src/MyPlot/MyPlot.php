@@ -43,6 +43,7 @@ use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 use PocketMoney\PocketMoney;
 use spoondetector\SpoonDetector;
+use function class_exists;
 
 class MyPlot extends PluginBase
 {
@@ -1034,10 +1035,10 @@ class MyPlot extends PluginBase
 	}
 
 	public function onEnable() : void {
-                if (!class_exist(SpoonDetector::class){
-                        $this->getLogger()->info("SpoonDetector virion not found!Please download from poggit or use devirion (not recommended)");
-                        $this->getServer()->getPluginManager()->disablePlugin($this);
-        }
+		if (class_exists(SpoonDetector::class)){
+			$this->getLogger()->error("SpoonDetector not found!Please download from poggit or use devirion (not recommended)");
+			$this->getServer()->getPluginManager()->disablePlugin($this);
+		}
 		SpoonDetector::printSpoon($this, "spoon.txt");
 		if($this->isDisabled()) {
 			return;
