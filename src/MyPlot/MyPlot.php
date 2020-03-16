@@ -1038,6 +1038,7 @@ class MyPlot extends PluginBase
 		if (class_exists(SpoonDetector::class)){
 			$this->getLogger()->error("SpoonDetector not found!Please download from poggit or use devirion (not recommended)");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
+			return;
 		}
 		SpoonDetector::printSpoon($this, "spoon.txt");
 		if($this->isDisabled()) {
