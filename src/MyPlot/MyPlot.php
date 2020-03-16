@@ -43,7 +43,6 @@ use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 use PocketMoney\PocketMoney;
 use spoondetector\SpoonDetector;
-use function class_exists;
 
 class MyPlot extends PluginBase
 {
@@ -955,6 +954,10 @@ class MyPlot extends PluginBase
 
 	/* -------------------------- Non-API part -------------------------- */
 	public function onLoad() : void {
+		if (\class_exists(SpoonDetector::class)) {
+			$this->getLogger()->critical("SpoonDetector Virion not found! Please re-download MyPlot from Poggit.");
+			return;
+		}
 		$this->getLogger()->debug(TF::BOLD."Loading...");
 		self::$instance = $this;
 		$this->getLogger()->debug(TF::BOLD . "Loading Configs");
@@ -1035,8 +1038,7 @@ class MyPlot extends PluginBase
 	}
 
 	public function onEnable() : void {
-		if (class_exists(SpoonDetector::class)){
-			$this->getLogger()->error("SpoonDetector not found!Please download from poggit or use devirion (not recommended)");
+		if (\class_exists(SpoonDetector::class)) {
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
