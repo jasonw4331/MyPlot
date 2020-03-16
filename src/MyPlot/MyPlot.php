@@ -1034,6 +1034,10 @@ class MyPlot extends PluginBase
 	}
 
 	public function onEnable() : void {
+                if (!class_exist(SpoonDetector::class){
+                        $this->getLogger()->info("SpoonDetector virion not found!Please download from poggit or use devirion (not recommended)");
+                        $this->getServer()->getPluginManager()->disablePlugin($this);
+        }
 		SpoonDetector::printSpoon($this, "spoon.txt");
 		if($this->isDisabled()) {
 			return;
