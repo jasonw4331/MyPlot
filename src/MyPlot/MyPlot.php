@@ -954,7 +954,7 @@ class MyPlot extends PluginBase
 
 	/* -------------------------- Non-API part -------------------------- */
 	public function onLoad() : void {
-		if (\class_exists(SpoonDetector::class)) {
+		if (!class_exists(SpoonDetector::class)) {
 			$this->getLogger()->critical("SpoonDetector Virion not found! Please re-download MyPlot from Poggit.");
 			return;
 		}
@@ -1038,7 +1038,7 @@ class MyPlot extends PluginBase
 	}
 
 	public function onEnable() : void {
-		if (\class_exists(SpoonDetector::class)) {
+		if (!class_exists(SpoonDetector::class)) {
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
