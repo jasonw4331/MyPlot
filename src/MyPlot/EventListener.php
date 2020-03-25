@@ -20,11 +20,11 @@ use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\item\Food;
 use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
-use pocketmine\item\Food;
 
 class EventListener implements Listener
 {
@@ -112,11 +112,8 @@ class EventListener implements Listener
 	 * @param PlayerInteractEvent $event
 	 */
 	public function onPlayerInteract(PlayerInteractEvent $event) : void {
-		if($event->getItem() instanceof Food){
-			//do nothing
-		}else{
+		if(!$event->getItem() instanceof Food)
 			$this->onEventOnBlock($event);
-		}
 	}
 
 	/**
