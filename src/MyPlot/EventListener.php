@@ -112,7 +112,7 @@ class EventListener implements Listener
 	 * @param PlayerInteractEvent $event
 	 */
 	public function onPlayerInteract(PlayerInteractEvent $event) : void {
-		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR and $event->getItem() instanceof Food)
+		if(($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK or $event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR) and $event->getItem() instanceof Food and $event->getBlock()->getLevel()->getTile($event->getBlock()) === null)
 			return;
 		$this->onEventOnBlock($event);
 	}
