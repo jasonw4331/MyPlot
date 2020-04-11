@@ -256,7 +256,7 @@ class EventListener implements Listener
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
-		if(!$settings->updatePlotLiquids and ($this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot or $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot)) {
+		if(!$settings->updatePlotLiquids and ($this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot or $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot or $this->plugin->isPositionBorderingPlot($event->getBlock()) or $this->plugin->isPositionBorderingPlot($event->getSource()))) {
 			$event->setCancelled();
 			$this->plugin->getLogger()->debug("Cancelled block spread of {$event->getBlock()->getName()} on " . $levelName);
 		}
