@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use jasonwynn10\EasyCommandAutofill\Main;
+use MyPlot\forms\MainForm;
 use MyPlot\subcommand\AddHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
 use MyPlot\subcommand\BiomeSubCommand;
@@ -34,6 +35,7 @@ use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\types\CommandData;
 use pocketmine\network\mcpe\protocol\types\CommandEnum;
 use pocketmine\network\mcpe\protocol\types\CommandParameter;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Commands extends PluginCommand
@@ -218,6 +220,11 @@ class Commands extends PluginCommand
 		}
 		if(!isset($args[0])) {
 			$args[0] = "help";
+			if($sender instanceof Player) {
+				/** @noinspection PhpParamsInspection */
+				$sender->sendForm(new MainForm($this->getPlugin(), $sender, $this->subCommands));
+				return true;
+			}
 		}
 		$subCommand = strtolower(array_shift($args));
 		if(isset($this->subCommands[$subCommand])) {
