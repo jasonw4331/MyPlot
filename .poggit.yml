@@ -6,4 +6,6 @@ projects:
     libs:
       - src: Falkirks/spoondetector/spoondetector
         version: ^0.0.1
+      - src: jojoe77777/FormAPI/libFormAPI
+          version: ^1.3.0
 ...
