@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
@@ -78,6 +79,11 @@ abstract class SubCommand implements PluginIdentifiableCommand
         $alias = $this->getPlugin()->getLanguage()->get($this->name . ".alias");
         return ($alias == $this->name . ".alias") ? "" : $alias;
     }
+
+	/**
+	 * @return MyPlotForm
+	 */
+	public abstract function getForm() : MyPlotForm;
 
 	/**
 	 * @param CommandSender $sender

@@ -9,7 +9,7 @@ use pocketmine\Player;
 
 class MainForm extends MyPlotForm {
 
-	/** @var string[] $link */
+	/** @var SubCommand[] $link */
 	private $link = [];
 
 	/**
@@ -31,15 +31,18 @@ class MainForm extends MyPlotForm {
 			$this->link[$i] = $name;
 		}
 
-		parent::__construct($plugin, function(Player $player, $data) {
-			var_dump($player->getName(), $data);
-			// TODO: open subcommand forms
+		parent::__construct($plugin, function(Player $player, ?MyPlotForm $data) {
+			if(is_null($data))
+				return;
+			$player->sendForm($data);
 		});
 	}
 
 	public function processData(&$data) : void {
 		if(is_int($data))
-			$data = $this->link[$data];
+			$data = $this->link[$data]->getForm();
+		elseif(is_null($data))
+			return;
 		else
 			throw new FormValidationException("Unexpected form data returned");
 	}
