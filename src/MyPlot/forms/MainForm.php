@@ -22,13 +22,11 @@ class MainForm extends MyPlotForm {
 	public function __construct(MyPlot $plugin, Player $player, array $subCommands) {
 		$this->setTitle($plugin->getLanguage()->get("form.title"));
 
-		$i = 0;
 		foreach($subCommands as $name => $command) {
 			if(!$command->canUse($player))
 				continue;
 			$this->addButton($name);
-			$i++;
-			$this->link[$i] = $name;
+			$this->link[] = $name;
 		}
 
 		parent::__construct($plugin, function(Player $player, ?MyPlotForm $data) {
