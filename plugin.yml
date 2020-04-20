@@ -68,6 +68,8 @@ permissions:
         default: true
       myplot.command.clone:
         default: true
+      myplot.command.find:
+        default: true
   myplot.admin:
     default: op
     children:
