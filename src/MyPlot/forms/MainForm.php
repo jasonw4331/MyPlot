@@ -20,7 +20,7 @@ class MainForm extends MyPlotForm {
 	 * @param SubCommand[] $subCommands
 	 */
 	public function __construct(MyPlot $plugin, Player $player, array $subCommands) {
-		$this->setTitle($plugin->getLanguage()->get("form.title"));
+		$this->setTitle($plugin->getLanguage()->translateString("form.header", ["Main Form"]));
 
 		foreach($subCommands as $name => $command) {
 			if(!$command->canUse($player))
