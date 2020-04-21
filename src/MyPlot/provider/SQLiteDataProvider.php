@@ -59,6 +59,7 @@ class SQLiteDataProvider extends DataProvider
 					(abs(Z) = :number AND abs(X) <= :number)
 				)
 			);");
+		$this->sqlGetPlotByNameAndLevel = $this->db->prepare("SELECT * FROM plots WHERE name = :name AND level = :level;");
 		$this->plugin->getLogger()->debug("SQLite data provider registered");
 	}
 
