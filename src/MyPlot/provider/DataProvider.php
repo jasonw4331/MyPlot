@@ -90,6 +90,14 @@ abstract class DataProvider
 	 * @return Plot[]
 	 */
 	public abstract function getPlotsByOwner(string $owner, string $levelName = "") : array;
+	
+	/**
+	 * @param string $name
+	 * @param string $levelName
+	 *
+	 * @return Plot|null
+	 */
+	public abstract function getPlotByName(string $name, string $levelName) : ?Plot;
 
 	/**
 	 * @param string $levelName
