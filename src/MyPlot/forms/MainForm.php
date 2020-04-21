@@ -26,7 +26,11 @@ class MainForm extends SimpleMyPlotForm {
 		foreach($subCommands as $name => $command) {
 			if(!$command->canUse($player) or $command->getForm() === null)
 				continue;
-			$this->addButton(TextFormat::YELLOW.strtoupper($name));
+			$name = (new \ReflectionClass($command))->getShortName();
+			$name = preg_replace('/([a-z])([A-Z])/s','$1 $2', $name);
+			$length = strlen($name) - strlen("Sub Command");
+			$name = substr($name, 0, $length);
+			$this->addButton(TextFormat::BLUE.ucfirst($name));
 			$this->link[] = $command;
 		}
 
