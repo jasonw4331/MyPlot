@@ -189,6 +189,29 @@ class SQLiteDataProvider extends DataProvider
 		});
 		return $plots;
 	}
+	
+	/**
+	 * @param string $name
+	 * @param string $levelName
+	 *
+	 * @return Plot|null
+	 */
+	public function getPlotByName(string $name, string $levelName) : ?Plot {
+		$stmt = $this->sqlGetPlotByNameAndLevel;
+		$stmt->bindValue(":level", $levelName, SQLITE3_TEXT);
+		$stmt->bindValue(":name", $name, SQLITE3_TEXT);
+		$stmt->reset();
+		$result = $stmt->execute();
+		if($val = $result->fetchArray(SQLITE3_ASSOC)) {
+			$helpers = explode(",", (string) $val["helpers"]);
+			$denied = explode(",", (string) $val["denied"]);
+			$pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
+			$plot = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], $pvp, (int) $val["id"]);
+			return $plot;
+		}else{
+			return null;
+		}
+	}
 
 	/**
 	 * @param string $levelName
