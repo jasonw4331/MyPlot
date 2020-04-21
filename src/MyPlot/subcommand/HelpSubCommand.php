@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use MyPlot\Commands;
+use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
@@ -67,5 +68,9 @@ class HelpSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::AQUA . $command->getDescription());
 		}
 		return true;
+	}
+
+	public function getForm() : ?MyPlotForm {
+		return null;
 	}
 }
