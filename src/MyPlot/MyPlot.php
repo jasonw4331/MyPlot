@@ -201,6 +201,20 @@ class MyPlot extends PluginBase
 	public function getPlotsOfPlayer(string $username, string $levelName) : array {
 		return $this->dataProvider->getPlotsByOwner($username, $levelName);
 	}
+	
+	/**
+	 * Get all the plots by name (in a certain level if $levelName is provided)
+	 *
+	 * @api
+	 *
+	 * @param string $name
+	 * @param string $levelName
+	 *
+	 * @return Plot|null
+	 */
+	public function getPlotOfName(string $name, string $levelName) : ?Plot {
+		return $this->dataProvider->getPlotByName($name, $levelName);
+	}
 
 	/**
 	 * Get the next free plot in a level
