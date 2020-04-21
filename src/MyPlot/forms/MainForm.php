@@ -27,7 +27,7 @@ class MainForm extends SimpleMyPlotForm {
 			if(!$command->canUse($player) or $command->getForm() === null)
 				continue;
 			$this->addButton(TextFormat::YELLOW.strtoupper($name));
-			$this->link[] = $name;
+			$this->link[] = $command;
 		}
 
 		parent::__construct($plugin, function(Player $player, ?MyPlotForm $data) use($plugin) {
