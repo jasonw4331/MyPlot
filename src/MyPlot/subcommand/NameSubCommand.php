@@ -36,6 +36,11 @@ class NameSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
+		$levelName = $plot->levelName;
+		if($this->getPlugin()->getPlotOfName($args[0], $levelName) !== null){
+			$sender->sendMessage(TextFormat::RED . $this->translateString("name.alwaysexist"));
+			return true;
+		}
 		if($this->getPlugin()->renamePlot($plot, $args[0])) {
 			$sender->sendMessage($this->translateString("name.success"));
 		}else{
