@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -50,5 +51,9 @@ class DisposeSubCommand extends SubCommand
 			$sender->sendMessage($this->translateString("dispose.confirm", [$plotId]));
 		}
 		return true;
+	}
+
+	public function getForm() : ?MyPlotForm {
+		return null;
 	}
 }
