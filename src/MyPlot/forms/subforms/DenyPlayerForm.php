@@ -18,7 +18,7 @@ class DenyPlayerForm extends ComplexMyPlotForm {
 			}, $plugin->getServer()->getOnlinePlayers())
 		);
 
-		parent::__construct($plugin, function(Player $player, string $data) use ($plugin) {
+		parent::__construct($plugin, function(Player $player, ?string $data) use ($plugin) {
 			if(is_null($data)) {
 				$player->getServer()->dispatchCommand($player, $this->plugin->getLanguage()->get("command.name"), true);
 				return;
