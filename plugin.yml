@@ -68,6 +68,8 @@ permissions:
         default: true
       myplot.command.clone:
         default: true
+      myplot.command.kick:
+        default: true
   myplot.admin:
     default: op
     children:
@@ -116,6 +118,11 @@ permissions:
             default: op
       myplot.admin.clone:
         default: op
+      myplot.admin.kick:
+        default: op
+        children:
+          myplot.admin.kick.bypass:
+            default: op
   myplot.claimplots:
     default: op
     children:
