@@ -2,6 +2,14 @@
 declare(strict_types=1);
 namespace MyPlot\forms;
 
+use MyPlot\Plot;
 use pocketmine\form\Form;
 
-interface MyPlotForm extends Form {}
+interface MyPlotForm extends Form {
+	/**
+	 * @param Plot $plot
+	 *
+	 * @return void
+	 */
+	public function setPlot(Plot $plot) : void;
+}

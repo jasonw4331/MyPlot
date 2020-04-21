@@ -30,9 +30,10 @@ class MainForm extends SimpleMyPlotForm {
 			$this->link[] = $name;
 		}
 
-		parent::__construct($plugin, function(Player $player, ?MyPlotForm $data) {
+		parent::__construct($plugin, function(Player $player, ?MyPlotForm $data) use($plugin) {
 			if(is_null($data))
 				return;
+			$data->setPlot($plugin->getPlotByPosition($player));
 			$player->sendForm($data);
 		});
 	}
