@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
+use MyPlot\forms\subforms\DenyPlayerForm;
 use pocketmine\command\CommandSender;
 use pocketmine\OfflinePlayer;
 use pocketmine\Player;
@@ -71,5 +73,9 @@ class DenyPlayerSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
 		return true;
+	}
+
+	public function getForm() : MyPlotForm {
+		return new DenyPlayerForm();
 	}
 }
