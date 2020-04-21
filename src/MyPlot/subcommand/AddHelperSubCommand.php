@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
-use MyPlot\forms\AddHelperForm;
 use MyPlot\forms\MyPlotForm;
+use MyPlot\forms\subforms\AddHelperForm;
 use pocketmine\command\CommandSender;
 use pocketmine\OfflinePlayer;
 use pocketmine\Player;
