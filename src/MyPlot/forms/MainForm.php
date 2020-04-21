@@ -24,7 +24,7 @@ class MainForm extends SimpleMyPlotForm {
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."MyPlot Forms List"]));
 
 		foreach($subCommands as $name => $command) {
-			if(!$command->canUse($player) and $command->getForm() !== null)
+			if(!$command->canUse($player) or $command->getForm() === null)
 				continue;
 			$this->addButton(TextFormat::YELLOW.strtoupper($name));
 			$this->link[] = $name;
