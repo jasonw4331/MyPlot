@@ -36,8 +36,8 @@ class FindSubCommand extends SubCommand
 
 		$sender->sendMessage(TextFormat::GREEN.$this->translateString("find.header"));
 		foreach($plots as $plot) {
-			$sender->sendMessage(TextFormat::BLUE.$plot->name.TextFormat::WHITE." by ".$plot->owner);
-			$sender->sendMessage(TextFormat::AQUA."located at: ".$plot->levelName." ".$plot->X.";".$plot->Z);
+			$sender->sendMessage(TextFormat::BLUE.$this->translateString("find.line1", [$plot->name.TextFormat::WHITE, $plot->owner]));
+			$sender->sendMessage(TextFormat::AQUA.$this->translateString("find.line1", [$plot->levelName, $plot->X.";".$plot->Z]));
 		}
 		return true;
 	}
