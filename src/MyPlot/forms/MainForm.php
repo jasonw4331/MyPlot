@@ -6,8 +6,9 @@ use MyPlot\MyPlot;
 use MyPlot\subcommand\SubCommand;
 use pocketmine\form\FormValidationException;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 
-class MainForm extends MyPlotForm {
+class MainForm extends SimpleMyPlotForm {
 
 	/** @var SubCommand[] $link */
 	private $link = [];
@@ -20,12 +21,12 @@ class MainForm extends MyPlotForm {
 	 * @param SubCommand[] $subCommands
 	 */
 	public function __construct(MyPlot $plugin, Player $player, array $subCommands) {
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", ["Main Form"]));
+		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."MyPlot Forms List"]));
 
 		foreach($subCommands as $name => $command) {
 			if(!$command->canUse($player))
 				continue;
-			$this->addButton($name);
+			$this->addButton(TextFormat::YELLOW.strtoupper($name));
 			$this->link[] = $name;
 		}
 
