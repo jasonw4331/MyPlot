@@ -210,6 +210,7 @@ class Commands extends PluginCommand
 	 * @param string[] $args
 	 *
 	 * @return bool
+	 * @throws \ReflectionException
 	 */
 	public function execute(CommandSender $sender, string $alias, array $args) : bool {
 		/** @var MyPlot $plugin */
@@ -221,8 +222,7 @@ class Commands extends PluginCommand
 		if(!isset($args[0])) {
 			$args[0] = "help";
 			if($sender instanceof Player) {
-				/** @noinspection PhpParamsInspection */
-				$sender->sendForm(new MainForm($this->getPlugin(), $sender, $this->subCommands));
+				$sender->sendForm(new MainForm($sender, $this->subCommands));
 				return true;
 			}
 		}
