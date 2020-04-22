@@ -9,6 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class RemoveHelperForm extends ComplexMyPlotForm {
 	public function __construct() {
+		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."Add Helper Form"]));
 		$this->addDropdown(
@@ -16,7 +17,7 @@ class RemoveHelperForm extends ComplexMyPlotForm {
 			$this->plot ? $this->plot->helpers : array_map(function($val) {return $val->getDisplayName();}, $plugin->getServer()->getOnlinePlayers())
 		);
 
-		parent::__construct($plugin, function(Player $player, ?string $data) use ($plugin) {
+		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {
 			if(is_null($data)) {
 				$player->getServer()->dispatchCommand($player, $this->plugin->getLanguage()->get("command.name"), true);
 				return;

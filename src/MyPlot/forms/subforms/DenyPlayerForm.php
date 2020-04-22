@@ -9,6 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class DenyPlayerForm extends ComplexMyPlotForm {
 	public function __construct() {
+		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."Deny Player Form"]));
 		$this->addDropdown(
@@ -18,7 +19,7 @@ class DenyPlayerForm extends ComplexMyPlotForm {
 			}, $plugin->getServer()->getOnlinePlayers())
 		);
 
-		parent::__construct($plugin, function(Player $player, ?string $data) use ($plugin) {
+		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {
 			if(is_null($data)) {
 				$player->getServer()->dispatchCommand($player, $this->plugin->getLanguage()->get("command.name"), true);
 				return;

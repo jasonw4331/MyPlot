@@ -16,11 +16,12 @@ class MainForm extends SimpleMyPlotForm {
 	/**
 	 * MainForm constructor.
 	 *
-	 * @param MyPlot $plugin
 	 * @param Player $player
 	 * @param SubCommand[] $subCommands
 	 */
-	public function __construct(MyPlot $plugin, Player $player, array $subCommands) {
+	public function __construct(Player $player, array $subCommands) {
+		parent::__construct(null);
+		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."MyPlot Forms List"]));
 
 		foreach($subCommands as $name => $command) {
@@ -34,7 +35,7 @@ class MainForm extends SimpleMyPlotForm {
 			$this->link[] = $command;
 		}
 
-		parent::__construct($plugin, function(Player $player, ?MyPlotForm $data) use($plugin) {
+		$this->setCallable(function(Player $player, ?MyPlotForm $data) use($plugin) {
 			if(is_null($data))
 				return;
 			$data->setPlot($plugin->getPlotByPosition($player));
