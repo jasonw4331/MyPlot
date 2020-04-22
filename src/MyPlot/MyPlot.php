@@ -954,10 +954,10 @@ class MyPlot extends PluginBase
 
 	/* -------------------------- Non-API part -------------------------- */
 	public function onLoad() : void {
-		/*if (!\class_exists(SpoonDetector::class)) {
+		if (!\class_exists(SpoonDetector::class)) {
 			$this->getLogger()->critical("SpoonDetector Virion not found! Please re-download MyPlot from Poggit.");
 			return;
-		} */
+		}
 		$this->getLogger()->debug(TF::BOLD."Loading...");
 		self::$instance = $this;
 		$this->getLogger()->debug(TF::BOLD . "Loading Configs");
@@ -1038,14 +1038,14 @@ class MyPlot extends PluginBase
 	}
 
 	public function onEnable() : void {
-		/*if (!\class_exists(SpoonDetector::class)) {
+		if (!\class_exists(SpoonDetector::class)) {
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
 		SpoonDetector::printSpoon($this, "spoon.txt");
 		if($this->isDisabled()) {
 			return;
-		}*/
+		}
 		$this->getLogger()->debug(TF::BOLD . "Loading economy settings");
 		// Initialize EconomyProvider
 		if($this->getConfig()->get("UseEconomy", false) === true) {
