@@ -3,26 +3,14 @@ declare(strict_types=1);
 namespace MyPlot\forms;
 
 use jojoe77777\FormAPI\SimpleForm;
-use MyPlot\MyPlot;
 use MyPlot\Plot;
 
 abstract class SimpleMyPlotForm extends SimpleForm implements MyPlotForm {
-
-	/** @var MyPlot $plugin */
-	protected $plugin;
 	/** @var Plot|null $plot */
 	protected $plot;
 
-	public function __construct(MyPlot $plugin, ?callable $callable) {
-		$this->plugin = $plugin;
+	public function __construct(?callable $callable) {
 		parent::__construct($callable);
-	}
-
-	/**
-	 * @return MyPlot
-	 */
-	public function getPlugin() : MyPlot {
-		return $this->plugin;
 	}
 
 	/**
