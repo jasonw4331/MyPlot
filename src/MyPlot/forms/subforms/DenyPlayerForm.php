@@ -4,19 +4,26 @@ namespace MyPlot\forms\subforms;
 
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
+use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class DenyPlayerForm extends ComplexMyPlotForm {
+	/** @var string[] $players */
+	private $players;
+
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."Deny Player Form"]));
+		$players = ["*"];
+		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
+			$players[] = $player->getDisplayName();
+			$this->players[] = $player->getName();
+		}
 		$this->addDropdown(
 			$plugin->getLanguage()->translateString("denyplayer.dropdown", [TextFormat::WHITE."Player Name"]),
-			array_map(function($val) {
-				return $val->getDisplayName();
-			}, $plugin->getServer()->getOnlinePlayers())
+			$players
 		);
 
 		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {
@@ -31,9 +38,9 @@ class DenyPlayerForm extends ComplexMyPlotForm {
 	public function processData(&$data) : void {
 		if(is_null($data))
 			return;
-		var_dump($data);
-		// TODO: convert dropdown return value to player name
-		$data = "player Name";
-		//throw new FormValidationException("Unexpected form data returned");
+		elseif(is_array($data))
+			$data = $this->players[$data[0]];
+		else
+			throw new FormValidationException("Unexpected form data returned");
 	}
 }
