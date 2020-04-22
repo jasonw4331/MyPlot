@@ -24,7 +24,7 @@ class MainForm extends SimpleMyPlotForm {
 	public function __construct(Player $player, array $subCommands) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."MyPlot Forms List"]));
+		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."MyPlot Forms List"]));
 
 		foreach($subCommands as $name => $command) {
 			if(!$command->canUse($player) or $command->getForm() === null)

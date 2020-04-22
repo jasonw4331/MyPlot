@@ -15,7 +15,7 @@ class AddHelperForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."Add Helper Form"]));
+		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Add Helper Form"]));
 		$players = ["*"];
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
 			$players[] = $player->getDisplayName();

@@ -4,6 +4,7 @@ namespace MyPlot\forms\subforms;
 
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
+use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -11,7 +12,7 @@ class UndenyPlayerForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."Undeny Player Form"]));
+		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Undeny Player Form"]));
 		$this->addDropdown(
 			$plugin->getLanguage()->translateString("denyplayer.dropdown", [TextFormat::WHITE."Player Name"]),
 			$this->plot ? $this->plot->denied : []
