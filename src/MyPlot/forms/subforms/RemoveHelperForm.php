@@ -14,7 +14,7 @@ class RemoveHelperForm extends ComplexMyPlotForm {
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::AQUA."Add Helper Form"]));
 		$this->addDropdown(
 			$plugin->getLanguage()->translateString("removehelper.dropdown", [TextFormat::WHITE."Helper Name"]),
-			$this->plot ? $this->plot->helpers : array_map(function($val) {return $val->getDisplayName();}, $plugin->getServer()->getOnlinePlayers())
+			$this->plot ? $this->plot->helpers : []
 		);
 
 		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {
