@@ -18,6 +18,8 @@ class MainForm extends SimpleMyPlotForm {
 	 *
 	 * @param Player $player
 	 * @param SubCommand[] $subCommands
+	 *
+	 * @throws \ReflectionException
 	 */
 	public function __construct(Player $player, array $subCommands) {
 		parent::__construct(null);
