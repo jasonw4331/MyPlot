@@ -4,6 +4,7 @@ namespace MyPlot\forms\subforms;
 
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
+use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -29,9 +30,9 @@ class RemoveHelperForm extends ComplexMyPlotForm {
 	public function processData(&$data) : void {
 		if(is_null($data))
 			return;
-		var_dump($data);
-		// TODO: convert dropdown return value to player name
-		$data = "player Name";
-		//throw new FormValidationException("Unexpected form data returned");
+		elseif(is_array($data))
+			$data = $this->plot->helpers[$data[0]];
+		else
+			throw new FormValidationException("Unexpected form data returned");
 	}
 }
