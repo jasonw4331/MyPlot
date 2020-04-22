@@ -21,10 +21,10 @@ class DenyPlayerForm extends ComplexMyPlotForm {
 
 		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {
 			if(is_null($data)) {
-				$player->getServer()->dispatchCommand($player, $this->plugin->getLanguage()->get("command.name"), true);
+				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
 				return;
 			}
-			$player->getServer()->dispatchCommand($player, $this->plugin->getLanguage()->get("command.name")." ".$this->plugin->getLanguage()->get("denyplayer.name")." \"$data\"", true);
+			$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("denyplayer.name")." \"$data\"", true);
 		});
 	}
 
