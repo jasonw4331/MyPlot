@@ -49,9 +49,7 @@ class KickSubCommand extends SubCommand
             $target->sendMessage($this->translateString("kick.attemptkick", [$target->getName()]));
             return true;
         }
-        $vector = $this->getPlugin()->getPlotPosition($plot)->add(0, 2, 0)->subtract(1, 0, 1);
-        $pos = new Position($vector->x, $vector->y, $vector->z, $target->getLevel());
-        if ($target->teleport($pos)) {
+        if ($target->teleport($this->getPlugin()->getPlotPosition($plot)->add(0, 2, 0)->subtract(1, 0, 1))) {
             $sender->sendMessage($this->translateString("kick.success1", [$target->getName(), $plot->__toString()]));
             $target->sendMessage($this->translateString("kick.success2", [$sender->getName(), $plot->__toString()]));
             return true;
