@@ -21,7 +21,6 @@ use MyPlot\subcommand\KickSubCommand;
 use MyPlot\subcommand\ListSubCommand;
 use MyPlot\subcommand\MiddleSubCommand;
 use MyPlot\subcommand\NameSubCommand;
-use MyPlot\subcommand\php;
 use MyPlot\subcommand\PvpSubCommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\ResetSubCommand;
