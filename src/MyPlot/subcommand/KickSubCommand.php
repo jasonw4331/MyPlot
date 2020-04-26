@@ -1,9 +1,10 @@
 <?php
+
 declare(strict_types=1);
+
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -14,7 +15,8 @@ class KickSubCommand extends SubCommand
      *
      * @return bool
      */
-    public function canUse(CommandSender $sender) : bool {
+    public function canUse(CommandSender $sender): bool
+    {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.kick");
     }
 
@@ -24,10 +26,11 @@ class KickSubCommand extends SubCommand
      *
      * @return bool
      */
-    public function execute(CommandSender $sender, array $args) : bool {
+    public function execute(CommandSender $sender, array $args): bool
+    {
         if (!isset($args[0])) return false;
         $plot = $this->getPlugin()->getPlotByPosition($sender);
-        if($plot === null) {
+        if ($plot === null) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
             return true;
         }
