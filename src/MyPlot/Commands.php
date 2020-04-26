@@ -76,7 +76,7 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
 		$this->loadSubCommand(new ListSubCommand($plugin, "list"));
 		$this->loadSubCommand(new PvpSubCommand($plugin, "pvp"));
-        $this->loadSubCommand(new KickSubCommand($plugin, "kick"));
+        	$this->loadSubCommand(new KickSubCommand($plugin, "kick"));
 		$styler = $this->getPlugin()->getServer()->getPluginManager()->getPlugin("WorldStyler");
 		if($styler !== null) {
 			$this->loadSubCommand(new CloneSubCommand($plugin, "clone"));
