@@ -1,10 +1,9 @@
 <?php
-
 declare(strict_types=1);
-
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
+use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -15,8 +14,7 @@ class KickSubCommand extends SubCommand
      *
      * @return bool
      */
-    public function canUse(CommandSender $sender): bool
-    {
+    public function canUse(CommandSender $sender) : bool {
         return ($sender instanceof Player) and $sender->hasPermission("myplot.command.kick");
     }
 
@@ -26,11 +24,10 @@ class KickSubCommand extends SubCommand
      *
      * @return bool
      */
-    public function execute(CommandSender $sender, array $args): bool
-    {
+    public function execute(CommandSender $sender, array $args) : bool {
         if (!isset($args[0])) return false;
         $plot = $this->getPlugin()->getPlotByPosition($sender);
-        if ($plot === null) {
+        if($plot === null) {
             $sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
             return true;
         }
@@ -52,7 +49,7 @@ class KickSubCommand extends SubCommand
             $target->sendMessage($this->translateString("kick.attemptkick", [$target->getName()]));
             return true;
         }
-        if ($target->teleport($this->getPlugin()->getPlotPosition($plot)->add(0, 2, 0)->subtract(1, 0, 1))) {
+        if ($this->getPlugin()->teleportPlayerToPlot($target, $plot)) {
             $sender->sendMessage($this->translateString("kick.success1", [$target->getName(), $plot->__toString()]));
             $target->sendMessage($this->translateString("kick.success2", [$sender->getName(), $plot->__toString()]));
             return true;
