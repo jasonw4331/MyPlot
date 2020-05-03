@@ -46,7 +46,7 @@ class AutoSubCommand extends SubCommand
 		return true;
 	}
 
-	public function getForm() : ?MyPlotForm {
+	public function getForm(?Player $player = null) : ?MyPlotForm {
 		return null;
 	}
 }

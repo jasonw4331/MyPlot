@@ -74,7 +74,7 @@ class BiomeSubCommand extends SubCommand
 		return true;
 	}
 
-	public function getForm() : ?MyPlotForm {
+	public function getForm(?Player $player = null) : ?MyPlotForm {
 		return new BiomeForm(array_keys($this->biomes));
 	}
 }

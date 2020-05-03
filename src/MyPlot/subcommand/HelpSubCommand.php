@@ -6,6 +6,7 @@ use MyPlot\Commands;
 use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class HelpSubCommand extends SubCommand
@@ -70,7 +71,7 @@ class HelpSubCommand extends SubCommand
 		return true;
 	}
 
-	public function getForm() : ?MyPlotForm {
+	public function getForm(?Player $player = null) : ?MyPlotForm {
 		return null;
 	}
 }

@@ -54,7 +54,7 @@ class UnDenySubCommand extends SubCommand
 		return true;
 	}
 
-	public function getForm() : MyPlotForm {
+	public function getForm(?Player $player = null) : MyPlotForm {
 		return new UndenyPlayerForm();
 	}
 }

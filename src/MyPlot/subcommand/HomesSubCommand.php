@@ -44,7 +44,7 @@ class HomesSubCommand extends SubCommand
 		return true;
 	}
 
-	public function getForm() : ?MyPlotForm {
+	public function getForm(?Player $player = null) : ?MyPlotForm {
 		return null; // we can just list homes in the home form
 	}
 }
