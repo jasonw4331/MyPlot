@@ -6,7 +6,7 @@ use jojoe77777\FormAPI\CustomForm;
 use MyPlot\Plot;
 
 abstract class ComplexMyPlotForm extends CustomForm implements MyPlotForm {
-	/** @var Plot $plot */
+	/** @var Plot|null $plot */
 	protected $plot;
 
 	public function __construct(?callable $callable) {
@@ -14,16 +14,16 @@ abstract class ComplexMyPlotForm extends CustomForm implements MyPlotForm {
 	}
 
 	/**
-	 * @param Plot $plot
+	 * @param Plot|null $plot
 	 */
-	public function setPlot(Plot $plot) : void {
+	public function setPlot(?Plot $plot) : void {
 		$this->plot = $plot;
 	}
 
 	/**
-	 * @return Plot
+	 * @return Plot|null
 	 */
-	public function getPlot() : Plot {
+	public function getPlot() : ?Plot {
 		return $this->plot;
 	}
 }
