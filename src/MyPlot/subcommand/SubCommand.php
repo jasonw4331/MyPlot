@@ -82,6 +82,8 @@ abstract class SubCommand implements PluginIdentifiableCommand
     }
 
 	/**
+	 * @param Player|null $player
+	 *
 	 * @return MyPlotForm|null
 	 */
 	public abstract function getForm(?Player $player = null) : ?MyPlotForm;
