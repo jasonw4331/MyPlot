@@ -5,6 +5,7 @@ namespace MyPlot\forms\subforms;
 
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
+use MyPlot\Plot;
 use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -23,7 +24,10 @@ class GenerateForm extends ComplexMyPlotForm {
 
 		foreach($plugin->getConfig()->get("DefaultWorld", []) as $key => $value) {
 			if(is_numeric($value)) {
-				$this->addSlider($key, 1, 4 * $value, -1, $value);
+				if($value > 0)
+					$this->addSlider($key, 1, 4 * $value, -1, $value);
+				else
+					$this->addSlider($key, 1, 1000, -1, $value);
 			}elseif(is_bool($value)) {
 				$this->addToggle($key, $value);
 			}elseif(is_string($value)) {
@@ -32,22 +36,35 @@ class GenerateForm extends ComplexMyPlotForm {
 			$this->keys[] = $key;
 		}
 
+		$this->keys[] = "teleport"; // added option to end of keys for data parsing
+		$this->addToggle("Teleport After Generated", true);
+
 		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
 			if(is_null($data)) {
 				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
 				return;
 			}
-			$plugin->generateLevel(array_shift($data), array_shift($data), $data);
+			$teleport = array_pop($data);
+			$world = array_shift($data);
+			$plugin->generateLevel($world, array_shift($data), $data);
+			if($teleport)
+				$plugin->teleportPlayerToPlot($player, new Plot($world, 0, 0));
 		});
 	}
 
 	public function processData(&$data) : void {
 		if(is_null($data))
 			return;
-		var_dump($data);
-		//elseif(is_array($data))
-		//	$data = $this->keys[$data[0]];
-		//else
-		//	throw new FormValidationException("Unexpected form data returned");
+		elseif(is_array($data)) {
+			$copy = [];
+			foreach($data as $key => $value) {
+				if(isset($this->keys[$key-2]))
+					$copy[$this->keys[$key-2]] = $value;
+				else
+					$copy[] = $value;
+			}
+			$data = $copy;
+		}else
+			throw new FormValidationException("Unexpected form data returned");
 	}
 }
