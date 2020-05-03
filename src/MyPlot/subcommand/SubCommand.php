@@ -6,6 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
 abstract class SubCommand implements PluginIdentifiableCommand
@@ -83,7 +84,7 @@ abstract class SubCommand implements PluginIdentifiableCommand
 	/**
 	 * @return MyPlotForm|null
 	 */
-	public abstract function getForm() : ?MyPlotForm;
+	public abstract function getForm(?Player $player = null) : ?MyPlotForm;
 
 	/**
 	 * @param CommandSender $sender

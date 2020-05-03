@@ -27,7 +27,7 @@ class MainForm extends SimpleMyPlotForm {
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."MyPlot Forms List"]));
 
 		foreach($subCommands as $name => $command) {
-			if(!$command->canUse($player) or $command->getForm() === null)
+			if(!$command->canUse($player) or $command->getForm($player) === null)
 				continue;
 			$name = (new \ReflectionClass($command))->getShortName();
 			$name = preg_replace('/([a-z])([A-Z])/s','$1 $2', $name);
