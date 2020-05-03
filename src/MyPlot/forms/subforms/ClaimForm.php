@@ -73,8 +73,8 @@ class ClaimForm extends ComplexMyPlotForm {
 	public function processData(&$data) : void {
 		if(is_null($data))
 			return;
-		elseif(is_array($data) and is_numeric($data[0]) and is_numeric($data[1]) and !empty($data[2]))
-			$data = MyPlot::getInstance()->getProvider()->getPlot($data[2], (int)$data[0], (int)$data[1]);
+		elseif(is_array($data) and is_numeric($data[0]) and is_numeric($data[1]))
+			$data = MyPlot::getInstance()->getProvider()->getPlot(empty($data[2]) ? $this->player->getLevel()->getFolderName() : $data[2], (int)$data[0], (int)$data[1]);
 		elseif(is_array($data) and empty($data[0]) and empty($data[1])) {
 			$plot = MyPlot::getInstance()->getPlotByPosition($this->player);
 			if($plot === null) {
