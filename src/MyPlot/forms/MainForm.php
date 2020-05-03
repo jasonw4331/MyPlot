@@ -12,6 +12,8 @@ class MainForm extends SimpleMyPlotForm {
 
 	/** @var SubCommand[] $link */
 	private $link = [];
+	/** @var Player|null $player */
+	private $player;
 
 	/**
 	 * MainForm constructor.
@@ -45,9 +47,14 @@ class MainForm extends SimpleMyPlotForm {
 		});
 	}
 
+	public function handleResponse(Player $player, $data) : void {
+		$this->player = $player;
+		parent::handleResponse($player, $data);
+	}
+
 	public function processData(&$data) : void {
 		if(is_int($data))
-			$data = $this->link[$data]->getForm();
+			$data = $this->link[$data]->getForm($this->player);
 		elseif(is_null($data))
 			return;
 		else
