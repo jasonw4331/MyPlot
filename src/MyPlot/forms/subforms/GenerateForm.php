@@ -44,11 +44,19 @@ class GenerateForm extends ComplexMyPlotForm {
 				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
 				return;
 			}
-			$teleport = array_pop($data);
 			$world = array_shift($data);
-			$plugin->generateLevel($world, array_shift($data), $data);
-			if($teleport)
-				$plugin->teleportPlayerToPlot($player, new Plot($world, 0, 0));
+			if($player->getServer()->isLevelGenerated($world)) {
+				$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("generate.exists", [$world]));
+				return;
+			}
+			$teleport = array_pop($data);
+			if($plugin->generateLevel($world, array_shift($data), $data)) {
+				if($teleport)
+					$plugin->teleportPlayerToPlot($player, new Plot($world, 0, 0));
+				$player->sendMessage($plugin->getLanguage()->translateString("generate.success", [$world]));
+			}else{
+				$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("generate.error"));
+			}
 		});
 	}
 
