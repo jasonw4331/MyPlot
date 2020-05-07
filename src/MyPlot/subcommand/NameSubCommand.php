@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
+use MyPlot\forms\subforms\NameForm;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -42,5 +44,9 @@ class NameSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
 		return true;
+	}
+
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		return new NameForm($player, false);
 	}
 }
