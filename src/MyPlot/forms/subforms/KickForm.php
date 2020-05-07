@@ -20,7 +20,7 @@ class KickForm extends ComplexMyPlotForm {
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Add Helper Form"]));
 		$players = [];
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
-			if(!$plugin->getPlotByPosition($player)->isSame($this->plot))
+			if(isset($this->plot) and !$plugin->getPlotByPosition($player)->isSame($this->plot))
 				continue;
 			$players[] = $player->getDisplayName();
 			$this->players[] = $player->getName();
