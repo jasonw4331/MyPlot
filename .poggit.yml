@@ -6,4 +6,6 @@ projects:
     libs:
       - src: dktapps-pm-pl/pmforms/pmforms
         version: ^1.0.0
+    lint:
+      phpstan: false
 ...
