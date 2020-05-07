@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace MyPlot\forms\subforms;
 
-
 use MyPlot\forms\SimpleMyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\form\FormValidationException;

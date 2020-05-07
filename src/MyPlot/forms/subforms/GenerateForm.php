@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace MyPlot\forms\subforms;
 
-
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
