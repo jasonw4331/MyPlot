@@ -27,7 +27,7 @@ class WarpForm extends ComplexMyPlotForm {
 		$this->addInput("Plot Z Coordinate", "-4");
 		$this->addInput("Plot World", "world", $player->getLevel()->getFolderName());
 
-		$this->setCallable(function(Player $player, ?Plot $data) use ($plugin) {
+		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
 			if(is_null($data)) {
 				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
 				return;
