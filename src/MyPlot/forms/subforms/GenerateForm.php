@@ -11,7 +11,7 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class GenerateForm extends ComplexMyPlotForm {
-	/** @var string[] $players */
+	/** @var string[] $keys */
 	private $keys = [];
 
 	public function __construct() {
