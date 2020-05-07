@@ -6,4 +6,6 @@ projects:
     libs:
       - src: Falkirks/spoondetector/spoondetector
         version: ^0.0.1
+    lint:
+      phpstan: false
 ...
