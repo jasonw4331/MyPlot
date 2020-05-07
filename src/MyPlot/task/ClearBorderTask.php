@@ -68,7 +68,7 @@ class ClearBorderTask extends Task {
 					$block = $this->plotWallBlock;
 				elseif($y === $this->height)
 					$block = $this->roadBlock;
-				elseif($y < $this->height)
+				else//if($y < $this->height)
 					$block = $this->groundBlock;
 				$this->level->setBlock(new Vector3($x, $y, $this->plotBeginPos->z), $block, false, false);
 				$this->level->setBlock(new Vector3($x, $y, $this->zMax), $block, false, false);
@@ -82,7 +82,7 @@ class ClearBorderTask extends Task {
 					$block = $this->plotWallBlock;
 				elseif($y === $this->height)
 					$block = $this->roadBlock;
-				elseif($y < $this->height)
+				else//if($y < $this->height)
 					$block = $this->groundBlock;
 				$this->level->setBlock(new Vector3($this->plotBeginPos->x, $y, $z), $block, false, false);
 				$this->level->setBlock(new Vector3($this->xMax, $y, $z), $block, false, false);
