@@ -1056,20 +1056,6 @@ class MyPlot extends PluginBase
 				}else
 				$this->getLogger()->debug("Eco not instance of EconomyAPI");
 			}
-			elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("EssentialsPE")) !== null) {
-				if($plugin instanceof Loader) {
-					$this->economyProvider = new EssentialsPEProvider($plugin);
-					$this->getLogger()->debug("Eco set to EssentialsPE");
-				}else
-				$this->getLogger()->debug("Eco not instance of EssentialsPE");
-			}
-			elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
-				if($plugin instanceof PocketMoney) {
-					$this->economyProvider = new PocketMoneyProvider($plugin);
-					$this->getLogger()->debug("Eco set to PocketMoney");
-				}else
-				$this->getLogger()->debug("Eco not instance of PocketMoney");
-			}
 			if(!isset($this->economyProvider)) {
 				$this->getLogger()->info("No supported economy plugin found!");
 				$this->getConfig()->set("UseEconomy", false);

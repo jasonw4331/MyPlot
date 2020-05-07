@@ -25,13 +25,9 @@ before_script:
  - cd ${TRAVIS_BUILD_DIR}
  - chmod 777 ${TRAVIS_BUILD_DIR}/tests/travisScript.sh
  - chmod 777 ${TRAVIS_BUILD_DIR}/tests/lint.sh
- - curl -sSLO https://github.com/phpstan/phpstan/releases/download/0.12.3/phpstan.phar
- - curl https://phar.phpunit.de/phpunit-7.phar --silent --location -o phpunit.phar
 
 script:
  - ${TRAVIS_BUILD_DIR}/tests/lint.sh -p php -d ${TRAVIS_BUILD_DIR}/src/MyPlot
- - php phpstan.phar analyze --no-progress --memory-limit=2G || exit 1
-# - (php phpunit.phar --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit || exit 1) | bash -s -
  - cd ${TRAVIS_BUILD_DIR}/../PocketMine && ls
  - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh MyPlot MyPlot
  - sed -i 's/world/Plots/' server.properties
