@@ -14,8 +14,10 @@ class NameForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Rename Form"]));
 
-		if(isset($this->plot))
-			$this->addInput("New Plot Title", $player->getDisplayName()."'s Plot", $this->plot->name);
+		if(!isset($this->plot))
+			$this->plot = $plugin->getPlotByPosition($player);
+
+		$this->addInput("New Plot Title", $player->getDisplayName()."'s Plot", $this->plot->name);
 
 		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {
 			if(is_null($data)) {
