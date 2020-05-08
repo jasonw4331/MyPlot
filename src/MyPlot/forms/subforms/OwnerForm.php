@@ -12,7 +12,7 @@ class OwnerForm extends ComplexMyPlotForm {
 	/** @var string[] $players */
 	private $players = [];
 
-	public function __construct(Player $player) {
+	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Owner Form"]));

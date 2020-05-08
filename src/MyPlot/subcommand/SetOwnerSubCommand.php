@@ -54,6 +54,6 @@ class SetOwnerSubCommand extends SubCommand {
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new OwnerForm($player);
+		return new OwnerForm();
 	}
 }
