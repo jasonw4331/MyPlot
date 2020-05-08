@@ -70,6 +70,6 @@ class InfoSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new InfoForm();
+		return new InfoForm($player);
 	}
 }

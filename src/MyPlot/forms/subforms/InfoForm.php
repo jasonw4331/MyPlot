@@ -10,16 +10,13 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class InfoForm extends ComplexMyPlotForm {
-	/** @var string[] $players */
-	private $players = ["*"];
-
-	public function __construct() {
+	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Info Form"]));
 
 		if(!isset($this->plot))
-			return;
+			$this->plot = $plugin->getPlotByPosition($player);
 
 		$this->addLabel((string)$this->plot);
 		$this->addInput("Owner", "owner", $this->plot->owner);
