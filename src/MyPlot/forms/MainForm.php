@@ -41,7 +41,7 @@ class MainForm extends SimpleMyPlotForm {
 			$this->link[] = $command;
 		}
 
-		$this->setCallable(function(Player $player, ?MyPlotForm $data) use($plugin) {
+		$this->setCallable(function(Player $player, ?MyPlotForm $data) {
 			if(is_null($data))
 				return;
 			$data->setPlot($this->plot);
