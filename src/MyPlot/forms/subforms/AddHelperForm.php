@@ -38,12 +38,9 @@ class AddHelperForm extends ComplexMyPlotForm {
 	public function processData(&$data) : void {
 		if(is_null($data))
 			return;
-		elseif(is_array($data)) {
-			$key = array_search($data[0], $this->players);
-			if($key === false)
-				throw new FormValidationException("Invalid form data returned");
-			$data = $this->players[$key];
-		}else
+		elseif(is_array($data))
+			$data = $this->players[$data[0]];
+		else
 			throw new FormValidationException("Unexpected form data returned");
 	}
 }
