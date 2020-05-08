@@ -20,11 +20,11 @@ class BiomeForm extends SimpleMyPlotForm {
 	public function __construct(array $biomes) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Biome Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Biome Form"]));
 
 		$this->biomeNames = $biomes;
 		foreach($biomes as $biomeName) {
-			$this->addButton($biomeName); // TODO: add images
+			$this->addButton(TextFormat::DARK_RED.ucfirst(strtolower(str_replace("_", " ", $biomeName)))); // TODO: add images
 		}
 
 		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {

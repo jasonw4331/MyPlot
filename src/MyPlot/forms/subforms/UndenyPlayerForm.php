@@ -12,10 +12,12 @@ class UndenyPlayerForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Undeny Player Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Undeny Player Form"]));
 		$this->addDropdown(
-			$plugin->getLanguage()->translateString("denyplayer.dropdown", [TextFormat::WHITE."Player Name"]),
-			$this->plot ? $this->plot->denied : []
+			$plugin->getLanguage()->translateString("denyplayer.dropdown", ["Player Name"]),
+			$this->plot ? array_map(function(string $text) {
+				return TextFormat::DARK_BLUE.$text;
+			}, $this->plot->denied) : []
 		);
 
 		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {

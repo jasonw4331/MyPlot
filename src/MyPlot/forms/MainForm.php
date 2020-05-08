@@ -26,7 +26,7 @@ class MainForm extends SimpleMyPlotForm {
 	public function __construct(Player $player, array $subCommands) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Main Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Main Form"]));
 
 		$this->plot = $plugin->getPlotByPosition($player);
 
@@ -37,7 +37,7 @@ class MainForm extends SimpleMyPlotForm {
 			$name = preg_replace('/([a-z])([A-Z])/s','$1 $2', $name);
 			$length = strlen($name) - strlen("Sub Command");
 			$name = substr($name, 0, $length);
-			$this->addButton(TextFormat::BLUE.ucfirst($name));
+			$this->addButton(TextFormat::DARK_RED.ucfirst($name));
 			$this->link[] = $command;
 		}
 

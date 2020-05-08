@@ -15,15 +15,17 @@ class AddHelperForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Add Helper Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Add Helper Form"]));
 		$players = ["*"];
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
 			$players[] = $player->getDisplayName();
 			$this->players[] = $player->getName();
 		}
 		$this->addDropdown(
-			$plugin->getLanguage()->translateString("addhelper.dropdown", [TextFormat::WHITE."Helper Name"]),
-			$players
+			$plugin->getLanguage()->translateString("addhelper.dropdown", ["Helper Name"]),
+			array_map(function(string $text) {
+				return TextFormat::DARK_BLUE.$text;
+			}, $players)
 		);
 
 		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {

@@ -17,17 +17,17 @@ class CloneForm extends ComplexMyPlotForm {
 	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Clone Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Clone Form"]));
 
 		$this->addLabel("Origin Plot Location");
 		$this->addInput("Plot X Coordinate", "2");
 		$this->addInput("Plot Z Coordinate", "-4");
-		$this->addInput("Plot World", "world", $player->getLevel()->getFolderName());
+		$this->addInput("Plot World Name", "world", $player->getLevel()->getFolderName());
 
 		$this->addLabel("Clone Plot Location");
 		$this->addInput("Plot X Coordinate", "2");
 		$this->addInput("Plot Z Coordinate", "-4");
-		$this->addInput("Plot World", "world", $player->getLevel()->getFolderName());
+		$this->addInput("Plot World Name", "world", $player->getLevel()->getFolderName());
 
 		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
 			if(is_null($data)) {

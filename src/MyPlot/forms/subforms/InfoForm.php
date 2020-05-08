@@ -13,7 +13,7 @@ class InfoForm extends ComplexMyPlotForm {
 	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Info Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Info Form"]));
 
 		if(!isset($this->plot))
 			$this->plot = $plugin->getPlotByPosition($player);
@@ -21,9 +21,22 @@ class InfoForm extends ComplexMyPlotForm {
 		$this->addLabel("Plot ".(string)$this->plot);
 		$this->addInput("Owner", "owner", $this->plot->owner);
 		$this->addInput("Plot Name", "name", $this->plot->name);
-		$this->addDropdown("Helpers", $this->plot->helpers);
-		$this->addDropdown("Denied", $this->plot->denied);
-		$this->addDropdown("Biome", array_keys(BiomeSubCommand::BIOMES), (int)array_search($this->plot->biome, array_keys(BiomeSubCommand::BIOMES)));
+		$this->addDropdown("Helpers",
+			array_map(function(string $text) {
+				return TextFormat::DARK_BLUE.$text;
+			}, $this->plot->helpers)
+		);
+		$this->addDropdown("Denied",
+			array_map(function(string $text) {
+				return TextFormat::DARK_BLUE.$text;
+			}, $this->plot->denied)
+		);
+		$this->addDropdown("Biome",
+			array_map(function(string $text) {
+				return TextFormat::DARK_BLUE.ucfirst(strtolower(str_replace("_", " ", $text)));
+			}, array_keys(BiomeSubCommand::BIOMES)),
+			(int)array_search($this->plot->biome, array_keys(BiomeSubCommand::BIOMES))
+		);
 		$this->addToggle("PvP", $this->plot->pvp);
 
 		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {

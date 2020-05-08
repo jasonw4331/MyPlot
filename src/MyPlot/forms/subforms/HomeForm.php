@@ -15,12 +15,12 @@ class HomeForm extends SimpleMyPlotForm {
 	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Home Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Homes Form"]));
 
 		$this->plots = $plugin->getPlotsOfPlayer($player->getName(), $player->getLevel()->getFolderName());
 		$i = 1;
 		foreach($this->plots as $plot) {
-			$this->addButton(TextFormat::DARK_GREEN.$i++.") ".TextFormat::BLUE.$plot->name." ".(string)$plot);
+			$this->addButton(TextFormat::DARK_RED.$i++.") ".$plot->name." ".(string)$plot);
 		}
 
 		$this->setCallable(function(Player $player, ?int $data) use ($plugin) {

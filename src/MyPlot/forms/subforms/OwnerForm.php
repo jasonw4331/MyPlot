@@ -15,7 +15,7 @@ class OwnerForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Owner Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Owner Form"]));
 
 		$players = [];
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
@@ -23,7 +23,7 @@ class OwnerForm extends ComplexMyPlotForm {
 			$this->players[] = $player->getName();
 		}
 		$this->addDropdown(
-			$plugin->getLanguage()->translateString("setowner.dropdown", [TextFormat::WHITE."Player Name"]),
+			$plugin->getLanguage()->translateString("setowner.dropdown", ["Player Name"]),
 			$players
 		);
 
