@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
+use MyPlot\forms\subforms\GiveForm;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -67,5 +69,9 @@ class GiveSubCommand extends SubCommand
 			$sender->sendMessage($this->translateString("give.confirm", [$plotId, $newOwnerName]));
 		}
 		return true;
+	}
+
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		return new GiveForm();
 	}
 }
