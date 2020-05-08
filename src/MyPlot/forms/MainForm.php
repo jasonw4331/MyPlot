@@ -28,6 +28,8 @@ class MainForm extends SimpleMyPlotForm {
 		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Main Form"]));
 
+		$this->plot = $plugin->getPlotByPosition($player);
+
 		foreach($subCommands as $name => $command) {
 			if(!$command->canUse($player) or $command->getForm($player) === null)
 				continue;
@@ -42,7 +44,7 @@ class MainForm extends SimpleMyPlotForm {
 		$this->setCallable(function(Player $player, ?MyPlotForm $data) use($plugin) {
 			if(is_null($data))
 				return;
-			$data->setPlot($plugin->getPlotByPosition($player));
+			$data->setPlot($this->plot);
 			$player->sendForm($data);
 		});
 	}
