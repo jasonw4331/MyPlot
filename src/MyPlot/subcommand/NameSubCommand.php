@@ -47,6 +47,6 @@ class NameSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new NameForm($player, false);
+		return new NameForm($player);
 	}
 }
