@@ -26,7 +26,7 @@ class InfoForm extends ComplexMyPlotForm {
 		$this->addDropdown("Biome", array_keys(BiomeSubCommand::BIOMES), (int)array_search($this->plot->biome, array_keys(BiomeSubCommand::BIOMES)));
 		$this->addToggle("PvP", $this->plot->pvp);
 
-		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {
+		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
 			if(is_null($data)) {
 				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
 				return;
