@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class AddHelperForm extends ComplexMyPlotForm {
 	/** @var string[] $players */
-	private $players = [];
+	private $players = ["*"];
 
 	public function __construct() {
 		parent::__construct(null);
