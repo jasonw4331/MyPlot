@@ -14,13 +14,10 @@ class CloneForm extends ComplexMyPlotForm {
 	/** @var Player $player */
 	private $player;
 
-	public function __construct(Player $player, bool $redo = false) {
+	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Clone Form"]));
-
-		if($redo)
-			$this->addLabel(TextFormat::RED.$plugin->getLanguage()->get("form.redo"));
 
 		$this->addLabel("Origin Plot Location");
 		$this->addInput("Plot X Coordinate", "2");

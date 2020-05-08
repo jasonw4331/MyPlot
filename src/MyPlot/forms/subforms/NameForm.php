@@ -9,13 +9,10 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class NameForm extends ComplexMyPlotForm {
-	public function __construct(Player $player, bool $redo = false) {
+	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Rename Form"]));
-
-		if($redo)
-			$this->addLabel(TextFormat::RED.$plugin->getLanguage()->get("form.redo"));
 
 		if(isset($this->plot))
 			$this->addInput("New Plot Title", $player->getDisplayName()."'s Plot", $this->plot->name);

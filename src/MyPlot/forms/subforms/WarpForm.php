@@ -15,13 +15,10 @@ class WarpForm extends ComplexMyPlotForm {
 	/** @var Player $player */
 	private $player;
 
-	public function __construct(Player $player, bool $redo = false) {
+	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle($plugin->getLanguage()->translateString("form.header", [TextFormat::DARK_BLUE."Claim Form"]));
-
-		if($redo)
-			$this->addLabel(TextFormat::RED.$plugin->getLanguage()->get("form.redo"));
 
 		$this->addInput("Plot X Coordinate", "2");
 		$this->addInput("Plot Z Coordinate", "-4");
@@ -51,7 +48,7 @@ class WarpForm extends ComplexMyPlotForm {
 				empty($data[2]) ? $this->player->getLevel()->getFolderName() : $data[2]
 			];
 		elseif(is_array($data) and empty($data[0]) and empty($data[1])) {
-			$this->player->sendForm(new self($this->player, true));
+			$this->player->sendForm(new self($this->player));
 			throw new FormValidationException("Invalid form data returned");
 		}else
 			throw new FormValidationException("Unexpected form data returned");

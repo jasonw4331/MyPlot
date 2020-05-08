@@ -65,6 +65,6 @@ class CloneSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new CloneForm($player, false);
+		return new CloneForm($player);
 	}
 }

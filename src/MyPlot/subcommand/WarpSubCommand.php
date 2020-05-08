@@ -55,6 +55,6 @@ class WarpSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new WarpForm($player, false);
+		return new WarpForm($player);
 	}
 }
