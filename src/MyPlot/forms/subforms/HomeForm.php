@@ -28,6 +28,7 @@ class HomeForm extends SimpleMyPlotForm {
 				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
 				return;
 			}
+			// TODO: merge list and home into one form
 			$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("home.name")." \"$data\"", true);
 		});
 	}

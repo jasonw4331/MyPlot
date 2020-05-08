@@ -30,7 +30,7 @@ class GenerateForm extends ComplexMyPlotForm {
 			}elseif(is_bool($value)) {
 				$this->addToggle($key, $value);
 			}elseif(is_string($value)) {
-				$this->addInput($key, "", $value);
+				$this->addInput($key, "", $value); // TODO: parse ids AND block names
 			}
 			$this->keys[] = $key;
 		}
