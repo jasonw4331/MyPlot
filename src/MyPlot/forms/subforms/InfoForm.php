@@ -18,7 +18,7 @@ class InfoForm extends ComplexMyPlotForm {
 		if(!isset($this->plot))
 			$this->plot = $plugin->getPlotByPosition($player);
 
-		$this->addLabel((string)$this->plot);
+		$this->addLabel("Plot ".(string)$this->plot);
 		$this->addInput("Owner", "owner", $this->plot->owner);
 		$this->addInput("Plot Name", "name", $this->plot->name);
 		$this->addDropdown("Helpers", $this->plot->helpers);
