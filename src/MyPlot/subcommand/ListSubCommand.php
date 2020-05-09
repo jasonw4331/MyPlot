@@ -43,7 +43,6 @@ class ListSubCommand extends SubCommand {
 						$z = $plot->Z;
 						$sender->sendMessage(TF::YELLOW . $this->translateString("list.found", [$name, $x, $z]));
 					}
-					return true;
 				}
 			}
 		}elseif($sender->hasPermission("myplot.command.list")) {
