@@ -1,6 +1,6 @@
 parameters:
-    level: 6
-    checkMissingIterableValueType: true
+    level: 5
+    checkMissingIterableValueType: false
     paths:
         - /source/src
         - /deps
