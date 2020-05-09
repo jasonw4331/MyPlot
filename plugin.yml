@@ -11,8 +11,6 @@ description: "Plots and Protection Plugin for PocketMine-MP Servers"
 load: STARTUP
 softdepend:
 - EconomyAPI
-- PocketMoney
-- EssentialsPE
 - DEVirion
 - WorldStyler
 - EasyCommandAutofill
