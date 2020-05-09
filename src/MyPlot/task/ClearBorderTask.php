@@ -32,6 +32,8 @@ class ClearBorderTask extends Task {
 	protected $roadBlock;
 	/** @var Block $groundBlock */
 	protected $groundBlock;
+	/** @var Block $bottomBlock */
+	protected $bottomBlock;
 
 	/**
 	 * ClearBorderTask constructor.
@@ -53,6 +55,7 @@ class ClearBorderTask extends Task {
 		$this->plotWallBlock = $plotLevel->wallBlock;
 		$this->roadBlock = $plotLevel->roadBlock;
 		$this->groundBlock = $plotLevel->plotFillBlock;
+		$this->bottomBlock = $plotLevel->bottomBlock;
 		$plugin->getLogger()->debug("Border Clear Task started at plot {$plot->X};{$plot->Z}");
 	}
 
@@ -68,7 +71,9 @@ class ClearBorderTask extends Task {
 					$block = $this->plotWallBlock;
 				elseif($y === $this->height)
 					$block = $this->roadBlock;
-				else//if($y < $this->height)
+				elseif($y === 0)
+					$block = $this->bottomBlock;
+				elseif($y < $this->height)
 					$block = $this->groundBlock;
 				$this->level->setBlock(new Vector3($x, $y, $this->plotBeginPos->z), $block, false, false);
 				$this->level->setBlock(new Vector3($x, $y, $this->zMax), $block, false, false);
@@ -82,7 +87,9 @@ class ClearBorderTask extends Task {
 					$block = $this->plotWallBlock;
 				elseif($y === $this->height)
 					$block = $this->roadBlock;
-				else//if($y < $this->height)
+				elseif($y === 0)
+					$block = $this->bottomBlock;
+				elseif($y < $this->height)
 					$block = $this->groundBlock;
 				$this->level->setBlock(new Vector3($this->plotBeginPos->x, $y, $z), $block, false, false);
 				$this->level->setBlock(new Vector3($this->xMax, $y, $z), $block, false, false);
