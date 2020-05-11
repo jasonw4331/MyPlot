@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\RemoveHelperForm;
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\OfflinePlayer;
 use pocketmine\Player;
@@ -51,7 +52,9 @@ class RemoveHelperSubCommand extends SubCommand
 		return true;
 	}
 
-	public function getForm(?Player $player = null) : MyPlotForm {
-		return new RemoveHelperForm();
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+			return new RemoveHelperForm();
+		return null;
 	}
 }

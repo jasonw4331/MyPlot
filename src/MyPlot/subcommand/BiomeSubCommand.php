@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\BiomeForm;
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\level\biome\Biome;
 use pocketmine\Player;
@@ -74,6 +75,8 @@ class BiomeSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new BiomeForm(array_keys(self::BIOMES));
+		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+			return new BiomeForm(array_keys(self::BIOMES));
+		return null;
 	}
 }

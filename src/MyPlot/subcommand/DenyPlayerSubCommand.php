@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\DenyPlayerForm;
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\OfflinePlayer;
 use pocketmine\Player;
@@ -75,7 +76,9 @@ class DenyPlayerSubCommand extends SubCommand
 		return true;
 	}
 
-	public function getForm(?Player $player = null) : MyPlotForm {
-		return new DenyPlayerForm();
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+			return new DenyPlayerForm();
+		return null;
 	}
 }

@@ -70,6 +70,8 @@ class InfoSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new InfoForm($player);
+		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+			return new InfoForm($player);
+		return null;
 	}
 }

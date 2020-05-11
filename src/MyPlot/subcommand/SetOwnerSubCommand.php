@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\OwnerForm;
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -54,6 +55,8 @@ class SetOwnerSubCommand extends SubCommand {
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new OwnerForm();
+		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+			return new OwnerForm();
+		return null;
 	}
 }

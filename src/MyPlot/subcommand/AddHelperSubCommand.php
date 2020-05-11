@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\AddHelperForm;
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\OfflinePlayer;
 use pocketmine\Player;
@@ -51,7 +52,9 @@ class AddHelperSubCommand extends SubCommand
 		return true;
 	}
 
-	public function getForm(?Player $player = null) : MyPlotForm {
-		return new AddHelperForm();
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+			return new AddHelperForm();
+		return null;
 	}
 }

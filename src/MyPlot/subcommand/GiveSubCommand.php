@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\GiveForm;
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -72,6 +73,8 @@ class GiveSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new GiveForm();
+		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+			return new GiveForm();
+		return null;
 	}
 }
