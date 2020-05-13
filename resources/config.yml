@@ -10,7 +10,7 @@
 #########################################
 
 # The language that should be used in MyPlot
-# Available languages: eng, nld, vie, spa, chs, zho, deu, cze, tur, kor, fre, tgl
+# Available languages: eng, nld, vie, spa, chs, zho, deu, cze, tur, kor, fre, tgl, pol
 #
 # English language pack by @jasonwynn10
 # Dutch language pack by @Wies
@@ -24,6 +24,7 @@
 # Korean language pack by @Johnmacrocraft
 # French language pack by @ad5001
 # Tagalog language pack by @Lentou
+# Polish language pack by @KMatuszak
 Language: eng
 
 # Allows editing language file as a config
