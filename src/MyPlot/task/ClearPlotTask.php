@@ -80,7 +80,7 @@ class ClearPlotTask extends Task {
 		$plugin->getLogger()->debug("Plot Clear Task started at plot {$plot->X};{$plot->Z}");
 	}
 
-	public function onRun(int $currentTick) : void {
+	public function onRun() : void {
 		foreach($this->level->getEntities() as $entity) {
 			if($this->plotBB->isVectorInXZ($entity->getPosition())) {
 				if(!$entity instanceof Player) {
