@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace MyPlot;
 
-use EssentialsPE\Loader;
 use muqsit\worldstyler\shapes\CommonShape;
 use muqsit\worldstyler\shapes\Cuboid;
 use muqsit\worldstyler\WorldStyler;
@@ -16,10 +15,8 @@ use MyPlot\events\MyPlotTeleportEvent;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
-use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\JSONDataProvider;
 use MyPlot\provider\MySQLProvider;
-use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearBorderTask;
@@ -29,6 +26,7 @@ use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\lang\Language;
+use pocketmine\math\Facing;
 use pocketmine\player\Player;
 use pocketmine\world\biome\Biome;
 use pocketmine\world\format\Chunk;
@@ -42,7 +40,6 @@ use pocketmine\permission\PermissionManager;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
-use PocketMoney\PocketMoney;
 use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
@@ -81,10 +78,10 @@ class MyPlot extends PluginBase
 	 *
 	 * @internal
 	 *
-	 * @return BaseLang
+	 * @return Language
 	 */
-	public function getFallBackLang() : BaseLang {
-		return new BaseLang(BaseLang::FALLBACK_LANGUAGE, $this->getFile() . "resources/");
+	public function getFallBackLang() : Language {
+		return new Language(Language::FALLBACK_LANGUAGE, $this->getFile() . "resources/");
 	}
 
 	/**
@@ -303,11 +300,11 @@ class MyPlot extends PluginBase
 	public function isPositionBorderingPlot(Position $position) : bool {
 		if(!$position->isValid())
 			return false;
-		for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+		for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
 			$pos = $position->getSide($i);
 			$x = $pos->x;
 			$z = $pos->z;
-			$levelName = $pos->level->getFolderName();
+			$levelName = $pos->getWorld()->getFolderName();
 
 			$plotLevel = $this->getLevelSettings($levelName);
 			if($plotLevel === null)
@@ -336,14 +333,14 @@ class MyPlot extends PluginBase
 			if($plot !== null)
 				return true;
 		}
-		for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
-			for($n = Vector3::SIDE_NORTH; $n <= Vector3::SIDE_EAST; ++$n) {
-				if($i === $n or Vector3::getOppositeSide($i) === $n)
+		for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
+			for($n = Facing::NORTH; $n <= Facing::EAST; ++$n) {
+				if($i === $n or Facing::opposite($i) === $n)
 					continue;
 				$pos = $position->getSide($i)->getSide($n);
 				$x = $pos->x;
 				$z = $pos->z;
-				$levelName = $pos->level->getFolderName();
+				$levelName = $pos->getWorld()->getFolderName();
 
 				$plotLevel = $this->getLevelSettings($levelName);
 				if($plotLevel === null)
@@ -388,11 +385,11 @@ class MyPlot extends PluginBase
 	public function getPlotBorderingPosition(Position $position) : ?Plot {
 		if(!$position->isValid())
 			return null;
-		for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+		for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
 			$pos = $position->getSide($i);
 			$x = $pos->x;
 			$z = $pos->z;
-			$levelName = $pos->level->getFolderName();
+			$levelName = $pos->getWorld()->getFolderName();
 
 			$plotLevel = $this->getLevelSettings($levelName);
 			if($plotLevel === null)
@@ -563,7 +560,7 @@ class MyPlot extends PluginBase
 		$plotLevel = $this->getLevelSettings($plotFrom->levelName);
 		$plotSize = $plotLevel->plotSize-1;
 		$plotBeginPos = $this->getPlotPosition($plotFrom);
-		$level = $plotBeginPos->level;
+		$level = $plotBeginPos->getWorld();
 		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
 		$plotBeginPos->y = 0;
 		$plugin = $this;
@@ -580,7 +577,7 @@ class MyPlot extends PluginBase
 		$plotLevel = $this->getLevelSettings($plotTo->levelName);
 		$plotSize = $plotLevel->plotSize-1;
 		$plotBeginPos = $this->getPlotPosition($plotTo);
-		$level = $plotBeginPos->level;
+		$level = $plotBeginPos->getWorld();
 		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
 		$plotBeginPos->y = 0;
 		$selection->setPosition(1, $plotBeginPos);
