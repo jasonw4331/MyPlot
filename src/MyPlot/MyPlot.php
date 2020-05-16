@@ -30,6 +30,7 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\data\bedrock\BiomeIds;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\lang\Language;
+use pocketmine\math\Facing;
 use pocketmine\player\Player;
 use pocketmine\world\biome\Biome;
 use pocketmine\world\biome\BiomeRegistry;
@@ -79,10 +80,10 @@ class MyPlot extends PluginBase
 	 *
 	 * @internal
 	 *
-	 * @return BaseLang
+	 * @return Language
 	 */
-	public function getFallBackLang() : BaseLang {
-		return new BaseLang(BaseLang::FALLBACK_LANGUAGE, $this->getFile() . "resources/");
+	public function getFallBackLang() : Language {
+		return new Language(Language::FALLBACK_LANGUAGE, $this->getFile() . "resources/");
 	}
 
 	/**
@@ -341,11 +342,11 @@ class MyPlot extends PluginBase
 	public function isPositionBorderingPlot(Position $position) : bool {
 		if(!$position->isValid())
 			return false;
-		for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+		for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
 			$pos = $position->getSide($i);
 			$x = $pos->x;
 			$z = $pos->z;
-			$levelName = $pos->getLevelNonNull()->getFolderName();
+			$levelName = $pos->getWorld()->getFolderName();
 
 			if(!$this->isLevelLoaded($levelName))
 				return false;
@@ -369,14 +370,14 @@ class MyPlot extends PluginBase
 			}
 			return true;
 		}
-		for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
-			for($n = Vector3::SIDE_NORTH; $n <= Vector3::SIDE_EAST; ++$n) {
-				if($i === $n or Vector3::getOppositeSide($i) === $n)
+		for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
+			for($n = Facing::NORTH; $n <= Facing::EAST; ++$n) {
+				if($i === $n or Facing::opposite($i) === $n)
 					continue;
 				$pos = $position->getSide($i)->getSide($n);
 				$x = $pos->x;
 				$z = $pos->z;
-				$levelName = $pos->getLevelNonNull()->getFolderName();
+				$levelName = $pos->getWorld()->getFolderName();
 
 				$plotLevel = $this->getLevelSettings($levelName);
 				$plotSize = $plotLevel->plotSize;
@@ -413,11 +414,11 @@ class MyPlot extends PluginBase
 	public function getPlotBorderingPosition(Position $position) : ?Plot {
 		if(!$position->isValid())
 			return null;
-		for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+		for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
 			$pos = $position->getSide($i);
 			$x = $pos->x;
 			$z = $pos->z;
-			$levelName = $pos->getLevelNonNull()->getFolderName();
+			$levelName = $pos->getWorld()->getFolderName();
 
 			if(!$this->isLevelLoaded($levelName))
 				return null;
@@ -738,7 +739,7 @@ class MyPlot extends PluginBase
 		$plotLevel = $this->getLevelSettings($plotFrom->levelName);
 		$plotSize = $plotLevel->plotSize-1;
 		$plotBeginPos = $this->getPlotPosition($plotFrom);
-		$level = $plotBeginPos->getLevelNonNull();
+		$level = $plotBeginPos->getWorld();
 		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
 		$plotBeginPos->y = 0;
 		$plugin = $this;
@@ -766,7 +767,7 @@ class MyPlot extends PluginBase
 		$plotLevel = $this->getLevelSettings($plotTo->levelName);
 		$plotSize = $plotLevel->plotSize-1;
 		$plotBeginPos = $this->getPlotPosition($plotTo);
-		$level = $plotBeginPos->getLevelNonNull();
+		$level = $plotBeginPos->getWorld();
 		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
 		$plotBeginPos->y = 0;
 		$xMax = (int)($plotBeginPos->x + $plotSize);
