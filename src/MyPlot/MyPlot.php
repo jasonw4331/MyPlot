@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace MyPlot;
 
-use EssentialsPE\Loader;
 use muqsit\worldstyler\shapes\CommonShape;
 use muqsit\worldstyler\shapes\Cuboid;
 use muqsit\worldstyler\WorldStyler;
@@ -16,10 +15,8 @@ use MyPlot\events\MyPlotTeleportEvent;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
-use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\JSONDataProvider;
 use MyPlot\provider\MySQLProvider;
-use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearBorderTask;
@@ -41,7 +38,6 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
-use PocketMoney\PocketMoney;
 use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
