@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot;
 
-use jasonwynn10\EasyCommandAutofill\Main;
+//use jasonwynn10\EasyCommandAutofill\Main;
 use MyPlot\forms\MainForm;
 use MyPlot\subcommand\AddHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
@@ -34,16 +34,16 @@ use MyPlot\subcommand\UnDenySubCommand;
 use MyPlot\subcommand\WarpSubCommand;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
-use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
-use pocketmine\network\mcpe\protocol\types\command\CommandData;
-use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
-use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
+//use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+//use pocketmine\network\mcpe\protocol\types\command\CommandData;
+//use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
+//use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class Commands extends Command implements PluginIdentifiableCommand
+class Commands extends Command implements PluginOwned
 {
 	/** @var SubCommand[] $subCommands */
 	private $subCommands = [];
@@ -90,13 +90,13 @@ class Commands extends Command implements PluginIdentifiableCommand
 			$this->loadSubCommand(new SellSubCommand($plugin, "sell"));
 			$this->loadSubCommand(new BuySubCommand($plugin, "buy"));
 		}
-		$styler = $this->getPlugin()->getServer()->getPluginManager()->getPlugin("WorldStyler");
+		$styler = $this->getOwningPlugin()->getServer()->getPluginManager()->getPlugin("WorldStyler");
 		if($styler !== null) {
 			$this->loadSubCommand(new CloneSubCommand($plugin, "clone"));
 		}
 		$plugin->getLogger()->debug("Commands Registered to MyPlot");
 
-		$autofill = $plugin->getServer()->getPluginManager()->getPlugin("EasyCommandAutofill");
+		/*$autofill = $plugin->getServer()->getPluginManager()->getPlugin("EasyCommandAutofill");
 		if($autofill instanceof Main) {
 			$overloads = [];
 			$enumCount = 0;
@@ -182,7 +182,7 @@ class Commands extends Command implements PluginIdentifiableCommand
 			);
 			$autofill->addManualOverride($this->getName(), $data);
 			$plugin->getLogger()->debug("Command Autofill Enabled");
-		}
+		}*/
 	}
 
 	/**
@@ -217,7 +217,7 @@ class Commands extends Command implements PluginIdentifiableCommand
 	 */
 	public function execute(CommandSender $sender, string $alias, array $args) : bool {
 		/** @var MyPlot $plugin */
-		$plugin = $this->getPlugin();
+		$plugin = $this->getOwningPlugin();
 		if($plugin->isDisabled()) {
 			$sender->sendMessage($plugin->getLanguage()->get("plugin.disabled"));
 			return true;
@@ -249,7 +249,7 @@ class Commands extends Command implements PluginIdentifiableCommand
 		return true;
 	}
 
-	public function getPlugin() : Plugin {
+	public function getOwningPlugin() : Plugin {
 		return MyPlot::getInstance();
 	}
 }
