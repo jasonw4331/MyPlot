@@ -76,6 +76,17 @@ class MyPlot extends PluginBase
 	}
 
 	/**
+	 * Returns the fallback language class
+	 *
+	 * @internal
+	 *
+	 * @return BaseLang
+	 */
+	public function getFallBackLang() : BaseLang {
+		return new BaseLang(BaseLang::FALLBACK_LANGUAGE, $this->getFile() . "resources/");
+	}
+
+	/**
 	 * Returns the DataProvider that is being used
 	 *
 	 * @api
