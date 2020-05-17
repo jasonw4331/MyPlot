@@ -12,7 +12,7 @@ class NameForm extends ComplexMyPlotForm {
 	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Rename Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("name.form")]));
 
 		if(!isset($this->plot))
 			$this->plot = $plugin->getPlotByPosition($player);

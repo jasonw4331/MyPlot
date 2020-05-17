@@ -15,7 +15,7 @@ class HomeForm extends SimpleMyPlotForm {
 	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Homes Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("home.form")]));
 
 		$this->plots = $plugin->getPlotsOfPlayer($player->getName(), $player->getLevel()->getFolderName());
 		$i = 1;

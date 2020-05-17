@@ -15,7 +15,7 @@ class KickForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Kick Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("kick.form")]));
 		$players = [];
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
 			if(isset($this->plot) and !$plugin->getPlotByPosition($player)->isSame($this->plot))
@@ -24,7 +24,7 @@ class KickForm extends ComplexMyPlotForm {
 			$this->players[] = $player->getName();
 		}
 		$this->addDropdown(
-			$plugin->getLanguage()->translateString("kick.dropdown", ["Player Name"]),
+			$plugin->getLanguage()->get("kick.dropdown"),
 			$players
 		);
 

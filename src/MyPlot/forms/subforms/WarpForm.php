@@ -18,7 +18,7 @@ class WarpForm extends ComplexMyPlotForm {
 	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Warp Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("warp.form")]));
 
 		$this->addInput("Plot X Coordinate", "2");
 		$this->addInput("Plot Z Coordinate", "-4");

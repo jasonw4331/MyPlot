@@ -20,7 +20,7 @@ class BiomeForm extends SimpleMyPlotForm {
 	public function __construct(array $biomes) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Biome Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("biome.form")]));
 
 		$this->biomeNames = $biomes;
 		foreach($biomes as $biomeName) {

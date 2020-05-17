@@ -12,9 +12,9 @@ class RemoveHelperForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Remove Helper Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("removehelper.form")]));
 		$this->addDropdown(
-			$plugin->getLanguage()->translateString("removehelper.dropdown", ["Helper Name"]),
+			$plugin->getLanguage()->translateString("removehelper.dropdown"),
 			$this->plot ? array_map(function(string $text) {
 				return TextFormat::DARK_BLUE.$text;
 			}, $this->plot->helpers) : []

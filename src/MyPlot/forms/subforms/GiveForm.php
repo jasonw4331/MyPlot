@@ -15,7 +15,7 @@ class GiveForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Give Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("give.form")]));
 
 		$players = [];
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
@@ -23,7 +23,7 @@ class GiveForm extends ComplexMyPlotForm {
 			$this->players[] = $player->getName();
 		}
 		$this->addDropdown(
-			$plugin->getLanguage()->translateString("give.dropdown", ["Recipient"]),
+			$plugin->getLanguage()->get("give.dropdown"),
 			$players
 		);
 

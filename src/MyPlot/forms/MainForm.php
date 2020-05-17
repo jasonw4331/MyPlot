@@ -26,7 +26,7 @@ class MainForm extends SimpleMyPlotForm {
 	public function __construct(Player $player, array $subCommands) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Main Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Main"]));
 
 		$this->plot = $plugin->getPlotByPosition($player);
 

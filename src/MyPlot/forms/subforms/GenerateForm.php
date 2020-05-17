@@ -16,7 +16,7 @@ class GenerateForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Generate Form"]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("generate.form")]));
 
 		$this->addInput("World Name", "plots");
 		$this->addInput("World Generator", "", "myplot");
