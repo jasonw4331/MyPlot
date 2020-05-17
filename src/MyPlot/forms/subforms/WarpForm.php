@@ -20,9 +20,9 @@ class WarpForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("warp.form")]));
 
-		$this->addInput("Plot X Coordinate", "2");
-		$this->addInput("Plot Z Coordinate", "-4");
-		$this->addInput("Plot World Name", "world", $player->getLevel()->getFolderName());
+		$this->addInput($plugin->getLanguage()->get("warp.formxcoord"), "2");
+		$this->addInput($plugin->getLanguage()->get("warp.formzcoord"), "-4");
+		$this->addInput($plugin->getLanguage()->get("warp.formworld"), "world", $player->getLevel()->getFolderName());
 
 		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
 			if(is_null($data)) {

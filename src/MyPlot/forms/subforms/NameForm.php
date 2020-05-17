@@ -17,7 +17,7 @@ class NameForm extends ComplexMyPlotForm {
 		if(!isset($this->plot))
 			$this->plot = $plugin->getPlotByPosition($player);
 
-		$this->addInput("New Plot Title", $player->getDisplayName()."'s Plot", $this->plot->name);
+		$this->addInput($plugin->getLanguage()->get("name.formtitle"), $player->getDisplayName()."'s Plot", $this->plot->name);
 
 		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {
 			if(is_null($data)) {

@@ -18,8 +18,8 @@ class GenerateForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("generate.form")]));
 
-		$this->addInput("World Name", "plots");
-		$this->addInput("World Generator", "", "myplot");
+		$this->addInput($plugin->getLanguage()->get("generate.formworld"), "plots");
+		$this->addInput($plugin->getLanguage()->get("generate.formgenerator"), "", "myplot");
 
 		foreach($plugin->getConfig()->get("DefaultWorld", []) as $key => $value) {
 			if(is_numeric($value)) {
@@ -36,7 +36,7 @@ class GenerateForm extends ComplexMyPlotForm {
 		}
 
 		$this->keys[] = "teleport"; // added option to end of keys for data parsing
-		$this->addToggle("Teleport After Generated", true);
+		$this->addToggle($plugin->getLanguage()->get("generate.formteleport"), true);
 
 		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
 			if(is_null($data)) {

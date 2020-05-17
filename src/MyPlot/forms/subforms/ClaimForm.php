@@ -19,9 +19,9 @@ class ClaimForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("claim.form")]));
 
-		$this->addInput("Plot X Coordinate", "2");
-		$this->addInput("Plot Z Coordinate", "-4");
-		$this->addInput("Plot World Name", "world", $player->getLevel()->getFolderName());
+		$this->addInput($plugin->getLanguage()->get("claim.formxcoord"), "2");
+		$this->addInput($plugin->getLanguage()->get("claim.formzcoord"), "-4");
+		$this->addInput($plugin->getLanguage()->get("claim.formworld"), "world", $player->getLevel()->getFolderName());
 
 		$this->setCallable(function(Player $player, ?Plot $data) use ($plugin) {
 			if(is_null($data)) {

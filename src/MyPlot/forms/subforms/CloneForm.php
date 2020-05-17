@@ -19,15 +19,15 @@ class CloneForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("clone.form")]));
 
-		$this->addLabel("Origin Plot Location");
-		$this->addInput("Plot X Coordinate", "2");
-		$this->addInput("Plot Z Coordinate", "-4");
-		$this->addInput("Plot World Name", "world", $player->getLevel()->getFolderName());
+		$this->addLabel($plugin->getLanguage()->get("clone.formlabel1"));
+		$this->addInput($plugin->getLanguage()->get("clone.formxcoord"), "2");
+		$this->addInput($plugin->getLanguage()->get("clone.formzcoord"), "-4");
+		$this->addInput($plugin->getLanguage()->get("clone.formworld"), "world", $player->getLevel()->getFolderName());
 
-		$this->addLabel("Clone Plot Location");
-		$this->addInput("Plot X Coordinate", "2");
-		$this->addInput("Plot Z Coordinate", "-4");
-		$this->addInput("Plot World Name", "world", $player->getLevel()->getFolderName());
+		$this->addLabel($plugin->getLanguage()->get("clone.formlabel2"));
+		$this->addInput($plugin->getLanguage()->get("clone.formxcoord"), "2");
+		$this->addInput($plugin->getLanguage()->get("clone.formzcoord"), "-4");
+		$this->addInput($plugin->getLanguage()->get("clone.formworld"), "world", $player->getLevel()->getFolderName());
 
 		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
 			if(is_null($data)) {
