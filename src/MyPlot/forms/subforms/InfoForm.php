@@ -18,26 +18,26 @@ class InfoForm extends ComplexMyPlotForm {
 		if(!isset($this->plot))
 			$this->plot = $plugin->getPlotByPosition($player);
 
-		$this->addLabel("Plot ".(string)$this->plot);
-		$this->addInput("Owner", "owner", $this->plot->owner);
-		$this->addInput("Plot Name", "name", $this->plot->name);
-		$this->addDropdown("Helpers",
+		$this->addLabel($plugin->getLanguage()->translateString("form.formlabel1", [(string)$this->plot]));
+		$this->addInput($plugin->getLanguage()->get("info.formowner"), "owner", $this->plot->owner);
+		$this->addInput($plugin->getLanguage()->get("info.formpname"), "name", $this->plot->name);
+		$this->addDropdown($plugin->getLanguage()->get("info.formhelpers"),
 			array_map(function(string $text) {
 				return TextFormat::DARK_BLUE.$text;
 			}, $this->plot->helpers)
 		);
-		$this->addDropdown("Denied",
+		$this->addDropdown($plugin->getLanguage()->get("info.formdenied"),
 			array_map(function(string $text) {
 				return TextFormat::DARK_BLUE.$text;
 			}, $this->plot->denied)
 		);
-		$this->addDropdown("Biome",
+		$this->addDropdown($plugin->getLanguage()->get("info.formbiome"),
 			array_map(function(string $text) {
 				return TextFormat::DARK_BLUE.ucfirst(strtolower(str_replace("_", " ", $text)));
 			}, array_keys(BiomeSubCommand::BIOMES)),
 			(int)array_search($this->plot->biome, array_keys(BiomeSubCommand::BIOMES))
 		);
-		$this->addToggle("PvP", $this->plot->pvp);
+		$this->addToggle($plugin->getLanguage()->get("info.formpvp"), $this->plot->pvp);
 
 		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
 			if(is_null($data)) {
