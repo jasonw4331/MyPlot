@@ -17,11 +17,14 @@ use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
 use MyPlot\provider\JSONDataProvider;
 use MyPlot\provider\MySQLProvider;
+use MyPlot\provider\ParoxityEconProvider;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
 use onebone\economyapi\EconomyAPI;
+use Paroxity\ParoxityEcon\ParoxityEcon;
+use Paroxity\ParoxityEcon\ParoxityEconAPI;
 use pocketmine\block\Block;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\lang\BaseLang;
@@ -1056,6 +1059,13 @@ class MyPlot extends PluginBase
 		$this->getLogger()->debug(TF::BOLD . "Loading economy settings");
 		// Initialize EconomyProvider
 		if($this->getConfig()->get("UseEconomy", false) === true) {
+			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("ParoxityEcon")) !== null) {
+				if($plugin instanceof ParoxityEcon) {
+					$this->economyProvider = new ParoxityEconProvider(ParoxityEconAPI::getInstance());
+					$this->getLogger()->debug("Eco set to ParoxityEconProvider");
+				}else
+					$this->getLogger()->debug("Eco not instance of ParoxityEcon");
+			}
 			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
 				if($plugin instanceof EconomyAPI) {
 					$this->economyProvider = new EconomySProvider($plugin);
