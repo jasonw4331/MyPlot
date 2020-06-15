@@ -44,7 +44,7 @@ class InfoForm extends ComplexMyPlotForm {
 				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
 				return;
 			}
-			// TODO: apply changes after submission
+			// TODO: should this apply changes after submission?
 		});
 	}
 
@@ -52,7 +52,7 @@ class InfoForm extends ComplexMyPlotForm {
 		if(is_null($data))
 			return;
 		elseif(is_array($data))
-			return; // TODO: data parsing
+			return; // TODO: should this have data parsing?
 		else
 			throw new FormValidationException("Unexpected form data returned");
 	}
