@@ -5,6 +5,7 @@ namespace MyPlot\forms\subforms;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\block\BlockIds;
 use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -30,11 +31,11 @@ class GenerateForm extends ComplexMyPlotForm {
 			}elseif(is_bool($value)) {
 				$this->addToggle($key, $value);
 			}elseif(is_string($value)) {
-				$this->addInput($key, "", $value); // TODO: parse ids AND block names
+				$this->addInput($key, "", $value);
 			}
 			$this->keys[] = $key;
 		}
-
+		// TODO: multi lang for teleport
 		$this->keys[] = "teleport"; // added option to end of keys for data parsing
 		$this->addToggle($plugin->getLanguage()->get("generate.formteleport"), true);
 
@@ -49,6 +50,18 @@ class GenerateForm extends ComplexMyPlotForm {
 				return;
 			}
 			$teleport = array_pop($data);
+			$data = array_map(function($val) {
+				if(strpos($val, ':') !== false) {
+					$peices = explode(':', $val);
+					if(defined(BlockIds::class."::".strtoupper(str_replace(' ', '_', $peices[0]))))
+						return constant(BlockIds::class."::".strtoupper(str_replace(' ', '_', $val))).':'.($peices[1] ?? 0);
+					return $val;
+				}elseif(is_numeric($val))
+					return $val.':0';
+				elseif(defined(BlockIds::class."::".strtoupper(str_replace(' ', '_', $val))))
+					return constant(BlockIds::class."::".strtoupper(str_replace(' ', '_', $val))).':0';
+				return $val;
+			}, $data);
 			if($plugin->generateLevel($world, array_shift($data), $data)) {
 				if($teleport)
 					$plugin->teleportPlayerToPlot($player, new Plot($world, 0, 0));
