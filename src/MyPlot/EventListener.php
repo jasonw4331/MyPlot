@@ -312,7 +312,7 @@ class EventListener implements Listener
 			$ev->call();
 			$event->setCancelled($ev->isCancelled());
 		}elseif($plotFrom !== null and $plot !== null and ($plot->isDenied($event->getPlayer()->getName()) or $plot->isDenied("*")) and $plot->owner !== $event->getPlayer()->getName() and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
-			$this->plugin->teleportPlayerToPlot($event->getPlayer(), $plot, false); // TODO: is this in the plot?
+			$this->plugin->teleportPlayerToPlot($event->getPlayer(), $plot, false);
 		}
 	}
 
