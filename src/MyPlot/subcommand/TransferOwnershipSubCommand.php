@@ -33,7 +33,6 @@ class TransferOwnershipSubCommand extends SubCommand {
 		$toUser = $args[1];
 		/** TODO: Check if $toUser can bypass */
 		$plots = MyPlot::getInstance()->getPlotsOfPlayer($fromUser, "");
-		var_dump($plots);
 		if(empty($plots)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("transferownership.noplots", [$fromUser]));
 			return true;
