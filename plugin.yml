@@ -114,7 +114,7 @@ permissions:
             default: op
       myplot.admin.clone:
         default: op
-      myplot.admin.transferownership:
+      myplot.admin.transfer:
         default: op
   myplot.claimplots:
     default: op

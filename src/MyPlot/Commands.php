@@ -23,7 +23,7 @@ use MyPlot\subcommand\MiddleSubCommand;
 use MyPlot\subcommand\NameSubCommand;
 use MyPlot\subcommand\PvpSubCommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
-use MyPlot\subcommand\TransferOwnershipSubCommand;
+use MyPlot\subcommand\TransferSubCommand;
 use MyPlot\subcommand\ResetSubCommand;
 use MyPlot\subcommand\SetOwnerSubCommand;
 use MyPlot\subcommand\SubCommand;
@@ -78,7 +78,7 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new ListSubCommand($plugin, "list"));
 		$this->loadSubCommand(new PvpSubCommand($plugin, "pvp"));
 		$this->loadSubCommand(new KickSubCommand($plugin, "kick"));
-		$this->loadSubCommand(new TransferOwnershipSubCommand($plugin, "transferownership"));
+		$this->loadSubCommand(new TransferSubCommand($plugin, "transfer"));
 		$styler = $this->getPlugin()->getServer()->getPluginManager()->getPlugin("WorldStyler");
 		if($styler !== null) {
 			$this->loadSubCommand(new CloneSubCommand($plugin, "clone"));

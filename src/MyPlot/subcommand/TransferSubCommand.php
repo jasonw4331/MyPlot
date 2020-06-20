@@ -1,31 +1,30 @@
 <?php
-
 declare(strict_types=1);
-
 namespace MyPlot\subcommand;
 
-
 use MyPlot\MyPlot;
-use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 
-class TransferOwnershipSubCommand extends SubCommand {
+class TransferSubCommand extends SubCommand
+{
 
 	/**
 	 * @param CommandSender $sender
+	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender): bool {
-		return $sender->hasPermission("myplot.admin.transferownership");
+	public function canUse(CommandSender $sender) : bool {
+		return $sender->hasPermission("myplot.admin.transfer");
 	}
 
 	/**
 	 * @param CommandSender $sender
 	 * @param array $args
+	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args): bool {
+	public function execute(CommandSender $sender, array $args) : bool {
 		if(!isset($args[1])) {
 			return false;
 		}
@@ -34,14 +33,14 @@ class TransferOwnershipSubCommand extends SubCommand {
 		/** TODO: Check if $toUser can bypass */
 		$plots = MyPlot::getInstance()->getPlotsOfPlayer($fromUser, "");
 		if(empty($plots)) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("transferownership.noplots", [$fromUser]));
+			$sender->sendMessage(TextFormat::RED . $this->translateString("transfer.noplots", [$fromUser]));
 			return true;
 		}
 		foreach($plots as $plot) {
 			$plot->owner = $toUser;
 			MyPlot::getInstance()->savePlot($plot);
 		}
-		$sender->sendMessage(TextFormat::WHITE . $this->translateString("transferownership.success", [count($plots), $fromUser, $toUser]));
+		$sender->sendMessage(TextFormat::WHITE . $this->translateString("transfer.success", [count($plots), $fromUser, $toUser]));
 		return true;
 	}
 
