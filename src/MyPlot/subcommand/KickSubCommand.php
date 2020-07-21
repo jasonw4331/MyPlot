@@ -39,7 +39,7 @@ class KickSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.noPlayer"));
 			return true;
 		}
-		if (!$this->getPlugin()->getPlotByPosition($target)->isSame($plot)) {
+		if (($plot = $this->getPlugin()->getPlotByPosition($target)) === null or !$plot->isSame($plot)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.notInPlot"));
 			return true;
 		}
