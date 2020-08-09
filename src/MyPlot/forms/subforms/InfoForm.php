@@ -18,7 +18,7 @@ class InfoForm extends ComplexMyPlotForm {
 		if(!isset($this->plot))
 			$this->plot = $plugin->getPlotByPosition($player);
 
-		$this->addLabel($plugin->getLanguage()->translateString("info.formlabel1", [(string)$this->plot]));
+		$this->addLabel($plugin->getLanguage()->translateString("info.formcoords", [(string)$this->plot]));
 		$this->addLabel($plugin->getLanguage()->translateString("info.formowner", [TextFormat::BOLD.$this->plot->owner]));
 		$this->addLabel($plugin->getLanguage()->translateString("info.formpname", [TextFormat::BOLD.$this->plot->name]));
 		$this->addDropdown($plugin->getLanguage()->get("info.formhelpers"),
