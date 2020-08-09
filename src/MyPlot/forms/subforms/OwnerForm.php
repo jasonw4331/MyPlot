@@ -15,7 +15,7 @@ class OwnerForm extends ComplexMyPlotForm {
 	public function __construct() {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("owner.form")]));
+		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("setowner.form")]));
 
 		$players = [];
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
