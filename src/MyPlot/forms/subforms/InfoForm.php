@@ -18,9 +18,9 @@ class InfoForm extends ComplexMyPlotForm {
 		if(!isset($this->plot))
 			$this->plot = $plugin->getPlotByPosition($player);
 
-		$this->addLabel($plugin->getLanguage()->translateString("form.formlabel1", [(string)$this->plot]));
-		$this->addInput($plugin->getLanguage()->get("info.formowner"), "owner", $this->plot->owner);
-		$this->addInput($plugin->getLanguage()->get("info.formpname"), "name", $this->plot->name);
+		$this->addLabel($plugin->getLanguage()->translateString("info.formlabel1", [(string)$this->plot]));
+		$this->addLabel($plugin->getLanguage()->translateString("info.formowner", [TextFormat::BOLD.$this->plot->owner]));
+		$this->addLabel($plugin->getLanguage()->translateString("info.formpname", [TextFormat::BOLD.$this->plot->name]));
 		$this->addDropdown($plugin->getLanguage()->get("info.formhelpers"),
 			array_map(function(string $text) {
 				return TextFormat::DARK_BLUE.$text;
@@ -37,14 +37,13 @@ class InfoForm extends ComplexMyPlotForm {
 			}, array_keys(BiomeSubCommand::BIOMES)),
 			(int)array_search($this->plot->biome, array_keys(BiomeSubCommand::BIOMES))
 		);
-		$this->addToggle($plugin->getLanguage()->get("info.formpvp"), $this->plot->pvp);
+		$this->addLabel($plugin->getLanguage()->translateString("info.formpvp", [$this->plot->pvp ? "Enabled" : "Disabled"])); // TODO: translations
 
 		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
 			if(is_null($data)) {
 				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
 				return;
 			}
-			// TODO: should this apply changes after submission?
 		});
 	}
 
@@ -52,7 +51,7 @@ class InfoForm extends ComplexMyPlotForm {
 		if(is_null($data))
 			return;
 		elseif(is_array($data))
-			return; // TODO: should this have data parsing?
+			return;
 		else
 			throw new FormValidationException("Unexpected form data returned");
 	}
