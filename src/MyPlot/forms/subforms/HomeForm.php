@@ -4,22 +4,19 @@ namespace MyPlot\forms\subforms;
 
 use MyPlot\forms\SimpleMyPlotForm;
 use MyPlot\MyPlot;
-use MyPlot\Plot;
 use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class HomeForm extends SimpleMyPlotForm {
-	/** @var Plot[] $plots */
-	private $plots = [];
 	public function __construct(Player $player) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("home.form")]));
 
-		$this->plots = $plugin->getPlotsOfPlayer($player->getName(), $player->getLevel()->getFolderName());
+		$plots = $plugin->getPlotsOfPlayer($player->getName(), $player->getLevel()->getFolderName());
 		$i = 1;
-		foreach($this->plots as $plot) {
+		foreach($plots as $plot) {
 			$this->addButton(TextFormat::DARK_RED.$i++.") ".$plot->name." ".(string)$plot);
 		}
 

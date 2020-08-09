@@ -61,6 +61,8 @@ class HomeSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new HomeForm($player);
+		if(count($this->getPlugin()->getPlotsOfPlayer($player->getName(), $player->getLevel()->getFolderName())) > 0)
+			return new HomeForm($player);
+		return null;
 	}
 }
