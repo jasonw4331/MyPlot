@@ -19,9 +19,16 @@ class CloneForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("clone.form")]));
 
+		$plot = $plugin->getPlotByPosition($player);
+		if($plot === null) {
+			$plot = new \stdClass();
+			$plot->X = "";
+			$plot->Z = "";
+		}
+
 		$this->addLabel($plugin->getLanguage()->get("clone.formlabel1"));
-		$this->addInput($plugin->getLanguage()->get("clone.formxcoord"), "2");
-		$this->addInput($plugin->getLanguage()->get("clone.formzcoord"), "-4");
+		$this->addInput($plugin->getLanguage()->get("clone.formxcoord"), "2", (string)$plot->X);
+		$this->addInput($plugin->getLanguage()->get("clone.formzcoord"), "-4", (string)$plot->Z);
 		$this->addInput($plugin->getLanguage()->get("clone.formworld"), "world", $player->getLevel()->getFolderName());
 
 		$this->addLabel($plugin->getLanguage()->get("clone.formlabel2"));
