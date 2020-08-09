@@ -77,8 +77,8 @@ class DenyPlayerSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
-			return new DenyPlayerForm();
+		if(($plot = $this->getPlugin()->getPlotByPosition($player)) instanceof Plot)
+			return new DenyPlayerForm($plot);
 		return null;
 	}
 }

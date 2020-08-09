@@ -4,19 +4,24 @@ namespace MyPlot\forms\subforms;
 
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
+use MyPlot\Plot;
 use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class AddHelperForm extends ComplexMyPlotForm {
 	/** @var string[] $players */
-	private $players = ["*"];
+	private $players = [];
 
-	public function __construct() {
+	public function __construct(Plot $plot) {
 		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
 		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("addhelper.form")]));
-		$players = ["*"];
+		$players = [];
+		if(!in_array("*", $plot->helpers)) {
+			$players = ["*"];
+			$this->players = ["*"];
+		}
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
 			$players[] = $player->getDisplayName();
 			$this->players[] = $player->getName();

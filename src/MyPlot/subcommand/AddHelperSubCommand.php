@@ -53,8 +53,8 @@ class AddHelperSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
-			return new AddHelperForm();
+		if(($plot = $this->getPlugin()->getPlotByPosition($player)) instanceof Plot)
+			return new AddHelperForm($plot);
 		return null;
 	}
 }
