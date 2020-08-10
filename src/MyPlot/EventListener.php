@@ -263,7 +263,7 @@ class EventListener implements Listener
 		}
 	}
 
-	/**
+    /**
      * @ignoreCancelled false
      * @priority LOWEST
      *
@@ -273,6 +273,7 @@ class EventListener implements Listener
     {
         $this->onEnterPlotCheck($event->getPlayer(), $event);
     }
+
     /**
      * @ignoreCancelled false
      * @priority LOWEST
@@ -287,6 +288,7 @@ class EventListener implements Listener
         }
 
     }
+
     /**
      * @param PlayerMoveEvent|EntityTeleportEvent $event
      */
@@ -337,12 +339,13 @@ class EventListener implements Listener
             $this->plugin->teleportPlayerToPlot($player, $plot, false);
         }
     }
-	/**
-	 * @ignoreCancelled false
-	 * @priority LOWEST
-	 *
-	 * @param EntityDamageByEntityEvent $event
-	 */
+
+    /**
+     * @ignoreCancelled false
+     * @priority LOWEST
+     *
+     * @param EntityDamageByEntityEvent $event
+     */
 	public function onEntityDamage(EntityDamageByEntityEvent $event) : void {
 		$damaged = $event->getEntity();
 		$damager = $event->getDamager();
