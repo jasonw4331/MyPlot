@@ -273,6 +273,70 @@ class EventListener implements Listener
     {
         $this->onEnterPlotCheck($event->getPlayer(), $event);
     }
+    /**
+     * @ignoreCancelled false
+     * @priority LOWEST
+     *
+     * @param EntityTeleportEvent $event
+     */
+    public function onPlayerTeleport(EntityTeleportEvent $event): void
+    {
+        $entity = $event->getEntity();
+        if ($entity instanceof Player) {
+            $this->onEnterPlotCheck($entity, $event);
+        }
+
+    }
+    /**
+     * @param PlayerMoveEvent|EntityTeleportEvent $event
+     */
+    private function onEnterPlotCheck(Player $player, $event): void
+    {
+        $levelName = $player->getLevel()->getFolderName();
+        if (!$this->plugin->isLevelLoaded($levelName))
+            return;
+        $plot = $this->plugin->getPlotByPosition($event->getTo());
+        $plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
+        if ($plot !== null and ($plotFrom === null or !$plot->isSame($plotFrom))) {
+            if (strpos((string)$plot, "-0")) {
+                return;
+            }
+            $ev = new MyPlotPlayerEnterPlotEvent($plot, $player);
+            $ev->setCancelled($event->isCancelled());
+            $username = $player->getName();
+            if ($plot->owner !== $username and ($plot->isDenied($username) or $plot->isDenied("*")) and !$player->hasPermission("myplot.admin.denyplayer.bypass")) {
+                $ev->setCancelled();
+            }
+            $ev->call();
+            if ($event->isCancelled()) {
+                return;
+            }
+            if (!$this->plugin->getConfig()->get("ShowPlotPopup", true))
+                return;
+            $popup = $this->plugin->getLanguage()->translateString("popup", [TextFormat::GREEN . $plot]);
+            if (!empty($plot->owner)) {
+                $owner = TextFormat::GREEN . $plot->owner;
+                $ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
+            } else {
+                $ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
+            }
+            $paddingSize = (int)floor((strlen($popup) - strlen($ownerPopup)) / 2);
+            $paddingPopup = str_repeat(" ", max(0, -$paddingSize));
+            $paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
+            $popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
+            $player->sendTip($popup);
+        } elseif ($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
+            if (strpos((string)$plotFrom, "-0")) {
+                return;
+            }
+            $ev = new MyPlotPlayerLeavePlotEvent($plotFrom, $player);
+            $ev->setCancelled($event->isCancelled());
+            $ev->call();
+            $event->setCancelled($ev->isCancelled());
+        } elseif ($plotFrom !== null and $plot !== null and ($plot->isDenied($player->getName()) or $plot->isDenied("*")) and $plot->owner !== $player->getName() and !$player->hasPermission("myplot.admin.denyplayer.bypass")) {
+            $this->plugin->teleportPlayerToPlot($player, $plot, false);
+        }
+    }
 	/**
 	 * @ignoreCancelled false
 	 * @priority LOWEST
