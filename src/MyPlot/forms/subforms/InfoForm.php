@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot\forms\subforms;
 
+use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Dropdown;
 use dktapps\pmforms\element\Label;
 use MyPlot\forms\ComplexMyPlotForm;
@@ -59,7 +60,7 @@ class InfoForm extends ComplexMyPlotForm {
 					$plugin->getLanguage()->translateString("info.formpvp", [$this->plot->pvp ? "Enabled" : "Disabled"])  // TODO: translations
 				)
 			],
-			null
+			function(Player $player, CustomFormResponse $response) : void{}
 		);
 	}
 }

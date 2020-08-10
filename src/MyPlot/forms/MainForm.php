@@ -43,7 +43,7 @@ class MainForm extends SimpleMyPlotForm {
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Main"]),
 			"",
 			$elements,
-			function(Player $player, int $selectedOption) use ($plugin) : void {
+			function(Player $player, int $selectedOption) : void {
 				$form = $this->link[$selectedOption]->getForm($this->player);
 				$form->setPlot($this->plot);
 				$player->sendForm($form);
