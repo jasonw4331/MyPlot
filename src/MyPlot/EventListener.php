@@ -296,7 +296,7 @@ class EventListener implements Listener
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
 		if($plot !== null and ($plotFrom === null or !$plot->isSame($plotFrom))) {
-			if(strpos((string)$plot, "-0")) {
+			if(strpos((string) $plot, "-0")) {
 				return;
 			}
 			$ev = new MyPlotPlayerEnterPlotEvent($plot, $player);
@@ -315,7 +315,7 @@ class EventListener implements Listener
 			if(!empty($plot->owner)) {
 				$owner = TextFormat::GREEN . $plot->owner;
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
-			}else {
+			}else{
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
 			}
 			$paddingSize = (int)floor((strlen($popup) - strlen($ownerPopup)) / 2);
@@ -324,7 +324,7 @@ class EventListener implements Listener
 			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			$player->sendTip($popup);
 		}elseif($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
-			if(strpos((string)$plotFrom, "-0")) {
+			if(strpos((string) $plotFrom, "-0")) {
 				return;
 			}
 			$ev = new MyPlotPlayerLeavePlotEvent($plotFrom, $player);
