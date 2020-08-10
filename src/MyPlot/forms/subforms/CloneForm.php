@@ -2,9 +2,11 @@
 declare(strict_types=1);
 namespace MyPlot\forms\subforms;
 
+use dktapps\pmforms\CustomFormResponse;
+use dktapps\pmforms\element\Input;
+use dktapps\pmforms\element\Label;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
-use MyPlot\Plot;
 use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -15,72 +17,86 @@ class CloneForm extends ComplexMyPlotForm {
 	private $player;
 
 	public function __construct(Player $player) {
-		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("clone.form")]));
-
 		$plot = $plugin->getPlotByPosition($player);
 		if($plot === null) {
 			$plot = new \stdClass();
 			$plot->X = "";
 			$plot->Z = "";
 		}
+		parent::__construct(
+			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("clone.form")]),
+			[
+				new Label(
+					"0",
+					$plugin->getLanguage()->get("clone.formlabel1")
+				),
+				new Input(
+					"1",
+					$plugin->getLanguage()->get("clone.formxcoord"),
+					"2",
+					(string)$plot->X
+				),
+				new Input(
+					"2",
+					$plugin->getLanguage()->get("clone.formzcoord"),
+					"-4",
+					(string)$plot->Z
+				),
+				new Input(
+					"3",
+					$plugin->getLanguage()->get("clone.formworld"),
+					"world",
+					$player->getLevel()->getFolderName()
+				),
+				new Label(
+					"4",
+					$plugin->getLanguage()->get("clone.formlabel2")
+				),
+				new Input(
+					"5",
+					$plugin->getLanguage()->get("clone.formxcoord"),
+					"2"
+				),
+				new Input(
+					"6",
+					$plugin->getLanguage()->get("clone.formzcoord"),
+					"-4"
+				),
+				new Input(
+					"7",
+					$plugin->getLanguage()->get("clone.formworld"),
+					"world",
+					$player->getLevel()->getFolderName()
+				)
+			],
+			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
+				if(is_numeric($response->getString("1")) and is_numeric($response->getString("2")) and is_numeric($response->getString("5")) and is_numeric($response->getString("6"))) {
+					$originPlot = MyPlot::getInstance()->getProvider()->getPlot(empty($response->getString("3")) ? $this->player->getLevel()->getFolderName() : $response->getString("3"), (int)$response->getString("1"), (int)$response->getString("2"));
+					$clonedPlot = MyPlot::getInstance()->getProvider()->getPlot(empty($response->getString("7")) ? $this->player->getLevel()->getFolderName() : $response->getString("7"), (int)$response->getString("5"), (int)$response->getString("6"));
+				}else
+					throw new FormValidationException("Unexpected form data returned");
 
-		$this->addLabel($plugin->getLanguage()->get("clone.formlabel1"));
-		$this->addInput($plugin->getLanguage()->get("clone.formxcoord"), "2", (string)$plot->X);
-		$this->addInput($plugin->getLanguage()->get("clone.formzcoord"), "-4", (string)$plot->Z);
-		$this->addInput($plugin->getLanguage()->get("clone.formworld"), "world", $player->getLevel()->getFolderName());
-
-		$this->addLabel($plugin->getLanguage()->get("clone.formlabel2"));
-		$this->addInput($plugin->getLanguage()->get("clone.formxcoord"), "2");
-		$this->addInput($plugin->getLanguage()->get("clone.formzcoord"), "-4");
-		$this->addInput($plugin->getLanguage()->get("clone.formworld"), "world", $player->getLevel()->getFolderName());
-
-		$this->setCallable(function(Player $player, ?array $data) use ($plugin) {
-			if(is_null($data)) {
-				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
-				return;
+				if($originPlot->owner !== $player->getName() and !$player->hasPermission("myplot.admin.clone")) {
+					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("notowner"));
+					return;
+				}
+				if($clonedPlot->owner !== $player->getName() and !$player->hasPermission("myplot.admin.clone")) {
+					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("notowner"));
+					return;
+				}
+				$plotLevel = $plugin->getLevelSettings($originPlot->levelName);
+				$economy = $plugin->getEconomyProvider();
+				if($economy !== null and !$economy->reduceMoney($player, $plotLevel->clonePrice)) {
+					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("clone.nomoney"));
+					return;
+				}
+				if($plugin->clonePlot($originPlot, $clonedPlot)) {
+					$player->sendMessage($plugin->getLanguage()->translateString("clone.success", [$clonedPlot->__toString(), $originPlot->__toString()]));
+				}else{
+					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("error"));
+				}
 			}
-			/** @var Plot $originPlot */
-			$originPlot = $data[0];
-			/** @var Plot $clonedPlot */
-			$clonedPlot = $data[1];
-			if($originPlot->owner !== $player->getName() and !$player->hasPermission("myplot.admin.clone")) {
-				$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("notowner"));
-				return;
-			}
-			if($clonedPlot->owner !== $player->getName() and !$player->hasPermission("myplot.admin.clone")) {
-				$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("notowner"));
-				return;
-			}
-			$plotLevel = $plugin->getLevelSettings($originPlot->levelName);
-			$economy = $plugin->getEconomyProvider();
-			if($economy !== null and !$economy->reduceMoney($player, $plotLevel->clonePrice)) {
-				$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("clone.nomoney"));
-				return;
-			}
-			if($plugin->clonePlot($originPlot, $clonedPlot)) {
-				$player->sendMessage($plugin->getLanguage()->translateString("clone.success", [$clonedPlot->__toString(), $originPlot->__toString()]));
-			}else{
-				$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("error"));
-			}
-		});
-	}
-
-	public function handleResponse(Player $player, $data) : void {
-		$this->player = $player;
-		parent::handleResponse($player, $data);
-	}
-
-	public function processData(&$data) : void {
-		if(is_null($data))
-			return;
-		elseif(is_array($data) and is_numeric($data[1]) and is_numeric($data[2]) and is_numeric($data[5]) and is_numeric($data[6])) {
-			$newData = [];
-			$newData[] = MyPlot::getInstance()->getProvider()->getPlot(empty($data[3]) ? $this->player->getLevel()->getFolderName() : $data[3], (int)$data[1], (int)$data[2]);
-			$newData[] = MyPlot::getInstance()->getProvider()->getPlot(empty($data[7]) ? $this->player->getLevel()->getFolderName() : $data[7], (int)$data[5], (int)$data[6]);
-			$data = $newData;
-		}else
-			throw new FormValidationException("Unexpected form data returned");
+		);
 	}
 }

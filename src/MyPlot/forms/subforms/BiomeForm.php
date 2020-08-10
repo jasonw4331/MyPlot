@@ -2,14 +2,14 @@
 declare(strict_types=1);
 namespace MyPlot\forms\subforms;
 
+use dktapps\pmforms\MenuOption;
 use MyPlot\forms\SimpleMyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class BiomeForm extends SimpleMyPlotForm {
-	/** @var string[] */
+	/** @var string[] $biomeNames */
 	private $biomeNames = [];
 
 	/**
@@ -18,30 +18,21 @@ class BiomeForm extends SimpleMyPlotForm {
 	 * @param string[] $biomes
 	 */
 	public function __construct(array $biomes) {
-		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("biome.form")]));
 
+		$elements = [];
 		$this->biomeNames = $biomes;
 		foreach($biomes as $biomeName) {
-			$this->addButton(TextFormat::DARK_RED.ucfirst(strtolower(str_replace("_", " ", $biomeName)))); // TODO: add images
+			$elements[] = new MenuOption(TextFormat::DARK_RED.ucfirst(strtolower(str_replace("_", " ", $biomeName)))); // TODO: add images
 		}
 
-		$this->setCallable(function(Player $player, ?string $data) use ($plugin) {
-			if(is_null($data)) {
-				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
-				return;
+		parent::__construct(
+			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("biome.form")]),
+			"",
+			$elements,
+			function(Player $player, int $selectedOption) use ($plugin) : void {
+				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("biome.name").' "'.$this->biomeNames[$selectedOption].'"', true);
 			}
-			$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("biome.name")." \"$data\"", true);
-		});
-	}
-
-	public function processData(&$data) : void {
-		if(is_null($data))
-			return;
-		elseif(is_int($data))
-			$data = $this->biomeNames[$data];
-		else
-			throw new FormValidationException("Unexpected form data returned");
+		);
 	}
 }

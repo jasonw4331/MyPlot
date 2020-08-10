@@ -2,40 +2,30 @@
 declare(strict_types=1);
 namespace MyPlot\forms\subforms;
 
+use dktapps\pmforms\MenuOption;
 use MyPlot\forms\SimpleMyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class HomeForm extends SimpleMyPlotForm {
 	public function __construct(Player $player) {
-		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("home.form")]));
 
 		$plots = $plugin->getPlotsOfPlayer($player->getName(), $player->getLevel()->getFolderName());
 		$i = 1;
+		$elements = [];
 		foreach($plots as $plot) {
-			$this->addButton(TextFormat::DARK_RED.$i++.") ".$plot->name." ".(string)$plot);
+			$elements[] = new MenuOption(TextFormat::DARK_RED.$i++.") ".$plot->name." ".(string)$plot);
 		}
-
-		$this->setCallable(function(Player $player, ?int $data) use ($plugin) {
-			if(is_null($data)) {
-				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
-				return;
+		parent::__construct(
+			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("home.form")]),
+			"",
+			$elements,
+			function(Player $player, int $selectedOption) use ($plugin) : void {
+				// TODO: merge list and home into one form
+				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("home.name").' "'.($selectedOption+1).'"', true);
 			}
-			// TODO: merge list and home into one form
-			$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("home.name")." \"$data\"", true);
-		});
-	}
-
-	public function processData(&$data) : void {
-		if(is_null($data))
-			return;
-		elseif(is_int($data))
-			$data += 1;
-		else
-			throw new FormValidationException("Unexpected form data returned");
+		);
 	}
 }

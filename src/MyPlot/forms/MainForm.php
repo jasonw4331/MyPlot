@@ -2,9 +2,9 @@
 declare(strict_types=1);
 namespace MyPlot\forms;
 
+use dktapps\pmforms\MenuOption;
 use MyPlot\MyPlot;
 use MyPlot\subcommand\SubCommand;
-use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -24,12 +24,11 @@ class MainForm extends SimpleMyPlotForm {
 	 * @throws \ReflectionException
 	 */
 	public function __construct(Player $player, array $subCommands) {
-		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Main"]));
 
 		$this->plot = $plugin->getPlotByPosition($player);
 
+		$elements = [];
 		foreach($subCommands as $name => $command) {
 			if(!$command->canUse($player) or $command->getForm($player) === null)
 				continue;
@@ -37,29 +36,18 @@ class MainForm extends SimpleMyPlotForm {
 			$name = preg_replace('/([a-z])([A-Z])/s','$1 $2', $name);
 			$length = strlen($name) - strlen("Sub Command");
 			$name = substr($name, 0, $length);
-			$this->addButton(TextFormat::DARK_RED.ucfirst($name));
+			$elements[] = new MenuOption(TextFormat::DARK_RED.ucfirst($name));
 			$this->link[] = $command;
 		}
-
-		$this->setCallable(function(Player $player, ?MyPlotForm $data) {
-			if(is_null($data))
-				return;
-			$data->setPlot($this->plot);
-			$player->sendForm($data);
-		});
-	}
-
-	public function handleResponse(Player $player, $data) : void {
-		$this->player = $player;
-		parent::handleResponse($player, $data);
-	}
-
-	public function processData(&$data) : void {
-		if(is_int($data))
-			$data = $this->link[$data]->getForm($this->player);
-		elseif(is_null($data))
-			return;
-		else
-			throw new FormValidationException("Unexpected form data returned");
+		parent::__construct(
+			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", ["Main"]),
+			"",
+			$elements,
+			function(Player $player, int $selectedOption) use ($plugin) : void {
+				$form = $this->link[$selectedOption]->getForm($this->player);
+				$form->setPlot($this->plot);
+				$player->sendForm($form);
+			}
+		);
 	}
 }

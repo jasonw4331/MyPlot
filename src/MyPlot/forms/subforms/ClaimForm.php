@@ -2,9 +2,10 @@
 declare(strict_types=1);
 namespace MyPlot\forms\subforms;
 
+use dktapps\pmforms\CustomFormResponse;
+use dktapps\pmforms\element\Input;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
-use MyPlot\Plot;
 use pocketmine\form\FormValidationException;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -15,78 +16,85 @@ class ClaimForm extends ComplexMyPlotForm {
 	private $player;
 
 	public function __construct(Player $player) {
-		parent::__construct(null);
 		$plugin = MyPlot::getInstance();
-		$this->setTitle(TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("claim.form")]));
-
 		$plot = $plugin->getPlotByPosition($player);
 		if($plot === null) {
 			$plot = new \stdClass();
 			$plot->X = "";
 			$plot->Z = "";
 		}
+		parent::__construct(
+			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("claim.form")]),
+			[
+				new Input(
+					"0",
+					$plugin->getLanguage()->get("claim.formxcoord"),
+					"2",
+					(string)$plot->X
+				),
+				new Input(
+					"1",
+					$plugin->getLanguage()->get("claim.formzcoord"),
+					"2",
+					(string)$plot->Z
+				),
+				new Input(
+					"2",
+					$plugin->getLanguage()->get("claim.formworld"),
+					"world",
+					$player->getLevel()->getFolderName()
+				)
+			],
+			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
+				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")))
+					$data = MyPlot::getInstance()->getProvider()->getPlot(
+						empty($response->getString("2")) ? $this->player->getLevel()->getFolderName() : $response->getString("2"),
+						(int)$response->getString("0"),
+						(int)$response->getString("1")
+					);
+				elseif(empty($response->getString("0")) or empty($response->getString("1"))) {
+					$plot = MyPlot::getInstance()->getPlotByPosition($this->player);
+					if($plot === null) {
+						$this->player->sendForm(new self($this->player));
+						throw new FormValidationException("Unexpected form data returned");
+					}
+					$data = $plot;
+				}else {
+					throw new FormValidationException("Unexpected form data returned");
+				}
 
-		$this->addInput($plugin->getLanguage()->get("claim.formxcoord"), "2", (string)$plot->X);
-		$this->addInput($plugin->getLanguage()->get("claim.formzcoord"), "-4", (string)$plot->Z);
-		$this->addInput($plugin->getLanguage()->get("claim.formworld"), "world", $player->getLevel()->getFolderName());
-
-		$this->setCallable(function(Player $player, ?Plot $data) use ($plugin) {
-			if(is_null($data)) {
-				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name"), true);
-				return;
-			}
-			if($data->owner != "") {
-				if($data->owner === $player->getName()) {
-					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.yourplot"));
+				if($data->owner != "") {
+					if($data->owner === $player->getName()) {
+						$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.yourplot"));
+					}else{
+						$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.alreadyclaimed", [$data->owner]));
+					}
+					return;
+				}
+				$maxPlots = $plugin->getMaxPlotsOfPlayer($player);
+				$plotsOfPlayer = 0;
+				foreach($plugin->getPlotLevels() as $level => $settings) {
+					$level = $plugin->getServer()->getLevelByName((string)$level);
+					if(!$level->isClosed()) {
+						$plotsOfPlayer += count($plugin->getPlotsOfPlayer($player->getName(), $level->getFolderName()));
+					}
+				}
+				if($plotsOfPlayer >= $maxPlots) {
+					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.maxplots", [$maxPlots]));
+					return;
+				}
+				$plotLevel = $plugin->getLevelSettings($data->levelName);
+				$economy = $plugin->getEconomyProvider();
+				if($economy !== null and !$economy->reduceMoney($player, $plotLevel->claimPrice)) {
+					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.nomoney"));
+					return;
+				}
+				if($plugin->claimPlot($data, $player->getName())) {
+					$player->sendMessage($plugin->getLanguage()->translateString("claim.success"));
 				}else{
-					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.alreadyclaimed", [$data->owner]));
-				}
-				return;
-			}
-			$maxPlots = $plugin->getMaxPlotsOfPlayer($player);
-			$plotsOfPlayer = 0;
-			foreach($plugin->getPlotLevels() as $level => $settings) {
-				$level = $plugin->getServer()->getLevelByName((string)$level);
-				if(!$level->isClosed()) {
-					$plotsOfPlayer += count($plugin->getPlotsOfPlayer($player->getName(), $level->getFolderName()));
+					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("error"));
 				}
 			}
-			if($plotsOfPlayer >= $maxPlots) {
-				$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.maxplots", [$maxPlots]));
-				return;
-			}
-			$plotLevel = $plugin->getLevelSettings($data->levelName);
-			$economy = $plugin->getEconomyProvider();
-			if($economy !== null and !$economy->reduceMoney($player, $plotLevel->claimPrice)) {
-				$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.nomoney"));
-				return;
-			}
-			if($plugin->claimPlot($data, $player->getName())) {
-				$player->sendMessage($plugin->getLanguage()->translateString("claim.success"));
-			}else{
-				$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("error"));
-			}
-		});
-	}
-
-	public function handleResponse(Player $player, $data) : void {
-		$this->player = $player;
-		parent::handleResponse($player, $data);
-	}
-
-	public function processData(&$data) : void {
-		if(is_null($data))
-			return;
-		elseif(is_array($data) and is_numeric($data[0]) and is_numeric($data[1]))
-			$data = MyPlot::getInstance()->getProvider()->getPlot(empty($data[2]) ? $this->player->getLevel()->getFolderName() : $data[2], (int)$data[0], (int)$data[1]);
-		elseif(is_array($data) and empty($data[0]) and empty($data[1])) {
-			$plot = MyPlot::getInstance()->getPlotByPosition($this->player);
-			if($plot === null) {
-				$this->player->sendForm(new self($this->player));
-				throw new FormValidationException("Unexpected form data returned");
-			}
-			$data = $plot;
-		}else
-			throw new FormValidationException("Unexpected form data returned");
+		);
 	}
 }
