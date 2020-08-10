@@ -286,7 +286,6 @@ class EventListener implements Listener
 		if ($entity instanceof Player) {
 			$this->onEnterPlotCheck($entity, $event);
 		}
-
 	}
 
 	/**
