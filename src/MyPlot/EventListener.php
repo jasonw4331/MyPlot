@@ -293,7 +293,7 @@ class EventListener implements Listener
     /**
      * @param PlayerMoveEvent|EntityTeleportEvent $event
      */
-    private function onEnterPlotCheck(Player $player, $event)
+    private function onEnterPlotCheck(Player $player, $event): void
     {
         $levelName = $player->getLevel()->getFolderName();
         if (!$this->plugin->isLevelLoaded($levelName))
