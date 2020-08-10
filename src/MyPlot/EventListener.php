@@ -15,6 +15,7 @@ use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
@@ -268,51 +269,74 @@ class EventListener implements Listener
 	 *
 	 * @param PlayerMoveEvent $event
 	 */
-	public function onPlayerMove(PlayerMoveEvent $event) : void {
-		$levelName = $event->getPlayer()->getLevel()->getFolderName();
-		if(!$this->plugin->isLevelLoaded($levelName))
+	public function onPlayerMove(PlayerMoveEvent $event): void
+	{
+		$this->onEnterPlotCheck($event->getPlayer(), $event);
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param EntityTeleportEvent $event
+	 */
+	public function onPlayerTeleport(EntityTeleportEvent $event): void
+	{
+		$entity = $event->getEntity();
+		if ($entity instanceof Player) {
+			$this->onEnterPlotCheck($entity, $event);
+		}
+
+	}
+
+	/**
+	 * @param PlayerMoveEvent|EntityTeleportEvent $event
+	 */
+	private function onEnterPlotCheck(Player $player, $event): void
+	{
+		$levelName = $player->getLevel()->getFolderName();
+		if (!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
-		if($plot !== null and ($plotFrom === null or !$plot->isSame($plotFrom))) {
-			if(strpos((string) $plot, "-0")) {
+		if ($plot !== null and ($plotFrom === null or !$plot->isSame($plotFrom))) {
+			if (strpos((string)$plot, "-0")) {
 				return;
 			}
-			$ev = new MyPlotPlayerEnterPlotEvent($plot, $event->getPlayer());
+			$ev = new MyPlotPlayerEnterPlotEvent($plot, $player);
 			$ev->setCancelled($event->isCancelled());
-			$username = $event->getPlayer()->getName();
-			if($plot->owner !== $username and ($plot->isDenied($username) or $plot->isDenied("*")) and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
+			$username = $player->getName();
+			if ($plot->owner !== $username and ($plot->isDenied($username) or $plot->isDenied("*")) and !$player->hasPermission("myplot.admin.denyplayer.bypass")) {
 				$ev->setCancelled();
 			}
 			$ev->call();
-			$event->setCancelled($ev->isCancelled());
-			if($event->isCancelled()) {
+			if ($event->isCancelled()) {
 				return;
 			}
-			if(!$this->plugin->getConfig()->get("ShowPlotPopup", true))
+			if (!$this->plugin->getConfig()->get("ShowPlotPopup", true))
 				return;
 			$popup = $this->plugin->getLanguage()->translateString("popup", [TextFormat::GREEN . $plot]);
-			if(!empty($plot->owner)) {
+			if (!empty($plot->owner)) {
 				$owner = TextFormat::GREEN . $plot->owner;
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
-			}else{
+			} else {
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
 			}
-			$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
+			$paddingSize = (int)floor((strlen($popup) - strlen($ownerPopup)) / 2);
 			$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
 			$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
 			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
-			$event->getPlayer()->sendTip($popup);
-		}elseif($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
-			if(strpos((string) $plotFrom, "-0")) {
+			$player->sendTip($popup);
+		} elseif ($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
+			if (strpos((string)$plotFrom, "-0")) {
 				return;
 			}
-			$ev = new MyPlotPlayerLeavePlotEvent($plotFrom, $event->getPlayer());
+			$ev = new MyPlotPlayerLeavePlotEvent($plotFrom, $player);
 			$ev->setCancelled($event->isCancelled());
 			$ev->call();
 			$event->setCancelled($ev->isCancelled());
-		}elseif($plotFrom !== null and $plot !== null and ($plot->isDenied($event->getPlayer()->getName()) or $plot->isDenied("*")) and $plot->owner !== $event->getPlayer()->getName() and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
-			$this->plugin->teleportPlayerToPlot($event->getPlayer(), $plot, false);
+		} elseif ($plotFrom !== null and $plot !== null and ($plot->isDenied($player->getName()) or $plot->isDenied("*")) and $plot->owner !== $player->getName() and !$player->hasPermission("myplot.admin.denyplayer.bypass")) {
+			$this->plugin->teleportPlayerToPlot($player, $plot, false);
 		}
 	}
 
