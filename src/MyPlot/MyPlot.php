@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace MyPlot;
 
-use EssentialsPE\Loader;
 use muqsit\worldstyler\shapes\CommonShape;
 use muqsit\worldstyler\shapes\Cuboid;
 use muqsit\worldstyler\WorldStyler;
@@ -16,10 +15,8 @@ use MyPlot\events\MyPlotTeleportEvent;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
-use MyPlot\provider\EssentialsPEProvider;
 use MyPlot\provider\JSONDataProvider;
 use MyPlot\provider\MySQLProvider;
-use MyPlot\provider\PocketMoneyProvider;
 use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearBorderTask;
@@ -41,7 +38,6 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
-use PocketMoney\PocketMoney;
 use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
@@ -73,6 +69,17 @@ class MyPlot extends PluginBase
 	 */
 	public function getLanguage() : BaseLang {
 		return $this->baseLang;
+	}
+
+	/**
+	 * Returns the fallback language class
+	 *
+	 * @internal
+	 *
+	 * @return BaseLang
+	 */
+	public function getFallBackLang() : BaseLang {
+		return new BaseLang(BaseLang::FALLBACK_LANGUAGE, $this->getFile() . "resources/");
 	}
 
 	/**
@@ -930,7 +937,7 @@ class MyPlot extends PluginBase
 		}
 		$plotSize = $plotLevel->plotSize;
 		$pos = $this->getPlotPosition($plot);
-		$pos = new Position($pos->x + ($plotSize / 2), $pos->y + 1, $pos->z + ($plotSize / 2));
+		$pos = new Position($pos->x + ($plotSize / 2), $pos->y + 1, $pos->z + ($plotSize / 2), $pos->getLevel());
 		return $pos;
 	}
 
@@ -954,6 +961,10 @@ class MyPlot extends PluginBase
 
 	/* -------------------------- Non-API part -------------------------- */
 	public function onLoad() : void {
+		if (!\class_exists(SpoonDetector::class)) {
+			$this->getLogger()->critical("SpoonDetector Virion not found! Please re-download MyPlot from Poggit.");
+			return;
+		}
 		$this->getLogger()->debug(TF::BOLD."Loading...");
 		self::$instance = $this;
 		$this->getLogger()->debug(TF::BOLD . "Loading Configs");
@@ -1034,6 +1045,10 @@ class MyPlot extends PluginBase
 	}
 
 	public function onEnable() : void {
+		if (!\class_exists(SpoonDetector::class)) {
+			$this->getServer()->getPluginManager()->disablePlugin($this);
+			return;
+		}
 		SpoonDetector::printSpoon($this, "spoon.txt");
 		if($this->isDisabled()) {
 			return;
@@ -1047,20 +1062,6 @@ class MyPlot extends PluginBase
 					$this->getLogger()->debug("Eco set to EconomySProvider");
 				}else
 				$this->getLogger()->debug("Eco not instance of EconomyAPI");
-			}
-			elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("EssentialsPE")) !== null) {
-				if($plugin instanceof Loader) {
-					$this->economyProvider = new EssentialsPEProvider($plugin);
-					$this->getLogger()->debug("Eco set to EssentialsPE");
-				}else
-				$this->getLogger()->debug("Eco not instance of EssentialsPE");
-			}
-			elseif(($plugin = $this->getServer()->getPluginManager()->getPlugin("PocketMoney")) !== null) {
-				if($plugin instanceof PocketMoney) {
-					$this->economyProvider = new PocketMoneyProvider($plugin);
-					$this->getLogger()->debug("Eco set to PocketMoney");
-				}else
-				$this->getLogger()->debug("Eco not instance of PocketMoney");
 			}
 			if(!isset($this->economyProvider)) {
 				$this->getLogger()->info("No supported economy plugin found!");

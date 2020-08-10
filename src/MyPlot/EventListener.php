@@ -20,6 +20,7 @@ use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\item\Food;
 use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\utils\Config;
@@ -111,6 +112,8 @@ class EventListener implements Listener
 	 * @param PlayerInteractEvent $event
 	 */
 	public function onPlayerInteract(PlayerInteractEvent $event) : void {
+		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR and $event->getItem() instanceof Food)
+			return;
 		$this->onEventOnBlock($event);
 	}
 
@@ -253,7 +256,7 @@ class EventListener implements Listener
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
-		if(!$settings->updatePlotLiquids) {
+		if(!$settings->updatePlotLiquids and ($this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot or $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot or $this->plugin->isPositionBorderingPlot($event->getBlock()) or $this->plugin->isPositionBorderingPlot($event->getSource()))) {
 			$event->setCancelled();
 			$this->plugin->getLogger()->debug("Cancelled block spread of {$event->getBlock()->getName()} on " . $levelName);
 		}
@@ -308,6 +311,8 @@ class EventListener implements Listener
 			$ev->setCancelled($event->isCancelled());
 			$ev->call();
 			$event->setCancelled($ev->isCancelled());
+		}elseif($plotFrom !== null and $plot !== null and ($plot->isDenied($event->getPlayer()->getName()) or $plot->isDenied("*")) and $plot->owner !== $event->getPlayer()->getName() and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
+			$this->plugin->teleportPlayerToPlot($event->getPlayer(), $plot, false);
 		}
 	}
 

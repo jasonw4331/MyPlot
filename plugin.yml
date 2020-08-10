@@ -1,6 +1,6 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.6.10
+version: 1.7.0
 api:
 - 3.4.0
 authors:
@@ -11,8 +11,6 @@ description: "Plots and Protection Plugin for PocketMine-MP Servers"
 load: STARTUP
 softdepend:
 - EconomyAPI
-- PocketMoney
-- EssentialsPE
 - DEVirion
 - WorldStyler
 - EasyCommandAutofill

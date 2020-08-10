@@ -137,7 +137,7 @@ class MyPlotGenerator extends Generator {
 	 * @param int $x
 	 * @param int $z
 	 *
-	 * @return \SplFixedArray
+	 * @return \SplFixedArray<int>
 	 */
 	public function getShape(int $x, int $z) {
 		$totalSize = $this->plotSize + $this->roadWidth;
