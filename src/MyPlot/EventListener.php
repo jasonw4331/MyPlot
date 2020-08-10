@@ -306,6 +306,7 @@ class EventListener implements Listener
 				$ev->setCancelled();
 			}
 			$ev->call();
+			$event->setCancelled($ev->isCancelled());
 			if($event->isCancelled()) {
 				return;
 			}
@@ -318,7 +319,7 @@ class EventListener implements Listener
 			}else{
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
 			}
-			$paddingSize = (int)floor((strlen($popup) - strlen($ownerPopup)) / 2);
+			$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
 			$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
 			$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
 			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
