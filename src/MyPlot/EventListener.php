@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace MyPlot;
 
 use MyPlot\events\MyPlotBlockEvent;
@@ -38,8 +37,7 @@ class EventListener implements Listener
 	 *
 	 * @param MyPlot $plugin
 	 */
-	public function __construct(MyPlot $plugin)
-	{
+	public function __construct(MyPlot $plugin) {
 		$this->plugin = $plugin;
 	}
 
@@ -49,24 +47,23 @@ class EventListener implements Listener
 	 *
 	 * @param LevelLoadEvent $event
 	 */
-	public function onLevelLoad(LevelLoadEvent $event): void
-	{
-		if (file_exists($this->plugin->getDataFolder() . "worlds" . DIRECTORY_SEPARATOR . $event->getLevel()->getFolderName() . ".yml")) {
+	public function onLevelLoad(LevelLoadEvent $event) : void {
+		if(file_exists($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$event->getLevel()->getFolderName().".yml")) {
 			$this->plugin->getLogger()->debug("MyPlot level " . $event->getLevel()->getFolderName() . " loaded!");
 			$settings = $event->getLevel()->getProvider()->getGeneratorOptions();
-			if (!isset($settings["preset"]) or empty($settings["preset"])) {
+			if(!isset($settings["preset"]) or empty($settings["preset"])) {
 				return;
 			}
 			$settings = json_decode($settings["preset"], true);
-			if ($settings === false) {
+			if($settings === false) {
 				return;
 			}
 			$levelName = $event->getLevel()->getFolderName();
-			$default = array_filter($this->plugin->getConfig()->get("DefaultWorld", []), function ($key) {
+			$default = array_filter($this->plugin->getConfig()->get("DefaultWorld", []), function($key){
 				return !in_array($key, ["PlotSize", "GroundHeight", "RoadWidth", "RoadBlock", "WallBlock", "PlotFloorBlock", "PlotFillBlock", "BottomBlock"]);
 			}, ARRAY_FILTER_USE_KEY);
-			$config = new Config($this->plugin->getDataFolder() . "worlds" . DIRECTORY_SEPARATOR . $levelName . ".yml", Config::YAML, $default);
-			foreach (array_keys($default) as $key) {
+			$config = new Config($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML, $default);
+			foreach(array_keys($default) as $key) {
 				$settings[$key] = $config->get((string)$key);
 			}
 			$this->plugin->addLevelSettings($levelName, new PlotLevelSettings($levelName, $settings));
@@ -79,13 +76,12 @@ class EventListener implements Listener
 	 *
 	 * @param LevelUnloadEvent $event
 	 */
-	public function onLevelUnload(LevelUnloadEvent $event): void
-	{
-		if ($event->isCancelled()) {
+	public function onLevelUnload(LevelUnloadEvent $event) : void {
+		if($event->isCancelled()) {
 			return;
 		}
 		$levelName = $event->getLevel()->getFolderName();
-		if ($this->plugin->unloadLevelSettings($levelName)) {
+		if($this->plugin->unloadLevelSettings($levelName)) {
 			$this->plugin->getLogger()->debug("Level " . $event->getLevel()->getFolderName() . " unloaded!");
 		}
 	}
@@ -96,33 +92,63 @@ class EventListener implements Listener
 	 *
 	 * @param BlockPlaceEvent $event
 	 */
-	public function onBlockPlace(BlockPlaceEvent $event): void
-	{
+	public function onBlockPlace(BlockPlaceEvent $event) : void {
+		$this->onEventOnBlock($event);
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param BlockBreakEvent $event
+	 */
+	public function onBlockBreak(BlockBreakEvent $event) : void {
+		$this->onEventOnBlock($event);
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param PlayerInteractEvent $event
+	 */
+	public function onPlayerInteract(PlayerInteractEvent $event) : void {
+		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR and $event->getItem() instanceof Food)
+			return;
+		$this->onEventOnBlock($event);
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param SignChangeEvent $event
+	 */
+	public function onSignChange(SignChangeEvent $event) : void {
 		$this->onEventOnBlock($event);
 	}
 
 	/**
 	 * @param BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent|SignChangeEvent $event
 	 */
-	private function onEventOnBlock($event): void
-	{
-		if (!$event->getBlock()->isValid())
+	private function onEventOnBlock($event) : void {
+		if(!$event->getBlock()->isValid())
 			return;
 		$levelName = $event->getBlock()->getLevel()->getFolderName();
-		if (!$this->plugin->isLevelLoaded($levelName)) {
+		if(!$this->plugin->isLevelLoaded($levelName)) {
 			return;
 		}
 		$plot = $this->plugin->getPlotByPosition($event->getBlock());
-		if ($plot !== null) {
+		if($plot !== null) {
 			$ev = new MyPlotBlockEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
-			if ($event->isCancelled()) {
+			if($event->isCancelled()) {
 				$ev->setCancelled($event->isCancelled());
 			}
 			$ev->call();
 			$event->setCancelled($ev->isCancelled());
 			$username = $event->getPlayer()->getName();
-			if ($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot")) {
-				if (!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
+			if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot")) {
+				if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
 					return;
 				/*
 				 * Prevent growing a tree near the edge of a plot
@@ -137,64 +163,29 @@ class EventListener implements Listener
 				$plotSize = $this->plugin->getLevelSettings($levelName)->plotSize;
 				$endPos->x += $plotSize - $maxLengthLeaves;
 				$endPos->z += $plotSize - $maxLengthLeaves;
-				if ($block->x >= $beginPos->x and $block->z >= $beginPos->z and $block->x < $endPos->x and $block->z < $endPos->z) {
+				if($block->x >= $beginPos->x and $block->z >= $beginPos->z and $block->x < $endPos->x and $block->z < $endPos->z) {
 					return;
 				}
 			}
-		} elseif ($event->getPlayer()->hasPermission("myplot.admin.build.road"))
+		}elseif($event->getPlayer()->hasPermission("myplot.admin.build.road"))
 			return;
-		elseif ($this->plugin->isPositionBorderingPlot($event->getBlock()) and $this->plugin->getLevelSettings($levelName)->editBorderBlocks) {
+		elseif($this->plugin->isPositionBorderingPlot($event->getBlock()) and $this->plugin->getLevelSettings($levelName)->editBorderBlocks) {
 			$plot = $this->plugin->getPlotBorderingPosition($event->getBlock());
-			if ($plot instanceof Plot) {
+			if($plot instanceof Plot) {
 				$ev = new MyPlotBorderChangeEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
-				if ($event->isCancelled()) {
+				if($event->isCancelled()) {
 					$ev->setCancelled($event->isCancelled());
 				}
 				$ev->call();
 				$event->setCancelled($ev->isCancelled());
 				$username = $event->getPlayer()->getName();
-				if ($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot"))
-					if (!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
+				if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot"))
+					if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
 						return;
 			}
 		}
 		$event->setCancelled();
-		$this->plugin->getLogger()->debug("Block placement/break/interaction of {$event->getBlock()->getName()} was cancelled at " . $event->getBlock()->asPosition()->__toString());
-	}
-
-	/**
-	 * @ignoreCancelled false
-	 * @priority LOWEST
-	 *
-	 * @param BlockBreakEvent $event
-	 */
-	public function onBlockBreak(BlockBreakEvent $event): void
-	{
-		$this->onEventOnBlock($event);
-	}
-
-	/**
-	 * @ignoreCancelled false
-	 * @priority LOWEST
-	 *
-	 * @param PlayerInteractEvent $event
-	 */
-	public function onPlayerInteract(PlayerInteractEvent $event): void
-	{
-		if ($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR and $event->getItem() instanceof Food)
-			return;
-		$this->onEventOnBlock($event);
-	}
-
-	/**
-	 * @ignoreCancelled false
-	 * @priority LOWEST
-	 *
-	 * @param SignChangeEvent $event
-	 */
-	public function onSignChange(SignChangeEvent $event): void
-	{
-		$this->onEventOnBlock($event);
+		$this->plugin->getLogger()->debug("Block placement/break/interaction of {$event->getBlock()->getName()} was cancelled at ".$event->getBlock()->asPosition()->__toString());
 	}
 
 	/**
@@ -203,16 +194,15 @@ class EventListener implements Listener
 	 *
 	 * @param EntityExplodeEvent $event
 	 */
-	public function onExplosion(EntityExplodeEvent $event): void
-	{
-		if ($event->isCancelled()) {
+	public function onExplosion(EntityExplodeEvent $event) : void {
+		if($event->isCancelled()) {
 			return;
 		}
 		$levelName = $event->getEntity()->getLevel()->getFolderName();
-		if (!$this->plugin->isLevelLoaded($levelName))
+		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getPosition());
-		if ($plot === null) {
+		if($plot === null) {
 			$event->setCancelled();
 			return;
 		}
@@ -221,8 +211,8 @@ class EventListener implements Listener
 		$plotSize = $this->plugin->getLevelSettings($levelName)->plotSize;
 		$endPos->x += $plotSize;
 		$endPos->z += $plotSize;
-		$blocks = array_filter($event->getBlockList(), function ($block) use ($beginPos, $endPos) {
-			if ($block->x >= $beginPos->x and $block->z >= $beginPos->z and $block->x < $endPos->x and $block->z < $endPos->z) {
+		$blocks = array_filter($event->getBlockList(), function($block) use ($beginPos, $endPos) {
+			if($block->x >= $beginPos->x and $block->z >= $beginPos->z and $block->x < $endPos->x and $block->z < $endPos->z) {
 				return true;
 			}
 			return false;
@@ -236,19 +226,18 @@ class EventListener implements Listener
 	 *
 	 * @param EntityMotionEvent $event
 	 */
-	public function onEntityMotion(EntityMotionEvent $event): void
-	{
-		if ($event->isCancelled()) {
+	public function onEntityMotion(EntityMotionEvent $event) : void {
+		if($event->isCancelled()) {
 			return;
 		}
 		$level = $event->getEntity()->getLevel();
-		if (!$level instanceof Level)
+		if(!$level instanceof Level)
 			return;
 		$levelName = $level->getFolderName();
-		if (!$this->plugin->isLevelLoaded($levelName))
+		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
-		if ($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
+		if($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
 			$event->setCancelled();
 			$this->plugin->getLogger()->debug("Cancelled entity motion on " . $levelName);
 		}
@@ -260,16 +249,15 @@ class EventListener implements Listener
 	 *
 	 * @param BlockSpreadEvent $event
 	 */
-	public function onBlockSpread(BlockSpreadEvent $event): void
-	{
-		if ($event->isCancelled()) {
+	public function onBlockSpread(BlockSpreadEvent $event) : void {
+		if($event->isCancelled()) {
 			return;
 		}
 		$levelName = $event->getBlock()->getLevel()->getFolderName();
-		if (!$this->plugin->isLevelLoaded($levelName))
+		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
-		if (!$settings->updatePlotLiquids and ($this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot or $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot or $this->plugin->isPositionBorderingPlot($event->getBlock()) or $this->plugin->isPositionBorderingPlot($event->getSource()))) {
+		if(!$settings->updatePlotLiquids and ($this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot or $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot or $this->plugin->isPositionBorderingPlot($event->getBlock()) or $this->plugin->isPositionBorderingPlot($event->getSource()))) {
 			$event->setCancelled();
 			$this->plugin->getLogger()->debug("Cancelled block spread of {$event->getBlock()->getName()} on " . $levelName);
 		}
@@ -284,6 +272,21 @@ class EventListener implements Listener
 	public function onPlayerMove(PlayerMoveEvent $event): void
 	{
 		$this->onEnterPlotCheck($event->getPlayer(), $event);
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param EntityTeleportEvent $event
+	 */
+	public function onPlayerTeleport(EntityTeleportEvent $event): void
+	{
+		$entity = $event->getEntity();
+		if ($entity instanceof Player) {
+			$this->onEnterPlotCheck($entity, $event);
+		}
+
 	}
 
 	/**
@@ -336,59 +339,42 @@ class EventListener implements Listener
 			$this->plugin->teleportPlayerToPlot($player, $plot, false);
 		}
 	}
-
-	/**
-	 * @ignoreCancelled false
-	 * @priority LOWEST
-	 *
-	 * @param EntityTeleportEvent $event
-	 */
-	public function onPlayerTeleport(EntityTeleportEvent $event): void
-	{
-		$entity = $event->getEntity();
-		if ($entity instanceof Player) {
-			$this->onEnterPlotCheck($entity, $event);
-		}
-
-	}
-
 	/**
 	 * @ignoreCancelled false
 	 * @priority LOWEST
 	 *
 	 * @param EntityDamageByEntityEvent $event
 	 */
-	public function onEntityDamage(EntityDamageByEntityEvent $event): void
-	{
+	public function onEntityDamage(EntityDamageByEntityEvent $event) : void {
 		$damaged = $event->getEntity();
 		$damager = $event->getDamager();
-		if ($damaged instanceof Player and $damager instanceof Player and !$event->isCancelled()) {
+		if($damaged instanceof Player and $damager instanceof Player and !$event->isCancelled()) {
 			$levelName = $damaged->getLevel()->getFolderName();
-			if (!$this->plugin->isLevelLoaded($levelName)) {
+			if(!$this->plugin->isLevelLoaded($levelName)) {
 				return;
 			}
 			$settings = $this->plugin->getLevelSettings($levelName);
 			$plot = $this->plugin->getPlotByPosition($damaged);
-			if ($plot !== null) {
+			if($plot !== null) {
 				$ev = new MyPlotPvpEvent($plot, $damager, $damaged, $event);
-				if (!$plot->pvp and !$damager->hasPermission("myplot.admin.pvp.bypass")) {
+				if(!$plot->pvp and !$damager->hasPermission("myplot.admin.pvp.bypass")) {
 					$ev->setCancelled();
-					$this->plugin->getLogger()->debug("Cancelled pvp event in plot " . $plot->X . ";" . $plot->Z . " on level '" . $levelName . "'");
+					$this->plugin->getLogger()->debug("Cancelled pvp event in plot ".$plot->X.";".$plot->Z." on level '" . $levelName . "'");
 				}
 				$ev->call();
 				$event->setCancelled($ev->isCancelled());
-				if ($event->isCancelled()) {
+				if($event->isCancelled()) {
 					$ev->getAttacker()->sendMessage(TextFormat::RED . $this->plugin->getLanguage()->translateString("pvp.disabled")); // generic message- we dont know if by config or plot
 				}
 				return;
 			}
-			if ($damager->hasPermission("myplot.admin.pvp.bypass")) {
+			if($damager->hasPermission("myplot.admin.pvp.bypass")) {
 				return;
 			}
-			if ($settings->restrictPVP) {
+			if($settings->restrictPVP) {
 				$event->setCancelled();
-				$damager->sendMessage(TextFormat::RED . $this->plugin->getLanguage()->translateString("pvp.world"));
-				$this->plugin->getLogger()->debug("Cancelled pvp event on " . $levelName);
+				$damager->sendMessage(TextFormat::RED.$this->plugin->getLanguage()->translateString("pvp.world"));
+				$this->plugin->getLogger()->debug("Cancelled pvp event on ".$levelName);
 			}
 		}
 	}
