@@ -38,7 +38,7 @@ class GenerateForm extends ComplexMyPlotForm {
 				if($value > 0)
 					$elements[] = new Slider("$i", $key, 1, 4 * $value, 1, $value);
 				else
-					$elements[] = new Slider("$i", $key, 1, 1000, 1, $value);
+					$elements[] = new Slider("$i", $key, 1, 1000, 1, 1);
 			}elseif(is_bool($value)) {
 				$elements[] = new Toggle("$i", $key, $value);
 			}elseif(is_string($value)) {
