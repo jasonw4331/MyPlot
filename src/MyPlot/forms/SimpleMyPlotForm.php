@@ -11,9 +11,9 @@ abstract class SimpleMyPlotForm extends MenuForm implements MyPlotForm {
 	/** @var Plot|null $plot */
 	protected $plot;
 
-	public function __construct(string $title, string $text, array $options, \Closure $onSubmit) {
+	public function __construct(string $title, string $text, array $options, \Closure $onSubmit, ?\Closure $onClose = null) {
 		parent::__construct($title, $text, $options, $onSubmit,
-			function(Player $player) : void {
+			$onClose ?? function(Player $player) : void {
 				$player->getServer()->dispatchCommand($player, MyPlot::getInstance()->getLanguage()->get("command.name"), true);
 			}
 		);

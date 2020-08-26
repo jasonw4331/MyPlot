@@ -12,8 +12,6 @@ class MainForm extends SimpleMyPlotForm {
 
 	/** @var SubCommand[] $link */
 	private $link = [];
-	/** @var Player|null $player */
-	private $player;
 
 	/**
 	 * MainForm constructor.
@@ -44,10 +42,11 @@ class MainForm extends SimpleMyPlotForm {
 			"",
 			$elements,
 			function(Player $player, int $selectedOption) : void {
-				$form = $this->link[$selectedOption]->getForm($this->player);
+				$form = $this->link[$selectedOption]->getForm($player);
 				$form->setPlot($this->plot);
 				$player->sendForm($form);
-			}
+			},
+			function(Player $player) : void {}
 		);
 	}
 }
