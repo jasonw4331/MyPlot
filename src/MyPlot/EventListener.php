@@ -317,7 +317,7 @@ class EventListener implements Listener
 				$owner = TextFormat::GREEN . $plot->owner;
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
 			}else{
-				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
+				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available", [$this->plugin->getLevelSettings($levelName)->claimPrice]);
 			}
 			$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
 			$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
