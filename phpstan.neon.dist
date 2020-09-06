@@ -1,7 +1,7 @@
 parameters:
-    level: 6
-    checkMissingIterableValueType: false
+    level: 7
     checkExplicitMixed: true
+    checkMissingIterableValueType: false
     reportUnmatchedIgnoredErrors: false
     paths:
         - /source/src
