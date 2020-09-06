@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
+use MyPlot\forms\subforms\InfoForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -65,5 +67,11 @@ class InfoSubCommand extends SubCommand
 			$sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
 		}
 		return true;
+	}
+
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+			return new InfoForm($player);
+		return null;
 	}
 }

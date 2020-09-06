@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
+use MyPlot\forms\subforms\GenerateForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -42,5 +44,9 @@ class GenerateSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.error"));
 		}
 		return true;
+	}
+
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		return new GenerateForm();
 	}
 }

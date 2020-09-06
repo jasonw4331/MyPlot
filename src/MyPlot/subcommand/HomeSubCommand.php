@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
+use MyPlot\forms\subforms\HomeForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -56,5 +58,11 @@ class HomeSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.error"));
 		}
 		return true;
+	}
+
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		if(count($this->getPlugin()->getPlotsOfPlayer($player->getName(), $player->getLevel()->getFolderName())) > 0)
+			return new HomeForm($player);
+		return null;
 	}
 }

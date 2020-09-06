@@ -31,6 +31,10 @@ Language: eng
 # This is not recommended unless you have a good text editor!
 Custom Messages: false
 
+# Allows use of MyPlot forms on /plot command
+# This does not add UIs for all commands. Some actions still require commands to use.
+UI Forms: true
+
 # The data provider where plot data is stored.
 # Current providers are: sqlite, mysql, json, and yaml.
 DataProvider: sqlite
