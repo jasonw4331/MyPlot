@@ -36,9 +36,9 @@ class GenerateForm extends ComplexMyPlotForm {
 		foreach($plugin->getConfig()->get("DefaultWorld", []) as $key => $value) {
 			if(is_numeric($value)) {
 				if($value > 0)
-					$elements[] = new Slider("$i", $key, 1, 4 * $value, 1, $value);
+					$elements[] = new Slider("$i", $key, 1, 4 * (float)$value, 1, (float)$value);
 				else
-					$elements[] = new Slider("$i", $key, 1, 1000, 1, 1);
+					$elements[] = new Slider("$i", $key, 1, 1000, 1, 1.0);
 			}elseif(is_bool($value)) {
 				$elements[] = new Toggle("$i", $key, $value);
 			}elseif(is_string($value)) {
