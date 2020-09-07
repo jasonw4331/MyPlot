@@ -18,12 +18,14 @@ class RemoveHelperForm extends ComplexMyPlotForm {
 				new Dropdown(
 					"0",
 					$plugin->getLanguage()->translateString("removehelper.dropdown"),
-					$this->plot ? array_map(function(string $text) {
+					empty($this->plot->helpers) ? [""] : array_map(function(string $text) {
 						return TextFormat::DARK_BLUE.$text;
-					}, $this->plot->helpers) : []
+					}, $this->plot->helpers)
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
+				if(empty($this->plot->helpers))
+					return;
 				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("removehelper.name").' "'.$this->plot->helpers[$response->getInt("0")].'"', true);
 			}
 		);

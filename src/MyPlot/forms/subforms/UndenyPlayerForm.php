@@ -18,12 +18,14 @@ class UndenyPlayerForm extends ComplexMyPlotForm {
 				new Dropdown(
 					"0",
 					$plugin->getLanguage()->get("undenyplayer.dropdown"),
-					$this->plot ? array_map(function(string $text) {
+					empty($this->plot->denied) ? [""] : array_map(function(string $text) {
 						return TextFormat::DARK_BLUE.$text;
-					}, $this->plot->denied) : []
+					}, $this->plot->denied)
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
+				if(empty($this->plot->denied))
+					return;
 				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("undenyplayer.name").' "'.$this->plot->denied[$response->getInt("0")].'"', true);
 			}
 		);
