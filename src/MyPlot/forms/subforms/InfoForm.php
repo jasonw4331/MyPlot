@@ -36,14 +36,14 @@ class InfoForm extends ComplexMyPlotForm {
 				new Dropdown(
 					"3",
 					$plugin->getLanguage()->get("info.formhelpers"),
-					array_map(function(string $text) {
+					empty($this->plot->helpers) ? [TextFormat::DARK_BLUE.$plugin->getLanguage()->get("info.formnohelpers")] : array_map(function(string $text) {
 						return TextFormat::DARK_BLUE.$text;
 					}, $this->plot->helpers)
 				),
 				new Dropdown(
 					"4",
 					$plugin->getLanguage()->get("info.formdenied"),
-					array_map(function(string $text) {
+					empty($this->plot->denied) ? [TextFormat::DARK_BLUE.$plugin->getLanguage()->get("info.formnodenied")] : array_map(function(string $text) {
 						return TextFormat::DARK_BLUE.$text;
 					}, $this->plot->denied)
 				),
