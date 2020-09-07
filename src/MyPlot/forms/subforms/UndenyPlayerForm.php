@@ -18,7 +18,7 @@ class UndenyPlayerForm extends ComplexMyPlotForm {
 				new Dropdown(
 					"0",
 					$plugin->getLanguage()->get("undenyplayer.dropdown"),
-					empty($this->plot->denied) ? [""] : array_map(function(string $text) {
+					empty($this->plot->denied) ? [TextFormat::DARK_BLUE.$plugin->getLanguage()->get("undenyplayer.formnodenied")] : array_map(function(string $text) {
 						return TextFormat::DARK_BLUE.$text;
 					}, $this->plot->denied)
 				)
