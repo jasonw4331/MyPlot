@@ -301,8 +301,8 @@ class EventListener implements Listener
 			}
 			$ev = new MyPlotPlayerEnterPlotEvent($plot, $player);
 			$ev->setCancelled($event->isCancelled());
-			$username = $player->getName();
-			if($plot->owner !== $username and $plot->isDenied($username) and !$player->hasPermission("myplot.admin.denyplayer.bypass")) {
+			$username = $ev->getPlayer()->getName();
+			if($plot->owner !== $username and $plot->isDenied($username) and !$ev->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
 				$ev->setCancelled();
 			}
 			$ev->call();
@@ -323,7 +323,7 @@ class EventListener implements Listener
 			$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
 			$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
 			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
-			$player->sendTip($popup);
+			$ev->getPlayer()->sendTip($popup);
 		}elseif($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
 			if(strpos((string) $plotFrom, "-0")) {
 				return;
