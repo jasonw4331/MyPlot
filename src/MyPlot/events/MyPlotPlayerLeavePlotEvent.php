@@ -27,14 +27,4 @@ class MyPlotPlayerLeavePlotEvent extends MyPlotPlotEvent implements Cancellable 
 	public function getPlayer() : Player {
 		return $this->player;
 	}
-
-	/**
-	 * @param Player $player
-	 *
-	 * @return self
-	 */
-	public function setPlayer(Player $player) : self {
-		$this->player = $player;
-		return $this;
-	}
 }
