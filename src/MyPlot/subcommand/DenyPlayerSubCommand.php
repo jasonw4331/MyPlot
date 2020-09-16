@@ -32,7 +32,7 @@ class DenyPlayerSubCommand extends SubCommand
 		if(empty($args)) {
 			return false;
 		}
-		$dplayer = $args[0];
+		$dplayerName = $args[0];
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
@@ -42,11 +42,7 @@ class DenyPlayerSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		if($dplayer === "*") {
-			$dplayer = new OfflinePlayer(Server::getInstance(), "*");
-			GOTO STAR;
-		}
-		$dplayer = $this->getPlugin()->getServer()->getPlayer($dplayer);
+		$dplayer = $this->getPlugin()->getServer()->getPlayer($dplayerName);
 		if(!$dplayer instanceof Player) {
 			$sender->sendMessage($this->translateString("denyplayer.notaplayer"));
 			return true;
@@ -57,18 +53,12 @@ class DenyPlayerSubCommand extends SubCommand
 				$dplayer->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));
 			return true;
 		}
-		STAR:
 		if($this->getPlugin()->addPlotDenied($plot, $dplayer->getName())) {
 			$sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer->getName()]));
 			if($dplayer instanceof Player) {
 				$dplayer->sendMessage($this->translateString("denyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
 			}
-			if($dplayer->getName() === "*") {
-				foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
-					if($this->getPlugin()->getPlotBB($plot)->isVectorInside($player) and !($player->getName() === $plot->owner) and !$plot->isHelper($player->getName()))
-						$this->getPlugin()->teleportPlayerToPlot($player, $plot);
-				}
-			}elseif($this->getPlugin()->getPlotBB($plot)->isVectorInside($dplayer))
+			if($this->getPlugin()->getPlotBB($plot)->isVectorInside($dplayer))
 				$this->getPlugin()->teleportPlayerToPlot($dplayer, $plot);
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));

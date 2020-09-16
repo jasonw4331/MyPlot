@@ -147,7 +147,7 @@ class EventListener implements Listener
 			$ev->call();
 			$event->setCancelled($ev->isCancelled());
 			$username = $event->getPlayer()->getName();
-			if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot")) {
+			if($plot->owner == $username or $plot->isHelper($username) or $event->getPlayer()->hasPermission("myplot.admin.build.plot")) {
 				if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
 					return;
 				/*
@@ -179,7 +179,7 @@ class EventListener implements Listener
 				$ev->call();
 				$event->setCancelled($ev->isCancelled());
 				$username = $event->getPlayer()->getName();
-				if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot"))
+				if($plot->owner == $username or $plot->isHelper($username) or $event->getPlayer()->hasPermission("myplot.admin.build.plot"))
 					if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
 						return;
 			}
@@ -302,7 +302,7 @@ class EventListener implements Listener
 			$ev = new MyPlotPlayerEnterPlotEvent($plot, $player);
 			$ev->setCancelled($event->isCancelled());
 			$username = $ev->getPlayer()->getName();
-			if($plot->owner !== $username and ($plot->isDenied($username) or $plot->isDenied("*")) and !$ev->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
+			if($plot->owner !== $username and $plot->isDenied($username) and !$ev->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
 				$ev->setCancelled();
 			}
 			$ev->call();
