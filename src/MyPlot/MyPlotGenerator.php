@@ -3,17 +3,12 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\world\biome\Biome;
 use pocketmine\world\ChunkManager;
 use pocketmine\world\generator\Generator;
 
 class MyPlotGenerator extends Generator {
-	/** @var ChunkManager $level */
-	protected $level;
-	/** @var string[] $settings */
-	private $settings;
 	/** @var Block $roadBlock */
 	protected $roadBlock;
 	/** @var Block $bottomBlock */
@@ -51,11 +46,11 @@ class MyPlotGenerator extends Generator {
 		}else{
 			$settings = [];
 		}
-		$this->roadBlock = PlotLevelSettings::parseBlock($settings, "RoadBlock", BlockFactory::get(BlockLegacyIds::PLANKS));
-		$this->wallBlock = PlotLevelSettings::parseBlock($settings, "WallBlock", BlockFactory::get(BlockLegacyIds::STONE_SLAB));
-		$this->plotFloorBlock = PlotLevelSettings::parseBlock($settings, "PlotFloorBlock", BlockFactory::get(BlockLegacyIds::GRASS));
-		$this->plotFillBlock = PlotLevelSettings::parseBlock($settings, "PlotFillBlock", BlockFactory::get(BlockLegacyIds::DIRT));
-		$this->bottomBlock = PlotLevelSettings::parseBlock($settings, "BottomBlock", BlockFactory::get(BlockLegacyIds::BEDROCK));
+		$this->roadBlock = PlotLevelSettings::parseBlock($settings, "RoadBlock", VanillaBlocks::OAK_PLANKS());
+		$this->wallBlock = PlotLevelSettings::parseBlock($settings, "WallBlock", VanillaBlocks::STONE_SLAB());
+		$this->plotFloorBlock = PlotLevelSettings::parseBlock($settings, "PlotFloorBlock", VanillaBlocks::GRASS());
+		$this->plotFillBlock = PlotLevelSettings::parseBlock($settings, "PlotFillBlock", VanillaBlocks::DIRT());
+		$this->bottomBlock = PlotLevelSettings::parseBlock($settings, "BottomBlock", VanillaBlocks::BEDROCK());
 		$this->roadWidth = PlotLevelSettings::parseNumber($settings, "RoadWidth", 7);
 		$this->plotSize = PlotLevelSettings::parseNumber($settings, "PlotSize", 32);
 		$this->groundHeight = PlotLevelSettings::parseNumber($settings, "GroundHeight", 64);
@@ -78,7 +73,7 @@ class MyPlotGenerator extends Generator {
 	 */
 	public function generateChunk(int $chunkX, int $chunkZ) : void {
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
-		$chunk = $this->level->getChunk($chunkX, $chunkZ);
+		$chunk = $this->world->getChunk($chunkX, $chunkZ);
 		$bottomBlockId = $this->bottomBlock->getFullId();
 		$plotFillBlockId = $this->plotFillBlock->getFullId();
 		$plotFloorBlockId = $this->plotFloorBlock->getFullId();
@@ -107,7 +102,7 @@ class MyPlotGenerator extends Generator {
 		$chunk->setX($chunkX);
 		$chunk->setZ($chunkZ);
 		$chunk->setGenerated();
-		$this->level->setChunk($chunkX, $chunkZ, $chunk);
+		$this->world->setChunk($chunkX, $chunkZ, $chunk);
 	}
 
 	/**

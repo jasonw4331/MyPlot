@@ -22,8 +22,7 @@ use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
 use onebone\economyapi\EconomyAPI;
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\lang\Language;
 use pocketmine\math\Facing;
@@ -168,7 +167,7 @@ class MyPlot extends PluginBase
 		if($ev->isCancelled() or $worldManager->isWorldGenerated($worldName)) {
 			return false;
 		}
-		$generator = GeneratorManager::getGenerator($generator);
+		$generator = GeneratorManager::getInstance()->getGenerator($generator, false);
 		if(empty($settings)) {
 			$this->getConfig()->reload();
 			$settings = $this->getConfig()->get("DefaultWorld", []);
@@ -641,7 +640,7 @@ class MyPlot extends PluginBase
 			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, World::Y_MAX, $plotBeginPos->z + $plotSize));
 			$cuboid = Cuboid::fromSelection($selection);
 			//$cuboid = $cuboid->async();
-			$cuboid->set($plotBeginPos->world, BlockFactory::get(BlockLegacyIds::AIR)->getFullId(), function (float $time, int $changed) use ($plugin) : void {
+			$cuboid->set($plotBeginPos->world, VanillaBlocks::AIR()->getFullId(), function (float $time, int $changed) use ($plugin) : void {
 				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
 			});
 			$styler->removeSelection(99998);
@@ -679,7 +678,7 @@ class MyPlot extends PluginBase
 			});
 			$styler->removeSelection(99998);
 			foreach($this->getPlotChunks($plot) as $chunk) {
-				$plotBeginPos->level->setChunk($chunk->getX(), $chunk->getZ(), $chunk, false);
+				$plotBeginPos->world->setChunk($chunk->getX(), $chunk->getZ(), $chunk, false);
 			}
 			$this->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this, $plot), 1);
 			return true;
@@ -793,7 +792,8 @@ class MyPlot extends PluginBase
 	public function addPlotHelper(Plot $plot, string $player) : bool {
 		$newPlot = clone $plot;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$ev->setCancelled(!$newPlot->addHelper($player));
+		if(!$newPlot->addHelper($player))
+			$ev->cancel();
 		$ev->call();
 		if($ev->isCancelled()) {
 			return false;
@@ -810,7 +810,8 @@ class MyPlot extends PluginBase
 	public function removePlotHelper(Plot $plot, string $player) : bool {
 		$newPlot = clone $plot;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$ev->setCancelled(!$newPlot->removeHelper($player));
+		if(!$newPlot->removeHelper($player))
+			$ev->cancel();
 		$ev->call();
 		if($ev->isCancelled()) {
 			return false;
@@ -827,7 +828,8 @@ class MyPlot extends PluginBase
 	public function addPlotDenied(Plot $plot, string $player) : bool {
 		$newPlot = clone $plot;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$ev->setCancelled(!$newPlot->denyPlayer($player));
+		if(!$newPlot->denyPlayer($player))
+			$ev->cancel();
 		$ev->call();
 		if($ev->isCancelled()) {
 			return false;
@@ -974,7 +976,7 @@ class MyPlot extends PluginBase
 		$this->reloadConfig();
 		@mkdir($this->getDataFolder() . "worlds");
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Generator");
-		GeneratorManager::addGenerator(MyPlotGenerator::class, "myplot", true);
+		GeneratorManager::getInstance()->addGenerator(MyPlotGenerator::class, "myplot", true);
 		$this->getLogger()->debug(TF::BOLD . "Loading Languages");
 		// Loading Languages
 		/** @var string $lang */

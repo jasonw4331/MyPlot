@@ -143,10 +143,16 @@ class EventListener implements Listener
 		if($plot !== null) {
 			$ev = new MyPlotBlockEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
 			if($event->isCancelled()) {
-				$ev->setCancelled($event->isCancelled());
+				$ev->cancel();
+			}else{
+				$ev->uncancel();
 			}
 			$ev->call();
-			$event->setCancelled($ev->isCancelled());
+			if($ev->isCancelled()) {
+				$event->cancel();
+			}else{
+				$event->uncancel();
+			}
 			$username = $event->getPlayer()->getName();
 			if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot")) {
 				if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
@@ -177,17 +183,23 @@ class EventListener implements Listener
 			if($plot instanceof Plot) {
 				$ev = new MyPlotBorderChangeEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
 				if($event->isCancelled()) {
-					$ev->setCancelled($event->isCancelled());
+					$ev->cancel();
+				}else{
+					$ev->uncancel();
 				}
 				$ev->call();
-				$event->setCancelled($ev->isCancelled());
+				if($ev->isCancelled()) {
+					$event->cancel();
+				}else{
+					$event->uncancel();
+				}
 				$username = $event->getPlayer()->getName();
 				if($plot->owner == $username or $plot->isHelper($username) or $plot->isHelper("*") or $event->getPlayer()->hasPermission("myplot.admin.build.plot"))
 					if(!($event instanceof PlayerInteractEvent and $event->getBlock() instanceof Sapling))
 						return;
 			}
 		}
-		$event->setCancelled();
+		$event->cancel();
 		$this->plugin->getLogger()->debug("Block placement/break/interaction of {$event->getBlock()->getName()} was cancelled at ".$event->getBlock()->getPos()->__toString());
 	}
 
@@ -206,7 +218,7 @@ class EventListener implements Listener
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getPosition());
 		if($plot === null) {
-			$event->setCancelled();
+			$event->cancel();
 			return;
 		}
 		$beginPos = $this->plugin->getPlotPosition($plot);
@@ -241,7 +253,7 @@ class EventListener implements Listener
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
 		if($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
-			$event->setCancelled();
+			$event->cancel();
 			$this->plugin->getLogger()->debug("Cancelled entity motion on " . $levelName);
 		}
 	}
@@ -261,7 +273,7 @@ class EventListener implements Listener
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
 		if(!$settings->updatePlotLiquids and ($this->plugin->getPlotByPosition($event->getBlock()->getPos()) instanceof Plot or $this->plugin->getPlotByPosition($event->getSource()->getPos()) instanceof Plot or $this->plugin->isPositionBorderingPlot($event->getBlock()->getPos()) or $this->plugin->isPositionBorderingPlot($event->getSource()->getPos()))) {
-			$event->setCancelled();
+			$event->cancel();
 			$this->plugin->getLogger()->debug("Cancelled block spread of {$event->getBlock()->getName()} on " . $levelName);
 		}
 	}
@@ -283,13 +295,21 @@ class EventListener implements Listener
 				return;
 			}
 			$ev = new MyPlotPlayerEnterPlotEvent($plot, $event->getPlayer());
-			$ev->setCancelled($event->isCancelled());
+			if($event->isCancelled()) {
+				$ev->cancel();
+			}else{
+				$ev->uncancel();
+			}
 			$username = $event->getPlayer()->getName();
 			if($plot->owner !== $username and ($plot->isDenied($username) or $plot->isDenied("*")) and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
-				$ev->setCancelled();
+				$ev->cancel();
 			}
 			$ev->call();
-			$event->setCancelled($ev->isCancelled());
+			if($ev->isCancelled()) {
+				$event->cancel();
+			}else{
+				$event->uncancel();
+			}
 			if($event->isCancelled()) {
 				return;
 			}
@@ -312,9 +332,17 @@ class EventListener implements Listener
 				return;
 			}
 			$ev = new MyPlotPlayerLeavePlotEvent($plotFrom, $event->getPlayer());
-			$ev->setCancelled($event->isCancelled());
+			if($event->isCancelled()) {
+				$ev->cancel();
+			}else{
+				$ev->uncancel();
+			}
 			$ev->call();
-			$event->setCancelled($ev->isCancelled());
+			if($ev->isCancelled()) {
+				$event->cancel();
+			}else{
+				$event->uncancel();
+			}
 		}elseif($plotFrom !== null and $plot !== null and ($plot->isDenied($event->getPlayer()->getName()) or $plot->isDenied("*")) and $plot->owner !== $event->getPlayer()->getName() and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
 			$this->plugin->teleportPlayerToPlot($event->getPlayer(), $plot, false); // TODO: is this in the plot?
 		}
@@ -339,11 +367,15 @@ class EventListener implements Listener
 			if($plot !== null) {
 				$ev = new MyPlotPvpEvent($plot, $damager, $damaged, $event);
 				if(!$plot->pvp and !$damager->hasPermission("myplot.admin.pvp.bypass")) {
-					$ev->setCancelled();
+					$ev->cancel();
 					$this->plugin->getLogger()->debug("Cancelled pvp event in plot ".$plot->X.";".$plot->Z." on level '" . $levelName . "'");
 				}
 				$ev->call();
-				$event->setCancelled($ev->isCancelled());
+				if($ev->isCancelled()) {
+					$event->cancel();
+				}else{
+					$event->uncancel();
+				}
 				if($event->isCancelled()) {
 					$ev->getAttacker()->sendMessage(TextFormat::RED . $this->plugin->getLanguage()->translateString("pvp.disabled")); // generic message- we dont know if by config or plot
 				}
@@ -353,7 +385,7 @@ class EventListener implements Listener
 				return;
 			}
 			if($settings->restrictPVP) {
-				$event->setCancelled();
+				$event->cancel();
 				$damager->sendMessage(TextFormat::RED.$this->plugin->getLanguage()->translateString("pvp.world"));
 				$this->plugin->getLogger()->debug("Cancelled pvp event on ".$levelName);
 			}
