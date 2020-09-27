@@ -58,11 +58,11 @@ class PlotLevelSettings
 	public function __construct(string $name, array $settings = []) {
 		$this->name = $name;
 		if(count($settings) > 0) {
-			$this->roadBlock = self::parseBlock($settings, "RoadBlock", BlockFactory::get(BlockLegacyIds::PLANKS));
-			$this->wallBlock = self::parseBlock($settings, "WallBlock", BlockFactory::get(BlockLegacyIds::STONE_SLAB));
-			$this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", BlockFactory::get(BlockLegacyIds::GRASS));
-			$this->plotFillBlock = self::parseBlock($settings, "PlotFillBlock", BlockFactory::get(BlockLegacyIds::DIRT));
-			$this->bottomBlock = self::parseBlock($settings, "BottomBlock", BlockFactory::get(BlockLegacyIds::BEDROCK));
+			$this->roadBlock = self::parseBlock($settings, "RoadBlock", BlockFactory::getInstance()->get(BlockLegacyIds::PLANKS));
+			$this->wallBlock = self::parseBlock($settings, "WallBlock", BlockFactory::getInstance()->get(BlockLegacyIds::STONE_SLAB));
+			$this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", BlockFactory::getInstance()->get(BlockLegacyIds::GRASS));
+			$this->plotFillBlock = self::parseBlock($settings, "PlotFillBlock", BlockFactory::getInstance()->get(BlockLegacyIds::DIRT));
+			$this->bottomBlock = self::parseBlock($settings, "BottomBlock", BlockFactory::getInstance()->get(BlockLegacyIds::BEDROCK));
 			$this->roadWidth = self::parseNumber($settings, "RoadWidth", 7);
 			$this->plotSize = self::parseNumber($settings, "PlotSize", 32);
 			$this->groundHeight = self::parseNumber($settings, "GroundHeight", 64);
@@ -90,11 +90,11 @@ class PlotLevelSettings
 		if(isset($array[$key])) {
 			$id = $array[$key];
 			if(is_numeric($id)) {
-				$block = BlockFactory::get((int) $id);
+				$block = BlockFactory::getInstance()->get((int) $id);
 			}else{
 				$split = explode(":", $id);
 				if(count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
-					$block = BlockFactory::get((int) $split[0], (int) $split[1]);
+					$block = BlockFactory::getInstance()->get((int) $split[0], (int) $split[1]);
 				}else{
 					$block = $default;
 				}

@@ -5,8 +5,7 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -101,7 +100,7 @@ class ClearPlotTask extends Task {
 					}elseif($this->pos->y === $this->height) {
 						$block = $this->plotFloorBlock;
 					}else{
-						$block = BlockFactory::get(BlockLegacyIds::AIR);
+						$block = VanillaBlocks::AIR();
 					}
 					$this->level->setBlock($this->pos, $block, false);
 					$blocks++;
