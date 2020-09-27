@@ -2,6 +2,9 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
+use MyPlot\forms\subforms\KickForm;
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -39,7 +42,7 @@ class KickSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.noPlayer"));
 			return true;
 		}
-		if (!$this->getPlugin()->getPlotByPosition($target->getPosition())->isSame($plot)) {
+		if (($plot = $this->getPlugin()->getPlotByPosition($target->getPosition())) === null or !$plot->isSame($plot)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.notInPlot"));
 			return true;
 		}
@@ -55,5 +58,11 @@ class KickSubCommand extends SubCommand
 		}
 		$sender->sendMessage($this->translateString("error"));
 		return true;
+	}
+
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		if($this->getPlugin()->getPlotByPosition($player->getPosition()) instanceof Plot)
+			return new KickForm();
+		return null;
 	}
 }

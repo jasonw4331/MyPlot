@@ -17,6 +17,7 @@ use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
@@ -285,8 +286,28 @@ class EventListener implements Listener
 	 * @param PlayerMoveEvent $event
 	 */
 	public function onPlayerMove(PlayerMoveEvent $event) : void {
-		$levelName = $event->getPlayer()->getWorld()->getFolderName();
-		if(!$this->plugin->isLevelLoaded($levelName))
+		$this->onEventOnMove($event->getPlayer(), $event);
+	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param EntityTeleportEvent $event
+	 */
+	public function onPlayerTeleport(EntityTeleportEvent $event) : void {
+		$entity = $event->getEntity();
+		if ($entity instanceof Player) {
+			$this->onEventOnMove($entity, $event);
+		}
+	}
+
+	/**
+	 * @param PlayerMoveEvent|EntityTeleportEvent $event
+	 */
+	private function onEventOnMove(Player $player, $event) : void {
+		$levelName = $player->getWorld()->getFolderName();
+		if (!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
@@ -320,18 +341,18 @@ class EventListener implements Listener
 				$owner = TextFormat::GREEN . $plot->owner;
 				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
 			}else{
-				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available");
+				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available", [$this->plugin->getLevelSettings($levelName)->claimPrice]);
 			}
 			$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
 			$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
 			$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
 			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
-			$event->getPlayer()->sendTip($popup);
+			$ev->getPlayer()->sendTip($popup);
 		}elseif($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
 			if(strpos((string) $plotFrom, "-0")) {
 				return;
 			}
-			$ev = new MyPlotPlayerLeavePlotEvent($plotFrom, $event->getPlayer());
+			$ev = new MyPlotPlayerLeavePlotEvent($plotFrom, $player);
 			if($event->isCancelled()) {
 				$ev->cancel();
 			}else{
@@ -343,8 +364,8 @@ class EventListener implements Listener
 			}else{
 				$event->uncancel();
 			}
-		}elseif($plotFrom !== null and $plot !== null and ($plot->isDenied($event->getPlayer()->getName()) or $plot->isDenied("*")) and $plot->owner !== $event->getPlayer()->getName() and !$event->getPlayer()->hasPermission("myplot.admin.denyplayer.bypass")) {
-			$this->plugin->teleportPlayerToPlot($event->getPlayer(), $plot, false); // TODO: is this in the plot?
+		}elseif($plotFrom !== null and $plot !== null and ($plot->isDenied($player->getName()) or $plot->isDenied("*")) and $plot->owner !== $player->getName() and !$player->hasPermission("myplot.admin.denyplayer.bypass")) {
+			$this->plugin->teleportPlayerToPlot($player, $plot, false);
 		}
 	}
 

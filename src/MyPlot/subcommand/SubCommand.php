@@ -2,8 +2,10 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
+use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginOwned;
 
@@ -85,6 +87,13 @@ abstract class SubCommand implements PluginOwned
         $alias = $this->getPlugin()->getLanguage()->get($this->name . ".alias");
         return ($alias == $this->name . ".alias") ? "" : $alias;
     }
+
+	/**
+	 * @param Player|null $player
+	 *
+	 * @return MyPlotForm|null
+	 */
+	public abstract function getForm(?Player $player = null) : ?MyPlotForm;
 
 	/**
 	 * @param CommandSender $sender

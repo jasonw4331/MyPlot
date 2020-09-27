@@ -88,6 +88,7 @@ class ClearPlotTask extends Task {
 					$this->level->setBlock($this->pos, $block, false);
 					$blocks++;
 					if($blocks >= $this->maxBlocksPerTick) {
+						$this->setHandler();
 						$this->plugin->getScheduler()->scheduleDelayedTask($this, 1);
 						return;
 					}

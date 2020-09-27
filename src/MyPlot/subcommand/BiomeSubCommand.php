@@ -2,6 +2,9 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\forms\MyPlotForm;
+use MyPlot\forms\subforms\BiomeForm;
+use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -9,8 +12,7 @@ use pocketmine\world\biome\Biome;
 
 class BiomeSubCommand extends SubCommand
 {
-	/** @var int[] $biomes */
-	private $biomes = ["PLAINS" => Biome::PLAINS, "DESERT" => Biome::DESERT, "MOUNTAINS" => Biome::MOUNTAINS, "FOREST" => Biome::FOREST, "TAIGA" => Biome::TAIGA, "SWAMP" => Biome::SWAMP, "NETHER" => Biome::HELL, "HELL" => Biome::HELL, "ICE_PLAINS" => Biome::ICE_PLAINS];
+	public CONST BIOMES = ["PLAINS" => Biome::PLAINS, "DESERT" => Biome::DESERT, "MOUNTAINS" => Biome::MOUNTAINS, "FOREST" => Biome::FOREST, "TAIGA" => Biome::TAIGA, "SWAMP" => Biome::SWAMP, "NETHER" => Biome::HELL, "HELL" => Biome::HELL, "ICE_PLAINS" => Biome::ICE_PLAINS];
 
 	/**
 	 * @param CommandSender $sender
@@ -29,7 +31,7 @@ class BiomeSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
-			$biomes = TextFormat::WHITE . implode(", ", array_keys($this->biomes));
+			$biomes = TextFormat::WHITE . implode(", ", array_keys(self::BIOMES));
 			$sender->sendMessage($this->translateString("biome.possible", [$biomes]));
 			return true;
 		}
@@ -48,7 +50,7 @@ class BiomeSubCommand extends SubCommand
 			$biome = (int) $biome;
 			if($biome > 27 or $biome < 0) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
-				$biomes = implode(", ", array_keys($this->biomes));
+				$biomes = implode(", ", array_keys(self::BIOMES));
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
 				return true;
 			}
@@ -58,7 +60,7 @@ class BiomeSubCommand extends SubCommand
 			$biome = ($biome === "ICE PLAINS" ? "ICE_PLAINS" : $biome);
 			if(!defined(Biome::class."::".$biome)) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
-				$biomes = implode(", ", array_keys($this->biomes));
+				$biomes = implode(", ", array_keys(self::BIOMES));
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
 				return true;
 			}
@@ -70,5 +72,11 @@ class BiomeSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}
 		return true;
+	}
+
+	public function getForm(?Player $player = null) : ?MyPlotForm {
+		if($this->getPlugin()->getPlotByPosition($player->getPosition()) instanceof Plot)
+			return new BiomeForm(array_keys(self::BIOMES));
+		return null;
 	}
 }
