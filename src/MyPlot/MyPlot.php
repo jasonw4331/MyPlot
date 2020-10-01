@@ -850,6 +850,65 @@ class MyPlot extends PluginBase
 	}
 
 	/**
+	 * Sells a plot
+	 *
+	 * @api
+	 *
+	 * @param Plot $plot
+	 * @param float $price
+	 *
+	 * @return bool
+	 */
+	public function sellPlot(Plot $plot, float $price) : bool {
+		if($this->getEconomyProvider() === null)
+			return false;
+		if($plot->isForSale())
+			return false;
+		if($price <= 0)
+			return false;
+		$plot->price = $price;
+		return $this->savePlot($plot);
+	}
+
+	/**
+	 * Checks if a player can buy a plot
+	 *
+	 * @api
+	 *
+	 * @param Plot $plot
+	 * @param Player $player
+	 *
+	 * @return bool
+	 */
+	public function canBuyPlot(Plot $plot, Player $player) : bool {
+		return $this->getEconomyProvider() !== null and $plot->isForSale() and $this->getEconomyProvider()->getMoney($player) >= $plot->price;
+	}
+
+	/**
+	 * Buys a plot
+	 *
+	 * @api
+	 *
+	 * @param Plot $plot
+	 * @param Player $player
+	 *
+	 * @return bool
+	 */
+	public function buyPlot(Plot $plot, Player $player) : bool {
+		if($this->getEconomyProvider() === null)
+			return false;
+		if(!$plot->isForSale())
+			return false;
+		if(!$this->getEconomyProvider()->reduceMoney($player, $plot->price))
+			return false;
+		$plot->owner = $player->getName();
+		$plot->helpers = [];
+		$plot->denied = [];
+		$plot->price = 0;
+		return $this->savePlot($plot);
+	}
+
+	/**
 	 * Returns the PlotLevelSettings of all the loaded levels
 	 *
 	 * @api
