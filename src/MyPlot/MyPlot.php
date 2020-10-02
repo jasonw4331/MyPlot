@@ -850,10 +850,6 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * Sells a plot
-	 *
-	 * @api
-	 *
 	 * @param Plot $plot
 	 * @param float $price
 	 *
@@ -871,10 +867,6 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * Checks if a player can buy a plot
-	 *
-	 * @api
-	 *
 	 * @param Plot $plot
 	 * @param Player $player
 	 *
@@ -885,10 +877,6 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * Buys a plot
-	 *
-	 * @api
-	 *
 	 * @param Plot $plot
 	 * @param Player $player
 	 *
