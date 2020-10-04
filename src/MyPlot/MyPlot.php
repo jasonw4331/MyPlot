@@ -871,20 +871,6 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * Checks if a player can buy a plot
-	 *
-	 * @api
-	 *
-	 * @param Plot $plot
-	 * @param Player $player
-	 *
-	 * @return bool
-	 */
-	public function canBuyPlot(Plot $plot, Player $player) : bool {
-		return $this->getEconomyProvider() !== null and $plot->isForSale() and $this->getEconomyProvider()->getMoney($player) >= $plot->price;
-	}
-
-	/**
 	 * Buys a plot
 	 *
 	 * @api
