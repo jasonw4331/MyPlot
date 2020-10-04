@@ -39,26 +39,21 @@ class SellSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
 		}
-		if($plot->owner == ""){
-			$sender->sendMessage(TextFormat::RED . "sell.unclaimed");
-			return true;
-		}
 		if($plot->name !== $sender->getName() and !$sender->hasPermission("myplot.admin.sell")){
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		if($plot->isForSale()){
-			$sender->sendMessage(TextFormat::RED . $this->translateString("sell.already"));
-			return true;
-		}
-		if(!is_numeric($price = $args[0]))
+		if(!is_numeric($args[0]))
 			return false;
-		if((float) $price <= 0){
-			$sender->sendMessage(TextFormat::RED . $this->translateString("sell.minprice"));
-			return true;
+		$price = (float)$args[0];
+		if($price <= 0){
+			$sender->sendMessage(TextFormat::RED . $this->translateString("sell.unlist"));
 		}
-		$this->getPlugin()->sellPlot($plot, (float) $price);
-		$sender->sendMessage($this->translateString("sell.success", [TextFormat::GREEN . $price . TextFormat::RESET]));
+		if($this->getPlugin()->sellPlot($plot, $price)) {
+			$sender->sendMessage($this->translateString("sell.success", [$price]));
+		}else{
+			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+		}
 		return true;
 	}
 
