@@ -885,7 +885,7 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function buyPlot(Plot $plot, Player $player) : bool {
-		if($this->getEconomyProvider() === null)
+		if($this->getEconomyProvider() === null or !$this->getEconomyProvider()->reduceMoney($player, $plot->price))
 			return false;
 
 		$newPlot = clone $plot;
