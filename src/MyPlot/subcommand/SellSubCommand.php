@@ -29,7 +29,7 @@ class SellSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if($this->getPlugin()->getEconomyProvider() === null){
-			$sender->sendMessage("NO-ECONOMY-PLUGIN");
+			$sender->sendMessage(TextFormat::RED . "noeconomy");
 			return true;
 		}
 		if(empty($args))
