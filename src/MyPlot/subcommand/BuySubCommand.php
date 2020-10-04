@@ -30,8 +30,8 @@ class BuySubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if($this->getPlugin()->getEconomyProvider() === null){
-			$sender->sendMessage(TextFormat::RED . "noeconomy");
-			return true;
+			$command = new ClaimSubCommand($this->getPlugin(), "claim");
+			return $command->execute($sender, []);
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender->asPosition());
 		if($plot === null){
