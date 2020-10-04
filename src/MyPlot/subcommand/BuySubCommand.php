@@ -42,15 +42,11 @@ class BuySubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("buy.noself"));
 			return true;
 		}
-		if(!$plot->isForSale()){
-			$sender->sendMessage(TextFormat::RED . $this->translateString("buy.notinsale"));
+		if($plot->price <= 0){
+			$sender->sendMessage(TextFormat::RED . $this->translateString("buy.notforsale"));
 			return true;
 		}
-		if(!$this->getPlugin()->canBuyPlot($plot, $sender)){
-			$sender->sendMessage(TextFormat::RED . $this->translateString("buy.nomoney"));
-			return true;
-		}
-		if(strtolower($args[0] ?? "") != $this->translateString("confirm")){
+		if(strtolower($args[0] ?? "") !== $this->translateString("confirm")){
 			$sender->sendMessage($this->translateString("buy.confirm", [TextFormat::GREEN . "{$plot->X};{$plot->Z}" . TextFormat::RESET, TextFormat::GREEN . $plot->price . TextFormat::RESET]));
 			return true;
 		}
