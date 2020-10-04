@@ -28,12 +28,9 @@ class SellSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if($this->getPlugin()->getEconomyProvider() === null){
-			$sender->sendMessage(TextFormat::RED . "noeconomy");
-			return true;
-		}
-		if(empty($args))
+		if(empty($args)) {
 			return false;
+		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender->asPosition());
 		if($plot === null){
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
