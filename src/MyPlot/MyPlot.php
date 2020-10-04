@@ -850,7 +850,7 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * Sells a plot
+	 * Assigns a price to a plot
 	 *
 	 * @api
 	 *
@@ -875,7 +875,7 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * Buys a plot
+	 * Resets the price and claims a plot in a players name
 	 *
 	 * @api
 	 *
