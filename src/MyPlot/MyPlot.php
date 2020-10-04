@@ -862,11 +862,15 @@ class MyPlot extends PluginBase
 	public function sellPlot(Plot $plot, float $price) : bool {
 		if($this->getEconomyProvider() === null)
 			return false;
-		if($plot->isForSale())
+
+		$newPlot = clone $plot;
+		$newPlot->price = $price;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled()) {
 			return false;
-		if($price <= 0)
-			return false;
-		$plot->price = $price;
+		}
+		$plot = $ev->getPlot();
 		return $this->savePlot($plot);
 	}
 
@@ -883,14 +887,18 @@ class MyPlot extends PluginBase
 	public function buyPlot(Plot $plot, Player $player) : bool {
 		if($this->getEconomyProvider() === null)
 			return false;
-		if(!$plot->isForSale())
+
+		$newPlot = clone $plot;
+		$newPlot->owner = $player->getName();
+		$newPlot->helpers = [];
+		$newPlot->denied = [];
+		$newPlot->price = 0.0;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled()) {
 			return false;
-		if(!$this->getEconomyProvider()->reduceMoney($player, $plot->price))
-			return false;
-		$plot->owner = $player->getName();
-		$plot->helpers = [];
-		$plot->denied = [];
-		$plot->price = 0;
+		}
+		$plot = $ev->getPlot();
 		return $this->savePlot($plot);
 	}
 
