@@ -41,6 +41,7 @@ class Plot
 	 * @param array $denied
 	 * @param string $biome
 	 * @param bool|null $pvp
+	 * @param float $price
 	 * @param int $id
 	 */
 	public function __construct(string $levelName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, float $price = -1, int $id = -1) {
