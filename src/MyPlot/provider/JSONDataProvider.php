@@ -32,11 +32,11 @@ class JSONDataProvider extends DataProvider {
 	public function savePlot(Plot $plot) : bool {
 		$plots = $this->json->get("plots", []);
 		if($plot->id > -1) {
-			$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+			$plots[$plot->id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp, "price" => $plot->price];
 		}else{
 			$id = $this->json->get("count", 0) + 1;
 			$plot->id = $id;
-			$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp];
+			$plots[$id] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp, "price" => $plot->price];
 			$this->json->set("count", $id);
 		}
 		$this->json->set("plots", $plots);
@@ -98,7 +98,8 @@ class JSONDataProvider extends DataProvider {
 			$denied = (array)$plots[$key]["denied"];
 			$biome = strtoupper($plots[$key]["biome"]);
 			$pvp = (bool)$plots[$key]["pvp"];
-			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
+			$price = (float)$plots[$key]["price"];
+			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $price, $key);
 		}
 		return new Plot($levelName, $X, $Z);
 	}
@@ -128,7 +129,8 @@ class JSONDataProvider extends DataProvider {
 						$denied = $plots[$levelKey]["denied"] == [] ? [] : $plots[$levelKey]["denied"];
 						$biome = strtoupper($plots[$levelKey]["biome"]) == "PLAINS" ? "PLAINS" : strtoupper($plots[$levelKey]["biome"]);
 						$pvp = $plots[$levelKey]["pvp"] == null ? false : $plots[$levelKey]["pvp"];
-						$ownerPlots[] = new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $levelKey);
+						$price = $plots[$levelKey]["price"] == null ? 0.0 : $plots[$levelKey]["price"];
+						$ownerPlots[] = new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $price, $levelKey);
 					}
 				}
 			}
@@ -145,7 +147,8 @@ class JSONDataProvider extends DataProvider {
 				$denied = $plots[$key]["denied"] == [] ? [] : $plots[$key]["denied"];
 				$biome = strtoupper($plots[$key]["biome"]) == "PLAINS" ? "PLAINS" : strtoupper($plots[$key]["biome"]);
 				$pvp = $plots[$key]["pvp"] == null ? false : $plots[$key]["pvp"];
-				$ownerPlots[] = new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $key);
+				$price = $plots[$key]["price"] == null ? 0.0 : $plots[$key]["price"];
+				$ownerPlots[] = new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $price, $key);
 			}
 		}
 		return $ownerPlots;
