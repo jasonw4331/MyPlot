@@ -6,9 +6,6 @@ use MyPlot\forms\MyPlotForm;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use function count;
-use function explode;
-use function is_numeric;
 
 class SellSubCommand extends SubCommand
 {
