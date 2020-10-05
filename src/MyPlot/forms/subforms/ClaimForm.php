@@ -83,9 +83,8 @@ class ClaimForm extends ComplexMyPlotForm {
 					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.maxplots", [$maxPlots]));
 					return;
 				}
-				$plotLevel = $plugin->getLevelSettings($data->levelName);
 				$economy = $plugin->getEconomyProvider();
-				if($economy !== null and !$economy->reduceMoney($player, $plotLevel->claimPrice)) {
+				if($economy !== null and !$economy->reduceMoney($player, $data->price)) {
 					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("claim.nomoney"));
 					return;
 				}
