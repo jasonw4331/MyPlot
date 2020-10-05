@@ -44,7 +44,7 @@ class SellSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("sell.unlist"));
 		}
 		if($this->getPlugin()->sellPlot($plot, $price)) {
-			$sender->sendMessage($this->translateString("sell.success", [$price]));
+			$sender->sendMessage($this->translateString("sell.success", ["{$plot->X};{$plot->Z}", $price]));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 		}

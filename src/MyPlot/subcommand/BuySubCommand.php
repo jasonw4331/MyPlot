@@ -43,7 +43,7 @@ class BuySubCommand extends SubCommand
 			return true;
 		}
 		if(strtolower($args[0] ?? "") !== $this->translateString("confirm")){
-			$sender->sendMessage($this->translateString("buy.confirm", [TextFormat::GREEN . "{$plot->X};{$plot->Z}" . TextFormat::RESET, TextFormat::GREEN . $plot->price . TextFormat::RESET]));
+			$sender->sendMessage($this->translateString("buy.confirm", ["{$plot->X};{$plot->Z}", $plot->price]));
 			return true;
 		}
 		$oldOwner = $this->getPlugin()->getServer()->getPlayer($plot->owner);
