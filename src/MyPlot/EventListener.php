@@ -312,7 +312,7 @@ class EventListener implements Listener
 			}
 			if(!$this->plugin->getConfig()->get("ShowPlotPopup", true))
 				return;
-			$popup = $this->plugin->getLanguage()->translateString("popup", [TextFormat::GREEN . $plot . TextFormat::RESET]);
+			$popup = $this->plugin->getLanguage()->translateString("popup", [TextFormat::GREEN . $plot]);
 			if(!empty($plot->owner)) {
 				$owner = TextFormat::GREEN . $plot->owner;
 				if($plot->price > 0) {
