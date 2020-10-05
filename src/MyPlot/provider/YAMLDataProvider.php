@@ -116,6 +116,7 @@ class YAMLDataProvider extends DataProvider {
 		if($levelName != "") {
 			/** @var int[] $levelKeys */
 			$levelKeys = array_keys($plots, $levelName);
+			/** @var int[] $ownerKeys */
 			$ownerKeys = array_keys($plots, $owner);
 			foreach($levelKeys as $levelKey) {
 				foreach($ownerKeys as $ownerKey) {
@@ -159,7 +160,7 @@ class YAMLDataProvider extends DataProvider {
 	 *
 	 * @return Plot|null
 	 */
-	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?plot {
+	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?Plot {
 		$plotsArr = $this->yaml->get("plots", []);
 		for($i = 0; $limitXZ <= 0 or $i < $limitXZ; $i++) {
 			$existing = [];
@@ -204,6 +205,7 @@ class YAMLDataProvider extends DataProvider {
 	}
 
 	public function close() : void {
+		$this->yaml->save(); // why don't save it on close??
 		unset($this->yaml);
 	}
 }
