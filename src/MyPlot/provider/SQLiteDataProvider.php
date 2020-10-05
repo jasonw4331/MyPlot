@@ -39,7 +39,12 @@ class SQLiteDataProvider extends DataProvider
 			(id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, X INTEGER, Z INTEGER, name TEXT,
 			 owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INTEGER, price FLOAT);");
 		try{
-			$this->db->exec("ALTER TABLE plots ADD (pvp INTEGER, price FLOAT);");
+			$this->db->exec("ALTER TABLE plots ADD pvp INTEGER;");
+		}catch(\Exception $e) {
+			// nothing :P
+		}
+		try{
+			$this->db->exec("ALTER TABLE plots ADD price FLOAT;");
 		}catch(\Exception $e) {
 			// nothing :P
 		}

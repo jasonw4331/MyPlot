@@ -21,15 +21,6 @@ class EconomySProvider implements EconomyProvider
 
 	/**
 	 * @param Player $player
-	 *
-	 * @return float
-	 */
-	public function getMoney(Player $player) : float {
-		return ($money = $this->plugin->myMoney($player)) === false ? 0 : $money;
-	}
-
-	/**
-	 * @param Player $player
 	 * @param float $amount
 	 *
 	 * @return bool
