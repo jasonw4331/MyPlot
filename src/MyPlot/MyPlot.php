@@ -1092,6 +1092,22 @@ class MyPlot extends PluginBase
 			$this->getConfig()->set("FastClearing", false);
 			$this->getLogger()->info(TF::BOLD . "WorldStyler not found. Legacy clearing will be used.");
 		}
+		$this->getLogger()->debug(TF::BOLD . "Loading economy settings");
+		// Initialize EconomyProvider
+		if($this->getConfig()->get("UseEconomy", false) === true) {
+			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
+				if($plugin instanceof EconomyAPI) {
+					$this->economyProvider = new EconomySProvider($plugin);
+					$this->getLogger()->debug("Eco set to EconomySProvider");
+				}else
+					$this->getLogger()->debug("Eco not instance of EconomyAPI");
+			}
+			if(!isset($this->economyProvider)) {
+				$this->getLogger()->info("No supported economy plugin found!");
+				$this->getConfig()->set("UseEconomy", false);
+				//$this->getConfig()->save();
+			}
+		}
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Commands");
 		// Register command
 		$this->getServer()->getCommandMap()->register("myplot", new Commands($this));
@@ -1105,22 +1121,6 @@ class MyPlot extends PluginBase
 		SpoonDetector::printSpoon($this, "spoon.txt");
 		if($this->isDisabled()) {
 			return;
-		}
-		$this->getLogger()->debug(TF::BOLD . "Loading economy settings");
-		// Initialize EconomyProvider
-		if($this->getConfig()->get("UseEconomy", false) === true) {
-			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
-				if($plugin instanceof EconomyAPI) {
-					$this->economyProvider = new EconomySProvider($plugin);
-					$this->getLogger()->debug("Eco set to EconomySProvider");
-				}else
-				$this->getLogger()->debug("Eco not instance of EconomyAPI");
-			}
-			if(!isset($this->economyProvider)) {
-				$this->getLogger()->info("No supported economy plugin found!");
-				$this->getConfig()->set("UseEconomy", false);
-				//$this->getConfig()->save();
-			}
 		}
 		$this->getLogger()->debug(TF::BOLD . "Loading Events");
 		$eventListener = new EventListener($this);
