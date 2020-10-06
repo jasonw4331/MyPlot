@@ -42,16 +42,19 @@ class BuySubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("buy.notforsale"));
 			return true;
 		}
+		$price = $plot->price;
 		if(strtolower($args[0] ?? "") !== $this->translateString("confirm")){
-			$sender->sendMessage($this->translateString("buy.confirm", ["{$plot->X};{$plot->Z}", $plot->price]));
+			$sender->sendMessage($this->translateString("buy.confirm", ["{$plot->X};{$plot->Z}", $price]));
 			return true;
 		}
 		$oldOwner = $this->getPlugin()->getServer()->getPlayer($plot->owner);
-		$clone = clone $plot;
-		$this->getPlugin()->buyPlot($plot, $sender);
-		$sender->sendMessage($this->translateString("buy.success", [TextFormat::GREEN . "{$plot->X};{$plot->Z}" . TextFormat::RESET, TextFormat::GREEN . $clone->price . TextFormat::RESET]));
-		if($oldOwner instanceof Player)
-			$oldOwner->sendMessage($this->translateString("buy.sold", [TextFormat::GREEN . $sender->getName() . TextFormat::RESET, TextFormat::GREEN . "{$plot->X};{$plot->Z}" . TextFormat::RESET, TextFormat::GREEN . $clone->price . TextFormat::RESET]));
+		if($this->getPlugin()->buyPlot($plot, $sender)) {
+			$sender->sendMessage($this->translateString("buy.success", ["{$plot->X};{$plot->Z}", $price]));
+			if($oldOwner !== null)
+				$oldOwner->sendMessage($this->translateString("buy.sold", [$sender->getName(), "{$plot->X};{$plot->Z}", $price]));
+		}else{
+			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+		}
 		return true;
 	}
 
