@@ -7,6 +7,7 @@ use MyPlot\events\MyPlotBorderChangeEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
+use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -253,6 +254,8 @@ class EventListener implements Listener
 		if($event->isCancelled()) {
 			return;
 		}
+		if(!$event->getBlock() instanceof Liquid)
+			return;
 		$levelName = $event->getBlock()->getLevel()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
