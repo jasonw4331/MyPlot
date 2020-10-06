@@ -31,7 +31,7 @@ class OwnerForm extends ComplexMyPlotForm {
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
-				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("setowner.name").' "'.$response->getString("0").'"', true);
+				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("setowner.name").' "'.$this->players[$response->getInt("0")].'"', true);
 			}
 		);
 	}
