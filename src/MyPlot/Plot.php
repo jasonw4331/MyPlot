@@ -24,6 +24,8 @@ class Plot
 	public $biome = "PLAINS";
 	/** @var bool $pvp */
 	public $pvp = true;
+	/** @var float $price */
+	public $price = 0.0;
 	/** @var int $id */
 	public $id = -1;
 
@@ -39,9 +41,10 @@ class Plot
 	 * @param array $denied
 	 * @param string $biome
 	 * @param bool|null $pvp
+	 * @param float $price
 	 * @param int $id
 	 */
-	public function __construct(string $levelName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, int $id = -1) {
+	public function __construct(string $levelName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, float $price = -1, int $id = -1) {
 		$this->levelName = $levelName;
 		$this->X = $X;
 		$this->Z = $Z;
@@ -56,6 +59,7 @@ class Plot
 		}else{
 			$this->pvp = $pvp;
 		}
+		$this->price = $price < 0 ? $settings->claimPrice : $price;
 		$this->id = $id;
 	}
 
