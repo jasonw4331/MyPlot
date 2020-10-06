@@ -7,6 +7,7 @@ use MyPlot\forms\MainForm;
 use MyPlot\subcommand\AddHelperSubCommand;
 use MyPlot\subcommand\AutoSubCommand;
 use MyPlot\subcommand\BiomeSubCommand;
+use MyPlot\subcommand\BuySubCommand;
 use MyPlot\subcommand\ClaimSubCommand;
 use MyPlot\subcommand\ClearSubCommand;
 use MyPlot\subcommand\CloneSubCommand;
@@ -25,6 +26,7 @@ use MyPlot\subcommand\NameSubCommand;
 use MyPlot\subcommand\PvpSubCommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\ResetSubCommand;
+use MyPlot\subcommand\SellSubCommand;
 use MyPlot\subcommand\SetOwnerSubCommand;
 use MyPlot\subcommand\SubCommand;
 use MyPlot\subcommand\UnDenySubCommand;
@@ -79,6 +81,10 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new ListSubCommand($plugin, "list"));
 		$this->loadSubCommand(new PvpSubCommand($plugin, "pvp"));
 		$this->loadSubCommand(new KickSubCommand($plugin, "kick"));
+		if($plugin->getEconomyProvider() !== null) {
+			$this->loadSubCommand(new SellSubCommand($plugin, "sell"));
+			$this->loadSubCommand(new BuySubCommand($plugin, "buy"));
+		}
 		$styler = $this->getPlugin()->getServer()->getPluginManager()->getPlugin("WorldStyler");
 		if($styler !== null) {
 			$this->loadSubCommand(new CloneSubCommand($plugin, "clone"));
