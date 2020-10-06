@@ -254,7 +254,7 @@ class EventListener implements Listener
 		if($event->isCancelled()) {
 			return;
 		}
-		if(!$event->getBlock() instanceof Liquid)
+		if(!$event->getSource() instanceof Liquid)
 			return;
 		$levelName = $event->getBlock()->getLevel()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName))
