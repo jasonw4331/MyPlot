@@ -33,7 +33,7 @@ class SellSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
 		}
-		if($plot->name !== $sender->getName() and !$sender->hasPermission("myplot.admin.sell")){
+		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.sell")){
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
