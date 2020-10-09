@@ -885,7 +885,7 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function buyPlot(Plot $plot, Player $player) : bool {
-		if($this->getEconomyProvider() === null or !$this->getEconomyProvider()->reduceMoney($player, $plot->price))
+		if($this->getEconomyProvider() === null or !$this->getEconomyProvider()->reduceMoney($player, $plot->price) or !$this->getEconomyProvider()->addMoney($this->getServer()->getOfflinePlayer($plot->owner), $plot->price))
 			return false;
 
 		$newPlot = clone $plot;
@@ -898,7 +898,6 @@ class MyPlot extends PluginBase
 		if($ev->isCancelled()) {
 			return false;
 		}
-		$this->getEconomyProvider()->addMoney($this->getServer()->getOfflinePlayer($plot->owner), $plot->price);
 		$plot = $ev->getPlot();
 		return $this->savePlot($plot);
 	}
