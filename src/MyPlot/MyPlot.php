@@ -875,7 +875,7 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * Resets the price and claims a plot in a players name
+	 * Resets the price, adds the money to the player's account and claims a plot in a players name
 	 *
 	 * @api
 	 *
@@ -898,6 +898,7 @@ class MyPlot extends PluginBase
 		if($ev->isCancelled()) {
 			return false;
 		}
+		$this->getEconomyProvider()->addMoney($plot->owner, $plot->price);
 		$plot = $ev->getPlot();
 		return $this->savePlot($plot);
 	}

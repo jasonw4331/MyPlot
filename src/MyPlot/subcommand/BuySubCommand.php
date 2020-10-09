@@ -50,7 +50,6 @@ class BuySubCommand extends SubCommand
 		$oldOwner = $this->getPlugin()->getServer()->getPlayer($plot->owner);
 		if($this->getPlugin()->buyPlot($plot, $sender)) {
 			$sender->sendMessage($this->translateString("buy.success", ["{$plot->X};{$plot->Z}", $price]));
-			$this->getPlugin()->getEconomyProvider()->addMoney($oldOwner, $price);
 			if($oldOwner !== null)
 				$oldOwner->sendMessage($this->translateString("buy.sold", [$sender->getName(), "{$plot->X};{$plot->Z}", $price]));
 		}else{
