@@ -898,7 +898,7 @@ class MyPlot extends PluginBase
 		if($ev->isCancelled()) {
 			return false;
 		}
-		$this->getEconomyProvider()->addMoney($plot->owner, $plot->price);
+		$this->getEconomyProvider()->addMoney($this->getServer()->getOfflinePlayer($plot->owner), $plot->price);
 		$plot = $ev->getPlot();
 		return $this->savePlot($plot);
 	}

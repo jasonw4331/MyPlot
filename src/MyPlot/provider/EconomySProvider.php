@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\provider;
 
 use onebone\economyapi\EconomyAPI;
+use pocketmine\IPlayer;
 use pocketmine\Player;
 
 class EconomySProvider implements EconomyProvider {
@@ -40,19 +41,19 @@ class EconomySProvider implements EconomyProvider {
 	}
 
 	/**
-	 * @param Player|string $player
+	 * @param IPlayer $player
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function addMoney($player, float $amount) : bool {
+	public function addMoney(IPlayer $player, float $amount) : bool {
 		if($amount < 1)
 			return true;
-		$ret = $this->plugin->addMoney($player, $amount, true, "MyPlot");
+		$ret = $this->plugin->addMoney($player->getName(), $amount, true, "MyPlot");
 		if($ret === EconomyAPI::RET_SUCCESS) {
-			$this->plugin->getLogger()->debug("MyPlot Reduced money of " . $player->getName());
+			$this->plugin->getLogger()->debug("MyPlot Add money of " . $player->getName());
 			return true;
 		}
-		$this->plugin->getLogger()->debug("MyPlot failed to reduce money of ".$player->getName());
+		$this->plugin->getLogger()->debug("MyPlot failed to add money of ".$player->getName());
 		return false;
 	}
 }
