@@ -1,6 +1,6 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.8.0
+version: 1.9.0
 api:
 - 3.4.0
 authors:
@@ -66,6 +66,10 @@ permissions:
         default: true
       myplot.command.clone:
         default: true
+      myplot.command.sell:
+        default: true
+      myplot.command.buy:
+        default: true
   myplot.admin:
     default: op
     children:
@@ -113,6 +117,10 @@ permissions:
           myplot.admin.pvp.bypass:
             default: op
       myplot.admin.clone:
+        default: op
+      myplot.admin.sell:
+        default: op
+      myplot.admin.buy:
         default: op
   myplot.claimplots:
     default: op

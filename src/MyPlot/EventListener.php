@@ -7,6 +7,7 @@ use MyPlot\events\MyPlotBorderChangeEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
+use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -21,6 +22,7 @@ use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\item\Bow;
 use pocketmine\item\Food;
 use pocketmine\level\Level;
 use pocketmine\Player;
@@ -113,7 +115,7 @@ class EventListener implements Listener
 	 * @param PlayerInteractEvent $event
 	 */
 	public function onPlayerInteract(PlayerInteractEvent $event) : void {
-		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR and $event->getItem() instanceof Food)
+		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR)
 			return;
 		$this->onEventOnBlock($event);
 	}
@@ -253,6 +255,8 @@ class EventListener implements Listener
 		if($event->isCancelled()) {
 			return;
 		}
+		if(!$event->getSource() instanceof Liquid)
+			return;
 		$levelName = $event->getBlock()->getLevel()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
@@ -315,9 +319,13 @@ class EventListener implements Listener
 			$popup = $this->plugin->getLanguage()->translateString("popup", [TextFormat::GREEN . $plot]);
 			if(!empty($plot->owner)) {
 				$owner = TextFormat::GREEN . $plot->owner;
-				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
+				if($plot->price > 0 and $plot->owner !== $player->getName()) {
+					$ownerPopup = $this->plugin->getLanguage()->translateString("popup.forsale", [$owner.TextFormat::RESET, $plot->price]);
+				}else{
+					$ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner]);
+				}
 			}else{
-				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available", [$this->plugin->getLevelSettings($levelName)->claimPrice]);
+				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available", [$plot->price]);
 			}
 			$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
 			$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
