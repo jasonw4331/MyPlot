@@ -22,6 +22,7 @@ use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\item\Bow;
 use pocketmine\item\Food;
 use pocketmine\level\Level;
 use pocketmine\Player;
@@ -114,7 +115,7 @@ class EventListener implements Listener
 	 * @param PlayerInteractEvent $event
 	 */
 	public function onPlayerInteract(PlayerInteractEvent $event) : void {
-		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR and $event->getItem() instanceof Food)
+		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR)
 			return;
 		$this->onEventOnBlock($event);
 	}
