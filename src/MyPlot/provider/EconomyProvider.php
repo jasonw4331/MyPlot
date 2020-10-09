@@ -12,4 +12,12 @@ interface EconomyProvider {
 	 * @return bool
 	 */
 	public function reduceMoney(Player $player, float $amount) : bool;
+
+	/**
+	 * @param Player|string $player
+	 * @param float $amount
+	 *
+	 * @return bool
+	 */
+	public function addMoney($player, float $amount) : bool;
 }

@@ -34,7 +34,7 @@ class BuySubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
 		}
-		if($plot->name === $sender->getName() and !$sender->hasPermission("myplot.admin.buy")){
+		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.buy")){
 			$sender->sendMessage(TextFormat::RED . $this->translateString("buy.noself"));
 			return true;
 		}
@@ -50,6 +50,7 @@ class BuySubCommand extends SubCommand
 		$oldOwner = $this->getPlugin()->getServer()->getPlayer($plot->owner);
 		if($this->getPlugin()->buyPlot($plot, $sender)) {
 			$sender->sendMessage($this->translateString("buy.success", ["{$plot->X};{$plot->Z}", $price]));
+			$this->getPlugin()->getEconomyProvider()->addMoney($oldOwner, $price);
 			if($oldOwner !== null)
 				$oldOwner->sendMessage($this->translateString("buy.sold", [$sender->getName(), "{$plot->X};{$plot->Z}", $price]));
 		}else{
