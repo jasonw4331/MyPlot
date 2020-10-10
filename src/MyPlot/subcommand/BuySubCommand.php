@@ -34,7 +34,7 @@ class BuySubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
 		}
-		if($plot->name === $sender->getName() and !$sender->hasPermission("myplot.admin.buy")){
+		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.buy")){
 			$sender->sendMessage(TextFormat::RED . $this->translateString("buy.noself"));
 			return true;
 		}
