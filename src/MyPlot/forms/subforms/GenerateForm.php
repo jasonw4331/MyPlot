@@ -69,7 +69,9 @@ class GenerateForm extends ComplexMyPlotForm {
 					return;
 				}
 				$teleport = array_pop($data);
-				$data = array_map(function($val) {
+
+				$blockIds = array_slice($data, -5, 5, true);
+				$blockIds = array_map(function($val) {
 					if(strpos($val, ':') !== false) {
 						$peices = explode(':', $val);
 						if(defined(BlockIds::class."::".strtoupper(str_replace(' ', '_', $peices[0]))))
@@ -80,7 +82,10 @@ class GenerateForm extends ComplexMyPlotForm {
 					elseif(defined(BlockIds::class."::".strtoupper(str_replace(' ', '_', $val))))
 						return constant(BlockIds::class."::".strtoupper(str_replace(' ', '_', $val))).':0';
 					return $val;
-				}, $data);
+				}, $blockIds);
+				foreach($blockIds as $key => $val)
+					$data[$key] = $val;
+
 				if($plugin->generateLevel($world, array_shift($data), $data)) {
 					if($teleport)
 						$plugin->teleportPlayerToPlot($player, new Plot($world, 0, 0));
