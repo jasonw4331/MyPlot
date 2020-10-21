@@ -155,6 +155,53 @@ class Plot
 		return true;
 	}
 
+		/**
+	 * @api
+	 *
+	 * @return string
+	 */
+	public function getOwner(): string {
+		return $this->owner;
+	}
+
+	/**
+	 * @api
+	 *
+	 * @return int
+	 */
+	public function getX(): int {
+		return $this->X;
+	}
+
+	/**
+	 * @api
+	 *
+	 * @return int
+	 */
+	public function getZ(): int {
+		return $this->Z;
+	}
+
+	/**
+	 * @api
+	 *
+	 * @return string
+	 */
+	public function getLevelName(): string {
+		return $this->levelName;
+	}
+
+	/**
+	 * @api
+	 *
+	 * @param string $username
+	 *
+	 * @return bool
+	 */
+	public function isOwner(string $username) :bool {
+		return ($this->owner === $username);
+	}
+	
 	/**
 	 * @api
 	 *
