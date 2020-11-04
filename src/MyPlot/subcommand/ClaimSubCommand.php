@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\ClaimForm;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -69,6 +70,8 @@ class ClaimSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new ClaimForm($player);
+		if(MyPlot::getInstance()->isLevelLoaded($player->getLevel()->getFolderName()))
+			return new ClaimForm($player);
+		return null;
 	}
 }
