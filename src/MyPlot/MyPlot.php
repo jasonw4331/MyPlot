@@ -487,6 +487,7 @@ class MyPlot extends PluginBase
 	public function claimPlot(Plot $plot, string $claimer, string $plotName = "") : bool {
 		$newPlot = clone $plot;
 		$newPlot->owner = $claimer;
+		$newPlot->price = 0.0;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
 		$ev->call();
 		if($ev->isCancelled()) {
