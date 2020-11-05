@@ -22,8 +22,6 @@ use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
-use pocketmine\item\Bow;
-use pocketmine\item\Food;
 use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\utils\Config;
