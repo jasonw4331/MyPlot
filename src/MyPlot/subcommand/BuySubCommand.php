@@ -42,6 +42,18 @@ class BuySubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("buy.notforsale"));
 			return true;
 		}
+		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($sender);
+		$plotsOfPlayer = 0;
+		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
+			$level = $this->getPlugin()->getServer()->getLevelByName((string)$level);
+			if(!$level->isClosed()) {
+				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
+			}
+		}
+		if($plotsOfPlayer >= $maxPlots) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxplots", [$maxPlots]));
+			return true;
+		}
 		$price = $plot->price;
 		if(strtolower($args[0] ?? "") !== $this->translateString("confirm")){
 			$sender->sendMessage($this->translateString("buy.confirm", ["{$plot->X};{$plot->Z}", $price]));
