@@ -4,7 +4,7 @@ namespace MyPlot;
 
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\VanillaBlocks;
 
 class PlotLevelSettings
 {
@@ -56,11 +56,11 @@ class PlotLevelSettings
 	public function __construct(string $name, array $settings = []) {
 		$this->name = $name;
 		if(!empty($settings)) {
-			$this->roadBlock = self::parseBlock($settings, "RoadBlock", BlockFactory::getInstance()->get(BlockLegacyIds::PLANKS));
-			$this->wallBlock = self::parseBlock($settings, "WallBlock", BlockFactory::getInstance()->get(BlockLegacyIds::STONE_SLAB));
-			$this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", BlockFactory::getInstance()->get(BlockLegacyIds::GRASS));
-			$this->plotFillBlock = self::parseBlock($settings, "PlotFillBlock", BlockFactory::getInstance()->get(BlockLegacyIds::DIRT));
-			$this->bottomBlock = self::parseBlock($settings, "BottomBlock", BlockFactory::getInstance()->get(BlockLegacyIds::BEDROCK));
+			$this->roadBlock = self::parseBlock($settings, "RoadBlock", VanillaBlocks::OAK_PLANKS());
+			$this->wallBlock = self::parseBlock($settings, "WallBlock", VanillaBlocks::SMOOTH_STONE_SLAB());
+			$this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", VanillaBlocks::GRASS());
+			$this->plotFillBlock = self::parseBlock($settings, "PlotFillBlock", VanillaBlocks::DIRT());
+			$this->bottomBlock = self::parseBlock($settings, "BottomBlock", VanillaBlocks::BEDROCK());
 			$this->roadWidth = self::parseNumber($settings, "RoadWidth", 7);
 			$this->plotSize = self::parseNumber($settings, "PlotSize", 32);
 			$this->groundHeight = self::parseNumber($settings, "GroundHeight", 64);
@@ -87,7 +87,7 @@ class PlotLevelSettings
 		if(isset($array[$key])) {
 			$id = $array[$key];
 			if(is_numeric($id)) {
-				$block = BlockFactory::getInstance()->get((int) $id);
+				$block = BlockFactory::getInstance()->get((int) $id, 0);
 			}else{
 				$split = explode(":", $id);
 				if(count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
