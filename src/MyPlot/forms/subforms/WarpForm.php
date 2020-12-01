@@ -43,10 +43,10 @@ class WarpForm extends ComplexMyPlotForm {
 					$data =[
 						(int)$response->getString("0"),
 						(int)$response->getString("1"),
-						empty($response->getString("2")) ? $this->player->getLevel()->getFolderName() : $response->getString("2")
+						empty($response->getString("2")) ? $player->getLevel()->getFolderName() : $response->getString("2")
 					];
 				elseif(empty($response->getString("0")) and empty($response->getString("1"))) {
-					$this->player->sendForm(new self($this->player));
+					$player->sendForm(new self($player));
 					throw new FormValidationException("Invalid form data returned");
 				}else
 					throw new FormValidationException("Unexpected form data returned");
