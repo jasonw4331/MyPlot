@@ -25,7 +25,7 @@ class SellSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			return false;
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender->asPosition());

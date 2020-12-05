@@ -51,11 +51,11 @@ class PlotLevelSettings
 	 * PlotLevelSettings constructor.
 	 *
 	 * @param string $name
-	 * @param array $settings
+	 * @param mixed[] $settings
 	 */
 	public function __construct(string $name, array $settings = []) {
 		$this->name = $name;
-		if(!empty($settings)) {
+		if(count($settings) > 0) {
 			$this->roadBlock = self::parseBlock($settings, "RoadBlock", Block::get(Block::PLANKS));
 			$this->wallBlock = self::parseBlock($settings, "WallBlock", Block::get(Block::STONE_SLAB));
 			$this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", Block::get(Block::GRASS));
@@ -78,7 +78,7 @@ class PlotLevelSettings
 	}
 
 	/**
-	 * @param array $array
+	 * @param string[] $array
 	 * @param string|int $key
 	 * @param Block $default
 	 *
@@ -104,7 +104,7 @@ class PlotLevelSettings
 	}
 
 	/**
-	 * @param array $array
+	 * @param string[] $array
 	 * @param string|int $key
 	 * @param int $default
 	 *
@@ -119,7 +119,7 @@ class PlotLevelSettings
 	}
 
 	/**
-	 * @param array $array
+	 * @param mixed[] $array
 	 * @param string|int $key
 	 * @param bool $default
 	 *
@@ -127,7 +127,7 @@ class PlotLevelSettings
 	 */
 	public static function parseBool(array &$array, $key, bool $default) : bool {
 		if(isset($array[$key]) and is_bool($array[$key])) {
-			return (bool) $array[$key];
+			return $array[$key];
 		}else{
 			return $default;
 		}

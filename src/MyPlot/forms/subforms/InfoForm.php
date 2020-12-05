@@ -17,6 +17,8 @@ class InfoForm extends ComplexMyPlotForm {
 
 		if(!isset($this->plot))
 			$this->plot = $plugin->getPlotByPosition($player);
+		if(!isset($this->plot))
+			return;
 
 		parent::__construct(
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("info.form")]),
@@ -36,24 +38,24 @@ class InfoForm extends ComplexMyPlotForm {
 				new Dropdown(
 					"3",
 					$plugin->getLanguage()->get("info.formhelpers"),
-					empty($this->plot->helpers) ? [TextFormat::DARK_BLUE.$plugin->getLanguage()->get("info.formnohelpers")] : array_map(function(string $text) {
+					count($this->plot->helpers) === 0 ? [TextFormat::DARK_BLUE.$plugin->getLanguage()->get("info.formnohelpers")] : array_map(function(string $text) : string {
 						return TextFormat::DARK_BLUE.$text;
 					}, $this->plot->helpers)
 				),
 				new Dropdown(
 					"4",
 					$plugin->getLanguage()->get("info.formdenied"),
-					empty($this->plot->denied) ? [TextFormat::DARK_BLUE.$plugin->getLanguage()->get("info.formnodenied")] : array_map(function(string $text) {
+					count($this->plot->denied) === 0 ? [TextFormat::DARK_BLUE.$plugin->getLanguage()->get("info.formnodenied")] : array_map(function(string $text) : string {
 						return TextFormat::DARK_BLUE.$text;
 					}, $this->plot->denied)
 				),
 				new Dropdown(
 					"5",
 					$plugin->getLanguage()->get("info.formbiome"),
-					array_map(function(string $text) {
+					array_map(function(string $text) : string {
 						return TextFormat::DARK_BLUE.ucfirst(strtolower(str_replace("_", " ", $text)));
 					}, array_keys(BiomeSubCommand::BIOMES)),
-					(int)array_search($this->plot->biome, array_keys(BiomeSubCommand::BIOMES))
+					(int)array_search($this->plot->biome, array_keys(BiomeSubCommand::BIOMES), true)
 				),
 				new Label(
 					"6",

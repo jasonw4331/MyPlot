@@ -26,7 +26,7 @@ class SetOwnerSubCommand extends SubCommand {
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			return false;
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
@@ -38,7 +38,7 @@ class SetOwnerSubCommand extends SubCommand {
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
 			$level = $this->getPlugin()->getServer()->getLevelByName($level);
-			if(!$level->isClosed()) {
+			if($level !== null and !$level->isClosed()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
 			}
 		}
@@ -55,7 +55,7 @@ class SetOwnerSubCommand extends SubCommand {
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
 			return new OwnerForm();
 		return null;
 	}

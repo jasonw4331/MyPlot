@@ -116,7 +116,7 @@ class Commands extends PluginCommand
 				preg_match_all('/(\s?[<\[]?\s*)([a-zA-Z0-9|]+)(?:\s*:?\s*)(string|int|x y z|float|mixed|target|message|text|json|command|boolean|bool)?(?:\s*[>\]]?\s?)/iu', $usage, $matches, PREG_PATTERN_ORDER, strlen($commandString));
 				$argumentCount = count($matches[0])-1;
 				for($argNumber = 1; $argNumber <= $argumentCount; ++$argNumber) {
-					$optional = empty($matches[1][$argNumber]) ? false : ($matches[1][$argNumber] === '[');
+					$optional = $matches[1][$argNumber] === '' ? false : ($matches[1][$argNumber] === '[');
 					$paramName = strtolower($matches[2][$argNumber]);
 					if(stripos($paramName, "|") === false) {
 						switch(strtolower($matches[3][$argNumber])) {
@@ -232,7 +232,7 @@ class Commands extends PluginCommand
 				return true;
 			}
 		}
-		$subCommand = strtolower(array_shift($args));
+		$subCommand = strtolower((string)array_shift($args));
 		if(isset($this->subCommands[$subCommand])) {
 			$command = $this->subCommands[$subCommand];
 		}elseif(isset($this->aliasSubCommands[$subCommand])) {

@@ -12,7 +12,7 @@ class HomeForm extends SimpleMyPlotForm {
 	public function __construct(Player $player) {
 		$plugin = MyPlot::getInstance();
 
-		$plots = $plugin->getPlotsOfPlayer($player->getName(), $player->getLevel()->getFolderName());
+		$plots = $plugin->getPlotsOfPlayer($player->getName(), $player->getLevelNonNull()->getFolderName());
 		$i = 1;
 		$elements = [];
 		foreach($plots as $plot) {

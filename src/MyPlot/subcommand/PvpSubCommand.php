@@ -34,7 +34,7 @@ class PvpSubCommand extends SubCommand {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("notowner"));
 			return true;
 		}
-		$levelSettings = $this->getPlugin()->getLevelSettings($sender->level->getFolderName());
+		$levelSettings = $this->getPlugin()->getLevelSettings($sender->getLevelNonNull()->getFolderName());
 		if($levelSettings->restrictPVP) {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("pvp.world"));
 			return true;

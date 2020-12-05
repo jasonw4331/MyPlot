@@ -11,7 +11,7 @@ class MySQLProvider extends DataProvider {
 	protected $plugin;
 	/** @var \mysqli $db */
 	protected $db;
-	/** @var array $settings */
+	/** @var mixed[] $settings */
 	protected $settings;
 	/** @var \mysqli_stmt $sqlGetPlot */
 	protected $sqlGetPlot;
@@ -35,7 +35,7 @@ class MySQLProvider extends DataProvider {
 	 *
 	 * @param MyPlot $plugin
 	 * @param int $cacheSize
-	 * @param array $settings
+	 * @param mixed[] $settings
 	 */
 	public function __construct(MyPlot $plugin, int $cacheSize = 0, array $settings = []) {
 		ini_set("mysqli.reconnect", "1");
@@ -46,7 +46,7 @@ class MySQLProvider extends DataProvider {
 		parent::__construct($plugin, $cacheSize);
 		$this->settings = $settings;
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
-		if($this->db->connect_error)
+		if($this->db->connect_error !== '')
 			throw new \RuntimeException("Failed to connect to the MySQL database: " . $this->db->connect_error);
 		$this->db->query("CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INT, price FLOAT);");
 		try{
@@ -128,13 +128,13 @@ class MySQLProvider extends DataProvider {
 			return new Plot($levelName, $X, $Z);
 		}
 		$result = $stmt->get_result();
-		if($val = $result->fetch_array(MYSQLI_ASSOC)) {
-			if(empty($val["helpers"])) {
+		if($result !== false and ($val = $result->fetch_array(MYSQLI_ASSOC)) !== null) {
+			if($val["helpers"] === '') {
 				$helpers = [];
 			}else{
 				$helpers = explode(",", (string) $val["helpers"]);
 			}
-			if(empty($val["denied"])) {
+			if($val["denied"] === '') {
 				$denied = [];
 			}else{
 				$denied = explode(",", (string) $val["denied"]);
@@ -152,11 +152,11 @@ class MySQLProvider extends DataProvider {
 	 * @param string $owner
 	 * @param string $levelName
 	 *
-	 * @return array
+	 * @return Plot[]
 	 */
 	public function getPlotsByOwner(string $owner, string $levelName = "") : array {
 		$this->reconnect();
-		if(empty($levelName)) {
+		if($levelName === '') {
 			$stmt = $this->sqlGetPlotsByOwner;
 			$stmt->bind_param('s', $owner);
 		}else{
@@ -170,18 +170,18 @@ class MySQLProvider extends DataProvider {
 			return $plots;
 		}
 		$result = $stmt->get_result();
-		while($val = $result->fetch_array()) {
+		while($result !== false and ($val = $result->fetch_array()) !== null) {
 			$helpers = explode(",", (string) $val["helpers"]);
 			$denied = explode(",", (string) $val["denied"]);
 			$pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
 			$plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], $pvp, (float) $val["price"], (int) $val["id"]);
 		}
 		// Remove unloaded plots
-		$plots = array_filter($plots, function($plot) {
+		$plots = array_filter($plots, function(Plot $plot) : bool {
 			return $this->plugin->isLevelLoaded($plot->levelName);
 		});
 		// Sort plots by level
-		usort($plots, function($plot1, $plot2) {
+		usort($plots, function(Plot $plot1, Plot $plot2) : int {
 			return strcmp($plot1->levelName, $plot2->levelName);
 		});
 		return $plots;
@@ -206,27 +206,27 @@ class MySQLProvider extends DataProvider {
 			}
 			$result = $stmt->get_result();
 			$plots = [];
-			while($val = $result->fetch_array(MYSQLI_NUM)) {
+			while($result !== false and ($val = $result->fetch_array(MYSQLI_NUM)) !== null) {
 				$plots[$val[0]][$val[1]] = true;
 			}
 			if(count($plots) === max(1, 8 * $i)) {
 				continue;
 			}
-			if($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
+			if(($ret = self::findEmptyPlotSquared(0, $i, $plots)) !== null) {
 				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;
 			}
 			for($a = 1; $a < $i; $a++) {
-				if($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
+				if(($ret = self::findEmptyPlotSquared($a, $i, $plots)) !== null) {
 					[$X, $Z] = $ret;
 					$plot = new Plot($levelName, $X, $Z);
 					$this->cachePlot($plot);
 					return $plot;
 				}
 			}
-			if($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
+			if(($ret = self::findEmptyPlotSquared($i, $i, $plots)) !== null) {
 				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
@@ -258,12 +258,14 @@ class MySQLProvider extends DataProvider {
 				$this->plugin->getLogger()->critical("Closing level to prevent griefing!");
 				foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
 					$level = $this->plugin->getServer()->getLevelByName($levelName);
-					$level->save(); // don't force in case owner doesn't want it saved
-					Server::getInstance()->unloadLevel($level, true); // force unload to prevent possible griefing
+					if($level !== null) {
+						$level->save(); // don't force in case owner doesn't want it saved
+						Server::getInstance()->unloadLevel($level, true); // force unload to prevent possible griefing
+					}
 				}
-				if($this->db->connect_error)
+				if($this->db->connect_error !== '')
 					$this->plugin->getLogger()->critical("Failed to connect to the MySQL database: " . $this->db->connect_error);
-				if($this->plugin->getConfig()->getNested("MySQLSettings.ShutdownOnFailure", false)) {
+				if((bool)$this->plugin->getConfig()->getNested("MySQLSettings.ShutdownOnFailure", false)) {
 					$this->plugin->getServer()->shutdown();
 				}
 				return false;
@@ -273,13 +275,37 @@ class MySQLProvider extends DataProvider {
 	}
 
 	private function prepare() : void {
-		$this->sqlGetPlot = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome, pvp, price FROM plots WHERE level = ? AND X = ? AND Z = ?;");
-		$this->sqlSavePlot = $this->db->prepare("INSERT INTO plots (`id`, `level`, `X`, `Z`, `name`, `owner`, `helpers`, `denied`, `biome`, `pvp`, `price`) VALUES((SELECT id FROM plots p WHERE p.level = ? AND X = ? AND Z = ?),?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name = VALUES(name), owner = VALUES(owner), helpers = VALUES(helpers), denied = VALUES(denied), biome = VALUES(biome), pvp = VALUES(pvp), price = VALUES(price);");
-		$this->sqlSavePlotById = $this->db->prepare("UPDATE plots SET id = ?, level = ?, X = ?, Z = ?, name = ?, owner = ?, helpers = ?, denied = ?, biome = ?, pvp = ?, price = ? WHERE id = VALUES(id);");
-		$this->sqlRemovePlotById = $this->db->prepare("DELETE FROM plots WHERE id = ?;");
-		$this->sqlRemovePlot = $this->db->prepare("DELETE FROM plots WHERE level = ? AND X = ? AND Z = ?;");
-		$this->sqlGetPlotsByOwner = $this->db->prepare("SELECT * FROM plots WHERE owner = ?;");
-		$this->sqlGetPlotsByOwnerAndLevel = $this->db->prepare("SELECT * FROM plots WHERE owner = ? AND level = ?;");
-		$this->sqlGetExistingXZ = $this->db->prepare("SELECT X, Z FROM plots WHERE (level = ? AND ((abs(X) = ? AND abs(Z) <= ?) OR (abs(Z) = ? AND abs(X) <= ?)));");
+		$stmt = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome, pvp, price FROM plots WHERE level = ? AND X = ? AND Z = ?;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetPlot = $stmt;
+		$stmt = $this->db->prepare("INSERT INTO plots (`id`, `level`, `X`, `Z`, `name`, `owner`, `helpers`, `denied`, `biome`, `pvp`, `price`) VALUES((SELECT id FROM plots p WHERE p.level = ? AND X = ? AND Z = ?),?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name = VALUES(name), owner = VALUES(owner), helpers = VALUES(helpers), denied = VALUES(denied), biome = VALUES(biome), pvp = VALUES(pvp), price = VALUES(price);");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlSavePlot = $stmt;
+		$stmt = $this->db->prepare("UPDATE plots SET id = ?, level = ?, X = ?, Z = ?, name = ?, owner = ?, helpers = ?, denied = ?, biome = ?, pvp = ?, price = ? WHERE id = VALUES(id);");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlSavePlotById = $stmt;
+		$stmt = $this->db->prepare("DELETE FROM plots WHERE id = ?;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlRemovePlotById = $stmt;
+		$stmt = $this->db->prepare("DELETE FROM plots WHERE level = ? AND X = ? AND Z = ?;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlRemovePlot = $stmt;
+		$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = ?;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetPlotsByOwner = $stmt;
+		$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = ? AND level = ?;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetPlotsByOwnerAndLevel = $stmt;
+		$stmt = $this->db->prepare("SELECT X, Z FROM plots WHERE (level = ? AND ((abs(X) = ? AND abs(Z) <= ?) OR (abs(Z) = ? AND abs(X) <= ?)));");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetExistingXZ = $stmt;
 	}
 }

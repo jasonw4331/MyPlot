@@ -7,7 +7,7 @@ use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
-use pocketmine\level\Position;
+use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
 
@@ -16,13 +16,13 @@ class ClearBorderTask extends Task {
 	protected $plugin;
 	/** @var Plot $plot */
 	protected $plot;
-	/** @var \pocketmine\level\Level|null $level */
+	/** @var Level $level */
 	protected $level;
 	/** @var int $height */
 	protected $height;
 	/** @var Block $plotWallBlock */
 	protected $plotWallBlock;
-	/** @var Position|Vector3|null $plotBeginPos */
+	/** @var Vector3 $plotBeginPos */
 	protected $plotBeginPos;
 	/** @var int $xMax */
 	protected $xMax;
@@ -44,9 +44,9 @@ class ClearBorderTask extends Task {
 	public function __construct(MyPlot $plugin, Plot $plot) {
 		$this->plugin = $plugin;
 		$this->plot = $plot;
-		$this->plotBeginPos = $plugin->getPlotPosition($plot);
-		$this->level = $this->plotBeginPos->getLevel();
-		$this->plotBeginPos = $this->plotBeginPos->subtract(1,0,1);
+		$plotBeginPos = $plugin->getPlotPosition($plot);
+		$this->level = $plotBeginPos->getLevelNonNull();
+		$this->plotBeginPos = $plotBeginPos->subtract(1,0,1);
 		$plotLevel = $plugin->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
 		$this->xMax = (int)($this->plotBeginPos->x + $plotSize + 1);

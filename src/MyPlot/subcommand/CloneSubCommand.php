@@ -26,7 +26,7 @@ class CloneSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			return false;
 		}
 		/** @var string[] $plotIdArray */
@@ -35,7 +35,7 @@ class CloneSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("clone.wrongid"));
 			return true;
 		}
-		$levelName = $args[1] ?? $sender->getLevel()->getFolderName();
+		$levelName = $args[1] ?? $sender->getLevelNonNull()->getFolderName();
 		$selectedPlot = $this->getPlugin()->getProvider()->getPlot($levelName, (int) $plotIdArray[0], (int) $plotIdArray[1]);
 		$standingPlot = $this->getPlugin()->getPlotByPosition($sender);
 		if($standingPlot === null) {
@@ -65,6 +65,6 @@ class CloneSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new CloneForm($player);
+			return $player !== null ? new CloneForm($player) : null;
 	}
 }

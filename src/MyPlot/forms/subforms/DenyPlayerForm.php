@@ -17,7 +17,7 @@ class DenyPlayerForm extends ComplexMyPlotForm {
 	public function __construct(Plot $plot) {
 		$plugin = MyPlot::getInstance();
 		$players = [];
-		if(!in_array("*", $plot->denied)) {
+		if(!in_array("*", $plot->denied, true)) {
 			$players = ["*"];
 			$this->players = ["*"];
 		}
@@ -31,7 +31,7 @@ class DenyPlayerForm extends ComplexMyPlotForm {
 				new Dropdown(
 					"0",
 					$plugin->getLanguage()->get("denyplayer.dropdown"),
-					array_map(function(string $text) {
+					array_map(function(string $text) : string {
 						return TextFormat::DARK_BLUE.$text;
 					}, $players)
 				)

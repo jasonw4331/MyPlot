@@ -48,22 +48,46 @@ class SQLiteDataProvider extends DataProvider
 		}catch(\Exception $e) {
 			// nothing :P
 		}
-		$this->sqlGetPlot = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome, pvp, price FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
-		$this->sqlSavePlot = $this->db->prepare("INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome, pvp, price) VALUES
+		$stmt = $this->db->prepare("SELECT id, name, owner, helpers, denied, biome, pvp, price FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetPlot = $stmt;
+		$stmt = $this->db->prepare("INSERT OR REPLACE INTO plots (id, level, X, Z, name, owner, helpers, denied, biome, pvp, price) VALUES
 			((SELECT id FROM plots WHERE level = :level AND X = :X AND Z = :Z),
 			 :level, :X, :Z, :name, :owner, :helpers, :denied, :biome, :pvp, :price);");
-		$this->sqlSavePlotById = $this->db->prepare("UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome, pvp = :pvp, price = :price WHERE id = :id;");
-		$this->sqlRemovePlot = $this->db->prepare("DELETE FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
-		$this->sqlRemovePlotById = $this->db->prepare("DELETE FROM plots WHERE id = :id;");
-		$this->sqlGetPlotsByOwner = $this->db->prepare("SELECT * FROM plots WHERE owner = :owner;");
-		$this->sqlGetPlotsByOwnerAndLevel = $this->db->prepare("SELECT * FROM plots WHERE owner = :owner AND level = :level;");
-		$this->sqlGetExistingXZ = $this->db->prepare("SELECT X, Z FROM plots WHERE (
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlSavePlot = $stmt;
+		$stmt = $this->db->prepare("UPDATE plots SET name = :name, owner = :owner, helpers = :helpers, denied = :denied, biome = :biome, pvp = :pvp, price = :price WHERE id = :id;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlSavePlotById = $stmt;
+		$stmt = $this->db->prepare("DELETE FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlRemovePlot = $stmt;
+		$stmt = $this->db->prepare("DELETE FROM plots WHERE id = :id;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlRemovePlotById = $stmt;
+		$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = :owner;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetPlotsByOwner = $stmt;
+		$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = :owner AND level = :level;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetPlotsByOwnerAndLevel = $stmt;
+		$stmt = $this->db->prepare("SELECT X, Z FROM plots WHERE (
 				level = :level
 				AND (
 					(abs(X) = :number AND abs(Z) <= :number) OR
 					(abs(Z) = :number AND abs(X) <= :number)
 				)
 			);");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetExistingXZ = $stmt;
 		$this->plugin->getLogger()->debug("SQLite data provider registered");
 	}
 
@@ -141,7 +165,7 @@ class SQLiteDataProvider extends DataProvider
 		$this->sqlGetPlot->bindValue(":Z", $Z, SQLITE3_INTEGER);
 		$this->sqlGetPlot->reset();
 		$result = $this->sqlGetPlot->execute();
-		if($val = $result->fetchArray(SQLITE3_ASSOC)) {
+		if($result !== false and ($val = $result->fetchArray(SQLITE3_ASSOC)) !== false) {
 			if($val["helpers"] === null or $val["helpers"] === "") {
 				$helpers = [];
 			}else{
@@ -165,7 +189,7 @@ class SQLiteDataProvider extends DataProvider
 	 * @param string $owner
 	 * @param string $levelName
 	 *
-	 * @return array
+	 * @return Plot[]
 	 */
 	public function getPlotsByOwner(string $owner, string $levelName = "") : array {
 		if($levelName === "") {
@@ -178,18 +202,18 @@ class SQLiteDataProvider extends DataProvider
 		$plots = [];
 		$stmt->reset();
 		$result = $stmt->execute();
-		while($val = $result->fetchArray(SQLITE3_ASSOC)) {
+		while($result !== false and ($val = $result->fetchArray(SQLITE3_ASSOC)) !== false) {
 			$helpers = explode(",", (string) $val["helpers"]);
 			$denied = explode(",", (string) $val["denied"]);
 			$pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
 			$plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], $pvp, (float) $val["price"], (int) $val["id"]);
 		}
 		// Remove unloaded plots
-		$plots = array_filter($plots, function($plot) {
+		$plots = array_filter($plots, function(Plot $plot) : bool {
 			return $this->plugin->isLevelLoaded($plot->levelName);
 		});
 		// Sort plots by level
-		usort($plots, function($plot1, $plot2) {
+		usort($plots, function(Plot $plot1, Plot $plot2) : int {
 			return strcmp($plot1->levelName, $plot2->levelName);
 		});
 		return $plots;
@@ -209,27 +233,27 @@ class SQLiteDataProvider extends DataProvider
 			$this->sqlGetExistingXZ->reset();
 			$result = $this->sqlGetExistingXZ->execute();
 			$plots = [];
-			while($val = $result->fetchArray(SQLITE3_NUM)) {
+			while($result !== false and ($val = $result->fetchArray(SQLITE3_NUM)) !== false) {
 				$plots[$val[0]][$val[1]] = true;
 			}
 			if(count($plots) === max(1, 8 * $i)) {
 				continue;
 			}
-			if($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
+			if(($ret = self::findEmptyPlotSquared(0, $i, $plots)) !== null) {
 				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;
 			}
 			for($a = 1; $a < $i; $a++) {
-				if($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
+				if(($ret = self::findEmptyPlotSquared($a, $i, $plots)) !== null) {
 					[$X, $Z] = $ret;
 					$plot = new Plot($levelName, $X, $Z);
 					$this->cachePlot($plot);
 					return $plot;
 				}
 			}
-			if($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
+			if(($ret = self::findEmptyPlotSquared($i, $i, $plots)) !== null) {
 				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);

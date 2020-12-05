@@ -5,6 +5,7 @@ namespace MyPlot;
 use pocketmine\block\Block;
 use pocketmine\level\biome\Biome;
 use pocketmine\level\ChunkManager;
+use pocketmine\level\format\Chunk;
 use pocketmine\level\generator\Generator;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
@@ -37,7 +38,7 @@ class MyPlotGenerator extends Generator {
 	/**
 	 * MyPlotGenerator constructor.
 	 *
-	 * @param array $settings
+	 * @param string[] $settings
 	 */
 	public function __construct(array $settings = []) {
 		if(isset($settings["preset"])) {
@@ -77,7 +78,8 @@ class MyPlotGenerator extends Generator {
 	}
 
 	/**
-	 * @return string[]
+	 * @return mixed[]
+	 * @phpstan-return array<string, mixed>
 	 */
 	public function getSettings() : array {
 		return $this->settings;
@@ -97,7 +99,7 @@ class MyPlotGenerator extends Generator {
 	 */
 	public function generateChunk(int $chunkX, int $chunkZ) : void {
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
-		$chunk = $this->level->getChunk($chunkX, $chunkZ);
+		$chunk = $this->level->getChunk($chunkX, $chunkZ) ?? new Chunk($chunkX, $chunkZ);
 		$bottomBlockId = $this->bottomBlock->getId();
 		$bottomBlockMeta = $this->bottomBlock->getDamage();
 		$plotFillBlockId = $this->plotFillBlock->getId();

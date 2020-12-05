@@ -27,7 +27,7 @@ class GiveSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			return false;
 		}
 		$newOwner = $args[0];
@@ -49,7 +49,7 @@ class GiveSubCommand extends SubCommand
 			return true;
 		}
 		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($newOwner);
-		$plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(), $newOwner->getLevel()->getFolderName()));
+		$plotsOfPlayer = count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(), $newOwner->getLevelNonNull()->getFolderName()));
 		if($plotsOfPlayer >= $maxPlots) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
 			return true;
@@ -73,7 +73,7 @@ class GiveSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
 			return new GiveForm();
 		return null;
 	}

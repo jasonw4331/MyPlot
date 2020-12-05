@@ -16,9 +16,9 @@ class Plot
 	public $name = "";
 	/** @var string $owner */
 	public $owner = "";
-	/** @var array $helpers */
+	/** @var string[] $helpers */
 	public $helpers = [];
-	/** @var array $denied */
+	/** @var string[] $denied */
 	public $denied = [];
 	/** @var string $biome */
 	public $biome = "PLAINS";
@@ -37,8 +37,8 @@ class Plot
 	 * @param int $Z
 	 * @param string $name
 	 * @param string $owner
-	 * @param array $helpers
-	 * @param array $denied
+	 * @param string[] $helpers
+	 * @param string[] $denied
 	 * @param string $biome
 	 * @param bool|null $pvp
 	 * @param float $price
@@ -54,7 +54,7 @@ class Plot
 		$this->denied = $denied;
 		$this->biome = strtoupper($biome);
 		$settings = MyPlot::getInstance()->getLevelSettings($levelName);
-		if(!isset($pvp) and $settings !== null) {
+		if(!isset($pvp)) {
 			$this->pvp = !$settings->restrictPVP;
 		}else{
 			$this->pvp = $pvp;
@@ -71,7 +71,7 @@ class Plot
 	 * @return bool
 	 */
 	public function isHelper(string $username) : bool {
-		return in_array($username, $this->helpers);
+		return in_array($username, $this->helpers, true);
 	}
 
 	/**
@@ -101,7 +101,7 @@ class Plot
 		if(!$this->isHelper($username)) {
 			return false;
 		}
-		$key = array_search($username, $this->helpers);
+		$key = array_search($username, $this->helpers, true);
 		if($key === false) {
 			return false;
 		}
@@ -117,7 +117,7 @@ class Plot
 	 * @return bool
 	 */
 	public function isDenied(string $username) : bool {
-		return in_array($username, $this->denied);
+		return in_array($username, $this->denied, true);
 	}
 
 	/**
@@ -147,7 +147,7 @@ class Plot
 		if(!$this->isDenied($username)) {
 			return false;
 		}
-		$key = array_search($username, $this->denied);
+		$key = array_search($username, $this->denied, true);
 		if($key === false) {
 			return false;
 		}

@@ -25,7 +25,7 @@ class ListSubCommand extends SubCommand {
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if($sender->hasPermission("myplot.admin.list")) {
-			if(!empty($args)) {
+			if(count($args) > 0) {
 				foreach($this->getPlugin()->getPlotLevels() as $levelName => $settings) {
 					$plots = $this->getPlugin()->getPlotsOfPlayer($args[0], $levelName);
 					foreach($plots as $plot) {

@@ -30,12 +30,14 @@ class BiomeSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			$biomes = TextFormat::WHITE . implode(", ", array_keys(self::BIOMES));
 			$sender->sendMessage($this->translateString("biome.possible", [$biomes]));
 			return true;
 		}
-		$player = $sender->getServer()->getPlayer($sender->getName());
+		$player = $sender->getServer()->getPlayerExact($sender->getName());
+		if($player === null)
+			return true;
 		$biome = strtoupper($args[0]);
 		$plot = $this->getPlugin()->getPlotByPosition($player);
 		if($plot === null) {
@@ -58,7 +60,7 @@ class BiomeSubCommand extends SubCommand
 		}else{
 			$biome = ($biome === "NETHER" ? "HELL" : $biome);
 			$biome = ($biome === "ICE PLAINS" ? "ICE_PLAINS" : $biome);
-			if(!defined(Biome::class."::".$biome)) {
+			if(!defined(Biome::class."::".$biome) or !is_int(constant(Biome::class."::".$biome))) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
 				$biomes = implode(", ", array_keys(self::BIOMES));
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
@@ -75,7 +77,7 @@ class BiomeSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
 			return new BiomeForm(array_keys(self::BIOMES));
 		return null;
 	}

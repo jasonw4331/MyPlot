@@ -5,6 +5,8 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
+use pocketmine\level\Level;
+use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\scheduler\Task;
@@ -14,7 +16,7 @@ class ClearPlotTask extends Task {
 	protected $plugin;
 	/** @var Plot $plot */
 	protected $plot;
-	/** @var \pocketmine\level\Level|null $level */
+	/** @var Level $level */
 	protected $level;
 	/** @var int $height */
 	protected $height;
@@ -24,7 +26,7 @@ class ClearPlotTask extends Task {
 	protected $plotFillBlock;
 	/** @var Block $plotFloorBlock */
 	protected $plotFloorBlock;
-	/** @var \pocketmine\level\Position|null $plotBeginPos */
+	/** @var Position $plotBeginPos */
 	protected $plotBeginPos;
 	/** @var int $xMax */
 	protected $xMax;
@@ -46,7 +48,7 @@ class ClearPlotTask extends Task {
 		$this->plugin = $plugin;
 		$this->plot = $plot;
 		$this->plotBeginPos = $plugin->getPlotPosition($plot);
-		$this->level = $this->plotBeginPos->getLevel();
+		$this->level = $this->plotBeginPos->getLevelNonNull();
 		$plotLevel = $plugin->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
 		$this->xMax = (int)($this->plotBeginPos->x + $plotSize);
@@ -65,8 +67,11 @@ class ClearPlotTask extends Task {
 	 * @param int $currentTick
 	 */
 	public function onRun(int $currentTick) : void {
+		$aabb = $this->plugin->getPlotBB($this->plot);
+		if($aabb === null)
+			return; // todo: throw here?
 		foreach($this->level->getEntities() as $entity) {
-			if($this->plugin->getPlotBB($this->plot)->isVectorInXZ($entity)) {
+			if($aabb->isVectorInXZ($entity)) {
 				if(!$entity instanceof Player) {
 					$entity->flagForDespawn();
 				}else{

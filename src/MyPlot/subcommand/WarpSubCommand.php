@@ -26,10 +26,10 @@ class WarpSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			return false;
 		}
-		$levelName = $args[1] ?? $sender->getLevel()->getFolderName();
+		$levelName = $args[1] ?? $sender->getLevelNonNull()->getFolderName();
 		if(!$this->getPlugin()->isLevelLoaded($levelName)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("warp.notinplotworld"));
 			return true;
@@ -55,6 +55,6 @@ class WarpSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return new WarpForm($player);
+		return $player !== null ? new WarpForm($player) : null;
 	}
 }

@@ -48,7 +48,7 @@ class ClaimSubCommand extends SubCommand
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
 			$level = $this->getPlugin()->getServer()->getLevelByName((string)$level);
-			if(!$level->isClosed()) {
+			if($level !== null and !$level->isClosed()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
 			}
 		}
@@ -70,7 +70,7 @@ class ClaimSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if(MyPlot::getInstance()->isLevelLoaded($player->getLevel()->getFolderName()))
+		if($player !== null and MyPlot::getInstance()->isLevelLoaded($player->getLevelNonNull()->getFolderName()))
 			return new ClaimForm($player);
 		return null;
 	}

@@ -32,6 +32,8 @@ class MainForm extends SimpleMyPlotForm {
 				continue;
 			$name = (new \ReflectionClass($command))->getShortName();
 			$name = preg_replace('/([a-z])([A-Z])/s','$1 $2', $name);
+			if($name === null)
+				continue;
 			$length = strlen($name) - strlen("Sub Command");
 			$name = substr($name, 0, $length);
 			$elements[] = new MenuOption(TextFormat::DARK_RED.ucfirst($name));
@@ -43,6 +45,8 @@ class MainForm extends SimpleMyPlotForm {
 			$elements,
 			function(Player $player, int $selectedOption) : void {
 				$form = $this->link[$selectedOption]->getForm($player);
+				if($form === null)
+					return;
 				$form->setPlot($this->plot);
 				$player->sendForm($form);
 			},

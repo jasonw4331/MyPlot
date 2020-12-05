@@ -29,7 +29,7 @@ class DenyPlayerSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			return false;
 		}
 		$dplayer = $args[0];
@@ -63,12 +63,15 @@ class DenyPlayerSubCommand extends SubCommand
 			if($dplayer instanceof Player) {
 				$dplayer->sendMessage($this->translateString("denyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
 			}
+			$aabb = $this->getPlugin()->getPlotBB($plot);
+			if($aabb === null)
+				return true;
 			if($dplayer->getName() === "*") {
 				foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
-					if($this->getPlugin()->getPlotBB($plot)->isVectorInside($player) and !($player->getName() === $plot->owner) and !$plot->isHelper($player->getName()))
+					if($aabb->isVectorInside($player) and !($player->getName() === $plot->owner) and !$plot->isHelper($player->getName()))
 						$this->getPlugin()->teleportPlayerToPlot($player, $plot);
 				}
-			}elseif($this->getPlugin()->getPlotBB($plot)->isVectorInside($dplayer))
+			}elseif($aabb->isVectorInside($dplayer))
 				$this->getPlugin()->teleportPlayerToPlot($dplayer, $plot);
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
@@ -77,7 +80,7 @@ class DenyPlayerSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if(($plot = $this->getPlugin()->getPlotByPosition($player)) instanceof Plot)
+		if($player !== null and ($plot = $this->getPlugin()->getPlotByPosition($player)) instanceof Plot)
 			return new DenyPlayerForm($plot);
 		return null;
 	}

@@ -106,7 +106,7 @@ abstract class DataProvider
 	 * @param int $b
 	 * @param array[] $plots
 	 *
-	 * @return array|null
+	 * @return int[]|null
 	 */
 	protected static function findEmptyPlotSquared(int $a, int $b, array $plots) : ?array {
 		if(!isset($plots[$a][$b]))
@@ -125,7 +125,7 @@ abstract class DataProvider
 			if(!isset($plots[$a][-$b]))
 				return [$a, -$b];
 		}
-		if($a | $b === 0) {
+		if(($a | $b) === 0) {
 			if(!isset($plots[-$a][-$b]))
 				return [-$a, -$b];
 			if(!isset($plots[-$b][-$a]))

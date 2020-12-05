@@ -69,7 +69,7 @@ class YAMLDataProvider extends DataProvider {
 		if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) !== null) {
 			return $plot;
 		}
-		$plots = $this->yaml->get("plots");
+		$plots = $this->yaml->get("plots", []);
 		$levelKeys = $xKeys = $zKeys = [];
 		foreach($plots as $key => $plotData) {
 			if($plotData["level"] === $levelName)
@@ -115,8 +115,8 @@ class YAMLDataProvider extends DataProvider {
 		$ownerPlots = [];
 		if($levelName != "") {
 			/** @var int[] $levelKeys */
-			$levelKeys = array_keys($plots, $levelName);
-			$ownerKeys = array_keys($plots, $owner);
+			$levelKeys = array_keys($plots, $levelName, true);
+			$ownerKeys = array_keys($plots, $owner, true);
 			foreach($levelKeys as $levelKey) {
 				foreach($ownerKeys as $ownerKey) {
 					if($levelKey == $ownerKey) {
@@ -135,7 +135,7 @@ class YAMLDataProvider extends DataProvider {
 			}
 		}else{
 			/** @var int[] $ownerKeys */
-			$ownerKeys = array_keys($plots, $owner);
+			$ownerKeys = array_keys($plots, $owner, true);
 			foreach($ownerKeys as $key) {
 				$levelName = $plots[$key]["level"];
 				$X = $plots[$key]["x"];
@@ -179,22 +179,22 @@ class YAMLDataProvider extends DataProvider {
 			if(count($plots) === max(1, 8 * $i)) {
 				continue;
 			}
-			if($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
-				list($X, $Z) = $ret;
+			if(($ret = self::findEmptyPlotSquared(0, $i, $plots)) !== null) {
+				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;
 			}
 			for($a = 1; $a < $i; $a++) {
-				if($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
-					list($X, $Z) = $ret;
+				if(($ret = self::findEmptyPlotSquared($a, $i, $plots)) !== null) {
+					[$X, $Z] = $ret;
 					$plot = new Plot($levelName, $X, $Z);
 					$this->cachePlot($plot);
 					return $plot;
 				}
 			}
-			if($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
-				list($X, $Z) = $ret;
+			if(($ret = self::findEmptyPlotSquared($i, $i, $plots)) !== null) {
+				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;

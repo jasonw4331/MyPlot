@@ -27,16 +27,16 @@ class HomeSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			$plotNumber = 1;
 		}elseif(is_numeric($args[0])) {
 			$plotNumber = (int) $args[0];
 		}else{
 			return false;
 		}
-		$levelName = $args[1] ?? $sender->getLevel()->getFolderName();
+		$levelName = $args[1] ?? $sender->getLevelNonNull()->getFolderName();
 		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
-		if(empty($plots)) {
+		if(count($plots) === 0) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));
 			return true;
 		}
@@ -50,7 +50,6 @@ class HomeSubCommand extends SubCommand
 			}
 			return ($plot1->levelName < $plot2->levelName) ? -1 : 1;
 		});
-		/** @var Plot $plot */
 		$plot = $plots[$plotNumber - 1];
 		if($this->getPlugin()->teleportPlayerToPlot($sender, $plot)) {
 			$sender->sendMessage($this->translateString("home.success", [$plot->__toString(), $plot->levelName]));
@@ -61,7 +60,7 @@ class HomeSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if(count($this->getPlugin()->getPlotsOfPlayer($player->getName(), $player->getLevel()->getFolderName())) > 0)
+		if($player !== null and count($this->getPlugin()->getPlotsOfPlayer($player->getName(), $player->getLevelNonNull()->getFolderName())) > 0)
 			return new HomeForm($player);
 		return null;
 	}
