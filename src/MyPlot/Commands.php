@@ -189,9 +189,6 @@ class Commands extends PluginCommand
 		return $this->subCommands;
 	}
 
-	/**
-	 * @param SubCommand $command
-	 */
 	public function loadSubCommand(SubCommand $command) : void {
 		$this->subCommands[$command->getName()] = $command;
 		if($command->getAlias() != "") {
@@ -199,9 +196,6 @@ class Commands extends PluginCommand
 		}
 	}
 
-	/**
-	 * @param string $name
-	 */
 	public function unloadSubCommand(string $name) : void {
 		$subcommand = $this->subCommands[$name] ?? $this->aliasSubCommands[$name] ?? null;
 		if($subcommand !== null) {

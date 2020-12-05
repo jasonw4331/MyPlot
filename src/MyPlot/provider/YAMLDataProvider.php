@@ -24,11 +24,6 @@ class YAMLDataProvider extends DataProvider {
 		$this->yaml = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::YAML, ["count" => -1, "plots" => []]);
 	}
 
-	/**
-	 * @param Plot $plot
-	 *
-	 * @return bool
-	 */
 	public function savePlot(Plot $plot) : bool {
 		$plots = $this->yaml->get("plots", []);
 		if($plot->id > -1) {
@@ -44,11 +39,6 @@ class YAMLDataProvider extends DataProvider {
 		return $this->yaml->save();
 	}
 
-	/**
-	 * @param Plot $plot
-	 *
-	 * @return bool
-	 */
 	public function deletePlot(Plot $plot) : bool {
 		$plots = $this->yaml->get("plots", []);
 		unset($plots[$plot->id]);
@@ -58,13 +48,6 @@ class YAMLDataProvider extends DataProvider {
 		return $this->yaml->save();
 	}
 
-	/**
-	 * @param string $levelName
-	 * @param int $X
-	 * @param int $Z
-	 *
-	 * @return Plot
-	 */
 	public function getPlot(string $levelName, int $X, int $Z) : Plot {
 		if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) !== null) {
 			return $plot;
@@ -153,12 +136,6 @@ class YAMLDataProvider extends DataProvider {
 		return $ownerPlots;
 	}
 
-	/**
-	 * @param string $levelName
-	 * @param int $limitXZ
-	 *
-	 * @return Plot|null
-	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?plot {
 		$plotsArr = $this->yaml->get("plots", []);
 		for($i = 0; $limitXZ <= 0 or $i < $limitXZ; $i++) {

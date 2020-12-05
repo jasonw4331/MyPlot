@@ -11,11 +11,6 @@ use pocketmine\utils\TextFormat;
 
 class NameSubCommand extends SubCommand
 {
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.name");
 	}

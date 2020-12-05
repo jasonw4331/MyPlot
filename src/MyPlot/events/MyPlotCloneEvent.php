@@ -20,16 +20,10 @@ class MyPlotCloneEvent extends MyPlotPlotEvent implements Cancellable {
 		parent::__construct($originPlot);
 	}
 
-	/**
-	 * @param Plot $clonePlot
-	 */
 	public function setClonePlot(Plot $clonePlot) : void {
 		$this->clonePlot = $clonePlot;
 	}
 
-	/**
-	 * @return Plot
-	 */
 	public function getClonePlot() : Plot {
 		return $this->clonePlot;
 	}

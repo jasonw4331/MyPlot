@@ -55,9 +55,6 @@ class MyPlot extends PluginBase
 	/** @var BaseLang $baseLang */
 	private $baseLang = null;
 
-	/**
-	 * @return MyPlot
-	 */
 	public static function getInstance() : self {
 		return self::$instance;
 	}
@@ -1107,7 +1104,7 @@ class MyPlot extends PluginBase
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
-		SpoonDetector::printSpoon($this, "spoon.txt");
+		SpoonDetector::printSpoon($this);
 		if($this->isDisabled()) {
 			return;
 		}
@@ -1121,22 +1118,11 @@ class MyPlot extends PluginBase
 		$this->getLogger()->debug(TF::BOLD.TF::GREEN."Enabled!");
 	}
 
-	/**
-	 * @param string $levelName
-	 * @param PlotLevelSettings $settings
-	 *
-	 * @return bool
-	 */
 	public function addLevelSettings(string $levelName, PlotLevelSettings $settings) : bool {
 		$this->levels[$levelName] = $settings;
 		return true;
 	}
 
-	/**
-	 * @param string $levelName
-	 *
-	 * @return bool
-	 */
 	public function unloadLevelSettings(string $levelName) : bool {
 		if(isset($this->levels[$levelName])) {
 			unset($this->levels[$levelName]);

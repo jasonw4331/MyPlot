@@ -26,35 +26,19 @@ class MyPlotGenerationEvent extends Event implements Cancellable {
 		$this->settings = $settings;
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getLevelName() : string {
 		return $this->levelName;
 	}
 
-	/**
-	 * @param string $levelName
-	 *
-	 * @return self
-	 */
 	public function setLevelName(string $levelName) : self {
 		$this->levelName = $levelName;
 		return $this;
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getGenerator() : string {
 		return $this->generator;
 	}
 
-	/**
-	 * @param string $generator
-	 *
-	 * @return self
-	 */
 	public function setGenerator(string $generator) : self {
 		$this->generator = $generator;
 		return $this;

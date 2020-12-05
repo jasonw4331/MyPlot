@@ -59,9 +59,6 @@ class ClearBorderTask extends Task {
 		$plugin->getLogger()->debug("Border Clear Task started at plot {$plot->X};{$plot->Z}");
 	}
 
-	/**
-	 * @param int $currentTick
-	 */
 	public function onRun(int $currentTick) : void {
 		for($x = $this->plotBeginPos->x; $x <= $this->xMax; $x++) {
 			for($y = 0; $y < $this->level->getWorldHeight(); ++$y) {

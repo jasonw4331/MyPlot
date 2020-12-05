@@ -59,11 +59,6 @@ class MySQLProvider extends DataProvider {
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
 
-	/**
-	 * @param Plot $plot
-	 *
-	 * @return bool
-	 */
 	public function savePlot(Plot $plot) : bool {
 		$this->reconnect();
 		$helpers = implode(',', $plot->helpers);
@@ -84,11 +79,6 @@ class MySQLProvider extends DataProvider {
 		return true;
 	}
 
-	/**
-	 * @param Plot $plot
-	 *
-	 * @return bool
-	 */
 	public function deletePlot(Plot $plot) : bool {
 		$this->reconnect();
 		if($plot->id >= 0) {
@@ -108,13 +98,6 @@ class MySQLProvider extends DataProvider {
 		return true;
 	}
 
-	/**
-	 * @param string $levelName
-	 * @param int $X
-	 * @param int $Z
-	 *
-	 * @return Plot
-	 */
 	public function getPlot(string $levelName, int $X, int $Z) : Plot {
 		$this->reconnect();
 		if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) != null) {
@@ -187,12 +170,6 @@ class MySQLProvider extends DataProvider {
 		return $plots;
 	}
 
-	/**
-	 * @param string $levelName
-	 * @param int $limitXZ
-	 *
-	 * @return Plot|null
-	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?Plot {
 		$this->reconnect();
 		$i = 0;
@@ -241,9 +218,6 @@ class MySQLProvider extends DataProvider {
 			$this->plugin->getLogger()->debug("MySQL database closed!");
 	}
 
-	/**
-	 * @return bool
-	 */
 	private function reconnect() : bool {
 		if(!$this->db->ping()) {
 			$this->plugin->getLogger()->error("The MySQL server can not be reached! Trying to reconnect!");

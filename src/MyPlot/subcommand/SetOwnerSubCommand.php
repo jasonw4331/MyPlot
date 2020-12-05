@@ -10,11 +10,6 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class SetOwnerSubCommand extends SubCommand {
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.admin.setowner");
 	}

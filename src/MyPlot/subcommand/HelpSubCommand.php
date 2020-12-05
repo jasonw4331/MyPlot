@@ -26,11 +26,6 @@ class HelpSubCommand extends SubCommand
 		$this->cmds = $cmds;
 	}
 
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return $sender->hasPermission("myplot.command.help");
 	}

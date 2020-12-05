@@ -19,9 +19,6 @@ class MyPlotSaveEvent extends MyPlotPlotEvent implements Cancellable {
 		parent::__construct($plot);
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getSaveType() : int {
 		return $this->type;
 	}

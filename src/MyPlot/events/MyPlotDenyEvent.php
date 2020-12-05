@@ -27,26 +27,15 @@ class MyPlotDenyEvent extends MyPlotPlotEvent implements Cancellable {
 		parent::__construct($plot);
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getType() : int {
 		return $this->type;
 	}
 
-	/**
-	 * @param int $type
-	 *
-	 * @return self
-	 */
 	public function setType(int $type) : self {
 		$this->type = $type;
 		return $this;
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getDenied() : string {
 		return $this->player;
 	}

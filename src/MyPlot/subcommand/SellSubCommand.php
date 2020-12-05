@@ -9,11 +9,6 @@ use pocketmine\utils\TextFormat;
 
 class SellSubCommand extends SubCommand
 {
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.sell");
 	}

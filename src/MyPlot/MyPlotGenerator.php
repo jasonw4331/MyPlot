@@ -70,9 +70,6 @@ class MyPlotGenerator extends Generator {
 		]);
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getName() : string {
 		return "myplot";
 	}
@@ -85,18 +82,10 @@ class MyPlotGenerator extends Generator {
 		return $this->settings;
 	}
 
-	/**
-	 * @param ChunkManager $level
-	 * @param Random $random
-	 */
 	public function init(ChunkManager $level, Random $random) : void {
 		$this->level = $level;
 	}
 
-	/**
-	 * @param int $chunkX
-	 * @param int $chunkZ
-	 */
 	public function generateChunk(int $chunkX, int $chunkZ) : void {
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
 		$chunk = $this->level->getChunk($chunkX, $chunkZ) ?? new Chunk($chunkX, $chunkZ);
@@ -192,16 +181,9 @@ class MyPlotGenerator extends Generator {
 		return $shape;
 	}
 
-	/**
-	 * @param int $chunkX
-	 * @param int $chunkZ
-	 */
 	public function populateChunk(int $chunkX, int $chunkZ) : void {
 	}
 
-	/**
-	 * @return Vector3
-	 */
 	public function getSpawn() : Vector3 {
 		return new Vector3(0, $this->groundHeight + 1, 0);
 	}

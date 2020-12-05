@@ -166,12 +166,6 @@ class Plot
 		return $this->X === $plot->X and $this->Z === $plot->Z and $this->levelName === $plot->levelName;
 	}
 
-	/**
-	 * @param int $side
-	 * @param int $step
-	 *
-	 * @return Plot
-	 */
 	public function getSide(int $side, int $step = 1) : Plot {
 		$levelSettings = MyPlot::getInstance()->getLevelSettings($this->levelName);
 		$pos = MyPlot::getInstance()->getPlotPosition($this);
@@ -198,9 +192,6 @@ class Plot
 		return $sidePlot;
 	}
 
-	/**
-	 * @return string
-	 */
 	public function __toString() : string {
 		return "(" . $this->X . ";" . $this->Z . ")";
 	}

@@ -14,18 +14,10 @@ class MyPlotTeleportEvent extends MyPlotPlayerEnterPlotEvent {
 		parent::__construct($plot, $player);
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function toCenter() : bool {
 		return $this->center;
 	}
 
-	/**
-	 * @param bool $center
-	 *
-	 * @return self
-	 */
 	public function setToCenter(bool $center) : self {
 		$this->center = $center;
 		return $this;
