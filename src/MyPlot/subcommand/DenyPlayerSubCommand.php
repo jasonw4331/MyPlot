@@ -64,8 +64,6 @@ class DenyPlayerSubCommand extends SubCommand
 				$dplayer->sendMessage($this->translateString("denyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
 			}
 			$aabb = $this->getPlugin()->getPlotBB($plot);
-			if($aabb === null)
-				return true;
 			if($dplayer->getName() === "*") {
 				foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
 					if($aabb->isVectorInside($player) and !($player->getName() === $plot->owner) and !$plot->isHelper($player->getName()))

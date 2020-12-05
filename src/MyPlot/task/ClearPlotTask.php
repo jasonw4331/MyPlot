@@ -67,11 +67,8 @@ class ClearPlotTask extends Task {
 	 * @param int $currentTick
 	 */
 	public function onRun(int $currentTick) : void {
-		$aabb = $this->plugin->getPlotBB($this->plot);
-		if($aabb === null)
-			return; // todo: throw here?
 		foreach($this->level->getEntities() as $entity) {
-			if($aabb->isVectorInXZ($entity)) {
+			if($this->plugin->getPlotBB($this->plot)->isVectorInXZ($entity)) {
 				if(!$entity instanceof Player) {
 					$entity->flagForDespawn();
 				}else{

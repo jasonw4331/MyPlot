@@ -405,9 +405,9 @@ class MyPlot extends PluginBase
 	 *
 	 * @param Plot $plot
 	 *
-	 * @return AxisAlignedBB|null
+	 * @return AxisAlignedBB
 	 */
-	public function getPlotBB(Plot $plot) : ?AxisAlignedBB {
+	public function getPlotBB(Plot $plot) : AxisAlignedBB {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize-1;
@@ -512,12 +512,9 @@ class MyPlot extends PluginBase
 		if(!$styler instanceof WorldStyler) {
 			return false;
 		}
-		$aabb = $this->getPlotBB($plotTo);
-		if($aabb === null)
-			return false;
 		foreach($this->getPlotChunks($plotTo) as $chunk) {
 			foreach($chunk->getEntities() as $entity) {
-				if($aabb->isVectorInXZ($entity)) {
+				if($this->getPlotBB($plotTo)->isVectorInXZ($entity)) {
 					if($entity instanceof Player){
 						$this->teleportPlayerToPlot($entity, $plotTo);
 					}
@@ -596,11 +593,8 @@ class MyPlot extends PluginBase
 		$level = $this->getServer()->getLevelByName($plot->levelName);
 		if($level === null)
 			return false;
-		$aabb = $this->getPlotBB($plot);
-		if($aabb === null)
-			return false;
 		foreach($level->getEntities() as $entity) {
-			if($aabb->isVectorInXZ($entity)) {
+			if($this->getPlotBB($plot)->isVectorInXZ($entity)) {
 				if(!$entity instanceof Player) {
 					$entity->flagForDespawn();
 				}else{
