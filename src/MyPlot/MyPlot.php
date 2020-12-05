@@ -1038,38 +1038,43 @@ class MyPlot extends PluginBase
 		if(!is_string($dataProvider))
 			$this->dataProvider = new JSONDataProvider($this, $cacheSize);
 		else
-			switch(strtolower($dataProvider)) {
-				case "mysqli":
-				case "mysql":
-					if(extension_loaded("mysqli")) {
-						$settings = (array) $this->getConfig()->get("MySQLSettings");
-						$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
-					}else {
-						$this->getLogger()->warning("MySQLi is not installed in your php build! JSON will be used instead.");
+			try {
+				switch(strtolower($dataProvider)) {
+					case "mysqli":
+					case "mysql":
+						if(extension_loaded("mysqli")) {
+							$settings = (array) $this->getConfig()->get("MySQLSettings");
+							$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
+						}else {
+							$this->getLogger()->warning("MySQLi is not installed in your php build! JSON will be used instead.");
+							$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+						}
+					break;
+					case "yaml":
+						if(extension_loaded("yaml")) {
+							$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
+						}else {
+							$this->getLogger()->warning("YAML is not installed in your php build! JSON will be used instead.");
+							$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+						}
+					break;
+					case "sqlite3":
+					case "sqlite":
+						if(extension_loaded("sqlite3")) {
+							$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
+						}else {
+							$this->getLogger()->warning("SQLite3 is not installed in your php build! JSON will be used instead.");
+							$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+						}
+					break;
+					case "json":
+					default:
 						$this->dataProvider = new JSONDataProvider($this, $cacheSize);
-					}
-				break;
-				case "yaml":
-					if(extension_loaded("yaml")) {
-						$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
-					}else {
-						$this->getLogger()->warning("YAML is not installed in your php build! JSON will be used instead.");
-						$this->dataProvider = new JSONDataProvider($this, $cacheSize);
-					}
-				break;
-				case "sqlite3":
-				case "sqlite":
-					if(extension_loaded("sqlite3")) {
-						$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
-					}else {
-						$this->getLogger()->warning("SQLite3 is not installed in your php build! JSON will be used instead.");
-						$this->dataProvider = new JSONDataProvider($this, $cacheSize);
-					}
-				break;
-				case "json":
-				default:
-					$this->dataProvider = new JSONDataProvider($this, $cacheSize);
-				break;
+					break;
+				}
+			}catch(\Exception $e) {
+				$this->getLogger()->error("The selected data provider crashed. JSON will be used instead.");
+				$this->dataProvider = new JSONDataProvider($this, $cacheSize);
 			}
 		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings");
 		if($this->getConfig()->get("FastClearing", false) and $this->getServer()->getPluginManager()->getPlugin("WorldStyler") === null) {
