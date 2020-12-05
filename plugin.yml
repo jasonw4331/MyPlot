@@ -1,6 +1,6 @@
 name: MyPlot
 main: MyPlot\MyPlot
-version: 1.9.0
+version: 1.10
 api:
 - 3.4.0
 authors:
@@ -38,6 +38,8 @@ permissions:
         default: true
       myplot.command.clear:
         default: true
+      myplot.command.fill:
+        default: op
       myplot.command.dispose:
         default: true
       myplot.command.reset:
@@ -74,6 +76,8 @@ permissions:
     default: op
     children:
       myplot.admin.clear:
+        default: op
+      myplot.admin.fill:
         default: op
       myplot.admin.biome:
         default: op

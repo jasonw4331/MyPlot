@@ -8,6 +8,7 @@ use muqsit\worldstyler\WorldStyler;
 use MyPlot\events\MyPlotClearEvent;
 use MyPlot\events\MyPlotCloneEvent;
 use MyPlot\events\MyPlotDisposeEvent;
+use MyPlot\events\MyPlotFillEvent;
 use MyPlot\events\MyPlotGenerationEvent;
 use MyPlot\events\MyPlotResetEvent;
 use MyPlot\events\MyPlotSettingEvent;
@@ -21,6 +22,7 @@ use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
+use MyPlot\task\FillPlotTask;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Block;
 use pocketmine\event\level\LevelLoadEvent;
@@ -615,7 +617,7 @@ class MyPlot extends PluginBase
 		}
 		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
 		foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
-			if($this->getPlotBB($plot)->isVectorInXZ($entity)) {
+			if($this->getPlotBB($plot)->isVectorInXZ($entity) && $entity->getY() <= $this->getLevelSettings($plot->levelName)->groundHeight) {
 				if(!$entity instanceof Player) {
 					$entity->flagForDespawn();
 				}else{
@@ -685,6 +687,77 @@ class MyPlot extends PluginBase
 		$this->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
 		return true;
 	}
+
+    /**
+     * Fills the whole plot with a block
+     *
+     * @api
+     *
+     * @param Plot $plot
+     * @param int $plotFillBlock
+     * @param Block $maxBlocksPerTick
+     *
+     * @return bool
+     */
+    public function fillPlot(Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) : bool {
+        $ev = new MyPlotFillEvent($plot, $maxBlocksPerTick);
+        $ev->call();
+        if($ev->isCancelled()) {
+            return false;
+        }
+        $plot = $ev->getPlot();
+        if(!$this->isLevelLoaded($plot->levelName)) {
+            return false;
+        }
+        $maxBlocksPerTick = $ev->getMaxBlocksPerTick();
+        foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
+            if($this->getPlotBB($plot)->isVectorInXZ($entity) && $entity->getY() <= $this->getLevelSettings($plot->levelName)->groundHeight) {
+                if(!$entity instanceof Player) {
+                    $entity->flagForDespawn();
+                }else{
+                    $this->teleportPlayerToPlot($entity, $plot);
+                }
+            }
+        }
+        if($this->getConfig()->get("FastFilling", false)) {
+            $styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
+            if(!$styler instanceof WorldStyler) {
+                return false;
+            }
+            $plotLevel = $this->getLevelSettings($plot->levelName);
+            $plotSize = $plotLevel->plotSize-1;
+            $plotBeginPos = $this->getPlotPosition($plot);
+            $plugin = $this;
+            // Ground
+            $selection = $styler->getSelection(99998);
+            $plotBeginPos->y = 1;
+            $selection->setPosition(1, $plotBeginPos);
+            $selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, $plotLevel->groundHeight, $plotBeginPos->z + $plotSize));
+            $cuboid = Cuboid::fromSelection($selection);
+            //$cuboid = $cuboid->async();
+            $cuboid->set($plotBeginPos->level, $plotFillBlock, function (float $time, int $changed) use ($plugin) : void {
+                $plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+            });
+            $styler->removeSelection(99998);
+            // Bottom of world
+            $selection = $styler->getSelection(99998);
+            $plotBeginPos->y = 0;
+            $selection->setPosition(1, $plotBeginPos);
+            $selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, 0, $plotBeginPos->z + $plotSize));
+            $cuboid = Cuboid::fromSelection($selection);
+            //$cuboid = $cuboid->async();
+            $cuboid->set($plotBeginPos->level, $plotLevel->bottomBlock, function (float $time, int $changed) use ($plugin) : void {
+                $plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+            });
+            $styler->removeSelection(99998);
+            foreach($this->getPlotChunks($plot) as $chunk) {
+                $plotBeginPos->level->setChunk($chunk->getX(), $chunk->getZ(), $chunk, false);
+            }
+            return true;
+        }
+        $this->getScheduler()->scheduleTask(new FillPlotTask($this, $plot, $plotFillBlock, $maxBlocksPerTick));
+        return true;
+    }
 
 	/**
 	 * Delete the plot data
@@ -1116,9 +1189,9 @@ class MyPlot extends PluginBase
 
 	public function onEnable() : void {
 		if (!\class_exists(SpoonDetector::class)) {
-			$this->getServer()->getPluginManager()->disablePlugin($this);
-			return;
-		}
+            $this->getServer()->getPluginManager()->disablePlugin($this);
+            return;
+        }
 		SpoonDetector::printSpoon($this, "spoon.txt");
 		if($this->isDisabled()) {
 			return;

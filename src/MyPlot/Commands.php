@@ -13,6 +13,7 @@ use MyPlot\subcommand\ClearSubCommand;
 use MyPlot\subcommand\CloneSubCommand;
 use MyPlot\subcommand\DenyPlayerSubCommand;
 use MyPlot\subcommand\DisposeSubCommand;
+use MyPlot\subcommand\FillSubcommand;
 use MyPlot\subcommand\GenerateSubCommand;
 use MyPlot\subcommand\GiveSubCommand;
 use MyPlot\subcommand\HelpSubCommand;
@@ -66,6 +67,7 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new RemoveHelperSubCommand($plugin, "removehelper"));
 		$this->loadSubCommand(new AutoSubCommand($plugin, "auto"));
 		$this->loadSubCommand(new ClearSubCommand($plugin, "clear"));
+		$this->loadSubCommand(new FillSubcommand($plugin, "fill"));
 		$this->loadSubCommand(new DisposeSubCommand($plugin, "dispose"));
 		$this->loadSubCommand(new ResetSubCommand($plugin, "reset"));
 		$this->loadSubCommand(new BiomeSubCommand($plugin, "biome"));
