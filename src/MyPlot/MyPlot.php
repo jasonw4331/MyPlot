@@ -617,7 +617,7 @@ class MyPlot extends PluginBase
 		}
 		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
 		foreach($this->getServer()->getLevelByName($plot->levelName)->getEntities() as $entity) {
-			if($this->getPlotBB($plot)->isVectorInXZ($entity) && $entity->getY() <= $this->getLevelSettings($plot->levelName)->groundHeight) {
+			if($this->getPlotBB($plot)->isVectorInXZ($entity)) {
 				if(!$entity instanceof Player) {
 					$entity->flagForDespawn();
 				}else{
