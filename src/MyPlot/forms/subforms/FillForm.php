@@ -10,25 +10,25 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class FillForm extends ComplexMyPlotForm {
-    public function __construct(Player $player) {
-        $plugin = MyPlot::getInstance();
+	public function __construct(Player $player) {
+		$plugin = MyPlot::getInstance();
 
-        if(!isset($this->plot))
-            $this->plot = $plugin->getPlotByPosition($player);
+		if(!isset($this->plot))
+			$this->plot = $plugin->getPlotByPosition($player);
 
-        parent::__construct(
-            TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("fill.form")]),
-            [
-                new Input(
-                    "0",
-                    $plugin->getLanguage()->get("fill.formtitle"),
-                    "1:0",
-                    "1:0"
-                )
-            ],
-            function(Player $player, CustomFormResponse $response) use ($plugin) : void {
-                $player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("fill.name").' "'.$response->getString("0").'"', true);
-            }
-        );
-    }
+		parent::__construct(
+			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("fill.form")]),
+			[
+				new Input(
+					"0",
+					$plugin->getLanguage()->get("fill.formtitle"),
+					"1:0",
+					"1:0"
+				)
+			],
+			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
+				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("fill.name").' "'.$response->getString("0").'"', true);
+			}
+		);
+	}
 }
