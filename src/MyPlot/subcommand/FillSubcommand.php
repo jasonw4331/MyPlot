@@ -42,7 +42,7 @@ class FillSubcommand extends SubCommand
 			return true;
 		}
 		if(Item::fromString($args[0]) !== null && Item::fromString($args[0])->getBlock()->getId() !== Block::AIR) {
-            $maxBlocksPerTick = (int) $this->getPlugin()->getConfig()->get("FillBlocksPerTick",  256);
+			$maxBlocksPerTick = (int) $this->getPlugin()->getConfig()->get("FillBlocksPerTick",  256);
 			if($this->getPlugin()->fillPlot($plot, Item::fromString($args[0])->getBlock(), $maxBlocksPerTick)) {
 				$sender->sendMessage($this->translateString("fill.success", [Item::fromString($args[0])->getBlock()->getName()]));
 			}else{

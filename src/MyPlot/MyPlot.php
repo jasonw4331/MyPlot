@@ -688,17 +688,17 @@ class MyPlot extends PluginBase
 		return true;
 	}
 
-    /**
-     * Fills the whole plot with a block
-     *
-     * @api
-     *
-     * @param Plot $plot
-     * @param int $plotFillBlock
-     * @param Block $maxBlocksPerTick
-     *
-     * @return bool
-     */
+	/**
+	 * Fills the whole plot with a block
+	 *
+	 * @api
+	 *
+	 * @param Plot $plot
+	 * @param int $plotFillBlock
+	 * @param Block $maxBlocksPerTick
+	 *
+	 * @return bool
+	 */
     public function fillPlot(Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) : bool {
         $ev = new MyPlotFillEvent($plot, $maxBlocksPerTick);
         $ev->call();
@@ -1187,24 +1187,23 @@ class MyPlot extends PluginBase
 		$this->getServer()->getCommandMap()->register("myplot", new Commands($this));
 	}
 
-	public function onEnable() : void
-	{
+	public function onEnable() : void {
 		if (!\class_exists(SpoonDetector::class)) {
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
 		SpoonDetector::printSpoon($this, "spoon.txt");
-		if ($this->isDisabled()) {
+		if($this->isDisabled()) {
 			return;
 		}
-		$this->getLogger()->debug(TF::BOLD . "Loading Events");
+		$this->getLogger()->debug(TF::BOLD."Loading Events");
 		$eventListener = new EventListener($this);
 		$this->getServer()->getPluginManager()->registerEvents($eventListener, $this);
-		$this->getLogger()->debug(TF::BOLD . "Registering Loaded Levels");
-		foreach ($this->getServer()->getLevels() as $level) {
+		$this->getLogger()->debug(TF::BOLD."Registering Loaded Levels");
+		foreach($this->getServer()->getLevels() as $level) {
 			$eventListener->onLevelLoad(new LevelLoadEvent($level));
 		}
-		$this->getLogger()->debug(TF::BOLD . TF::GREEN . "Enabled!");
+		$this->getLogger()->debug(TF::BOLD.TF::GREEN."Enabled!");
 	}
 
 	/**
