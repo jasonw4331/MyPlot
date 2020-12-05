@@ -1187,24 +1187,25 @@ class MyPlot extends PluginBase
 		$this->getServer()->getCommandMap()->register("myplot", new Commands($this));
 	}
 
-	public function onEnable() : void {
-		if (!\class_exists(SpoonDetector::class)) {
+	public function onEnable() : void
+    {
+        if (!\class_exists(SpoonDetector::class)) {
             $this->getServer()->getPluginManager()->disablePlugin($this);
             return;
         }
-		SpoonDetector::printSpoon($this, "spoon.txt");
-		if($this->isDisabled()) {
-			return;
-		}
-		$this->getLogger()->debug(TF::BOLD . "Loading Events");
-		$eventListener = new EventListener($this);
-		$this->getServer()->getPluginManager()->registerEvents($eventListener, $this);
-		$this->getLogger()->debug(TF::BOLD . "Registering Loaded Levels");
-		foreach($this->getServer()->getLevels() as $level) {
-			$eventListener->onLevelLoad(new LevelLoadEvent($level));
-		}
-		$this->getLogger()->debug(TF::BOLD.TF::GREEN."Enabled!");
-	}
+        SpoonDetector::printSpoon($this, "spoon.txt");
+        if ($this->isDisabled()) {
+            return;
+        }
+        $this->getLogger()->debug(TF::BOLD . "Loading Events");
+        $eventListener = new EventListener($this);
+        $this->getServer()->getPluginManager()->registerEvents($eventListener, $this);
+        $this->getLogger()->debug(TF::BOLD . "Registering Loaded Levels");
+        foreach ($this->getServer()->getLevels() as $level) {
+            $eventListener->onLevelLoad(new LevelLoadEvent($level));
+        }
+        $this->getLogger()->debug(TF::BOLD . TF::GREEN . "Enabled!");
+    }
 
 	/**
 	 * @param string $levelName
