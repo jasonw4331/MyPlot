@@ -9,8 +9,7 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\scheduler\Task;
 
-class FillPlotTask extends Task
-{
+class FillPlotTask extends Task {
 	/** @var MyPlot $plugin */
 	protected $plugin;
 	/** @var Plot $plot */
@@ -41,8 +40,7 @@ class FillPlotTask extends Task
 	 * @param Plot $plot
 	 * @param int $maxBlocksPerTick
 	 */
-	public function __construct(MyPlot $plugin, Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256)
-	{
+	public function __construct(MyPlot $plugin, Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) {
 		$this->plugin = $plugin;
 		$this->plot = $plot;
 		$this->plotBeginPos = $plugin->getPlotPosition($plot);
@@ -62,31 +60,30 @@ class FillPlotTask extends Task
 	/**
 	 * @param int $currentTick
 	 */
-	public function onRun(int $currentTick): void
-	{
-		foreach ($this->level->getEntities() as $entity) {
-			if ($this->plugin->getPlotBB($this->plot)->isVectorInXZ($entity)) {
-				if (!$entity instanceof Player) {
+	public function onRun(int $currentTick) : void {
+		foreach($this->level->getEntities() as $entity) {
+			if($this->plugin->getPlotBB($this->plot)->isVectorInXZ($entity)) {
+				if(!$entity instanceof Player) {
 					$entity->flagForDespawn();
-				} else {
+				}else {
 					$this->plugin->teleportPlayerToPlot($entity, $this->plot);
 				}
 			}
 		}
 		$blocks = 0;
-		while ($this->pos->x < $this->xMax) {
-			while ($this->pos->z < $this->zMax) {
-				while ($this->pos->y < $this->level->getWorldHeight()) {
-					if ($this->pos->y === 0) {
+		while($this->pos->x < $this->xMax) {
+			while($this->pos->z < $this->zMax) {
+				while($this->pos->y < $this->level->getWorldHeight()) {
+					if($this->pos->y === 0) {
 						$block = $this->bottomBlock;
-					} elseif ($this->pos->y <= $this->height) {
+					}elseif($this->pos->y <= $this->height) {
 						$block = $this->plotFillBlock;
-					} else {
+					}else {
 						$block = Block::get(Block::AIR);
 					}
 					$this->level->setBlock($this->pos, $block, false, false);
 					$blocks++;
-					if ($blocks >= $this->maxBlocksPerTick) {
+					if($blocks >= $this->maxBlocksPerTick) {
 						$this->setHandler();
 						$this->plugin->getScheduler()->scheduleDelayedTask($this, 1);
 						return;
@@ -99,9 +96,9 @@ class FillPlotTask extends Task
 			$this->pos->z = $this->plotBeginPos->z;
 			$this->pos->x++;
 		}
-		foreach ($this->level->getTiles() as $tile) {
-			if (($plot = $this->plugin->getPlotByPosition($tile)) != null) {
-				if ($this->plot->isSame($plot)) {
+		foreach($this->level->getTiles() as $tile) {
+			if(($plot = $this->plugin->getPlotByPosition($tile)) != null) {
+				if($this->plot->isSame($plot)) {
 					$tile->close();
 				}
 			}
