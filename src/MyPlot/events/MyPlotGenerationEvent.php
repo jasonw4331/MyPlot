@@ -10,9 +10,16 @@ class MyPlotGenerationEvent extends Event implements Cancellable {
 	private $levelName;
 	/** @var string $generator */
 	private $generator = "myplot";
-	/** @var array $settings */
+	/** @var mixed[] $settings */
 	private $settings = [];
 
+	/**
+	 * MyPlotGenerationEvent constructor.
+	 *
+	 * @param string $levelName
+	 * @param string $generator
+	 * @param mixed[] $settings
+	 */
 	public function __construct(string $levelName, string $generator = "myplot", array $settings = []) {
 		$this->levelName = $levelName;
 		$this->generator = $generator;
@@ -54,14 +61,14 @@ class MyPlotGenerationEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * @return array
+	 * @return mixed[]
 	 */
 	public function getSettings() : array {
 		return $this->settings;
 	}
 
 	/**
-	 * @param array $settings
+	 * @param mixed[] $settings
 	 *
 	 * @return self
 	 */
