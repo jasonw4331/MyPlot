@@ -6,11 +6,11 @@ use MyPlot\Plot;
 use pocketmine\event\Cancellable;
 
 class MyPlotSaveEvent extends MyPlotPlotEvent implements Cancellable {
-	const SQLITE3 = 0;
-	const MySQL = 1;
-	const JSON = 2;
-	const YAML = 3;
-	const OTHER = -1;
+	public const SQLITE3 = 0;
+	public const MySQL = 1;
+	public const JSON = 2;
+	public const YAML = 3;
+	public const OTHER = -1;
 	/** @var int $type */
 	private $type;
 

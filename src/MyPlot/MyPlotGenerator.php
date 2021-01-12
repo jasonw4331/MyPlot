@@ -31,9 +31,9 @@ class MyPlotGenerator extends Generator {
 	protected $groundHeight = 64;
 	/** @var int $plotSize */
 	protected $plotSize = 32;
-	const PLOT = 0;
-	const ROAD = 1;
-	const WALL = 2;
+	public const PLOT = 0;
+	public const ROAD = 1;
+	public const WALL = 2;
 
 	/**
 	 * MyPlotGenerator constructor.
