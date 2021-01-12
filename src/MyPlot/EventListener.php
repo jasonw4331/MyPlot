@@ -208,7 +208,7 @@ class EventListener implements Listener
 		}
 		$beginPos = $this->plugin->getPlotPosition($plot);
 		$endPos = clone $beginPos;
-		$levelSettings= $this->plugin->getLevelSettings($levelName);
+		$levelSettings = $this->plugin->getLevelSettings($levelName);
 		$plotSize = $levelSettings->plotSize;
 		$endPos->x += $plotSize;
 		$endPos->z += $plotSize;
