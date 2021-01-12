@@ -745,12 +745,6 @@ class MyPlot extends PluginBase
 		return $this->savePlot($plot);
 	}
 
-	/**
-	 * @param Plot $plot
-	 * @param bool $pvp
-	 *
-	 * @return bool
-	 */
 	public function setPlotPvp(Plot $plot, bool $pvp) : bool {
 		$newPlot = clone $plot;
 		$newPlot->pvp = $pvp;
@@ -762,12 +756,6 @@ class MyPlot extends PluginBase
 		return $this->savePlot($ev->getPlot());
 	}
 
-	/**
-	 * @param Plot $plot
-	 * @param string $player
-	 *
-	 * @return bool
-	 */
 	public function addPlotHelper(Plot $plot, string $player) : bool {
 		$newPlot = clone $plot;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
@@ -779,12 +767,6 @@ class MyPlot extends PluginBase
 		return $this->savePlot($ev->getPlot());
 	}
 
-	/**
-	 * @param Plot $plot
-	 * @param string $player
-	 *
-	 * @return bool
-	 */
 	public function removePlotHelper(Plot $plot, string $player) : bool {
 		$newPlot = clone $plot;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
@@ -796,12 +778,6 @@ class MyPlot extends PluginBase
 		return $this->savePlot($ev->getPlot());
 	}
 
-	/**
-	 * @param Plot $plot
-	 * @param string $player
-	 *
-	 * @return bool
-	 */
 	public function addPlotDenied(Plot $plot, string $player) : bool {
 		$newPlot = clone $plot;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
@@ -813,12 +789,6 @@ class MyPlot extends PluginBase
 		return $this->savePlot($ev->getPlot());
 	}
 
-	/**
-	 * @param Plot $plot
-	 * @param string $player
-	 *
-	 * @return bool
-	 */
 	public function removePlotDenied(Plot $plot, string $player) : bool {
 		$newPlot = clone $plot;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
