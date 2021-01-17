@@ -7,9 +7,7 @@ use MyPlot\events\MyPlotBorderChangeEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
-use pocketmine\block\Grass;
 use pocketmine\block\Liquid;
-use pocketmine\block\Mycelium;
 use pocketmine\block\Sapling;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -259,20 +257,28 @@ class EventListener implements Listener
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
+
+		$newBlockInPlot = $this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot;
+		$sourceBlockInPlot = $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot;
+
+		if($newBlockInPlot and $sourceBlockInPlot) {
+			$spreadIsSamePlot = $this->plugin->getPlotByPosition($event->getBlock())->isSame($this->plugin->getPlotByPosition($event->getSource()));
+		}else {
+			$spreadIsSamePlot = false;
+		}
+
 		if($event->getSource() instanceof Liquid) {
-		    if (!$settings->updatePlotLiquids and ($this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot or $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot or $this->plugin->isPositionBorderingPlot($event->getBlock()) or $this->plugin->isPositionBorderingPlot($event->getSource()))) {
-		        $event->setCancelled();
-		        $this->plugin->getLogger()->debug("Cancelled block spread of {$event->getSource()->getName()} on " . $levelName);
-		    }elseif ($settings->updatePlotLiquids and ((!$this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot and $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot) or ($this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot and !$this->plugin->getPlotByPosition($event->getSource()) instanceof Plot) or ($this->plugin->isPositionBorderingPlot($event->getBlock()) and !$this->plugin->getPlotByPosition($event->getSource()) instanceof Plot) or ($this->plugin->isPositionBorderingPlot($event->getSource()) and !$this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot))) {
-		        $event->setCancelled();
-		        $this->plugin->getLogger()->debug("Cancelled block spread of {$event->getSource()->getName()} on " . $levelName);
-		    }
-		}elseif ($event->getSource() instanceof Grass or $event->getSource() instanceof Mycelium){
-		    if ((!$this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot and $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot) or !$this->plugin->getPlotByPosition($event->getSource()) instanceof Plot) {
-		        $event->setCancelled();
-		        $this->plugin->getLogger()->debug("Cancelled block spread of {$event->getSource()->getName()} on " . $levelName);
-            }
-        }
+			if(!$settings->updatePlotLiquids and ($sourceBlockInPlot or $this->plugin->isPositionBorderingPlot($event->getSource()))) {
+				$event->setCancelled();
+				$this->plugin->getLogger()->debug("Cancelled {$event->getSource()->getName()} spread on [$levelName]");
+			}elseif($settings->updatePlotLiquids and ($sourceBlockInPlot or $this->plugin->isPositionBorderingPlot($event->getSource())) and (!$newBlockInPlot or !$this->plugin->isPositionBorderingPlot($event->getBlock()) or !$spreadIsSamePlot)) {
+				$event->setCancelled();
+				$this->plugin->getLogger()->debug("Cancelled {$event->getSource()->getName()} spread on [$levelName]");
+			}
+		}elseif(!$settings->allowOutsidePlotSpread and (!$newBlockInPlot or !$spreadIsSamePlot)) {
+			$event->setCancelled();
+			//$this->plugin->getLogger()->debug("Cancelled block spread of {$event->getSource()->getName()} on ".$levelName);
+		}
 	}
 
 	/**
