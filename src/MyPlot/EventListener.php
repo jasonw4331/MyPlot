@@ -253,15 +253,31 @@ class EventListener implements Listener
 		if($event->isCancelled()) {
 			return;
 		}
-		if(!$event->getSource() instanceof Liquid)
-			return;
 		$levelName = $event->getBlock()->getLevel()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
-		if(!$settings->updatePlotLiquids and ($this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot or $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot or $this->plugin->isPositionBorderingPlot($event->getBlock()) or $this->plugin->isPositionBorderingPlot($event->getSource()))) {
+
+		$newBlockInPlot = $this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot;
+		$sourceBlockInPlot = $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot;
+
+		if($newBlockInPlot and $sourceBlockInPlot) {
+			$spreadIsSamePlot = $this->plugin->getPlotByPosition($event->getBlock())->isSame($this->plugin->getPlotByPosition($event->getSource()));
+		}else {
+			$spreadIsSamePlot = false;
+		}
+
+		if($event->getSource() instanceof Liquid) {
+			if(!$settings->updatePlotLiquids and ($sourceBlockInPlot or $this->plugin->isPositionBorderingPlot($event->getSource()))) {
+				$event->setCancelled();
+				$this->plugin->getLogger()->debug("Cancelled {$event->getSource()->getName()} spread on [$levelName]");
+			}elseif($settings->updatePlotLiquids and ($sourceBlockInPlot or $this->plugin->isPositionBorderingPlot($event->getSource())) and (!$newBlockInPlot or !$this->plugin->isPositionBorderingPlot($event->getBlock()) or !$spreadIsSamePlot)) {
+				$event->setCancelled();
+				$this->plugin->getLogger()->debug("Cancelled {$event->getSource()->getName()} spread on [$levelName]");
+			}
+		}elseif(!$settings->allowOutsidePlotSpread and (!$newBlockInPlot or !$spreadIsSamePlot)) {
 			$event->setCancelled();
-			$this->plugin->getLogger()->debug("Cancelled block spread of {$event->getBlock()->getName()} on " . $levelName);
+			//$this->plugin->getLogger()->debug("Cancelled block spread of {$event->getSource()->getName()} on ".$levelName);
 		}
 	}
 

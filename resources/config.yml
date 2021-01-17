@@ -82,6 +82,10 @@ DefaultWorld:
   # This will allow things like water to lag the server in plot worlds
   UpdatePlotLiquids: false
 
+  # Allow plants (e.g. Grass) from spreading to the outside of plots.
+  # This will allow blocks like mycelium to spread from one plot into another
+  AllowOutsidePlotSpread: false
+
   # Edit Border Blocks (Any block immediately adjacent to a plot space)
   # This will allow players to break and place their own border blocks
   EditBorderBlocks: true

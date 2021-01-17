@@ -40,6 +40,8 @@ class PlotLevelSettings
 	public $restrictPVP = false;
 	/** @var bool $updatePlotLiquids */
 	public $updatePlotLiquids = false;
+	/** @var bool $allowOutsidePlotSpread */
+	public $allowOutsidePlotSpread = false;
 	/** @var bool $displayDoneNametags */
 	public $displayDoneNametags = false;
 	/** @var bool $editBorderBlocks */
@@ -70,6 +72,7 @@ class PlotLevelSettings
 			$this->restrictEntityMovement = self::parseBool($settings, "RestrictEntityMovement", true);
 			$this->restrictPVP = self::parseBool($settings, "RestrictPVP", false);
 			$this->updatePlotLiquids = self::parseBool($settings, "UpdatePlotLiquids", false);
+			$this->allowOutsidePlotSpread = self::parseBool($settings, "AllowOutsidePlotSpread", false);
 			$this->editBorderBlocks = self::parseBool($settings, "EditBorderBlocks", true);
 		}
 	}
