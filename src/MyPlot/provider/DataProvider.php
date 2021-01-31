@@ -25,9 +25,6 @@ abstract class DataProvider
 		$this->cacheSize = $cacheSize;
 	}
 
-	/**
-	 * @param Plot $plot
-	 */
 	protected final function cachePlot(Plot $plot) : void {
 		if($this->cacheSize > 0) {
 			$key = $plot->levelName . ';' . $plot->X . ';' . $plot->Z;
@@ -42,13 +39,6 @@ abstract class DataProvider
 		}
 	}
 
-	/**
-	 * @param string $levelName
-	 * @param int $X
-	 * @param int $Z
-	 *
-	 * @return Plot|null
-	 */
 	protected final function getPlotFromCache(string $levelName, int $X, int $Z) : ?Plot {
 		if($this->cacheSize > 0) {
 			$key = $levelName . ';' . $X . ';' . $Z;
@@ -60,27 +50,10 @@ abstract class DataProvider
 		return null;
 	}
 
-	/**
-	 * @param Plot $plot
-	 *
-	 * @return bool
-	 */
 	public abstract function savePlot(Plot $plot) : bool;
 
-	/**
-	 * @param Plot $plot
-	 *
-	 * @return bool
-	 */
 	public abstract function deletePlot(Plot $plot) : bool;
 
-	/**
-	 * @param string $levelName
-	 * @param int $X
-	 * @param int $Z
-	 *
-	 * @return Plot
-	 */
 	public abstract function getPlot(string $levelName, int $X, int $Z) : Plot;
 
 	/**
@@ -91,12 +64,6 @@ abstract class DataProvider
 	 */
 	public abstract function getPlotsByOwner(string $owner, string $levelName = "") : array;
 
-	/**
-	 * @param string $levelName
-	 * @param int $limitXZ
-	 *
-	 * @return Plot|null
-	 */
 	public abstract function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?Plot;
 
 	public abstract function close() : void;
@@ -106,7 +73,7 @@ abstract class DataProvider
 	 * @param int $b
 	 * @param array[] $plots
 	 *
-	 * @return array|null
+	 * @return int[]|null
 	 */
 	protected static function findEmptyPlotSquared(int $a, int $b, array $plots) : ?array {
 		if(!isset($plots[$a][$b]))
@@ -125,7 +92,7 @@ abstract class DataProvider
 			if(!isset($plots[$a][-$b]))
 				return [$a, -$b];
 		}
-		if($a | $b === 0) {
+		if(($a | $b) === 0) {
 			if(!isset($plots[-$a][-$b]))
 				return [-$a, -$b];
 			if(!isset($plots[-$b][-$a]))

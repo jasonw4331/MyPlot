@@ -24,11 +24,6 @@ class JSONDataProvider extends DataProvider {
 		$this->json = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::JSON, ["count" => -1, "plots" => []]);
 	}
 
-	/**
-	 * @param Plot $plot
-	 *
-	 * @return bool
-	 */
 	public function savePlot(Plot $plot) : bool {
 		$plots = $this->json->get("plots", []);
 		if($plot->id > -1) {
@@ -44,11 +39,6 @@ class JSONDataProvider extends DataProvider {
 		return $this->json->save();
 	}
 
-	/**
-	 * @param Plot $plot
-	 *
-	 * @return bool
-	 */
 	public function deletePlot(Plot $plot) : bool {
 		$plots = $this->json->get("plots", []);
 		unset($plots[$plot->id]);
@@ -58,13 +48,6 @@ class JSONDataProvider extends DataProvider {
 		return $this->json->save();
 	}
 
-	/**
-	 * @param string $levelName
-	 * @param int $X
-	 * @param int $Z
-	 *
-	 * @return Plot
-	 */
 	public function getPlot(string $levelName, int $X, int $Z) : Plot {
 		if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) !== null) {
 			return $plot;
@@ -115,9 +98,9 @@ class JSONDataProvider extends DataProvider {
 		$ownerPlots = [];
 		if($levelName != "") {
 			/** @var int[] $levelKeys */
-			$levelKeys = array_keys($plots, $levelName);
+			$levelKeys = array_keys($plots, $levelName, true);
 			/** @var int[] $ownerKeys */
-			$ownerKeys = array_keys($plots, $owner);
+			$ownerKeys = array_keys($plots, $owner, true);
 			foreach($levelKeys as $levelKey) {
 				foreach($ownerKeys as $ownerKey) {
 					if($levelKey === $ownerKey) {
@@ -136,7 +119,7 @@ class JSONDataProvider extends DataProvider {
 			}
 		}else{
 			/** @var int[] $ownerKeys */
-			$ownerKeys = array_keys($plots, $owner);
+			$ownerKeys = array_keys($plots, $owner, true);
 			foreach($ownerKeys as $key) {
 				$levelName = $plots[$key]["level"];
 				$X = $plots[$key]["x"];
@@ -154,12 +137,6 @@ class JSONDataProvider extends DataProvider {
 		return $ownerPlots;
 	}
 
-	/**
-	 * @param string $levelName
-	 * @param int $limitXZ
-	 *
-	 * @return Plot|null
-	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?Plot {
 		$plotsArr = $this->json->get("plots", []);
 		for($i = 0; $limitXZ <= 0 or $i < $limitXZ; $i++) {
@@ -180,22 +157,22 @@ class JSONDataProvider extends DataProvider {
 			if(count($plots) === max(1, 8 * $i)) {
 				continue;
 			}
-			if($ret = self::findEmptyPlotSquared(0, $i, $plots)) {
-				list($X, $Z) = $ret;
+			if(($ret = self::findEmptyPlotSquared(0, $i, $plots)) !== null) {
+				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;
 			}
 			for($a = 1; $a < $i; $a++) {
-				if($ret = self::findEmptyPlotSquared($a, $i, $plots)) {
-					list($X, $Z) = $ret;
+				if(($ret = self::findEmptyPlotSquared($a, $i, $plots)) !== null) {
+					[$X, $Z] = $ret;
 					$plot = new Plot($levelName, $X, $Z);
 					$this->cachePlot($plot);
 					return $plot;
 				}
 			}
-			if($ret = self::findEmptyPlotSquared($i, $i, $plots)) {
-				list($X, $Z) = $ret;
+			if(($ret = self::findEmptyPlotSquared($i, $i, $plots)) !== null) {
+				[$X, $Z] = $ret;
 				$plot = new Plot($levelName, $X, $Z);
 				$this->cachePlot($plot);
 				return $plot;

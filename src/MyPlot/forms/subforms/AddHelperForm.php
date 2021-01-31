@@ -17,7 +17,7 @@ class AddHelperForm extends ComplexMyPlotForm {
 	public function __construct(Plot $plot) {
 		$plugin = MyPlot::getInstance();
 		$players = [];
-		if(!in_array("*", $plot->helpers)) {
+		if(!in_array("*", $plot->helpers, true)) {
 			$players = ["*"];
 			$this->players = ["*"];
 		}
@@ -32,7 +32,7 @@ class AddHelperForm extends ComplexMyPlotForm {
 					"0",
 					$plugin->getLanguage()->get("addhelper.dropdown"),
 					array_map(
-						function(string $text) {
+						function(string $text) : string {
 							return TextFormat::DARK_BLUE.$text;
 						}, $players
 					)

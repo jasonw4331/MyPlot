@@ -5,6 +5,7 @@ namespace MyPlot;
 use pocketmine\block\Block;
 use pocketmine\level\biome\Biome;
 use pocketmine\level\ChunkManager;
+use pocketmine\level\format\Chunk;
 use pocketmine\level\generator\Generator;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
@@ -30,14 +31,14 @@ class MyPlotGenerator extends Generator {
 	protected $groundHeight = 64;
 	/** @var int $plotSize */
 	protected $plotSize = 32;
-	const PLOT = 0;
-	const ROAD = 1;
-	const WALL = 2;
+	public const PLOT = 0;
+	public const ROAD = 1;
+	public const WALL = 2;
 
 	/**
 	 * MyPlotGenerator constructor.
 	 *
-	 * @param array $settings
+	 * @param string[] $settings
 	 */
 	public function __construct(array $settings = []) {
 		if(isset($settings["preset"])) {
@@ -69,35 +70,25 @@ class MyPlotGenerator extends Generator {
 		]);
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getName() : string {
 		return "myplot";
 	}
 
 	/**
-	 * @return string[]
+	 * @return mixed[]
+	 * @phpstan-return array<string, mixed>
 	 */
 	public function getSettings() : array {
 		return $this->settings;
 	}
 
-	/**
-	 * @param ChunkManager $level
-	 * @param Random $random
-	 */
 	public function init(ChunkManager $level, Random $random) : void {
 		$this->level = $level;
 	}
 
-	/**
-	 * @param int $chunkX
-	 * @param int $chunkZ
-	 */
 	public function generateChunk(int $chunkX, int $chunkZ) : void {
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
-		$chunk = $this->level->getChunk($chunkX, $chunkZ);
+		$chunk = $this->level->getChunk($chunkX, $chunkZ) ?? new Chunk($chunkX, $chunkZ);
 		$bottomBlockId = $this->bottomBlock->getId();
 		$bottomBlockMeta = $this->bottomBlock->getDamage();
 		$plotFillBlockId = $this->plotFillBlock->getId();
@@ -190,16 +181,9 @@ class MyPlotGenerator extends Generator {
 		return $shape;
 	}
 
-	/**
-	 * @param int $chunkX
-	 * @param int $chunkZ
-	 */
 	public function populateChunk(int $chunkX, int $chunkZ) : void {
 	}
 
-	/**
-	 * @return Vector3
-	 */
 	public function getSpawn() : Vector3 {
 		return new Vector3(0, $this->groundHeight + 1, 0);
 	}

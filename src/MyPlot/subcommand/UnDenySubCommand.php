@@ -12,11 +12,6 @@ use pocketmine\utils\TextFormat;
 
 class UnDenySubCommand extends SubCommand
 {
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.undenyplayer");
 	}
@@ -28,7 +23,7 @@ class UnDenySubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			return false;
 		}
 		$dplayerName = $args[0];
@@ -56,7 +51,7 @@ class UnDenySubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
 			return new UndenyPlayerForm();
 		return null;
 	}

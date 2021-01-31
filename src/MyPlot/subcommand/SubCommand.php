@@ -16,10 +16,6 @@ abstract class SubCommand implements PluginIdentifiableCommand
 	/** @var string $name */
     private $name;
 
-    /**
-     * @param MyPlot $plugin
-     * @param string $name
-     */
 	public function __construct(MyPlot $plugin, string $name) {
         $this->plugin = $plugin;
         $this->name = $name;
@@ -43,49 +39,28 @@ abstract class SubCommand implements PluginIdentifiableCommand
         return $this->plugin->getLanguage()->translateString($str, $params, $onlyPrefix);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @return bool
-     */
 	public abstract function canUse(CommandSender $sender) : bool;
 
-    /**
-     * @return string
-     */
 	public function getUsage() : string {
         $usage = $this->getPlugin()->getFallBackLang()->get($this->name . ".usage"); // TODO: use normal language when command autofill gains support
         return ($usage == $this->name . ".usage") ? "" : $usage;
     }
 
-    /**
-     * @return string
-     */
 	public function getName() : string {
         $name = $this->getPlugin()->getLanguage()->get($this->name . ".name");
         return ($name == $this->name . ".name") ? "" : $name;
     }
 
-    /**
-     * @return string
-     */
 	public function getDescription() : string {
         $desc = $this->getPlugin()->getLanguage()->get($this->name . ".desc");
         return ($desc == $this->name . ".desc") ? "" : $desc;
     }
 
-    /**
-     * @return string
-     */
 	public function getAlias() : string {
         $alias = $this->getPlugin()->getLanguage()->get($this->name . ".alias");
         return ($alias == $this->name . ".alias") ? "" : $alias;
     }
 
-	/**
-	 * @param Player|null $player
-	 *
-	 * @return MyPlotForm|null
-	 */
 	public abstract function getForm(?Player $player = null) : ?MyPlotForm;
 
 	/**

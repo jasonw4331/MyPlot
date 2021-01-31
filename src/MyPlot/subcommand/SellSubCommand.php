@@ -9,11 +9,6 @@ use pocketmine\utils\TextFormat;
 
 class SellSubCommand extends SubCommand
 {
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.sell");
 	}
@@ -25,7 +20,7 @@ class SellSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			return false;
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender->asPosition());

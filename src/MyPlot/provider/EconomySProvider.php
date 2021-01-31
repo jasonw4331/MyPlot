@@ -19,12 +19,6 @@ class EconomySProvider implements EconomyProvider {
 		$this->plugin = $plugin;
 	}
 
-	/**
-	 * @param Player $player
-	 * @param float $amount
-	 *
-	 * @return bool
-	 */
 	public function reduceMoney(Player $player, float $amount) : bool {
 		if($amount == 0) {
 			return true;
@@ -40,11 +34,6 @@ class EconomySProvider implements EconomyProvider {
 		return false;
 	}
 
-	/**
-	 * @param IPlayer $player
-	 * @param float $amount
-	 * @return bool
-	 */
 	public function addMoney(IPlayer $player, float $amount) : bool {
 		if($amount < 1)
 			return true;

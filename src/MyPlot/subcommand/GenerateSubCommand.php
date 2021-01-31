@@ -11,11 +11,6 @@ use pocketmine\utils\TextFormat;
 
 class GenerateSubCommand extends SubCommand
 {
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return $sender->hasPermission("myplot.command.generate");
 	}
@@ -27,7 +22,7 @@ class GenerateSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			return false;
 		}
 		$levelName = $args[0];
