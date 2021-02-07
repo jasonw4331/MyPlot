@@ -5,7 +5,8 @@
 [![Build Status](https://travis-ci.org/jasonwynn10/MyPlot.svg?branch=master)](https://travis-ci.org/jasonwynn10/MyPlot)
 ### **Create, manage, and build in protected plots. Keep your builds safe from griefers!**
 
-#### Official MyPlot precompiled builds can be found on [Poggit](https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot) at https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot
+#### Official MyPlot releases can be found on [here](https://poggit.pmmp.io/p/MyPlot)
+#### Precompiled dev build for MyPlot can be found on [PoggitCI](https://poggit.pmmp.io/ci/jasonwynn10/MyPlot/MyPlot)
 
 Have you ever seen those Java servers with the PlotSquared plugin and thought "Hey, why can't I have plots on my Minecraft server?" Well, now you can with **MyPlot** for PocketMine-MP!
 
