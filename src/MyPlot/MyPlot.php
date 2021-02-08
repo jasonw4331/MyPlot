@@ -131,7 +131,7 @@ class MyPlot extends PluginBase
 	 * @return PlotLevelSettings
 	 */
 	public function getLevelSettings(string $levelName) : PlotLevelSettings {
-		if(isset($this->levels[$levelName]))
+		if(!isset($this->levels[$levelName]))
 			throw new AssumptionFailedError("Provided level name is not a MyPlot level");
 		return $this->levels[$levelName];
 	}
