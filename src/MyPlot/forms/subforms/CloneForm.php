@@ -85,6 +85,8 @@ class CloneForm extends ComplexMyPlotForm {
 					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("notowner"));
 					return;
 				}
+				if(!$plugin->isLevelLoaded($originPlot->levelName))
+					throw new FormValidationException("Invalid world given");
 				$plotLevel = $plugin->getLevelSettings($originPlot->levelName);
 				$economy = $plugin->getEconomyProvider();
 				if($economy !== null and !$economy->reduceMoney($player, $plotLevel->clonePrice)) {

@@ -237,6 +237,8 @@ class MyPlot extends PluginBase
 		$x = $position->x;
 		$z = $position->z;
 		$levelName = $position->getLevelNonNull()->getFolderName();
+		if(!$this->isLevelLoaded($levelName))
+			return null;
 
 		$plotLevel = $this->getLevelSettings($levelName);
 		$plotSize = $plotLevel->plotSize;
@@ -299,6 +301,9 @@ class MyPlot extends PluginBase
 			$x = $pos->x;
 			$z = $pos->z;
 			$levelName = $pos->getLevelNonNull()->getFolderName();
+
+			if(!$this->isLevelLoaded($levelName))
+				return false;
 
 			$plotLevel = $this->getLevelSettings($levelName);
 			$plotSize = $plotLevel->plotSize;
@@ -368,6 +373,9 @@ class MyPlot extends PluginBase
 			$x = $pos->x;
 			$z = $pos->z;
 			$levelName = $pos->getLevelNonNull()->getFolderName();
+
+			if(!$this->isLevelLoaded($levelName))
+				return null;
 
 			$plotLevel = $this->getLevelSettings($levelName);
 			$plotSize = $plotLevel->plotSize;
@@ -509,9 +517,13 @@ class MyPlot extends PluginBase
 		if(!$styler instanceof WorldStyler) {
 			return false;
 		}
+		if(!$this->isLevelLoaded($plotFrom->levelName) or !$this->isLevelLoaded($plotTo->levelName)) {
+			return false;
+		}
+		$aabb = $this->getPlotBB($plotTo);
 		foreach($this->getPlotChunks($plotTo) as $chunk) {
 			foreach($chunk->getEntities() as $entity) {
-				if($this->getPlotBB($plotTo)->isVectorInXZ($entity)) {
+				if($aabb->isVectorInXZ($entity)) {
 					if($entity instanceof Player){
 						$this->teleportPlayerToPlot($entity, $plotTo);
 					}
@@ -726,6 +738,8 @@ class MyPlot extends PluginBase
 			$biome = Biome::PLAINS;
 		}
 		$biome = Biome::getBiome($biome);
+		if(!$this->isLevelLoaded($plot->levelName))
+			return false;
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$level = $this->getServer()->getLevelByName($plot->levelName);
 		if($level === null)
@@ -874,6 +888,8 @@ class MyPlot extends PluginBase
 	 * @return Chunk[]
 	 */
 	public function getPlotChunks(Plot $plot) : array {
+		if(!$this->isLevelLoaded($plot->levelName))
+			return [];
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$level = $this->getServer()->getLevelByName($plot->levelName);
 		if($level === null)
@@ -934,6 +950,8 @@ class MyPlot extends PluginBase
 	 * @return Position|null
 	 */
 	public function getPlotMid(Plot $plot) : ?Position {
+		if(!$this->isLevelLoaded($plot->levelName))
+			return null;
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
 		$pos = $this->getPlotPosition($plot);
