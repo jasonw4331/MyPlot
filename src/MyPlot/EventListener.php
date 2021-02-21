@@ -22,6 +22,7 @@ use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\item\Consumable;
 use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\utils\Config;
@@ -184,6 +185,14 @@ class EventListener implements Listener
 						return;
 			}
 		}
+		
+		// Allows the player to eat
+		if($event instanceof PlayerInteractEvent) {
+		    if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR and $event->getItem() instanceof Consumable) {
+			return;
+		    }
+        	}
+		
 		$event->setCancelled();
 		$this->plugin->getLogger()->debug("Block placement/break/interaction of {$event->getBlock()->getName()} was cancelled at ".$event->getBlock()->asPosition()->__toString());
 	}
