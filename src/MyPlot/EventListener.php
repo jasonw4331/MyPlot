@@ -72,22 +72,6 @@ class EventListener implements Listener
 
 	/**
 	 * @ignoreCancelled false
-	 * @priority MONITOR
-	 *
-	 * @param LevelUnloadEvent $event
-	 */
-	public function onLevelUnload(LevelUnloadEvent $event) : void {
-		if($event->isCancelled()) {
-			return;
-		}
-		$levelName = $event->getLevel()->getFolderName();
-		if($this->plugin->unloadLevelSettings($levelName)) {
-			$this->plugin->getLogger()->debug("Level " . $event->getLevel()->getFolderName() . " unloaded!");
-		}
-	}
-
-	/**
-	 * @ignoreCancelled false
 	 * @priority LOWEST
 	 *
 	 * @param BlockPlaceEvent $event
