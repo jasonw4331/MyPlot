@@ -122,7 +122,7 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * Returns a PlotLevelSettings object which contains all the settings of a level
+	 * Returns a PlotLevelSettings object which contains all the settings of a plot world
 	 *
 	 * @api
 	 *
@@ -137,7 +137,7 @@ class MyPlot extends PluginBase
 	}
 
 	/**
-	 * Checks if a plot level is loaded
+	 * Checks if a plot world's settings are loaded
 	 *
 	 * @api
 	 *
@@ -988,6 +988,17 @@ class MyPlot extends PluginBase
 		$this->getLogger()->debug(TF::BOLD . "Loading Configs");
 		$this->reloadConfig();
 		@mkdir($this->getDataFolder() . "worlds");
+		$files = glob($this->getDataFolder() . 'worlds/*.{yml}', GLOB_BRACE);
+		foreach($files as $file) {
+			$this->getLogger()->debug($file . " settings loaded!");
+			$settings = [];
+			$levelName = substr($file, 0, strlen($file) - 4);
+			$config = new Config($this->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML);
+			foreach(["PlotSize", "GroundHeight", "RoadWidth", "RoadBlock", "WallBlock", "PlotFloorBlock", "PlotFillBlock", "BottomBlock"] as $key) {
+				$settings[$key] = $config->get((string)$key);
+			}
+			$this->addLevelSettings($levelName, new PlotLevelSettings($levelName, $settings));
+		}
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Generator");
 		GeneratorManager::addGenerator(MyPlotGenerator::class, "myplot", true);
 		$this->getLogger()->debug(TF::BOLD . "Loading Languages");
@@ -1106,9 +1117,8 @@ class MyPlot extends PluginBase
 		$this->getLogger()->debug(TF::BOLD.TF::GREEN."Enabled!");
 	}
 
-	public function addLevelSettings(string $levelName, PlotLevelSettings $settings) : bool {
+	public function addLevelSettings(string $levelName, PlotLevelSettings $settings) : void {
 		$this->levels[$levelName] = $settings;
-		return true;
 	}
 
 	public function unloadLevelSettings(string $levelName) : bool {
