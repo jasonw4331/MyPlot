@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\GenerateForm;
+use MyPlot\MyPlotGenerator;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -30,7 +31,7 @@ class GenerateSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.exists", [$levelName]));
 			return true;
 		}
-		if($this->getPlugin()->generateLevel($levelName, $args[2] ?? "myplot")) {
+		if($this->getPlugin()->generateLevel($levelName, $args[2] ?? MyPlotGenerator::NAME)) {
 			if(isset($args[1]) and $args[1] == true and $sender instanceof Player) {
 				$this->getPlugin()->teleportPlayerToPlot($sender, new Plot($levelName, 0, 0));
 			}

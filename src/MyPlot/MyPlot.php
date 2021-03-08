@@ -160,7 +160,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function generateLevel(string $levelName, string $generator = "myplot", array $settings = []) : bool {
+	public function generateLevel(string $levelName, string $generator = MyPlotGenerator::NAME, array $settings = []) : bool {
 		$ev = new MyPlotGenerationEvent($levelName, $generator, $settings);
 		$ev->call();
 		if($ev->isCancelled() or $this->getServer()->isLevelGenerated($levelName)) {

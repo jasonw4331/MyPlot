@@ -34,6 +34,7 @@ class MyPlotGenerator extends Generator {
 	public const PLOT = 0;
 	public const ROAD = 1;
 	public const WALL = 2;
+	public const NAME = 'myplot';
 
 	/**
 	 * MyPlotGenerator constructor.
@@ -71,7 +72,7 @@ class MyPlotGenerator extends Generator {
 	}
 
 	public function getName() : string {
-		return "myplot";
+		return self::NAME;
 	}
 
 	/**
