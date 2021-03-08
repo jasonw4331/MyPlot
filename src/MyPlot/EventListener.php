@@ -48,7 +48,7 @@ class EventListener implements Listener
 	 * @param LevelLoadEvent $event
 	 */
 	public function onLevelLoad(LevelLoadEvent $event) : void {
-		if(file_exists($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$event->getLevel()->getFolderName().".yml")) {
+		if($event->getLevel()->getProvider()->getGenerator() === MyPlotGenerator::NAME and !file_exists($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$event->getLevel()->getFolderName().".yml")) {
 			$this->plugin->getLogger()->debug("MyPlot level " . $event->getLevel()->getFolderName() . " loaded!");
 			$settings = $event->getLevel()->getProvider()->getGeneratorOptions();
 			if(!isset($settings["preset"]) or !is_string($settings["preset"]) or $settings["preset"] === "") {
