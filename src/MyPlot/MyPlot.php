@@ -40,7 +40,6 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
-use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
 {
@@ -979,11 +978,6 @@ class MyPlot extends PluginBase
 
 	/* -------------------------- Non-API part -------------------------- */
 	public function onLoad() : void {
-		if (!\class_exists(SpoonDetector::class)) {
-			$this->getLogger()->critical("SpoonDetector Virion not found! Please re-download MyPlot from Poggit.");
-			return;
-		}
-		$this->getLogger()->debug(TF::BOLD."Loading...");
 		self::$instance = $this;
 		$this->getLogger()->debug(TF::BOLD . "Loading Configs");
 		$this->reloadConfig();
@@ -1088,14 +1082,6 @@ class MyPlot extends PluginBase
 	}
 
 	public function onEnable() : void {
-		if (!\class_exists(SpoonDetector::class)) {
-			$this->getServer()->getPluginManager()->disablePlugin($this);
-			return;
-		}
-		SpoonDetector::printSpoon($this);
-		if($this->isDisabled()) {
-			return;
-		}
 		$this->getLogger()->debug(TF::BOLD . "Loading Events");
 		$eventListener = new EventListener($this);
 		$this->getServer()->getPluginManager()->registerEvents($eventListener, $this);
