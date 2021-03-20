@@ -4,8 +4,6 @@ projects:
     icon: "icon.png"
     path: ""
     libs:
-      - src: Falkirks/spoondetector/spoondetector
-        version: ^0.0.1
       - src: dktapps-pm-pl/pmforms/pmforms
         version: ^1.0.0
 ...
