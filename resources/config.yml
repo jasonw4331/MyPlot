@@ -86,6 +86,10 @@ DefaultWorld:
   # This will allow blocks like mycelium to spread from one plot into another
   AllowOutsidePlotSpread: false
 
+  # Allow fire spread and burning everywhere.
+  # This will allow fire to spread and burn blocks in plots and roads
+  AllowFireTicking: false
+
   # Edit Border Blocks (Any block immediately adjacent to a plot space)
   # This will allow players to break and place their own border blocks
   EditBorderBlocks: true
