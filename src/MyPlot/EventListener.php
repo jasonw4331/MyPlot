@@ -74,7 +74,7 @@ class EventListener implements Listener
 				$prop = $ref->getProperty('randomTickBlocks');
 				$prop->setAccessible(true);
 				/** @var \SplFixedArray $randomTickBlocks */
-				$randomTickBlocks = $prop->getValue();
+				$randomTickBlocks = $prop->getValue($event->getLevel());
 				$randomTickBlocks->offsetUnset(BlockIds::FIRE);
 				$prop->setValue($randomTickBlocks, $event->getLevel());
 			}
