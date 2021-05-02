@@ -59,7 +59,10 @@ class Plot
 		}else{
 			$this->pvp = $pvp;
 		}
-		$this->price = $price < 0 ? $settings->claimPrice : $price;
+		if(MyPlot::getInstance()->getConfig()->get('UseEconomy', false) === true)
+			$this->price = $price < 0 ? $settings->claimPrice : $price;
+		else
+			$this->price = 0;
 		$this->id = $id;
 	}
 
