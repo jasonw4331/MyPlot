@@ -12,9 +12,6 @@ use pocketmine\utils\TextFormat;
 
 class ClaimForm extends ComplexMyPlotForm {
 
-	/** @var Player $player */
-	private $player;
-
 	public function __construct(Player $player) {
 		$plugin = MyPlot::getInstance();
 		$plot = $plugin->getPlotByPosition($player);
@@ -48,14 +45,14 @@ class ClaimForm extends ComplexMyPlotForm {
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
 				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")))
 					$data = MyPlot::getInstance()->getProvider()->getPlot(
-						$response->getString("2") === '' ? $this->player->getLevelNonNull()->getFolderName() : $response->getString("2"),
+						$response->getString("2") === '' ? $player->getLevelNonNull()->getFolderName() : $response->getString("2"),
 						(int)$response->getString("0"),
 						(int)$response->getString("1")
 					);
 				elseif($response->getString("0") === '' or $response->getString("1") === '') {
-					$plot = MyPlot::getInstance()->getPlotByPosition($this->player);
+					$plot = MyPlot::getInstance()->getPlotByPosition($player);
 					if($plot === null) {
-						$this->player->sendForm(new self($this->player));
+						$player->sendForm(new self($player));
 						throw new FormValidationException("Unexpected form data returned");
 					}
 					$data = $plot;
