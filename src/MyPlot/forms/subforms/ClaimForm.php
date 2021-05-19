@@ -43,7 +43,7 @@ class ClaimForm extends ComplexMyPlotForm {
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
-				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")))
+				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")) and $plugin->isLevelLoaded($response->getString("2")))
 					$data = MyPlot::getInstance()->getProvider()->getPlot(
 						$response->getString("2") === '' ? $player->getLevelNonNull()->getFolderName() : $response->getString("2"),
 						(int)$response->getString("0"),
