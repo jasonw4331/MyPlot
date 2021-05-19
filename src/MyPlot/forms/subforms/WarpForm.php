@@ -38,7 +38,7 @@ class WarpForm extends ComplexMyPlotForm {
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
-				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")))
+				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")) and $plugin->isLevelLoaded($response->getString("2")))
 					$data =[
 						(int)$response->getString("0"),
 						(int)$response->getString("1"),
@@ -50,7 +50,7 @@ class WarpForm extends ComplexMyPlotForm {
 				}else
 					throw new FormValidationException("Unexpected form data returned");
 
-				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("warp.name")." ".((int)$response->getString("0")).";".((int)$response->getString("1")).' "'.($response->getString("2") === '' ? $this->player->getLevelNonNull()->getFolderName() : $response->getString("2")).'"', true);
+				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("warp.name")." $data[0];$data[1] $data[2]", true);
 			}
 		);
 	}
