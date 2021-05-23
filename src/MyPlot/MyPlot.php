@@ -491,7 +491,7 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function mergePlots(Plot $plot, int $direction, int $maxBlocksPerTick = 256) : bool {
-		if ($this->isLevelLoaded($plot->levelName))
+		if (!$this->isLevelLoaded($plot->levelName))
 			return false;
 		/** @var Plot[][] $toMerge */
 		$toMerge = [];
