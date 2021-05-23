@@ -234,7 +234,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Plot|null
 	 */
-	public function getPlotByPosition(Position $position) : ?Plot {
+	public function getPlotByPosition(Position $position, bool $blockRecursion = false) : ?Plot {
 		$x = $position->x;
 		$z = $position->z;
 		$levelName = $position->getLevelNonNull()->getFolderName();
@@ -458,7 +458,6 @@ class MyPlot extends PluginBase
 	 */
 	public function getPlotBB(Plot $plot) : AxisAlignedBB {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize-1;
 		$pos = $this->getPlotPosition($plot, false);
 		$xMax = (int)($pos->x + $plotSize);
@@ -492,8 +491,7 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function mergePlots(Plot $plot, int $direction, int $maxBlocksPerTick = 256) : bool {
-		$plotLevel = $this->getLevelSettings($plot->levelName);
-		if ($plotLevel === null)
+		if ($this->isLevelLoaded($plot->levelName))
 			return false;
 		/** @var Plot[][] $toMerge */
 		$toMerge = [];
@@ -624,18 +622,16 @@ class MyPlot extends PluginBase
 		if ($center)
 			return $this->teleportMiddle($player, $plot);
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		if ($plotLevel === null)
-			return false;
 		$mergedPlots = $this->getProvider()->getMergedPlots($plot);
-		$minx = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
-			return $this->getPlotPosition($a, false)->x<$this->getPlotPosition($b, false)->x?$a:$b;
-		},$mergedPlots[0]), false)->x;
-		$maxx = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
-				return $this->getPlotPosition($a, false)->x>$this->getPlotPosition($b, false)->x?$a:$b;
-			},$mergedPlots[0]), false)->x + $plotLevel->plotSize;
-		$minz = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
-			return $this->getPlotPosition($a, false)->z<$this->getPlotPosition($b, false)->z?$a:$b;
-		},$mergedPlots[0]), false)->z;
+		$minx = $this->getPlotPosition(array_reduce($mergedPlots, function(Plot $a, Plot $b) : Plot {
+			return $this->getPlotPosition($a, false)->x < $this->getPlotPosition($b, false)->x ? $a : $b;
+		}, $mergedPlots[0]), false)->x;
+		$maxx = $this->getPlotPosition(array_reduce($mergedPlots, function(Plot $a, Plot $b) : Plot {
+				return $this->getPlotPosition($a, false)->x > $this->getPlotPosition($b, false)->x ? $a : $b;
+			}, $mergedPlots[0]), false)->x + $plotLevel->plotSize;
+		$minz = $this->getPlotPosition(array_reduce($mergedPlots, function(Plot $a, Plot $b) : Plot {
+			return $this->getPlotPosition($a, false)->z < $this->getPlotPosition($b, false)->z ? $a : $b;
+		}, $mergedPlots[0]), false)->z;
 
 		$pos = new Position($minx,$plotLevel->groundHeight, $minz, $this->getServer()->getLevelByName($plot->levelName));
 		$pos->x = floor(($minx + $maxx) / 2);
@@ -746,8 +742,8 @@ class MyPlot extends PluginBase
 		$plugin = $this;
 		$xMax = (int)($plotBeginPos->x + $plotSize);
 		$zMax = (int)($plotBeginPos->z + $plotSize);
-		foreach ($plugin->getProvider()->getMergedPlots($plotFrom) as $mergedPlot){
-			$pos = $plugin->getPlotPosition($mergedPlot, false)->subtract(1,0,1);
+		foreach ($this->getProvider()->getMergedPlots($plotFrom) as $mergedPlot){
+			$pos = $this->getPlotPosition($mergedPlot, false)->subtract(1,0,1);
 			$xMaxPlot = (int)($pos->x + $plotSize);
 			$zMaxPlot = (int)($pos->z + $plotSize);
 			if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
@@ -773,8 +769,8 @@ class MyPlot extends PluginBase
 		$plotBeginPos->y = 0;
 		$xMax = (int)($plotBeginPos->x + $plotSize);
 		$zMax = (int)($plotBeginPos->z + $plotSize);
-		foreach ($plugin->getProvider()->getMergedPlots($plotTo) as $mergedPlot){
-			$pos = $plugin->getPlotPosition($mergedPlot, false)->subtract(1,0,1);
+		foreach ($this->getProvider()->getMergedPlots($plotTo) as $mergedPlot){
+			$pos = $this->getPlotPosition($mergedPlot, false)->subtract(1,0,1);
 			$xMaxPlot = (int)($pos->x + $plotSize);
 			$zMaxPlot = (int)($pos->z + $plotSize);
 			if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
@@ -841,9 +837,9 @@ class MyPlot extends PluginBase
 			$xMax = (int)($plotBeginPos->x + $plotSize);
 			$zMax = (int)($plotBeginPos->z + $plotSize);
 			$plugin = $this;
-			foreach ($plugin->getProvider()->getMergedPlots($plot) as $mergedPlot){
-				$xplot = $plugin->getPlotPosition($mergedPlot, false)->x;
-				$zplot = $plugin->getPlotPosition($mergedPlot, false)->z;
+			foreach ($this->getProvider()->getMergedPlots($plot) as $mergedPlot){
+				$xplot = $this->getPlotPosition($mergedPlot, false)->x;
+				$zplot = $this->getPlotPosition($mergedPlot, false)->z;
 				$xMaxPlot = (int)($xplot + $plotSize);
 				$zMaxPlot = (int)($zplot + $plotSize);
 				if($plotBeginPos->x > $xplot) $plotBeginPos->x = $xplot;
@@ -1140,7 +1136,6 @@ class MyPlot extends PluginBase
 		$level = $this->getServer()->getLevelByName($plot->levelName);
 		if($level === null)
 			return [];
-		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize;
 		$chunks = [];
 		foreach ($this->dataProvider->getMergedPlots($plot) as $mergedPlot){
@@ -1204,8 +1199,7 @@ class MyPlot extends PluginBase
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
 		$pos = $this->getPlotPosition($plot);
-		$pos = new Position($pos->x + ($plotSize / 2), $pos->y + 1, $pos->z + ($plotSize / 2), $pos->getLevel());
-		return $pos;
+		return new Position($pos->x + ($plotSize / 2), $pos->y + 1, $pos->z + ($plotSize / 2), $pos->getLevel());
 	}
 
 	/**
@@ -1217,28 +1211,23 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Position|null
 	 */
-	public function getMergeMid(Plot $plot): ?Position
-	{
+	public function getMergeMid(Plot $plot) : ?Position {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
-		if ($plotLevel === null) {
-			return null;
-		}
 		$plotSize = $plotLevel->plotSize;
 		$mergedPlots = $this->getProvider()->getMergedPlots($plot);
-		$minx = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
-			return $this->getPlotPosition($a, false)->x<$this->getPlotPosition($b, false)->x?$a:$b;
-		},$mergedPlots[0]), false)->x;
-		$maxx = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
-				return $this->getPlotPosition($a, false)->x>$this->getPlotPosition($b, false)->x?$a:$b;
-			},$mergedPlots[0]), false)->x + $plotSize;
-		$minz = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
-			return $this->getPlotPosition($a, false)->z<$this->getPlotPosition($b, false)->z?$a:$b;
-		},$mergedPlots[0]), false)->z;
-		$maxz = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
-				return $this->getPlotPosition($a, false)->z>$this->getPlotPosition($b, false)->z?$a:$b;
-			},$mergedPlots[0]), false)->z + $plotSize;
-		$pos = new Position(($minx + $maxx) / 2, $plotLevel->groundHeight, ($minz + $maxz) / 2, $this->getServer()->getLevelByName($plot->levelName));
-		return $pos;
+		$minx = $this->getPlotPosition(array_reduce($mergedPlots, function(Plot $a, Plot $b) : Plot {
+			return $this->getPlotPosition($a, false)->x < $this->getPlotPosition($b, false)->x ? $a : $b;
+		}, $mergedPlots[0]), false)->x;
+		$maxx = $this->getPlotPosition(array_reduce($mergedPlots, function(Plot $a, Plot  $b) : Plot {
+				return $this->getPlotPosition($a, false)->x > $this->getPlotPosition($b, false)->x ? $a : $b;
+			}, $mergedPlots[0]), false)->x + $plotSize;
+		$minz = $this->getPlotPosition(array_reduce($mergedPlots, function(Plot $a, Plot $b) : Plot {
+			return $this->getPlotPosition($a, false)->z < $this->getPlotPosition($b, false)->z ? $a : $b;
+		}, $mergedPlots[0]), false)->z;
+		$maxz = $this->getPlotPosition(array_reduce($mergedPlots, function(Plot $a, Plot $b) : Plot {
+				return $this->getPlotPosition($a, false)->z > $this->getPlotPosition($b, false)->z ? $a : $b;
+			}, $mergedPlots[0]), false)->z + $plotSize;
+		return new Position(($minx + $maxx) / 2, $plotLevel->groundHeight, ($minz + $maxz) / 2, $this->getServer()->getLevelByName($plot->levelName));
 	}
 
 	/**
