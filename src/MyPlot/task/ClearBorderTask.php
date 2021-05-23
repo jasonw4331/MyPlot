@@ -44,13 +44,25 @@ class ClearBorderTask extends Task {
 	public function __construct(MyPlot $plugin, Plot $plot) {
 		$this->plugin = $plugin;
 		$this->plot = $plot;
-		$plotBeginPos = $plugin->getPlotPosition($plot);
-		$this->level = $plotBeginPos->getLevelNonNull();
-		$this->plotBeginPos = $plotBeginPos->subtract(1,0,1);
 		$plotLevel = $plugin->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
-		$this->xMax = (int)($this->plotBeginPos->x + $plotSize + 1);
-		$this->zMax = (int)($this->plotBeginPos->z + $plotSize + 1);
+        $this->plotBeginPos = $plugin->getPlotPosition($plot, false);
+        $this->xMax = (int)($this->plotBeginPos->x + $plotSize);
+        $this->zMax = (int)($this->plotBeginPos->z + $plotSize);
+        foreach ($plugin->getProvider()->getMergedPlots($plot) as $mergedPlot){
+            $xplot = $plugin->getPlotPosition($mergedPlot, false)->x;
+            $zplot = $plugin->getPlotPosition($mergedPlot, false)->z;
+            $xMaxPlot = (int)($xplot + $plotSize);
+            $zMaxPlot = (int)($zplot + $plotSize);
+            if($this->plotBeginPos->x > $xplot) $this->plotBeginPos->x = $xplot;
+            if($this->plotBeginPos->z > $zplot) $this->plotBeginPos->z = $zplot;
+            if($this->xMax < $xMaxPlot) $this->xMax = $xMaxPlot;
+            if($this->zMax < $zMaxPlot) $this->zMax = $zMaxPlot;
+        }
+
+        --$this->plotBeginPos->x;
+        --$this->plotBeginPos->z;
+        $this->level = $this->plotBeginPos->getLevelNonNull();
 		$this->height = $plotLevel->groundHeight;
 		$this->plotWallBlock = $plotLevel->wallBlock;
 		$this->roadBlock = $plotLevel->roadBlock;

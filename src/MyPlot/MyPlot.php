@@ -10,6 +10,7 @@ use MyPlot\events\MyPlotClearEvent;
 use MyPlot\events\MyPlotCloneEvent;
 use MyPlot\events\MyPlotDisposeEvent;
 use MyPlot\events\MyPlotGenerationEvent;
+use MyPlot\events\MyPlotMergeEvent;
 use MyPlot\events\MyPlotResetEvent;
 use MyPlot\events\MyPlotSettingEvent;
 use MyPlot\events\MyPlotTeleportEvent;
@@ -22,6 +23,7 @@ use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
+use MyPlot\task\RoadFillTask;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Block;
 use pocketmine\event\level\LevelLoadEvent;
@@ -258,9 +260,43 @@ class MyPlot extends PluginBase
 			$difZ = abs(($z - $plotSize + 1) % $totalSize);
 		}
 		if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
-			return null;
+			if($blockRecursion)
+				return null;
+
+			$coordinateOffset = 14;
+			$northOrigin = $this->getPlotByPosition($position->getSide(Vector3::SIDE_NORTH, $coordinateOffset), true);
+			$southOrigin = $this->getPlotByPosition($position->getSide(Vector3::SIDE_SOUTH, $coordinateOffset), true);
+			if($northOrigin instanceof Plot) $northOrigin = $this->dataProvider->getMergeOrigin($northOrigin);
+			if($southOrigin instanceof Plot) $southOrigin = $this->dataProvider->getMergeOrigin($southOrigin);
+			if($northOrigin instanceof Plot and $southOrigin instanceof Plot and $northOrigin->isSame($southOrigin)) return $northOrigin;
+
+			$eastOrigin = $this->getPlotByPosition($position->getSide(Vector3::SIDE_EAST, $coordinateOffset), true);
+			$westOrigin = $this->getPlotByPosition($position->getSide(Vector3::SIDE_WEST, $coordinateOffset), true);
+			if($eastOrigin instanceof Plot) $eastOrigin = $this->dataProvider->getMergeOrigin($eastOrigin);
+			if($westOrigin instanceof Plot) $westOrigin = $this->dataProvider->getMergeOrigin($westOrigin);
+			if($eastOrigin instanceof Plot and $westOrigin instanceof Plot and $eastOrigin->isSame($westOrigin)) return $eastOrigin;
+
+			$southEastOrigin = $this->getPlotByPosition(Position::fromObject($position->add($coordinateOffset, 0, $coordinateOffset), $position->getLevelNonNull()), true);
+			$northEastOrigin = $this->getPlotByPosition(Position::fromObject($position->add(-$coordinateOffset, 0, $coordinateOffset), $position->getLevelNonNull()), true);
+			$southWestOrigin = $this->getPlotByPosition(Position::fromObject($position->add($coordinateOffset, 0, -$coordinateOffset), $position->getLevelNonNull()), true);
+			$northWestOrigin = $this->getPlotByPosition(Position::fromObject($position->add(-$coordinateOffset, 0, -$coordinateOffset), $position->getLevelNonNull()), true);
+			if($southEastOrigin instanceof Plot) $southEastOrigin = $this->dataProvider->getMergeOrigin($southEastOrigin);
+			if($northEastOrigin instanceof Plot) $northEastOrigin = $this->dataProvider->getMergeOrigin($northEastOrigin);
+			if($southWestOrigin instanceof Plot) $southWestOrigin = $this->dataProvider->getMergeOrigin($southWestOrigin);
+			if($northWestOrigin instanceof Plot) $northWestOrigin = $this->dataProvider->getMergeOrigin($northWestOrigin);
+
+			if($southEastOrigin instanceof Plot
+				and $northEastOrigin instanceof Plot
+				and $southWestOrigin instanceof Plot
+				and $northWestOrigin instanceof Plot
+				and $southEastOrigin->isSame($northEastOrigin)
+				and $southEastOrigin->isSame($southWestOrigin)
+				and $southEastOrigin->isSame($northWestOrigin)){
+				return $southEastOrigin;
+			}
+			return null; // this is the road and there are no plots here
 		}
-		return $this->dataProvider->getPlot($levelName, $X, $Z);
+		return $this->dataProvider->getMergeOrigin($this->dataProvider->getPlot($levelName, $X, $Z));
 	}
 
 	/**
@@ -272,13 +308,19 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Position
 	 */
-	public function getPlotPosition(Plot $plot) : Position {
+	public function getPlotPosition(Plot $plot, bool $mergeOrigin = true) : Position {
 		$plotLevel = $this->getLevelSettings($plot->levelName);
+		$origin = $this->dataProvider->getMergeOrigin($plot);
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
-		$x = $totalSize * $plot->X;
-		$z = $totalSize * $plot->Z;
+		if ($mergeOrigin) {
+			$x = $totalSize * $origin->X;
+			$z = $totalSize * $origin->Z;
+		} else {
+			$x = $totalSize * $plot->X;
+			$z = $totalSize * $plot->Z;
+		}
 		$level = $this->getServer()->getLevelByName($plot->levelName);
 		return new Position($x, $plotLevel->groundHeight, $z, $level);
 	}
@@ -395,6 +437,9 @@ class MyPlot extends PluginBase
 				$difZ = abs(($z - $plotSize + 1) % $totalSize);
 			}
 			if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
+				if($this->getPlotByPosition($pos) instanceof Plot) {
+					return $this->getPlotByPosition($pos);
+				}
 				continue;
 			}
 			return $this->dataProvider->getPlot($levelName, $X, $Z);
@@ -415,15 +460,115 @@ class MyPlot extends PluginBase
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize-1;
+		$pos = $this->getPlotPosition($plot, false);
+		$xMax = (int)($pos->x + $plotSize);
+		$zMax = (int)($pos->z + $plotSize);
+		foreach ($this->dataProvider->getMergedPlots($plot) as $mergedPlot){
+			$xplot = $this->getPlotPosition($mergedPlot, false)->x;
+			$zplot = $this->getPlotPosition($mergedPlot, false)->z;
+			$xMaxPlot = (int)($xplot + $plotSize);
+			$zMaxPlot = (int)($zplot + $plotSize);
+			if($pos->x > $xplot) $pos->x = $xplot;
+			if($pos->z > $zplot) $pos->z = $zplot;
+			if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+			if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+		}
 
 		return new AxisAlignedBB(
-			min($pos->x, $pos->x + $plotSize),
+			min($pos->x, $xMax),
 			0,
-			min($pos->z, $pos->z + $plotSize),
-			max($pos->x, $pos->x + $plotSize),
+			min($pos->z, $zMax),
+			max($pos->x, $xMax),
 			$pos->getLevelNonNull()->getWorldHeight(),
-			max($pos->z, $pos->z + $plotSize)
+			max($pos->z, $zMax)
 		);
+	}
+
+	/**
+	 * @param Plot $plot The plot that is to be expanded
+	 * @param int $direction The Vector3 direction value to expand towards
+	 * @param int $maxBlocksPerTick
+	 *
+	 * @return bool
+	 */
+	public function mergePlots(Plot $plot, int $direction, int $maxBlocksPerTick = 256) : bool {
+		$plotLevel = $this->getLevelSettings($plot->levelName);
+		if ($plotLevel === null)
+			return false;
+		/** @var Plot[][] $toMerge */
+		$toMerge = [];
+		$mergeToMerge = false;
+		$mergedPlots = $this->getProvider()->getMergedPlots($plot);
+		$newPlot = $plot->getSide($direction);
+		$alreadyMerged = false;
+		foreach ($mergedPlots as $mergedPlot) {
+			if ($mergedPlot->isSame($newPlot)) {
+				$alreadyMerged = true;
+			}
+		}
+		if ($alreadyMerged === false and $newPlot->isMerged()) $mergeToMerge = true;
+		if (!$alreadyMerged) {
+			if ((abs($plot->X - $newPlot->X) < 2 and abs($plot->Z - $newPlot->Z) < 2)) $toMerge[] = [$plot, $newPlot];
+		}
+		foreach ($mergedPlots as $mergedPlot) {
+			$newPlot = $mergedPlot->getSide($direction);
+			$alreadyMerged = false;
+			foreach ($mergedPlots as $mergedPlot2) {
+				if ($mergedPlot2->isSame($newPlot)) {
+					$alreadyMerged = true;
+				}
+			}
+			if ($alreadyMerged === false and $newPlot->isMerge()) $mergeToMerge = true;
+			if (!$alreadyMerged) {
+				if ((abs($mergedPlot->X - $newPlot->X) < 2 and abs($mergedPlot->Z - $newPlot->Z) < 2)) $toMerge[] = [$mergedPlot, $newPlot];
+			}
+		}
+		/** @var Plot[][] $toFill */
+		$toFill = [];
+		foreach ($toMerge as $pair) {
+			foreach ($toMerge as $pair2) {
+				for ($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+					if ($pair[1]->getSide($i)->isSame($pair2[1])) {
+						$toFill[] = [$pair[1], $pair2[1]];
+					}
+				}
+			}
+		}
+		$ev = new MyPlotMergeEvent($this->getProvider()->getMergeOrigin($plot), $toMerge);
+		$ev->call();
+		if($ev->isCancelled()) {
+			return false;
+		}
+		foreach ($toMerge as $pair) {
+
+			//if ($pair[1]->id === -1) {
+			//	$this->getLogger()->debug("Failed to merge due to invalid Id");
+			//	return false;
+			//} else
+			if ($pair[1]->owner === "") {
+				$this->getLogger()->debug("Failed to merge due to plot not claimed");
+				return false;
+			} elseif ($plot->owner !== $pair[1]->owner) {
+				$this->getLogger()->debug("Failed to merge due to owner mismatch");
+				return false;
+			}
+		}
+		if ($mergeToMerge === true) {
+			$this->getLogger()->debug("Cant merge two Merges together");
+			return false;
+		}
+
+		// TODO: WorldStyler clearing
+
+		foreach ($toMerge as $pair)
+			$this->getScheduler()->scheduleTask(new RoadFillTask($this, $pair[0], $pair[1], false, -1, $maxBlocksPerTick));
+
+		foreach ($toFill as $pair)
+			$this->getScheduler()->scheduleTask(new RoadFillTask($this, $pair[0], $pair[1], true, $direction, $maxBlocksPerTick));
+
+		return $this->getProvider()->mergePlots($this->getProvider()->getMergeOrigin($plot), ...array_map(function (array $val) {
+			return $val[1];
+		}, $toMerge));
 	}
 
 	/**
@@ -443,11 +588,57 @@ class MyPlot extends PluginBase
 		if($ev->isCancelled()) {
 			return false;
 		}
+		if($plot->isMerged()){
+			return $this->teleportPlayerToMerge($player, $plot, $center);
+		}
 		if($center)
 			return $this->teleportMiddle($player, $plot);
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$pos = $this->getPlotPosition($plot);
 		$pos->x += floor($plotLevel->plotSize / 2);
+		$pos->y += 1.5;
+		$pos->z -= 1;
+		return $player->teleport($pos);
+	}
+
+	/**
+	 * Teleport a player to a Merge
+	 *
+	 * @api
+	 *
+	 * @param Player $player
+	 * @param Plot $plot
+	 * @param bool $center
+	 *
+	 * @return bool
+	 */
+	public function teleportPlayerToMerge(Player $player, Plot $plot, bool $center = false) : bool {
+		$ev = new MyPlotTeleportEvent($plot, $player, $center);
+		$ev->call();
+		if ($ev->isCancelled()) {
+			return false;
+		}
+		if(!$plot->isMerged()){
+			$this->teleportPlayerToPlot($player, $plot, $center);
+		}
+		if ($center)
+			return $this->teleportMiddle($player, $plot);
+		$plotLevel = $this->getLevelSettings($plot->levelName);
+		if ($plotLevel === null)
+			return false;
+		$mergedPlots = $this->getProvider()->getMergedPlots($plot);
+		$minx = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
+			return $this->getPlotPosition($a, false)->x<$this->getPlotPosition($b, false)->x?$a:$b;
+		},$mergedPlots[0]), false)->x;
+		$maxx = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
+				return $this->getPlotPosition($a, false)->x>$this->getPlotPosition($b, false)->x?$a:$b;
+			},$mergedPlots[0]), false)->x + $plotLevel->plotSize;
+		$minz = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
+			return $this->getPlotPosition($a, false)->z<$this->getPlotPosition($b, false)->z?$a:$b;
+		},$mergedPlots[0]), false)->z;
+
+		$pos = new Position($minx,$plotLevel->groundHeight, $minz, $this->getServer()->getLevelByName($plot->levelName));
+		$pos->x = floor(($minx + $maxx) / 2);
 		$pos->y += 1.5;
 		$pos->z -= 1;
 		return $player->teleport($pos);
@@ -474,10 +665,17 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		$plot = $ev->getPlot();
-		if($plotName !== "") {
-			$this->renamePlot($plot, $plotName);
+		$failed = false;
+		foreach($this->getProvider()->getMergedPlots($plot) as $merged) {
+			if($plotName !== "") {
+				$this->renamePlot($merged, $plotName);
+			}
+			$merged->owner = $claimer;
+			$merged->price = 0.0;
+			if(!$this->savePlot($merged))
+				$failed = true;
 		}
-		return $this->savePlot($plot);
+		return !$failed;
 	}
 
 	/**
@@ -546,9 +744,20 @@ class MyPlot extends PluginBase
 		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
 		$plotBeginPos->y = 0;
 		$plugin = $this;
+		$xMax = (int)($plotBeginPos->x + $plotSize);
+		$zMax = (int)($plotBeginPos->z + $plotSize);
+		foreach ($plugin->getProvider()->getMergedPlots($plotFrom) as $mergedPlot){
+			$pos = $plugin->getPlotPosition($mergedPlot, false)->subtract(1,0,1);
+			$xMaxPlot = (int)($pos->x + $plotSize);
+			$zMaxPlot = (int)($pos->z + $plotSize);
+			if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
+			if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
+			if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+			if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+		}
 		$selection = $styler->getSelection(99997) ?? new Selection(99997);
 		$selection->setPosition(1, $plotBeginPos);
-		$vec2 = new Vector3($plotBeginPos->x + $plotSize + 1, $level->getWorldHeight() - 1, $plotBeginPos->z + $plotSize + 1);
+		$vec2 = new Vector3($xMax + 1, $level->getWorldHeight() - 1, $zMax + 1);
 		$selection->setPosition(2, $vec2);
 		$cuboid = Cuboid::fromSelection($selection);
 		//$cuboid = $cuboid->async(); // do not use async because WorldStyler async is very broken right now
@@ -562,8 +771,19 @@ class MyPlot extends PluginBase
 		$level = $plotBeginPos->getLevelNonNull();
 		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
 		$plotBeginPos->y = 0;
+		$xMax = (int)($plotBeginPos->x + $plotSize);
+		$zMax = (int)($plotBeginPos->z + $plotSize);
+		foreach ($plugin->getProvider()->getMergedPlots($plotTo) as $mergedPlot){
+			$pos = $plugin->getPlotPosition($mergedPlot, false)->subtract(1,0,1);
+			$xMaxPlot = (int)($pos->x + $plotSize);
+			$zMaxPlot = (int)($pos->z + $plotSize);
+			if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
+			if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
+			if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+			if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+		}
 		$selection->setPosition(1, $plotBeginPos);
-		$vec2 = new Vector3($plotBeginPos->x + $plotSize + 1, $level->getWorldHeight() - 1, $plotBeginPos->z + $plotSize + 1);
+		$vec2 = new Vector3($xMax + 1, $level->getWorldHeight() - 1, $zMax + 1);
 		$selection->setPosition(2, $vec2);
 		$commonShape = CommonShape::fromSelection($selection);
 		//$commonShape = $commonShape->async(); // do not use async because WorldStyler async is very broken right now
@@ -618,12 +838,24 @@ class MyPlot extends PluginBase
 			$plotLevel = $this->getLevelSettings($plot->levelName);
 			$plotSize = $plotLevel->plotSize-1;
 			$plotBeginPos = $this->getPlotPosition($plot);
+			$xMax = (int)($plotBeginPos->x + $plotSize);
+			$zMax = (int)($plotBeginPos->z + $plotSize);
 			$plugin = $this;
+			foreach ($plugin->getProvider()->getMergedPlots($plot) as $mergedPlot){
+				$xplot = $plugin->getPlotPosition($mergedPlot, false)->x;
+				$zplot = $plugin->getPlotPosition($mergedPlot, false)->z;
+				$xMaxPlot = (int)($xplot + $plotSize);
+				$zMaxPlot = (int)($zplot + $plotSize);
+				if($plotBeginPos->x > $xplot) $plotBeginPos->x = $xplot;
+				if($plotBeginPos->z > $zplot) $plotBeginPos->z = $zplot;
+				if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+				if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+			}
 			// Above ground
 			$selection = $styler->getSelection(99998) ?? new Selection(99998);
 			$plotBeginPos->y = $plotLevel->groundHeight+1;
 			$selection->setPosition(1, $plotBeginPos);
-			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, Level::Y_MAX, $plotBeginPos->z + $plotSize));
+			$selection->setPosition(2, new Vector3($xMax, Level::Y_MAX, $zMax));
 			$cuboid = Cuboid::fromSelection($selection);
 			//$cuboid = $cuboid->async();
 			$cuboid->set($plotBeginPos->getLevelNonNull(), Block::get(Block::AIR), function (float $time, int $changed) use ($plugin) : void {
@@ -634,7 +866,7 @@ class MyPlot extends PluginBase
 			$selection = $styler->getSelection(99998) ?? new Selection(99998);
 			$plotBeginPos->y = $plotLevel->groundHeight;
 			$selection->setPosition(1, $plotBeginPos);
-			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, $plotLevel->groundHeight, $plotBeginPos->z + $plotSize));
+			$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight, $zMax));
 			$cuboid = Cuboid::fromSelection($selection);
 			//$cuboid = $cuboid->async();
 			$cuboid->set($plotBeginPos->getLevelNonNull(), $plotLevel->plotFloorBlock, function (float $time, int $changed) use ($plugin) : void {
@@ -645,7 +877,7 @@ class MyPlot extends PluginBase
 			$selection = $styler->getSelection(99998) ?? new Selection(99998);
 			$plotBeginPos->y = 1;
 			$selection->setPosition(1, $plotBeginPos);
-			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, $plotLevel->groundHeight-1, $plotBeginPos->z + $plotSize));
+			$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight-1, $zMax));
 			$cuboid = Cuboid::fromSelection($selection);
 			//$cuboid = $cuboid->async();
 			$cuboid->set($plotBeginPos->getLevelNonNull(), $plotLevel->plotFillBlock, function (float $time, int $changed) use ($plugin) : void {
@@ -656,7 +888,7 @@ class MyPlot extends PluginBase
 			$selection = $styler->getSelection(99998) ?? new Selection(99998);
 			$plotBeginPos->y = 0;
 			$selection->setPosition(1, $plotBeginPos);
-			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, 0, $plotBeginPos->z + $plotSize));
+			$selection->setPosition(2, new Vector3($xMax, 0, $zMax));
 			$cuboid = Cuboid::fromSelection($selection);
 			//$cuboid = $cuboid->async();
 			$cuboid->set($plotBeginPos->getLevelNonNull(), $plotLevel->bottomBlock, function (float $time, int $changed) use ($plugin) : void {
@@ -688,7 +920,12 @@ class MyPlot extends PluginBase
 		if($ev->isCancelled()) {
 			return false;
 		}
-		return $this->dataProvider->deletePlot($plot);
+		$failed = false;
+		foreach($this->getProvider()->getMergedPlots($plot) as $merged) {
+			if(!$this->getProvider()->deletePlot($merged))
+				$failed = true;
+		}
+		return !$failed;
 	}
 
 	/**
@@ -739,6 +976,12 @@ class MyPlot extends PluginBase
 		$biome = Biome::getBiome($biome);
 		if(!$this->isLevelLoaded($plot->levelName))
 			return false;
+		$failed = false;
+		foreach($this->getProvider()->getMergedPlots($plot) as $merged) {
+			$merged->biome = $plot->biome;
+			if($this->savePlot($merged))
+				$failed = true;
+		}
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$level = $this->getServer()->getLevelByName($plot->levelName);
 		if($level === null)
@@ -755,7 +998,7 @@ class MyPlot extends PluginBase
 			}
 			$level->setChunk($chunk->getX(), $chunk->getZ(), $chunk, false);
 		}
-		return $this->savePlot($plot);
+		return !$failed;
 	}
 
 	public function setPlotPvp(Plot $plot, bool $pvp) : bool {
@@ -851,19 +1094,23 @@ class MyPlot extends PluginBase
 	public function buyPlot(Plot $plot, Player $player) : bool {
 		if($this->getEconomyProvider() === null or !$this->getEconomyProvider()->reduceMoney($player, $plot->price) or !$this->getEconomyProvider()->addMoney($this->getServer()->getOfflinePlayer($plot->owner), $plot->price))
 			return false;
-
-		$newPlot = clone $plot;
-		$newPlot->owner = $player->getName();
-		$newPlot->helpers = [];
-		$newPlot->denied = [];
-		$newPlot->price = 0.0;
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$ev->call();
-		if($ev->isCancelled()) {
-			return false;
+		$failed = false;
+		foreach ($this->dataProvider->getMergedPlots($plot) as $mergedPlot) {
+			$newPlot = clone $mergedPlot;
+			$newPlot->owner = $player->getName();
+			$newPlot->helpers = [];
+			$newPlot->denied = [];
+			$newPlot->price = 0.0;
+			$ev = new MyPlotSettingEvent($mergedPlot, $newPlot);
+			$ev->call();
+			if ($ev->isCancelled()) {
+				return false;
+			}
+			$mergedPlot = $ev->getPlot();
+			if($this->savePlot($mergedPlot))
+				$failed = true;
 		}
-		$plot = $ev->getPlot();
-		return $this->savePlot($plot);
+		return !$failed;
 	}
 
 	/**
@@ -895,12 +1142,15 @@ class MyPlot extends PluginBase
 			return [];
 		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotLevel->plotSize;
-		$xMax = ($pos->x + $plotSize) >> 4;
-		$zMax = ($pos->z + $plotSize) >> 4;
 		$chunks = [];
-		for($x = $pos->x >> 4; $x <= $xMax; $x++) {
-			for($z = $pos->z >> 4; $z <= $zMax; $z++) {
-				$chunks[] = $level->getChunk($x, $z, false) ?? new Chunk($x, $z);
+		foreach ($this->dataProvider->getMergedPlots($plot) as $mergedPlot){
+			$pos = $this->getPlotPosition($mergedPlot, false);
+			$xMax = ($pos->x + $plotSize) >> 4;
+			$zMax = ($pos->z + $plotSize) >> 4;
+			for($x = $pos->x >> 4; $x <= $xMax; $x++) {
+				for($z = $pos->z >> 4; $z <= $zMax; $z++) {
+					$chunks[] = $level->getChunk($x, $z, true);
+				}
 			}
 		}
 		return $chunks;
@@ -959,6 +1209,39 @@ class MyPlot extends PluginBase
 	}
 
 	/**
+	 * Finds the exact center of the Merge at ground level
+	 *
+	 * @api
+	 *
+	 * @param Plot $plot
+	 *
+	 * @return Position|null
+	 */
+	public function getMergeMid(Plot $plot): ?Position
+	{
+		$plotLevel = $this->getLevelSettings($plot->levelName);
+		if ($plotLevel === null) {
+			return null;
+		}
+		$plotSize = $plotLevel->plotSize;
+		$mergedPlots = $this->getProvider()->getMergedPlots($plot);
+		$minx = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
+			return $this->getPlotPosition($a, false)->x<$this->getPlotPosition($b, false)->x?$a:$b;
+		},$mergedPlots[0]), false)->x;
+		$maxx = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
+				return $this->getPlotPosition($a, false)->x>$this->getPlotPosition($b, false)->x?$a:$b;
+			},$mergedPlots[0]), false)->x + $plotSize;
+		$minz = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
+			return $this->getPlotPosition($a, false)->z<$this->getPlotPosition($b, false)->z?$a:$b;
+		},$mergedPlots[0]), false)->z;
+		$maxz = $this->getPlotPosition(array_reduce($mergedPlots,function($a,$b){
+				return $this->getPlotPosition($a, false)->z>$this->getPlotPosition($b, false)->z?$a:$b;
+			},$mergedPlots[0]), false)->z + $plotSize;
+		$pos = new Position(($minx + $maxx) / 2, $plotLevel->groundHeight, ($minz + $maxz) / 2, $this->getServer()->getLevelByName($plot->levelName));
+		return $pos;
+	}
+
+	/**
 	 * Teleports the player to the exact center of the plot at nearest open space to the ground level
 	 *
 	 * @internal
@@ -969,8 +1252,12 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	private function teleportMiddle(Player $player, Plot $plot) : bool {
-		$mid = $this->getPlotMid($plot);
-		if($mid === null) {
+		if($plot->isMerged()){
+			$mid = $this->getMergeMid($plot);
+		}else {
+			$mid = $this->getPlotMid($plot);
+		}
+		if ($mid === null) {
 			return false;
 		}
 		return $player->teleport($mid);

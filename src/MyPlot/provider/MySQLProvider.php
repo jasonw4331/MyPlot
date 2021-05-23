@@ -29,6 +29,16 @@ class MySQLProvider extends DataProvider {
 	protected $sqlGetPlotsByOwnerAndLevel;
 	/** @var \mysqli_stmt $sqlGetExistingXZ */
 	protected $sqlGetExistingXZ;
+	/** @var \mysqli_stmt $sqlMergePlot */
+	protected $sqlMergePlot;
+	/** @var \mysqli_stmt $sqlGetMergeOrigin */
+	protected $sqlGetMergeOrigin;
+	/** @var \mysqli_stmt $sqlGetMergedPlots */
+	protected $sqlGetMergedPlots;
+    /** @var \mysqli_stmt $sqlDisposeMergedPlot */
+    protected $sqlDisposeMergedPlot;
+    /** @var \mysqli_stmt $sqlDisposeMergedPlotById */
+    protected $sqlDisposeMergedPlotById;
 
 	/**
 	 * MySQLProvider constructor.
@@ -81,20 +91,40 @@ class MySQLProvider extends DataProvider {
 
 	public function deletePlot(Plot $plot) : bool {
 		$this->reconnect();
-		if($plot->id >= 0) {
-			$stmt = $this->sqlRemovePlotById;
-			$stmt->bind_param('i', $plot->id);
+		$settings = MyPlot::getInstance()->getLevelSettings($plot->levelName);
+		if($plot->isMerged()) {
+			if ($plot->id >= 0) {
+				$stmt = $this->sqlDisposeMergedPlotById;
+				$restrictPVP = !$settings->restrictPVP;
+				$stmt->bind_param('sidi',$plot->biome, $restrictPVP,  $settings->claimPrice, $plot->id);
+			}else{
+				$stmt = $this->sqlDisposeMergedPlot;
+				$restrictPVP = !$settings->restrictPVP;
+				$stmt->bind_param('idsii', $restrictPVP, $settings->claimPrice,  $plot->levelName, $plot->X, $plot->Z);
+			}
+			$result = $stmt->execute();
+			if ($result === false) {
+				$this->plugin->getLogger()->error($stmt->error);
+				return false;
+			}
+			$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
+			$this->cachePlot($this->getMergeOrigin($plot));
 		}else{
-			$stmt = $this->sqlRemovePlot;
-			$stmt->bind_param('sii', $plot->levelName, $plot->X, $plot->Z);
+			if($plot->id >= 0) {
+				$stmt = $this->sqlRemovePlotById;
+				$stmt->bind_param('i', $plot->id);
+			}else{
+				$stmt = $this->sqlRemovePlot;
+				$stmt->bind_param('sii', $plot->levelName, $plot->X, $plot->Z);
+			}
+			$result = $stmt->execute();
+			if($result === false){
+				$this->plugin->getLogger()->error($stmt->error);
+				return false;
+			}
+			$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
+			$this->cachePlot($plot);
 		}
-		$result = $stmt->execute();
-		if($result === false) {
-			$this->plugin->getLogger()->error($stmt->error);
-			return false;
-		}
-		$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
-		$this->cachePlot($plot);
 		return true;
 	}
 
@@ -213,6 +243,68 @@ class MySQLProvider extends DataProvider {
 		return null;
 	}
 
+	public function mergePlots(Plot $base, Plot ...$plots) : bool {
+        $stmt = $this->sqlMergePlot;
+        $ret = true;
+        foreach($plots as $plot) {
+            $stmt->bind_param('ii', $base->id, $plot->id);
+            $result = $stmt->execute();
+            if($result === false) {
+                $this->plugin->getLogger()->error($stmt->error);
+                $ret = false;
+                continue;
+            }
+        }
+        return $ret;
+	}
+
+	public function getMergedPlots(Plot $plot, bool $adjacent = false) : array {
+        $origin = $this->getMergeOrigin($plot);
+        $stmt = $this->sqlGetMergedPlots;
+        $stmt->bind_param('i', $origin->id);
+        $result = $stmt->execute();
+        $plots = [];
+        if($result === false) {
+            $this->plugin->getLogger()->error($stmt->error);
+            return $plots;
+        }
+        $plots[] = $origin;
+        $result = $stmt->get_result();
+        while($val = $result->fetch_array()) {
+            $helpers = explode(",", (string) $val["helpers"]);
+            $denied = explode(",", (string) $val["denied"]);
+            $pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
+            $plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], $pvp, (float) $val["price"], (int) $val["id"]);
+        }
+        if($adjacent)
+            $plots = array_filter($plots, function(Plot $val) use ($plot) {
+                for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+                    if($plot->getSide($i)->isSame($val))
+                        return true;
+                }
+                return false;
+            });
+        return $plots;
+	}
+
+	public function getMergeOrigin(Plot $plot) : Plot {
+        $stmt = $this->sqlGetMergeOrigin;
+        $stmt->bind_param('i', $plot->id);
+        $result = $stmt->execute();
+        if($result === false) {
+            $this->plugin->getLogger()->error($stmt->error);
+            return $plot;
+        }
+        $result = $stmt->get_result();
+        if($val = $result->fetch_array()) {
+            $helpers = explode(",", (string) $val["helpers"]);
+            $denied = explode(",", (string) $val["denied"]);
+            $pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
+            return new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], $pvp, (float) $val["price"], (int) $val["id"]);
+        }
+        return $plot;
+	}
+
 	public function close() : void {
 		if($this->db->close())
 			$this->plugin->getLogger()->debug("MySQL database closed!");
@@ -281,5 +373,26 @@ class MySQLProvider extends DataProvider {
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlGetExistingXZ = $stmt;
+
+		$stmt = $this->db->prepare("INSERT INTO mergedPlots (`originId`, `mergedId`) VALUES (?,?) ON DUPLICATE KEY UPDATE originId = VALUES(originId), mergedId = VALUES(mergedId);");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlMergePlot = $stmt;
+		$stmt = $this->db->prepare("SELECT plots.id, level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots LEFT JOIN mergedPlots ON mergedPlots.originId = plots.id WHERE mergedId = ?;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetMergeOrigin = $stmt;
+		$stmt = $this->db->prepare("SELECT plots.id, level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots LEFT JOIN mergedPlots ON mergedPlots.mergedId = plots.id WHERE originId = ?;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetMergedPlots = $stmt;
+		$stmt = $this->db->prepare("UPDATE plots SET name = '', owner = '', helpers = '', denied = '', biome = :biome, pvp = :pvp, price = :price WHERE level = :level AND X = :X AND Z = :Z;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlDisposeMergedPlot = $stmt;
+		$this->sqlDisposeMergedPlotById = $this->db->prepare("UPDATE plots SET name = '', owner = '', helpers = '', denied = '', biome = :biome, pvp = :pvp, price = :price WHERE id = :id;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlDisposeMergedPlot = $stmt;
 	}
 }
