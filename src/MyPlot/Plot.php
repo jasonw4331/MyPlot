@@ -162,16 +162,36 @@ class Plot
 	 * @api
 	 *
 	 * @param Plot $plot
+	 * @param bool $checkMerge
 	 *
 	 * @return bool
 	 */
-	public function isSame(Plot $plot) : bool {
+	public function isSame(Plot $plot, bool $checkMerge =  true) : bool {
+		if($checkMerge)
+			$plot = MyPlot::getInstance()->getProvider()->getMergeOrigin($plot);
 		return $this->X === $plot->X and $this->Z === $plot->Z and $this->levelName === $plot->levelName;
 	}
 
+	/**
+	 * @api
+	 *
+	 * @return bool
+	 */
+	public function isMerged() : bool {
+		return count(MyPlot::getInstance()->getProvider()->getMergedPlots($this)) > 1;
+	}
+
+	/**
+	 * @api
+	 *
+	 * @param int $side
+	 * @param int $step
+	 *
+	 * @return Plot
+	 */
 	public function getSide(int $side, int $step = 1) : Plot {
 		$levelSettings = MyPlot::getInstance()->getLevelSettings($this->levelName);
-		$pos = MyPlot::getInstance()->getPlotPosition($this);
+		$pos = MyPlot::getInstance()->getPlotPosition($this, false);
 		$sidePos = $pos->getSide($side, $step * ($levelSettings->plotSize + $levelSettings->roadWidth));
 		$sidePlot = MyPlot::getInstance()->getPlotByPosition($sidePos);
 		if($sidePlot === null) {

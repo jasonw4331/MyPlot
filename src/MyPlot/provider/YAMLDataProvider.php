@@ -4,6 +4,7 @@ namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\math\Vector3;
 use pocketmine\utils\Config;
 
 class YAMLDataProvider extends DataProvider {
@@ -178,6 +179,70 @@ class YAMLDataProvider extends DataProvider {
 			}
 		}
 		return null;
+	}
+
+	public function mergePlots(Plot $base, Plot ...$plots) : bool {
+		$originId = $base->id;
+		$mergedIds = $this->yaml->getNested("merges.$originId", []);
+		$mergedIds = array_merge($mergedIds, array_map(function(Plot $val) {
+			return $val->id;
+		}, $plots));
+		$mergedIds = array_unique($mergedIds, SORT_NUMERIC);
+		$this->yaml->setNested("merges.$originId", $mergedIds);
+		return $this->yaml->save();
+	}
+
+	public function getMergedPlots(Plot $plot, bool $adjacent = false) : array {
+		$originId = $plot->id;
+		$mergedIds = $this->yaml->getNested("merges.$originId", []);
+		$plotDatums = $this->yaml->get("plots", []);
+		$plots = [$plot];
+		foreach($mergedIds as $mergedId) {
+			if(!isset($plotDatums[$mergedIds]))
+				continue;
+			$levelName = $plotDatums[$mergedId]["level"];
+			$X = $plotDatums[$mergedId]["x"];
+			$Z = $plotDatums[$mergedId]["z"];
+			$plotName = $plotDatums[$mergedId]["name"] == "" ? "" : $plotDatums[$mergedId]["name"];
+			$owner = $plotDatums[$mergedId]["owner"] == "" ? "" : $plotDatums[$mergedId]["owner"];
+			$helpers = $plotDatums[$mergedId]["helpers"] == [] ? [] : $plotDatums[$mergedId]["helpers"];
+			$denied = $plotDatums[$mergedId]["denied"] == [] ? [] : $plotDatums[$mergedId]["denied"];
+			$biome = strtoupper($plotDatums[$mergedId]["biome"]) == "PLAINS" ? "PLAINS" : strtoupper($plotDatums[$mergedId]["biome"]);
+			$pvp = $plotDatums[$mergedId]["pvp"] == null ? false : $plotDatums[$mergedId]["pvp"];
+            $price = $plotDatums[$mergedId]["price"] == null ? 0 : $plotDatums[$mergedId]["price"];
+			$plots[] = new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $price, $mergedId);
+		}
+		if($adjacent)
+			$plots = array_filter($plots, function(Plot $val) use ($plot) {
+				for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+					if($plot->getSide($i)->isSame($val))
+						return true;
+				}
+				return false;
+			});
+		return $plots;
+	}
+
+	public function getMergeOrigin(Plot $plot) : Plot {
+		$allMerges = $this->yaml->get("merges", []);
+		if(isset($allMerges[$plot->id]))
+			return $plot;
+		$originId = array_search($plot->id, $allMerges);
+		$plotDatums = $this->yaml->get("plots", []);
+		if(isset($plotDatums[$originId])) {
+			$levelName = $plotDatums[$originId]["level"];
+			$X = $plotDatums[$originId]["x"];
+			$Z = $plotDatums[$originId]["z"];
+			$plotName = $plotDatums[$originId]["name"] == "" ? "" : $plotDatums[$originId]["name"];
+			$owner = $plotDatums[$originId]["owner"] == "" ? "" : $plotDatums[$originId]["owner"];
+			$helpers = $plotDatums[$originId]["helpers"] == [] ? [] : $plotDatums[$originId]["helpers"];
+			$denied = $plotDatums[$originId]["denied"] == [] ? [] : $plotDatums[$originId]["denied"];
+			$biome = strtoupper($plotDatums[$originId]["biome"]) == "PLAINS" ? "PLAINS" : strtoupper($plotDatums[$originId]["biome"]);
+			$pvp = $plotDatums[$originId]["pvp"] == null ? false : $plotDatums[$originId]["pvp"];
+            $price = $plotDatums[$originId]["price"] == null ? 0 : $plotDatums[$originId]["price"];
+			return new Plot($levelName, $X, $Z, $plotName, $owner, $helpers, $denied, $biome, $pvp, $price, $originId);
+		}
+		return $plot;
 	}
 
 	public function close() : void {
