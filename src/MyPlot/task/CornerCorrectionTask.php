@@ -43,9 +43,6 @@ class CornerCorrectionTask extends Task{
 	protected $pos;
 
 	public function __construct(MyPlot $plugin, Plot $start, Plot $end, int $cornerDirection, int $maxBlocksPerTick = 256) {
-		if($start->isSame($end))
-			throw new \Exception("Plot arguments cannot be the same plot or already be merged");
-
 		$this->plugin = $plugin;
 		$this->start = $start;
 		$this->plotBeginPos = $plugin->getPlotPosition($start, false);

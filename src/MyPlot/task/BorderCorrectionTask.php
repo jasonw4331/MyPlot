@@ -49,9 +49,6 @@ class BorderCorrectionTask extends Task{
 	protected $maxBlocksPerTick;
 
 	public function __construct(MyPlot $plugin, Plot $start, Plot $end, bool $fillCorner = false, int $cornerDirection = -1, int $maxBlocksPerTick = 256) {
-		if($start->isSame($end))
-			throw new \Exception("Plot arguments cannot be the same plot or already be merged");
-
 		$this->plugin = $plugin;
 		$this->start = $start;
 		$this->end = $end;
