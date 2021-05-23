@@ -7,14 +7,14 @@ use pocketmine\event\Cancellable;
 
 class MyPlotMergeEvent extends MyPlotPlotEvent implements Cancellable {
 
-    /** @var array $toMerge */
+    /** @var Plot[][] $toMerge */
     private $toMerge;
 
 
     /**
      * MyPlotMergeEvent constructor.
      * @param Plot $plot
-     * @param array $toMerge
+     * @param Plot[][] $toMerge
      */
     public function __construct(Plot $plot, array $toMerge) {
         $this->toMerge = $toMerge;
@@ -22,7 +22,7 @@ class MyPlotMergeEvent extends MyPlotPlotEvent implements Cancellable {
 	}
 
     /**
-     * @return array
+     * @return Plot[][]
      */
     public function getToMergePairs() : array {
         return $this->toMerge;

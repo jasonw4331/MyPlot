@@ -7,6 +7,7 @@ use MyPlot\events\MyPlotBorderChangeEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
+use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
@@ -73,7 +74,7 @@ class EventListener implements Listener
 				$ref = new \ReflectionClass($event->getLevel());
 				$prop = $ref->getProperty('randomTickBlocks');
 				$prop->setAccessible(true);
-				/** @var \SplFixedArray $randomTickBlocks */
+				/** @var \SplFixedArray<Block|null> $randomTickBlocks */
 				$randomTickBlocks = $prop->getValue($event->getLevel());
 				$randomTickBlocks->offsetUnset(BlockIds::FIRE);
 				$prop->setValue($randomTickBlocks, $event->getLevel());

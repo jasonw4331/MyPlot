@@ -299,12 +299,6 @@ class SQLiteDataProvider extends DataProvider
 		$this->plugin->getLogger()->debug("SQLite database closed!");
 	}
 
-	/**
-	 * @param Plot $base
-	 * @param Plot[] $plots
-	 *
-	 * @return bool
-	 */
 	public function mergePlots(Plot $base, Plot ...$plots) : bool {
 		$stmt = $this->sqlMergePlot;
 		$ret = true;

@@ -4,6 +4,7 @@ namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\math\Vector3;
 use pocketmine\Server;
 
 class MySQLProvider extends DataProvider {
@@ -264,13 +265,13 @@ class MySQLProvider extends DataProvider {
         $stmt->bind_param('i', $origin->id);
         $result = $stmt->execute();
         $plots = [];
-        if($result === false) {
+		$plots[] = $origin;
+        if(!$result) {
             $this->plugin->getLogger()->error($stmt->error);
             return $plots;
         }
-        $plots[] = $origin;
         $result = $stmt->get_result();
-        while($val = $result->fetch_array()) {
+        while($result !== false and $val = $result->fetch_array()) {
             $helpers = explode(",", (string) $val["helpers"]);
             $denied = explode(",", (string) $val["denied"]);
             $pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
@@ -291,12 +292,12 @@ class MySQLProvider extends DataProvider {
         $stmt = $this->sqlGetMergeOrigin;
         $stmt->bind_param('i', $plot->id);
         $result = $stmt->execute();
-        if($result === false) {
+        if(!$result) {
             $this->plugin->getLogger()->error($stmt->error);
             return $plot;
         }
         $result = $stmt->get_result();
-        if($val = $result->fetch_array()) {
+        if($result !== false and $val = $result->fetch_array()) {
             $helpers = explode(",", (string) $val["helpers"]);
             $denied = explode(",", (string) $val["denied"]);
             $pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
@@ -390,9 +391,9 @@ class MySQLProvider extends DataProvider {
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlDisposeMergedPlot = $stmt;
-		$this->sqlDisposeMergedPlotById = $this->db->prepare("UPDATE plots SET name = '', owner = '', helpers = '', denied = '', biome = :biome, pvp = :pvp, price = :price WHERE id = :id;");
+		$stmt = $this->db->prepare("UPDATE plots SET name = '', owner = '', helpers = '', denied = '', biome = :biome, pvp = :pvp, price = :price WHERE id = :id;");
 		if($stmt === false)
 			throw new \Exception();
-		$this->sqlDisposeMergedPlot = $stmt;
+		$this->sqlDisposeMergedPlotById = $stmt;
 	}
 }
