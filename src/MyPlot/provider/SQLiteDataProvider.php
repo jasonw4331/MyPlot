@@ -329,14 +329,14 @@ class SQLiteDataProvider extends DataProvider
 		$stmt->reset();
 		$result = $stmt->execute();
 		$plots = [$origin];
-		while($val = $result->fetchArray(SQLITE3_ASSOC)) {
+		while($result !== false and $val = $result->fetchArray(SQLITE3_ASSOC)) {
 			$helpers = explode(",", (string) $val["helpers"]);
 			$denied = explode(",", (string) $val["denied"]);
 			$pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
 			$plots[] = new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], $pvp, (float) $val["price"], (int) $val["id"]);
 		}
 		if($adjacent)
-			$plots = array_filter($plots, function(Plot $val) use ($plot) {
+			$plots = array_filter($plots, function(Plot $val) use ($plot) : bool {
 				for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
 					if($plot->getSide($i)->isSame($val))
 						return true;

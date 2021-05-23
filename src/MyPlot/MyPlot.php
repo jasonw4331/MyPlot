@@ -516,7 +516,7 @@ class MyPlot extends PluginBase
 					$alreadyMerged = true;
 				}
 			}
-			if ($alreadyMerged === false and $newPlot->isMerge()) $mergeToMerge = true;
+			if ($alreadyMerged === false and $newPlot->isMerged()) $mergeToMerge = true;
 			if (!$alreadyMerged) {
 				if ((abs($mergedPlot->X - $newPlot->X) < 2 and abs($mergedPlot->Z - $newPlot->Z) < 2)) $toMerge[] = [$mergedPlot, $newPlot];
 			}
