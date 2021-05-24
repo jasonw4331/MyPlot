@@ -4,11 +4,12 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\UndenyPlayerForm;
+use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\OfflinePlayer;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class UnDenySubCommand extends SubCommand
 {
@@ -24,28 +25,29 @@ class UnDenySubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(count($args) === 0) {
-			return false;
+            $sender->sendMessage(C::RED."/p undeny <Spieler>");
+            return true;
 		}
 		$dplayerName = $args[0];
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.undenyplayer")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		$dplayer = $this->getPlugin()->getServer()->getPlayer($dplayerName);
 		if($dplayer === null)
 			$dplayer = new OfflinePlayer($this->getPlugin()->getServer(), $dplayerName);
 		if($this->getPlugin()->removePlotDenied($plot, $dplayer->getName())) {
-			$sender->sendMessage($this->translateString("undenyplayer.success1", [$dplayer->getName()]));
+            $sender->sendMessage(MyPlot::PREFIX . C::GREEN . "Du hast erfolgreich ".C::YELLOW.($dplayerName === "*" ? "*" : $dplayer->getName()).C::GREEN." von deinem Grundstück entsperrt.");
 			if($dplayer instanceof Player) {
-				$dplayer->sendMessage($this->translateString("undenyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
+                $dplayer->sendMessage(MyPlot::PREFIX . C::GREEN . "Du wurdest wieder von dem Grundstück von ".C::YELLOW.$sender->getName().C::GRAY."(".C::YELLOW.$plot->X.";".$plot->Z.C::GRAY.")".C::GREEN." entsperrt.");
 			}
 		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+			$sender->sendMessage(C::RED . $this->translateString("error"));
 		}
 		return true;
 	}

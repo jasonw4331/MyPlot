@@ -3,9 +3,11 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\Server;
+use pocketmine\utils\TextFormat as C;
 
 class PvpSubCommand extends SubCommand {
 
@@ -22,22 +24,28 @@ class PvpSubCommand extends SubCommand {
 	public function execute(CommandSender $sender, array $args) : bool {
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED.$this->translateString("notinplot"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.pvp")) {
-			$sender->sendMessage(TextFormat::RED.$this->translateString("notowner"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		$levelSettings = $this->getPlugin()->getLevelSettings($sender->getLevelNonNull()->getFolderName());
 		if($levelSettings->restrictPVP) {
-			$sender->sendMessage(TextFormat::RED.$this->translateString("pvp.world"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED."PvP ist in dieser Welt deaktiviert.");
 			return true;
 		}
 		if($this->getPlugin()->setPlotPvp($plot, !$plot->pvp)) {
-			$sender->sendMessage($this->translateString("pvp.success", [!$plot->pvp ? "enabled" : "disabled"]));
+            $sender->sendMessage(MyPlot::PREFIX."Du hast auf deinem Grundstück PvP ".(!$plot->pvp ? C::GREEN."aktiviert" : C::RED."deaktiviert"));
+            if(!$plot->pvp)
+                foreach(Server::getInstance()->getOnlinePlayers() as $player)
+                    if(($playerPlot = MyPlot::getInstance()->getPlotByPosition($player)) !== null && $playerPlot->isSame($plot)){
+                        $this->getPlugin()->teleportPlayerToPlot($player, $plot);
+                        $player->sendTitle(C::RED."Achtung!", C::RED."PvP ist auf diesem Grundstück nun aktiviert");
+                    }
 		}else {
-			$sender->sendMessage(TextFormat::RED.$this->translateString("error"));
+			$sender->sendMessage(C::RED.$this->translateString("error"));
 		}
 		return true;
 	}

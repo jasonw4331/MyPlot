@@ -4,10 +4,12 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\GiveForm;
+use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class GiveSubCommand extends SubCommand
 {
@@ -23,24 +25,25 @@ class GiveSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(count($args) === 0) {
-			return false;
+            $sender->sendMessage(C::RED."/p give <Spieler>");
+            return true;
 		}
 		$newOwner = $args[0];
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName()) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		$newOwner = $this->getPlugin()->getServer()->getPlayer($newOwner);
 		if(!$newOwner instanceof Player) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("give.notonline"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Der Spieler muss online sein, damit du ihm dein Grundstück geben kannst!");
 			return true;
 		}elseif($newOwner->getName() === $sender->getName()) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("give.toself"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Du kannst dir nicht selber das Grundstück geben!");
 			return true;
 		}
 		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($newOwner);
@@ -52,23 +55,20 @@ class GiveSubCommand extends SubCommand
 			}
 		}
 		if($plotsOfPlayer >= $maxPlots) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
+            $sender->sendMessage(MyPlot::PREFIX.C::RED."Der Spieler hat schon die maximale Anzahl an Grundstücken!");
 			return true;
 		}
 		if(count($args) == 2 and $args[1] == $this->translateString("confirm")) {
 			if($this->getPlugin()->claimPlot($plot, $newOwner->getName())) {
-				$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
-				$oldOwnerName = TextFormat::GREEN . $sender->getName() . TextFormat::WHITE;
-				$newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;
-				$sender->sendMessage($this->translateString("give.success", [$newOwnerName]));
-				$newOwner->sendMessage($this->translateString("give.received", [$oldOwnerName, $plotId]));
-			}else{
-				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+                //$this->getPlugin()->setWand($plot, Block::get(Block::DIRT));
+                //$this->getPlugin()->setRand($plot, Block::get(Block::STONE_SLAB, 1));
+                $sender->sendMessage(MyPlot::PREFIX.C::GREEN."Du hast ".C::YELLOW.$newOwner->getName().C::GREEN." dein Grundstück gegeben");
+                $newOwner->sendMessage(MyPlot::PREFIX.C::YELLOW.$sender->getName().C::GREEN." hat dir sein Grundstück mit der ID ".C::YELLOW.$plot.C::GREEN." gegeben.");
+            }else{
+				$sender->sendMessage(C::RED . $this->translateString("error"));
 			}
 		}else{
-			$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
-			$newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;
-			$sender->sendMessage($this->translateString("give.confirm", [$plotId, $newOwnerName]));
+            $sender->sendMessage(MyPlot::PREFIX.C::RED."Bitte gebe ".C::YELLOW."/plot give ".$newOwner->getName()." confirm".C::RED." ein, um zu bestätigen, dass dein Grundstück an ".C::YELLOW.$newOwner->getName().C::RED." gegeben wird.");
 		}
 		return true;
 	}

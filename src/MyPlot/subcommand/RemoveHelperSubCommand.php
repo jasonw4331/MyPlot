@@ -4,11 +4,12 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\RemoveHelperForm;
+use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\OfflinePlayer;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class RemoveHelperSubCommand extends SubCommand
 {
@@ -24,25 +25,26 @@ class RemoveHelperSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(count($args) === 0) {
-			return false;
+            $sender->sendMessage(C::RED."/p remove <Spieler>");
+            return true;
 		}
 		$helperName = $args[0];
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.removehelper")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		$helper = $this->getPlugin()->getServer()->getPlayer($helperName);
 		if($helper === null)
 			$helper = new OfflinePlayer($this->getPlugin()->getServer(), $helperName);
 		if($this->getPlugin()->removePlotHelper($plot, $helper->getName())) {
-			$sender->sendMessage($this->translateString("removehelper.success", [$helper->getName()]));
+            $sender->sendMessage(MyPlot::PREFIX . "Du hast ".C::YELLOW.$helper->getName().C::GRAY." von deinem Grundstück als Helfer ".C::RED."entfernt");
 		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+            $sender->sendMessage(MyPlot::PREFIX . C::YELLOW.$helperName.C::RED." ist auf dem Grundstück kein Helfer!");
 		}
 		return true;
 	}

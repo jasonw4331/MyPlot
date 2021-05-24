@@ -45,7 +45,10 @@ use pocketmine\utils\TextFormat as TF;
 
 class MyPlot extends PluginBase
 {
-	/** @var MyPlot $instance */
+
+    public const PREFIX = TF::GOLD.TF::BOLD."Grundstück".TF::RESET.TF::DARK_GRAY." » ".TF::GRAY;
+
+    /** @var MyPlot $instance */
 	private static $instance;
 	/** @var PlotLevelSettings[] $levels */
 	private $levels = [];

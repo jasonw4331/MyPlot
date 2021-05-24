@@ -4,10 +4,11 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\NameForm;
+use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class NameSubCommand extends SubCommand
 {
@@ -23,21 +24,22 @@ class NameSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(count($args) === 0) {
-			return false;
+            $sender->sendMessage(C::RED."/p name <Name>");
+            return true;
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.name")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		if($this->getPlugin()->renamePlot($plot, $args[0])) {
-			$sender->sendMessage($this->translateString("name.success"));
+            $sender->sendMessage(MyPlot::PREFIX . C::GREEN . "Du hast dein Grundstück zu ".C::YELLOW.$args[0].C::GREEN." umbenannt.");
 		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+			$sender->sendMessage(C::RED . $this->translateString("error"));
 		}
 		return true;
 	}

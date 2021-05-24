@@ -2,12 +2,14 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\events\MyPlotOwnerChangeEvent;
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\OwnerForm;
+use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class SetOwnerSubCommand extends SubCommand {
 	public function canUse(CommandSender $sender) : bool {
@@ -22,29 +24,20 @@ class SetOwnerSubCommand extends SubCommand {
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(count($args) === 0) {
-			return false;
+            $sender->sendMessage(C::RED."/p setowner <Spieler>");
+            return true;
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
-			return true;
-		}
-		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($sender);
-		$plotsOfPlayer = 0;
-		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
-			$level = $this->getPlugin()->getServer()->getLevelByName($level);
-			if($level !== null and !$level->isClosed()) {
-				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
-			}
-		}
-		if($plotsOfPlayer >= $maxPlots) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("setowner.maxplots", [$maxPlots]));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($this->getPlugin()->claimPlot($plot, $args[0])) {
-			$sender->sendMessage($this->translateString("setowner.success", [$args[0]]));
-		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+            $sender->sendMessage(MyPlot::PREFIX . C::GREEN . "Das Grundstück gehört nun ".C::YELLOW.$args[0]);
+            $event = new MyPlotOwnerChangeEvent($plot, $sender->getName(), $args[0]);
+            $event->call();
+        }else{
+			$sender->sendMessage(C::RED . $this->translateString("error"));
 		}
 		return true;
 	}

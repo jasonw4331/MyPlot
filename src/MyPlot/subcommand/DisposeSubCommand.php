@@ -3,9 +3,10 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class DisposeSubCommand extends SubCommand
 {
@@ -22,27 +23,27 @@ class DisposeSubCommand extends SubCommand
 	public function execute(CommandSender $sender, array $args) : bool {
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.dispose")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		if(isset($args[0]) and $args[0] == $this->translateString("confirm")) {
 			$economy = $this->getPlugin()->getEconomyProvider();
 			$price = $this->getPlugin()->getLevelSettings($plot->levelName)->disposePrice;
 			if($economy !== null and !$economy->reduceMoney($sender, $price)) {
-				$sender->sendMessage(TextFormat::RED . $this->translateString("dispose.nomoney"));
+				$sender->sendMessage(C::RED . $this->translateString("dispose.nomoney"));
 				return true;
 			}
 			if($this->getPlugin()->disposePlot($plot)) {
 				$sender->sendMessage($this->translateString("dispose.success"));
 			}else{
-				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+				$sender->sendMessage(C::RED . $this->translateString("error"));
 			}
 		}else{
-			$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
+			$plotId = C::GREEN . $plot . C::WHITE;
 			$sender->sendMessage($this->translateString("dispose.confirm", [$plotId]));
 		}
 		return true;

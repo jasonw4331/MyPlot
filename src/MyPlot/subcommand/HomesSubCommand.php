@@ -3,9 +3,10 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class HomesSubCommand extends SubCommand
 {
@@ -23,14 +24,14 @@ class HomesSubCommand extends SubCommand
 		$levelName = $args[0] ?? $sender->getLevelNonNull()->getFolderName();
 		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
 		if(count($plots) === 0) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("homes.noplots"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Du hast noch keine Grundstücke!");
 			return true;
 		}
-		$sender->sendMessage(TextFormat::DARK_GREEN . $this->translateString("homes.header"));
+        $sender->sendMessage(MyPlot::PREFIX.C::GOLD."Deine Grundstücke");
 		for($i = 0; $i < count($plots); $i++) {
 			$plot = $plots[$i];
-			$message = TextFormat::DARK_GREEN . ($i + 1) . ") ";
-			$message .= TextFormat::WHITE . $plot->levelName . " " . $plot;
+			$message = C::DARK_GREEN . ($i + 1) . ") ";
+			$message .= C::WHITE . $plot->levelName . " " . $plot;
 			if($plot->name !== "") {
 				$message .= " = " . $plot->name;
 			}

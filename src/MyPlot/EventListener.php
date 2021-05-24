@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyPlot;
 
+use CortexPE\TeaSpoon\entity\object\ArmorStand;
+use CortexPE\TeaSpoon\event\player\PlayerEntityInteractEvent;
 use MyPlot\events\MyPlotBlockEvent;
 use MyPlot\events\MyPlotBorderChangeEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
@@ -15,6 +17,7 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\event\block\SignChangeEvent;
+use pocketmine\event\entity\EntityCombustByEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
@@ -43,6 +46,30 @@ class EventListener implements Listener
 		$this->plugin = $plugin;
 	}
 
+    public function onEntityInteract(PlayerEntityInteractEvent $event): void{
+        $player = $event->getPlayer();
+        $levelName = $player->getLevel()->getFolderName();
+        $entity = $event->getEntity();
+        if(!$this->plugin->isLevelLoaded($levelName) || !$entity instanceof ArmorStand)
+            return;
+        $plot = $this->plugin->getPlotByPosition($player);
+        $entityPlot = $this->plugin->getPlotByPosition($entity);
+        if(!$player->isOp() && (($plot !== null && $plot->owner !== $player->getName() && !$plot->isHelper($player->getName())) || ($entityPlot !== null && $entityPlot->owner !== $player->getName() && !$entityPlot->isHelper($player->getName()))))
+            $event->setCancelled();
+    }
+
+    public function onEntityCombust(EntityCombustByEntityEvent $event): void{
+        $player = $event->getCombuster();
+        $levelName = $player->getLevel()->getFolderName();
+        $entity = $event->getEntity();
+        if(!$this->plugin->isLevelLoaded($levelName) || !$entity instanceof ArmorStand || !$player instanceof Player)
+            return;
+        $plot = $this->plugin->getPlotByPosition($player);
+        $entityPlot = $this->plugin->getPlotByPosition($entity);
+        if(!$player->isOp() && (($plot !== null && $plot->owner !== $player->getName() && !$plot->isHelper($player->getName())) || ($entityPlot !== null && $entityPlot->owner !== $player->getName() && !$entityPlot->isHelper($player->getName()))))
+            $event->setCancelled();
+    }
+
 	/**
 	 * @ignoreCancelled false
 	 * @priority LOWEST
@@ -69,8 +96,9 @@ class EventListener implements Listener
 				$settings[$key] = $config->get((string)$key);
 			}
 			$this->plugin->addLevelSettings($levelName, new PlotLevelSettings($levelName, $settings));
+            $event->getLevel()->removeRandomTickedBlock(BlockIds::FIRE);
 
-			if($this->plugin->getConfig()->get('AllowFireTicking', false) === false) {
+            if($this->plugin->getConfig()->get('AllowFireTicking', false) === false) {
 				$ref = new \ReflectionClass($event->getLevel());
 				$prop = $ref->getProperty('randomTickBlocks');
 				$prop->setAccessible(true);
@@ -338,29 +366,28 @@ class EventListener implements Listener
 				$ev->setCancelled();
 			}
 			$ev->call();
-			$event->setCancelled($ev->isCancelled());
-			if($event->isCancelled()) {
-				return;
-			}
-			if(!(bool) $this->plugin->getConfig()->get("ShowPlotPopup", true))
-				return;
-			$popup = $this->plugin->getLanguage()->translateString("popup", [TextFormat::GREEN . $plot]);
-			$price = TextFormat::GREEN . $plot->price;
-			if($plot->owner !== "") {
-				$owner = TextFormat::GREEN . $plot->owner;
-				if($plot->price > 0 and $plot->owner !== $player->getName()) {
-					$ownerPopup = $this->plugin->getLanguage()->translateString("popup.forsale", [$owner.TextFormat::WHITE, $price.TextFormat::WHITE]);
-				}else{
-					$ownerPopup = $this->plugin->getLanguage()->translateString("popup.owner", [$owner.TextFormat::WHITE]);
-				}
-			}else{
-				$ownerPopup = $this->plugin->getLanguage()->translateString("popup.available", [$price.TextFormat::WHITE]);
-			}
-			$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
-			$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
-			$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
-			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
-			$ev->getPlayer()->sendTip($popup);
+            $event->setCancelled($ev->isCancelled());
+            if($event->isCancelled()) {
+                return;
+            }
+            if($plot->owner === "EntenGames" || $plot->owner === "Slimeunity" || !(bool) $this->plugin->getConfig()->get("ShowPlotPopup", true))
+                return;
+            $popup = TextFormat::YELLOW."Grundstück ".$plot;
+            $price = TextFormat::GREEN . $plot->price;
+            if($plot->owner !== "") {
+                $owner = TextFormat::GREEN . $plot->owner;
+                if($plot->price > 0 and $plot->owner !== $player->getName()) {
+                    $ownerPopup = $this->plugin->getLanguage()->translateString("popup.forsale", [$owner.TextFormat::WHITE, $price.TextFormat::WHITE]);
+                }else{
+                    $ownerPopup = TextFormat::GRAY."Besitzer: ".TextFormat::GOLD.$owner;
+                }
+            }else{
+                $ownerPopup = TextFormat::RED."Kein Besitzer".TextFormat::GRAY." - ".TextFormat::YELLOW."/p claim";
+            }
+            $player = $ev->getPlayer();
+            $player->sendTip($popup . "\n" .$ownerPopup);
+            if($plot->owner !== "" && $plot->pvp)
+                $player->sendTitle(TextFormat::RED."Achtung!", TextFormat::RED."PvP ist auf diesem Grundstück aktiviert");
 		}elseif($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
 			if(strpos((string) $plotFrom, "-0") !== false) {
 				return;

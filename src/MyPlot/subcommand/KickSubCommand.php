@@ -4,10 +4,11 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\KickForm;
+use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class KickSubCommand extends SubCommand
 {
@@ -22,33 +23,36 @@ class KickSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if (!isset($args[0])) return false;
+		if (!isset($args[0])){
+            $sender->sendMessage(C::RED."/p kick <Spieler>");
+            return true;
+        }
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.kick")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		$target = $this->getPlugin()->getServer()->getPlayer($args[0]);
 		if ($target === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.noPlayer"));
+            $sender->sendMessage(MyPlot::PREFIX.C::RED."Der Spieler ist nicht online!");
 			return true;
 		}
 		if (($targetPlot = $this->getPlugin()->getPlotByPosition($target)) === null or !$plot->isSame($targetPlot)) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.notInPlot"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Der Spieler steht nicht auf deinem Grundstück!");
 			return true;
 		}
 		if ($target->hasPermission("myplot.admin.kick.bypass")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.cannotkick"));
-			$target->sendMessage($this->translateString("kick.attemptkick", [$target->getName()]));
-			return true;
+            $sender->sendMessage(MyPlot::PREFIX.C::RED."Du kannst diesen Spieler nicht kicken!");
+            $sender->sendMessage(MyPlot::PREFIX.C::YELLOW.$sender->getName().C::RED." hat versucht dich von seinem Grundstück zu kicken.");
+            return true;
 		}
 		if ($this->getPlugin()->teleportPlayerToPlot($target, $plot)) {
-			$sender->sendMessage($this->translateString("kick.success1", [$target->getName(), $plot->__toString()]));
-			$target->sendMessage($this->translateString("kick.success2", [$sender->getName(), $plot->__toString()]));
+            $sender->sendMessage(MyPlot::PREFIX."Du hast ".C::YELLOW.$target->getName().C::GRAY." von deinem Grundstück ".C::RED."gekickt");
+            $target->sendMessage(MyPlot::PREFIX."Du wurdest von dem Grundstück ".C::RED."gekickt");
 			return true;
 		}
 		$sender->sendMessage($this->translateString("error"));

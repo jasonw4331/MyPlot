@@ -4,9 +4,10 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\WarpForm;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class WarpSubCommand extends SubCommand
 {
@@ -22,29 +23,29 @@ class WarpSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(count($args) === 0) {
-			return false;
+            $sender->sendMessage(C::RED."/p warp <PlotID>");
+            return true;
 		}
 		$levelName = $args[1] ?? $sender->getLevelNonNull()->getFolderName();
 		if(!$this->getPlugin()->isLevelLoaded($levelName)) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("warp.notinplotworld"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht in der Grundstückwelt!");
 			return true;
 		}
 		/** @var string[] $plotIdArray */
 		$plotIdArray = explode(";", $args[0]);
 		if(count($plotIdArray) != 2 or !is_numeric($plotIdArray[0]) or !is_numeric($plotIdArray[1])) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("warp.wrongid"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Die ID ist ungültig!");
 			return true;
 		}
 		$plot = $this->getPlugin()->getProvider()->getPlot($levelName, (int) $plotIdArray[0], (int) $plotIdArray[1]);
 		if($plot->owner == "" and !$sender->hasPermission("myplot.admin.warp")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("warp.unclaimed"));
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Dieses Grundstück gehört niemandem.");
 			return true;
 		}
 		if($this->getPlugin()->teleportPlayerToPlot($sender, $plot)) {
-			$plot = TextFormat::GREEN . $plot . TextFormat::WHITE;
-			$sender->sendMessage($this->translateString("warp.success", [$plot]));
+            $sender->sendMessage(MyPlot::PREFIX.C::GREEN."Du wurdest zum Grundstück ".C::YELLOW.$plot.C::GREEN." teleportiert");
 		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.error"));
+			$sender->sendMessage(C::RED . $this->translateString("generate.error"));
 		}
 		return true;
 	}

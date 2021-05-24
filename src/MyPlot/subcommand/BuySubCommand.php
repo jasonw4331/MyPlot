@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -26,7 +27,7 @@ class BuySubCommand extends SubCommand
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender->asPosition());
 		if($plot === null){
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner === $sender->getName() and !$sender->hasPermission("myplot.admin.buy")){

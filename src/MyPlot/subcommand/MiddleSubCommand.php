@@ -3,9 +3,10 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class MiddleSubCommand extends SubCommand
 {
@@ -25,15 +26,15 @@ class MiddleSubCommand extends SubCommand
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.middle")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		if($this->getPlugin()->teleportPlayerToPlot($sender, $plot, true)) {
-			$sender->sendMessage(TextFormat::GREEN . $this->translateString("middle.success"));
+            $sender->sendMessage(MyPlot::PREFIX . C::GREEN . "Du wurdest in die Mitte des Grundstücks teleportiert.");
 		}
 		return true;
 	}

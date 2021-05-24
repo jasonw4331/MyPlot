@@ -5,9 +5,10 @@ namespace MyPlot\subcommand;
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\ClaimForm;
 use MyPlot\MyPlot;
+use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class ClaimSubCommand extends SubCommand
 {
@@ -28,14 +29,14 @@ class ClaimSubCommand extends SubCommand
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner != "") {
 			if($plot->owner === $sender->getName()) {
-				$sender->sendMessage(TextFormat::RED . $this->translateString("claim.yourplot"));
+                $sender->sendMessage(MyPlot::PREFIX . C::RED."Dir gehört dieses Grundstück bereits!");
 			}else{
-				$sender->sendMessage(TextFormat::RED . $this->translateString("claim.alreadyclaimed", [$plot->owner]));
+                $sender->sendMessage(MyPlot::PREFIX . C::RED . "Dieses Grundstück hat schon einen Besitzer");
 			}
 			return true;
 		}
@@ -48,18 +49,20 @@ class ClaimSubCommand extends SubCommand
 			}
 		}
 		if($plotsOfPlayer >= $maxPlots) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxplots", [$maxPlots]));
-			return true;
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Du hast die Maximalanzahl von ".C::YELLOW.$maxPlots." Grundstücken " . C::RED."erreicht.");
+            $sender->sendMessage(MyPlot::PREFIX . C::RED . "Du kannst mit einem Rang auf ".C::YELLOW."shop.EntenGames.de". C::RED." mehr Grundstücke besitzen.");
+            return true;
 		}
 		$economy = $this->getPlugin()->getEconomyProvider();
 		if($economy !== null and !$economy->reduceMoney($sender, $plot->price)) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("claim.nomoney"));
+			$sender->sendMessage(C::RED . $this->translateString("claim.nomoney"));
 			return true;
 		}
 		if($this->getPlugin()->claimPlot($plot, $sender->getName(), $name)) {
-			$sender->sendMessage($this->translateString("claim.success"));
+            //$this->getPlugin()->setRand($plot, Block::get(Block::STONE_SLAB, 1));
+            $sender->sendMessage(MyPlot::PREFIX.C::GREEN."Du hast das Grundstück für dich beansprucht.");
 		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+			$sender->sendMessage(C::RED . $this->translateString("error"));
 		}
 		return true;
 	}

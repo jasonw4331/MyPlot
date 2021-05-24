@@ -4,12 +4,11 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\DenyPlayerForm;
+use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\OfflinePlayer;
 use pocketmine\Player;
-use pocketmine\Server;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class DenyPlayerSubCommand extends SubCommand
 {
@@ -25,31 +24,28 @@ class DenyPlayerSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(count($args) === 0) {
-			return false;
+            $sender->sendMessage(C::RED."/p deny <Spieler>");
+            return true;
 		}
 		$dplayer = $args[0];
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.denyplayer")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		if($dplayer === "*") {
 			if($this->getPlugin()->addPlotDenied($plot, $dplayer)) {
-				$sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer]));
+                $sender->sendMessage(MyPlot::PREFIX."Du hast ".C::YELLOW."jeden".C::GRAY." von deinem Grundstück ".C::RED."gesperrt");
 				foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
 					if($this->getPlugin()->getPlotBB($plot)->isVectorInside($player) and !($player->getName() === $plot->owner) and !$player->hasPermission("myplot.admin.denyplayer.bypass") and !$plot->isHelper($player->getName()))
 						$this->getPlugin()->teleportPlayerToPlot($player, $plot);
-					else {
-						$sender->sendMessage($this->translateString("denyplayer.cannotdeny", [$player->getName()]));
-						$player->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));
-					}
 				}
 			}else{
-				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+				$sender->sendMessage(C::RED . $this->translateString("error"));
 			}
 			return true;
 		}
@@ -59,17 +55,17 @@ class DenyPlayerSubCommand extends SubCommand
 			return true;
 		}
 		if($dplayer->hasPermission("myplot.admin.denyplayer.bypass") or $dplayer->getName() === $plot->owner) {
-			$sender->sendMessage($this->translateString("denyplayer.cannotdeny", [$dplayer->getName()]));
-			$dplayer->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));
+            $sender->sendMessage(MyPlot::PREFIX.C::RED."Du kannst diesen Spieler nicht sperren!");
+            $dplayer->sendMessage(MyPlot::PREFIX.C::YELLOW.$sender->getName().C::RED." hat versucht dich von seinem Grundstück zu sperren.");
 			return true;
 		}
 		if($this->getPlugin()->addPlotDenied($plot, $dplayer->getName())) {
-			$sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer->getName()]));
-			$dplayer->sendMessage($this->translateString("denyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
-			if($this->getPlugin()->getPlotBB($plot)->isVectorInside($dplayer))
+            $sender->sendMessage(MyPlot::PREFIX."Du hast ".C::YELLOW.$dplayer->getName().C::GRAY." von deinem Grundstück ".C::RED."gesperrt");
+            $dplayer->sendMessage(MyPlot::PREFIX."Du wurdest von dem Grundstück von ".$sender->getNameTag().C::GRAY."[".C::YELLOW.$plot->X.";".$plot->Z.C::GRAY."]".C::RED." gesperrt");
+            if($this->getPlugin()->getPlotBB($plot)->isVectorInside($dplayer))
 				$this->getPlugin()->teleportPlayerToPlot($dplayer, $plot);
 		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+			$sender->sendMessage(C::RED . $this->translateString("error"));
 		}
 		return true;
 	}

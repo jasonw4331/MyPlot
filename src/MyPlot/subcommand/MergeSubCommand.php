@@ -3,10 +3,11 @@ declare(strict_types=1);
 namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
 
 class MergeSubCommand extends SubCommand
 {
@@ -28,16 +29,15 @@ class MergeSubCommand extends SubCommand
 	public function execute(CommandSender $sender, array $args) : bool {
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.merge")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		if(!isset($args[0])) {
-			$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
-			$sender->sendMessage($this->translateString("merge.confirmface", [$plotId]));
+            $sender->sendMessage(MyPlot::PREFIX.C::RED."Bitte gebe ".C::YELLOW."/plot merge confirm".C::RED." ein, um zu bestätigen, dass das Grundstück gemerged wird. Das Mergen kann momentan noch nicht rückgängig gemacht werden!");
 			return true;
 		}elseif($args[0] === $this->translateString("confirm")) {
 			$rotation = ($sender->getYaw() - 180) % 360;
@@ -57,7 +57,7 @@ class MergeSubCommand extends SubCommand
 				$direction = Vector3::SIDE_WEST; //West
 				$args[0] = $this->translateString("merge.west");
 			}else{
-				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+				$sender->sendMessage(C::RED . $this->translateString("error"));
 				return true;
 			}
 		}else{
@@ -67,46 +67,41 @@ class MergeSubCommand extends SubCommand
 				case "z-":
 				case $this->translateString("merge.north"):
 					$direction = Vector3::SIDE_NORTH;
-					$args[0] = $this->translateString("merge.north");
 				break;
 				case "east":
 				case "+x":
 				case "x+":
 				case $this->translateString("merge.east"):
 					$direction = Vector3::SIDE_EAST;
-					$args[0] = $this->translateString("merge.east");
 				break;
 				case "south":
 				case "+z":
 				case "z+":
 				case $this->translateString("merge.south"):
 					$direction = Vector3::SIDE_SOUTH;
-					$args[0] = $this->translateString("merge.south");
 				break;
 				case "west":
 				case "-x":
 				case "x-":
 				case $this->translateString("merge.west"):
 					$direction = Vector3::SIDE_WEST;
-					$args[0] = $this->translateString("merge.west");
 				break;
 				default:
-					$sender->sendMessage(TextFormat::RED . $this->translateString("merge.direction"));
+					$sender->sendMessage(C::RED . $this->translateString("merge.direction"));
 					return true;
 			}
-			if(!isset($args[1]) or $args[1] !== $this->translateString("confirm")) {
-				$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
-				$sender->sendMessage($this->translateString("merge.confirmarg", [$plotId, $args[0], implode(' ', $args)." ".$this->translateString("confirm")]));
-				return true;
+            if(!isset($args[1]) or $args[1] !== $this->translateString("confirm")) {
+                $sender->sendMessage(MyPlot::PREFIX.C::RED."Bitte gebe ".C::YELLOW."/plot merge confirm".C::RED." ein, um zu bestätigen, dass das Grundstück gemerged wird. Das Mergen kann momentan noch nicht rückgängig gemacht werden!");
+                return true;
 			}
 		}
 		$maxBlocksPerTick = (int) $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 256);
 		if($this->getPlugin()->mergePlots($plot, $direction, $maxBlocksPerTick)) {
-			$plot = TextFormat::GREEN . $plot . TextFormat::WHITE;
-			$sender->sendMessage($this->translateString("merge.success", [$plot, $args[0]]));
+			$plot = C::GREEN . $plot . C::WHITE;
+            $sender->sendMessage(MyPlot::PREFIX . C::GREEN."Das Grundstück wird nun gemerged.");
 			return true;
 		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+			$sender->sendMessage(C::RED . $this->translateString("error"));
 			return true;
 		}
 	}

@@ -4,10 +4,12 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\InfoForm;
+use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as C;
+use function implode;
 
 class InfoSubCommand extends SubCommand
 {
@@ -32,16 +34,13 @@ class InfoSubCommand extends SubCommand
 				}
 				if(isset($plots[$key])) {
 					$plot = $plots[$key];
-					$sender->sendMessage($this->translateString("info.about", [TextFormat::GREEN . $plot]));
-					$sender->sendMessage($this->translateString("info.owner", [TextFormat::GREEN . $plot->owner]));
-					$sender->sendMessage($this->translateString("info.plotname", [TextFormat::GREEN . $plot->name]));
-					$helpers = implode(", ", $plot->helpers);
-					$sender->sendMessage($this->translateString("info.helpers", [TextFormat::GREEN . $helpers]));
-					$denied = implode(", ", $plot->denied);
-					$sender->sendMessage($this->translateString("info.denied", [TextFormat::GREEN . $denied]));
-					$sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
-				}else{
-					$sender->sendMessage(TextFormat::RED . $this->translateString("info.notfound"));
+                    $sender->sendMessage(MyPlot::PREFIX."Grundstück-Informationen zum Grundstück ".C::YELLOW.$plot);
+                    $sender->sendMessage(C::GOLD." Besitzer".C::DARK_GRAY.": ".C::GRAY.$plot->owner);
+                    $sender->sendMessage(C::GOLD." PvP".C::DARK_GRAY.": ".($plot->pvp ? C::GREEN."Aktiviert" : C::RED."Deaktiviert"));
+                    $sender->sendMessage(C::GOLD." Helfer".C::DARK_GRAY.": ".(empty($plot->helpers) ? C::RED."Keine" : C::YELLOW.implode(C::GRAY.", ".C::YELLOW, $plot->helpers)));
+                    $sender->sendMessage(C::GOLD." Verboten".C::DARK_GRAY.": ".(empty($plot->denied) ? C::RED."Keine" : C::YELLOW.implode(C::GRAY.", ".C::YELLOW, $plot->denied)));
+                }else{
+					$sender->sendMessage(C::RED . $this->translateString("info.notfound"));
 				}
 			}else{
 				return false;
@@ -49,18 +48,19 @@ class InfoSubCommand extends SubCommand
 		}else{
 			$plot = $this->getPlugin()->getPlotByPosition($sender);
 			if($plot === null) {
-				$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+				$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du stehst auf keinem Grundstück!");
 				return true;
 			}
-			$sender->sendMessage($this->translateString("info.about", [TextFormat::GREEN . $plot]));
-			$sender->sendMessage($this->translateString("info.owner", [TextFormat::GREEN . $plot->owner]));
-			$sender->sendMessage($this->translateString("info.plotname", [TextFormat::GREEN . $plot->name]));
-			$helpers = implode(", ", $plot->helpers);
-			$sender->sendMessage($this->translateString("info.helpers", [TextFormat::GREEN . $helpers]));
-			$denied = implode(", ", $plot->denied);
-			$sender->sendMessage($this->translateString("info.denied", [TextFormat::GREEN . $denied]));
-			$sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
-		}
+            if($plot->owner === "") {
+                $sender->sendMessage(MyPlot::PREFIX . C::RED . "Das Grundstück hat noch keinen Besitzer!");
+                return true;
+            }
+            $sender->sendMessage(MyPlot::PREFIX."Grundstück-Informationen zum Grundstück ".C::YELLOW.$plot);
+            $sender->sendMessage(C::GOLD." Besitzer".C::DARK_GRAY.": ".C::GRAY.$plot->owner);
+            $sender->sendMessage(C::GOLD." PvP".C::DARK_GRAY.": ".($plot->pvp ? C::GREEN."Aktiviert" : C::RED."Deaktiviert"));
+            $sender->sendMessage(C::GOLD." Helfer".C::DARK_GRAY.": ".(empty($plot->helpers) ? C::RED."Keine" : C::YELLOW.implode(C::GRAY.", ".C::YELLOW, $plot->helpers)));
+            $sender->sendMessage(C::GOLD." Verboten".C::DARK_GRAY.": ".(empty($plot->denied) ? C::RED."Keine" : C::YELLOW.implode(C::GRAY.", ".C::YELLOW, $plot->denied)));
+        }
 		return true;
 	}
 
