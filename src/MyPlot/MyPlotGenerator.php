@@ -32,19 +32,16 @@ class MyPlotGenerator extends Generator {
 	/**
 	 * MyPlotGenerator constructor.
 	 *
-	 * @param int $seed
-	 * @param array $options
+	 * @param int    $seed
+	 * @param string $preset
 	 */
-	public function __construct(int $seed, array $options = []) {
-		parent::__construct($seed, $options);
-		if(isset($options["preset"])) {
-			$options = json_decode($options["preset"], true);
-			if($options === false or is_null($options)) {
-				$options = [];
-			}
-		}else{
-			$options = [];
+	public function __construct(int $seed, string $preset) {
+		parent::__construct($seed, $preset);
+		if (is_null($preset))
+		{
+			$preset = "";
 		}
+
 		$this->roadBlock = PlotLevelSettings::parseBlock($options, "RoadBlock", VanillaBlocks::OAK_PLANKS());
 		$this->wallBlock = PlotLevelSettings::parseBlock($options, "WallBlock", VanillaBlocks::STONE_SLAB());
 		$this->plotFloorBlock = PlotLevelSettings::parseBlock($options, "PlotFloorBlock", VanillaBlocks::GRASS());
@@ -53,8 +50,8 @@ class MyPlotGenerator extends Generator {
 		$this->roadWidth = PlotLevelSettings::parseNumber($options, "RoadWidth", 7);
 		$this->plotSize = PlotLevelSettings::parseNumber($options, "PlotSize", 32);
 		$this->groundHeight = PlotLevelSettings::parseNumber($options, "GroundHeight", 64);
-		$this->options = [];
-		$this->options["preset"] = (string)json_encode([
+
+		$this->preset = (string)json_encode([
 			"RoadBlock" => $this->roadBlock->getId() . (($meta = $this->roadBlock->getMeta()) === 0 ? '' : ':' . $meta),
 			"WallBlock" => $this->wallBlock->getId() . (($meta = $this->wallBlock->getMeta()) === 0 ? '' : ':' . $meta),
 			"PlotFloorBlock" => $this->plotFloorBlock->getId() . (($meta = $this->plotFloorBlock->getMeta()) === 0 ? '' : ':' . $meta),
@@ -98,9 +95,10 @@ class MyPlotGenerator extends Generator {
 				}
 			}
 		}
-		$chunk->setX($chunkX);
+		/*$chunk->setX($chunkX);
 		$chunk->setZ($chunkZ);
-		$chunk->setGenerated();
+		$chunk->setGenerated();*/
+
 		$chunkManager->setChunk($chunkX, $chunkZ, $chunk);
 	}
 

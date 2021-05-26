@@ -39,6 +39,7 @@ use pocketmine\permission\PermissionManager;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
+use pocketmine\world\WorldCreationOptions;
 use spoondetector\SpoonDetector;
 
 class MyPlot extends PluginBase
@@ -177,7 +178,10 @@ class MyPlot extends PluginBase
 		}, ARRAY_FILTER_USE_KEY);
 		new Config($this->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$worldName.".yml", Config::YAML, $default);
 		$settings = ["preset" => json_encode($settings)];
-		$return = $worldManager->generateWorld($worldName, null, $generator, $settings);
+		$worldCreationsOptions = WorldCreationOptions::create();
+		$worldCreationsOptions->setGeneratorClass($generator);
+		$worldCreationsOptions->setGeneratorOptions($settings["preset"]);
+		$return = $worldManager->generateWorld($worldName, $worldCreationsOptions);
 		$world = $worldManager->getWorldByName($worldName);
 		if($world !== null)
 			$world->setSpawnLocation(new Vector3(0,(int)$this->getConfig()->getNested("DefaultWorld.GroundHeight", 64) + 1,0));
