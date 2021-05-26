@@ -6,13 +6,15 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\BiomeForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
+use pocketmine\data\bedrock\BiomeIds;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\biome\Biome;
+use pocketmine\world\biome\BiomeRegistry;
 
 class BiomeSubCommand extends SubCommand
 {
-	public CONST BIOMES = ["PLAINS" => Biome::PLAINS, "DESERT" => Biome::DESERT, "MOUNTAINS" => Biome::MOUNTAINS, "FOREST" => Biome::FOREST, "TAIGA" => Biome::TAIGA, "SWAMP" => Biome::SWAMP, "NETHER" => Biome::HELL, "HELL" => Biome::HELL, "ICE_PLAINS" => Biome::ICE_PLAINS];
+	public CONST BIOMES = ["PLAINS" => BiomeIds::PLAINS, "DESERT" => BiomeIds::DESERT, "MOUNTAINS" => BiomeIds::MOUNTAINS, "FOREST" => BiomeIds::FOREST, "TAIGA" => BiomeIds::TAIGA, "SWAMP" => BiomeIds::SWAMP, "NETHER" => BiomeIds::HELL, "HELL" => BiomeIds::HELL, "ICE_PLAINS" => BiomeIds::ICE_PLAINS];
 
 	/**
 	 * @param CommandSender $sender
@@ -54,7 +56,7 @@ class BiomeSubCommand extends SubCommand
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
 				return true;
 			}
-			$biome = Biome::getBiome($biome);
+			$biome = BiomeRegistry::getInstance()->getBiome($biome);
 		}else{
 			$biome = ($biome === "NETHER" ? "HELL" : $biome);
 			$biome = ($biome === "ICE PLAINS" ? "ICE_PLAINS" : $biome);
@@ -64,7 +66,7 @@ class BiomeSubCommand extends SubCommand
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
 				return true;
 			}
-			$biome = Biome::getBiome(constant(Biome::class."::".$biome));
+			$biome = BiomeRegistry::getInstance()->getBiome(constant(BiomeIds::class."::".$biome));
 		}
 		if($this->getPlugin()->setPlotBiome($plot, $biome)) {
 			$sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
