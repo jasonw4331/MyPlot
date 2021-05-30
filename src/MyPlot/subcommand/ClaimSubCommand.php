@@ -65,7 +65,7 @@ class ClaimSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and MyPlot::getInstance()->isLevelLoaded($player->getLevelNonNull()->getFolderName()))
+		if($player !== null and MyPlot::getInstance()->isLevelLoaded($player->getWorld()->getFolderName()))
 			return new ClaimForm($player);
 		return null;
 	}

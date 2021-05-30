@@ -35,7 +35,7 @@ class GiveSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		$newOwner = $this->getPlugin()->getServer()->getPlayer($newOwner);
+		$newOwner = $this->getPlugin()->getServer()->getPlayerByPrefix($newOwner);
 		if(!$newOwner instanceof Player) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("give.notonline"));
 			return true;
@@ -46,7 +46,7 @@ class GiveSubCommand extends SubCommand
 		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($newOwner);
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
-			$level = $this->getPlugin()->getServer()->getLevelByName((string)$level);
+			$level = $this->getPlugin()->getServer()->getWorldManager()->getWorldByName((string)$level);
 			if($level !== null and !$level->isClosed()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(), $level->getFolderName()));
 			}
@@ -74,7 +74,7 @@ class GiveSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player->getPosition()) instanceof Plot)
 			return new GiveForm();
 		return null;
 	}

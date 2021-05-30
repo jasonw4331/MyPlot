@@ -8,6 +8,7 @@ use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\OfflinePlayer;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class AddHelperSubCommand extends SubCommand
@@ -36,9 +37,9 @@ class AddHelperSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		$helper = $this->getPlugin()->getServer()->getPlayer($helperName);
+		$helper = $this->getPlugin()->getServer()->getPlayerByPrefix($helperName);
 		if($helper === null)
-			$helper = new OfflinePlayer($this->getPlugin()->getServer(), $helperName);
+			$helper = new OfflinePlayer($helperName, Server::getInstance()->getOfflinePlayerData($helperName));
 		if($this->getPlugin()->addPlotHelper($plot, $helper->getName())) {
 			$sender->sendMessage($this->translateString("addhelper.success", [$helper->getName()]));
 		}else{
@@ -48,7 +49,7 @@ class AddHelperSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and ($plot = $this->getPlugin()->getPlotByPosition($player)) instanceof Plot)
+		if($player !== null and ($plot = $this->getPlugin()->getPlotByPosition($player->getPosition())) instanceof Plot)
 			return new AddHelperForm($plot);
 		return null;
 	}

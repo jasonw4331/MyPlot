@@ -6,7 +6,7 @@ use MyPlot\Commands;
 use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class HelpSubCommand extends SubCommand

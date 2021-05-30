@@ -32,7 +32,7 @@ class KickSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		$target = $this->getPlugin()->getServer()->getPlayer($args[0]);
+		$target = $this->getPlugin()->getServer()->getPlayerByPrefix($args[0]);
 		if ($target === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.noPlayer"));
 			return true;
@@ -56,7 +56,7 @@ class KickSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player->getPosition()) instanceof Plot)
 			return new KickForm();
 		return null;
 	}
