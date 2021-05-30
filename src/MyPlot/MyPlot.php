@@ -31,6 +31,7 @@ use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\lang\Language;
 use pocketmine\math\Facing;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\world\biome\Biome;
 use pocketmine\world\biome\BiomeRegistry;
 use pocketmine\world\format\Chunk;
@@ -599,6 +600,10 @@ class MyPlot extends PluginBase
 		$pos->x += floor($plotWorld->plotSize / 2);
 		$pos->y += 1.5;
 		$pos->z -= 1;
+		$world = Server::getInstance()->getWorldManager()->getWorldByName($plot->levelName);
+		if($world->getOrLoadChunkAtPosition($pos) === null) {
+			$world->orderChunkPopulation($pos->getFloorX() >> 4, $pos->getFloorZ() >> 4, null);
+		}
 		return $player->teleport($pos);
 	}
 
