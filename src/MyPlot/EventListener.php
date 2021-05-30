@@ -65,13 +65,7 @@ class EventListener implements Listener
 			$this->plugin->addLevelSettings($levelName, new PlotLevelSettings($levelName, $settings));
 
 			if($this->plugin->getConfig()->get('AllowFireTicking', false) === false) {
-				$ref = new \ReflectionClass($event->getWorld());
-				$prop = $ref->getProperty('randomTickBlocks');
-				$prop->setAccessible(true);
-				/** @var \SplFixedArray<Block|null> $randomTickBlocks */
-				$randomTickBlocks = $prop->getValue($event->getWorld());
-				$randomTickBlocks->offsetUnset(VanillaBlocks::FIRE()->getFullId());
-				$prop->setValue($randomTickBlocks, $event->getWorld());
+				$event->getWorld()->removeRandomTickedBlock(VanillaBlocks::FIRE());
 			}
 		}
 	}
