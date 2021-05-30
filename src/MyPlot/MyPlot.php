@@ -181,7 +181,6 @@ class MyPlot extends PluginBase
 			return !in_array($key, ["PlotSize", "GroundHeight", "RoadWidth", "RoadBlock", "WallBlock", "PlotFloorBlock", "PlotFillBlock", "BottomBlock"], true);
 		}, ARRAY_FILTER_USE_KEY);
 		new Config($this->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$worldName.".yml", Config::YAML, $default);
-		$settings = ["preset" => json_encode($settings)];
 		$options = WorldCreationOptions::create()->setGeneratorClass($generator)->setGeneratorOptions(json_encode($settings));
 		$return = $worldManager->generateWorld($worldName, $options);
 		$world = $worldManager->getWorldByName($worldName);
