@@ -181,7 +181,8 @@ class MyPlot extends PluginBase
 		}, ARRAY_FILTER_USE_KEY);
 		new Config($this->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$worldName.".yml", Config::YAML, $default);
 		$settings = ["preset" => json_encode($settings)];
-		$return = $worldManager->generateWorld($worldName, null, $generator, $settings);
+		$options = WorldCreationOptions::create()->setGeneratorClass($generator)->setGeneratorOptions(json_encode($settings));
+		$return = $worldManager->generateWorld($worldName, $options);
 		$world = $worldManager->getWorldByName($worldName);
 		if($world !== null)
 			$world->setSpawnLocation(new Vector3(0, $this->getConfig()->getNested("DefaultWorld.GroundHeight", 64) + 1,0));

@@ -51,14 +51,8 @@ class EventListener implements Listener
 	public function onLevelLoad(WorldLoadEvent $event) : void {
 		if(file_exists($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$event->getWorld()->getFolderName().".yml")) {
 			$this->plugin->getLogger()->debug("MyPlot level " . $event->getWorld()->getFolderName() . " loaded!");
-			$settings = $event->getWorld()->getProvider()->getWorldData()->getGeneratorOptions();
-			if(!isset($settings["preset"]) or !is_string($settings["preset"]) or $settings["preset"] === "") {
-				return;
-			}
-			$settings = json_decode($settings["preset"], true);
-			if($settings === false) {
-				return;
-			}
+			$options = $event->getWorld()->getProvider()->getWorldData()->getGeneratorOptions();
+			$settings = json_decode($options, true, 512, JSON_THROW_ON_ERROR);
 			$levelName = $event->getWorld()->getFolderName();
 			$default = array_filter((array) $this->plugin->getConfig()->get("DefaultWorld", []), function($key) : bool {
 				return !in_array($key, ["PlotSize", "GroundHeight", "RoadWidth", "RoadBlock", "WallBlock", "PlotFloorBlock", "PlotFillBlock", "BottomBlock"], true);
