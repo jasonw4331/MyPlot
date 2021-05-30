@@ -10,6 +10,7 @@ use MyPlot\events\MyPlotPvpEvent;
 use pocketmine\block\Block;
 use pocketmine\block\Sapling;
 use pocketmine\block\utils\TreeType;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockSpreadEvent;
@@ -64,13 +65,13 @@ class EventListener implements Listener
 			$this->plugin->addLevelSettings($levelName, new PlotLevelSettings($levelName, $settings));
 
 			if($this->plugin->getConfig()->get('AllowFireTicking', false) === false) {
-				$ref = new \ReflectionClass($event->getLevel());
+				$ref = new \ReflectionClass($event->getWorld());
 				$prop = $ref->getProperty('randomTickBlocks');
 				$prop->setAccessible(true);
 				/** @var \SplFixedArray<Block|null> $randomTickBlocks */
-				$randomTickBlocks = $prop->getValue($event->getLevel());
-				$randomTickBlocks->offsetUnset(BlockIds::FIRE);
-				$prop->setValue($randomTickBlocks, $event->getLevel());
+				$randomTickBlocks = $prop->getValue($event->getWorld());
+				$randomTickBlocks->offsetUnset(VanillaBlocks::FIRE()->getFullId());
+				$prop->setValue($randomTickBlocks, $event->getWorld());
 			}
 		}
 	}
