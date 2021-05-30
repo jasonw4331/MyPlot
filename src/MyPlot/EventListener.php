@@ -8,6 +8,7 @@ use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
 use pocketmine\block\Block;
+use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
 use pocketmine\block\utils\TreeType;
 use pocketmine\block\VanillaBlocks;
