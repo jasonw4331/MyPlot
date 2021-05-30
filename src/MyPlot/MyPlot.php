@@ -45,6 +45,7 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
+use pocketmine\world\WorldCreationOptions;
 
 class MyPlot extends PluginBase
 {
