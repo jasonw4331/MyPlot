@@ -6,7 +6,7 @@ use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Dropdown;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class KickForm extends ComplexMyPlotForm {
@@ -17,7 +17,7 @@ class KickForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 		$players = [];
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
-			$plot = $plugin->getPlotByPosition($player);
+			$plot = $plugin->getPlotByPosition($player->getPosition());
 			if($plot === null)
 				continue;
 			if($this->plot !== null and !$plot->isSame($this->plot))

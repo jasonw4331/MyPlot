@@ -5,7 +5,7 @@ namespace MyPlot\forms;
 use dktapps\pmforms\CustomForm;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 abstract class ComplexMyPlotForm extends CustomForm implements MyPlotForm {
 	/** @var Plot|null $plot */

@@ -56,7 +56,7 @@ class MyPlotGenerator extends Generator {
 
 	public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ) : void {
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
-		$chunk = $world->getChunk($chunkX, $chunkZ) ?? new Chunk($chunkX, $chunkZ);
+		$chunk = $world->getChunk($chunkX, $chunkZ) ?? new Chunk();
 		$bottomBlockId = $this->bottomBlock->getFullId();
 		$plotFillBlockId = $this->plotFillBlock->getFullId();
 		$plotFloorBlockId = $this->plotFloorBlock->getFullId();

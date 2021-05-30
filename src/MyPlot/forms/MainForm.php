@@ -5,7 +5,7 @@ namespace MyPlot\forms;
 use dktapps\pmforms\MenuOption;
 use MyPlot\MyPlot;
 use MyPlot\subcommand\SubCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class MainForm extends SimpleMyPlotForm {
@@ -24,7 +24,7 @@ class MainForm extends SimpleMyPlotForm {
 	public function __construct(Player $player, array $subCommands) {
 		$plugin = MyPlot::getInstance();
 
-		$this->plot = $plugin->getPlotByPosition($player);
+		$this->plot = $plugin->getPlotByPosition($player->getPosition());
 
 		$elements = [];
 		foreach($subCommands as $name => $command) {

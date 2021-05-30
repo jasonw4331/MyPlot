@@ -8,7 +8,7 @@ use dktapps\pmforms\element\Label;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use MyPlot\subcommand\BiomeSubCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class InfoForm extends ComplexMyPlotForm {
@@ -16,7 +16,7 @@ class InfoForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 
 		if(!isset($this->plot))
-			$this->plot = $plugin->getPlotByPosition($player);
+			$this->plot = $plugin->getPlotByPosition($player->getPosition());
 		if(!isset($this->plot))
 			return;
 

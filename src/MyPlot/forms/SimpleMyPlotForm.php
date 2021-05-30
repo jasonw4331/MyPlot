@@ -5,7 +5,7 @@ namespace MyPlot\forms;
 use dktapps\pmforms\MenuForm;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 abstract class SimpleMyPlotForm extends MenuForm implements MyPlotForm {
 	/** @var Plot|null $plot */

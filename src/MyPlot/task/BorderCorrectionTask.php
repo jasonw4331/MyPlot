@@ -6,18 +6,19 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
+use pocketmine\block\BlockLegacyIds;
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
 class BorderCorrectionTask extends Task{
 	/** @var MyPlot $plugin */
 	protected $plugin;
 	/** @var Plot $start */
 	protected $start;
-	/** @var Level $level */
+	/** @var World $level */
 	protected $level;
 	/** @var int $height */
 	protected $height;
@@ -57,7 +58,7 @@ class BorderCorrectionTask extends Task{
 		$this->maxBlocksPerTick = $maxBlocksPerTick;
 
 		$this->plotBeginPos = $plugin->getPlotPosition($start, false);
-		$this->level = $this->plotBeginPos->getLevelNonNull();
+		$this->level = $this->plotBeginPos->getWorld();
 
 		$plotLevel = $plugin->getLevelSettings($start->levelName);
 		$plotSize = $plotLevel->plotSize;
@@ -72,22 +73,22 @@ class BorderCorrectionTask extends Task{
 			$this->plotBeginPos = $this->plotBeginPos->subtract(0, 0, $roadWidth);
 			$this->xMax = (int) ($this->plotBeginPos->x + $plotSize);
 			$this->zMax = (int) ($this->plotBeginPos->z + $roadWidth);
-			$this->direction = Vector3::SIDE_NORTH;
+			$this->direction = Facing::NORTH;
 		}elseif(($start->X - $end->X) === -1) { // East X+
-			$this->plotBeginPos = $this->plotBeginPos->add($plotSize);
+			$this->plotBeginPos = $this->plotBeginPos->add($plotSize, 0, 0);
 			$this->xMax = (int) ($this->plotBeginPos->x + $roadWidth);
 			$this->zMax = (int) ($this->plotBeginPos->z + $plotSize);
-			$this->direction = Vector3::SIDE_EAST;
+			$this->direction = Facing::EAST;
 		}elseif(($start->Z - $end->Z) === -1) { // South Z+
 			$this->plotBeginPos = $this->plotBeginPos->add(0, 0, $plotSize);
 			$this->xMax = (int) ($this->plotBeginPos->x + $plotSize);
 			$this->zMax = (int) ($this->plotBeginPos->z + $roadWidth);
-			$this->direction = Vector3::SIDE_SOUTH;
+			$this->direction = Facing::SOUTH;
 		}elseif(($start->X - $end->X) === 1) { // West X-
-			$this->plotBeginPos = $this->plotBeginPos->subtract($roadWidth);
+			$this->plotBeginPos = $this->plotBeginPos->subtract($roadWidth, 0, 0);
 			$this->xMax = (int) ($this->plotBeginPos->x + $roadWidth);
 			$this->zMax = (int) ($this->plotBeginPos->z + $plotSize);
-			$this->direction = Vector3::SIDE_WEST;
+			$this->direction = Facing::WEST;
 		}else{
 			throw new \Exception('Merge Plots are not adjacent');
 		}
@@ -97,13 +98,13 @@ class BorderCorrectionTask extends Task{
 		$plugin->getLogger()->debug("Border Correction Task started between plots {$start->X};{$start->Z} and {$end->X};{$end->Z}");
 	}
 
-	public function onRun(int $currentTick) : void {
+	public function onRun() : void {
 		$blocks = 0;
-		if($this->direction === Vector3::SIDE_NORTH or $this->direction === Vector3::SIDE_SOUTH) {
+		if($this->direction === Facing::NORTH or $this->direction === Facing::SOUTH) {
 			while($this->pos->z < $this->zMax) {
-				while($this->pos->y < $this->level->getWorldHeight()) {
+				while($this->pos->y < $this->level->getMaxY()) {
 					if($this->pos->y > $this->height + 1)
-						$block = BlockFactory::get(BlockIds::AIR);
+						$block = BlockFactory::getInstance()->get(BlockLegacyIds::AIR, 0);
 					elseif($this->pos->y === $this->height + 1){
 						// TODO: change by x/z coord
 						$block = $this->plotWallBlock;
@@ -114,13 +115,13 @@ class BorderCorrectionTask extends Task{
 					else//if($y < $this->height)
 						$block = $this->groundBlock;
 
-					$this->level->setBlock(new Vector3($this->pos->x - 1, $this->pos->y, $this->pos->z), $block, false, false);
-					$this->level->setBlock(new Vector3($this->xMax, $this->pos->y, $this->pos->z), $block, false, false);
+					$this->level->setBlock(new Vector3($this->pos->x - 1, $this->pos->y, $this->pos->z), $block, false);
+					$this->level->setBlock(new Vector3($this->xMax, $this->pos->y, $this->pos->z), $block, false);
 					$this->pos->y++;
 
 					$blocks += 2;
 					if($blocks >= $this->maxBlocksPerTick) {
-						$this->setHandler();
+						$this->setHandler(null);
 						$this->plugin->getScheduler()->scheduleDelayedTask($this, 1);
 						return;
 					}
@@ -130,9 +131,9 @@ class BorderCorrectionTask extends Task{
 			}
 		}else{
 			while($this->pos->x < $this->xMax) {
-				while($this->pos->y < $this->level->getWorldHeight()) {
+				while($this->pos->y < $this->level->getMaxY()) {
 					if($this->pos->y > $this->height + 1)
-						$block = BlockFactory::get(BlockIds::AIR);
+						$block = BlockFactory::getInstance()->get(BlockLegacyIds::AIR, 0);
 					elseif($this->pos->y === $this->height + 1)
 						$block = $this->plotWallBlock; // TODO: change by x/z coord
 					elseif($this->pos->y === $this->height)
@@ -141,12 +142,12 @@ class BorderCorrectionTask extends Task{
 						$block = $this->bottomBlock;
 					else//if($y < $this->height)
 						$block = $this->groundBlock;
-					$this->level->setBlock(new Vector3($this->pos->x, $this->pos->y, $this->pos->z - 1), $block, false, false);
-					$this->level->setBlock(new Vector3($this->pos->x, $this->pos->y, $this->zMax), $block, false, false);
+					$this->level->setBlock(new Vector3($this->pos->x, $this->pos->y, $this->pos->z - 1), $block, false);
+					$this->level->setBlock(new Vector3($this->pos->x, $this->pos->y, $this->zMax), $block, false);
 					$this->pos->y++;
 					$blocks += 2;
 					if($blocks >= $this->maxBlocksPerTick) {
-						$this->setHandler();
+						$this->setHandler(null);
 						$this->plugin->getScheduler()->scheduleDelayedTask($this, 1);
 						return;
 					}

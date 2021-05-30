@@ -8,7 +8,7 @@ use dktapps\pmforms\element\Input;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\form\FormValidationException;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class WarpForm extends ComplexMyPlotForm {

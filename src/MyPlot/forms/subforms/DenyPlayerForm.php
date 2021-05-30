@@ -7,7 +7,7 @@ use dktapps\pmforms\element\Dropdown;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class DenyPlayerForm extends ComplexMyPlotForm {

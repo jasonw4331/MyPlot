@@ -9,8 +9,8 @@ use dktapps\pmforms\element\Toggle;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\block\BlockIds;
-use pocketmine\Player;
+use pocketmine\block\BlockLegacyIds;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class GenerateForm extends ComplexMyPlotForm {
@@ -64,7 +64,7 @@ class GenerateForm extends ComplexMyPlotForm {
 				$data = $copy;
 
 				$world = array_shift($data);
-				if($player->getServer()->isLevelGenerated($world)) {
+				if($player->getServer()->getWorldManager()->isWorldLoaded($world)) {
 					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("generate.exists", [$world]));
 					return;
 				}
@@ -74,13 +74,13 @@ class GenerateForm extends ComplexMyPlotForm {
 				$blockIds = array_map(function($val) {
 					if(strpos($val, ':') !== false) {
 						$peices = explode(':', $val);
-						if(defined(BlockIds::class."::".strtoupper(str_replace(' ', '_', $peices[0]))))
-							return constant(BlockIds::class."::".strtoupper(str_replace(' ', '_', $val))).':'.($peices[1] ?? 0);
+						if(defined(BlockLegacyIds::class."::".strtoupper(str_replace(' ', '_', $peices[0]))))
+							return constant(BlockLegacyIds::class."::".strtoupper(str_replace(' ', '_', $val))).':'.($peices[1] ?? 0);
 						return $val;
 					}elseif(is_numeric($val))
 						return $val.':0';
-					elseif(defined(BlockIds::class."::".strtoupper(str_replace(' ', '_', $val))))
-						return constant(BlockIds::class."::".strtoupper(str_replace(' ', '_', $val))).':0';
+					elseif(defined(BlockLegacyIds::class."::".strtoupper(str_replace(' ', '_', $val))))
+						return constant(BlockLegacyIds::class."::".strtoupper(str_replace(' ', '_', $val))).':0';
 					return $val;
 				}, $blockIds);
 				foreach($blockIds as $key => $val)

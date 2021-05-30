@@ -6,7 +6,7 @@ use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Dropdown;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class GiveForm extends ComplexMyPlotForm {

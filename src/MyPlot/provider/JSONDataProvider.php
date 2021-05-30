@@ -4,7 +4,7 @@ namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\math\Vector3;
+use pocketmine\math\Facing;
 use pocketmine\utils\Config;
 
 class JSONDataProvider extends DataProvider {
@@ -192,7 +192,8 @@ class JSONDataProvider extends DataProvider {
 		}, $plots));
 		$mergedIds = array_unique($mergedIds, SORT_NUMERIC);
 		$this->json->setNested("merges.$originId", $mergedIds);
-		return $this->json->save();
+		$this->json->save();
+		return true;
 	}
 
 	public function getMergedPlots(Plot $plot, bool $adjacent = false) : array {
@@ -217,7 +218,7 @@ class JSONDataProvider extends DataProvider {
 		}
 		if($adjacent)
 			$plots = array_filter($plots, function(Plot $val) use ($plot) {
-				for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+				for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
 					if($plot->getSide($i)->isSame($val))
 						return true;
 				}

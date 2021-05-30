@@ -4,7 +4,7 @@ namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\math\Vector3;
+use pocketmine\math\Facing;
 use pocketmine\utils\Config;
 
 class YAMLDataProvider extends DataProvider {
@@ -191,7 +191,8 @@ class YAMLDataProvider extends DataProvider {
 		}, $plots));
 		$mergedIds = array_unique($mergedIds, SORT_NUMERIC);
 		$this->yaml->setNested("merges.$originId", $mergedIds);
-		return $this->yaml->save();
+		$this->yaml->save();
+		return true;
 	}
 
 	public function getMergedPlots(Plot $plot, bool $adjacent = false) : array {
@@ -216,7 +217,7 @@ class YAMLDataProvider extends DataProvider {
 		}
 		if($adjacent)
 			$plots = array_filter($plots, function(Plot $val) use ($plot) {
-				for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+				for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
 					if($plot->getSide($i)->isSame($val))
 						return true;
 				}

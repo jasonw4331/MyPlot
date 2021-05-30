@@ -6,7 +6,7 @@ use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Input;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class NameForm extends ComplexMyPlotForm {
@@ -14,7 +14,7 @@ class NameForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 
 		if(!isset($this->plot))
-			$this->plot = $plugin->getPlotByPosition($player);
+			$this->plot = $plugin->getPlotByPosition($player->getPosition());
 		if(!isset($this->plot))
 			return;
 
