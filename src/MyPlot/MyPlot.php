@@ -862,7 +862,7 @@ class MyPlot extends PluginBase
 			$selection->setPosition(2, new Vector3($xMax, World::Y_MAX, $zMax));
 			$cuboid = Cuboid::fromSelection($selection);
 			//$cuboid = $cuboid->async();
-			$cuboid->set($plotBeginPos->world, VanillaBlocks::AIR()->getFullId(), function (float $time, int $changed) use ($plugin) : void {
+			$cuboid->set($plotBeginPos->world, VanillaBlocks::AIR(), function (float $time, int $changed) use ($plugin) : void {
 				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
 			});
 			$styler->removeSelection(99998);
@@ -873,7 +873,7 @@ class MyPlot extends PluginBase
 			$selection->setPosition(2, new Vector3($xMax, $plotWorld->groundHeight, $zMax));
 			$cuboid = Cuboid::fromSelection($selection);
 			//$cuboid = $cuboid->async();
-			$cuboid->set($plotBeginPos->world, $plotWorld->plotFloorBlock->getFullId(), function (float $time, int $changed) use ($plugin) : void {
+			$cuboid->set($plotBeginPos->world, $plotWorld->plotFloorBlock, function (float $time, int $changed) use ($plugin) : void {
 				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
 			});
 			$styler->removeSelection(99998);
@@ -884,7 +884,7 @@ class MyPlot extends PluginBase
 			$selection->setPosition(2, new Vector3($xMax, $plotWorld->groundHeight-1, $zMax));
 			$cuboid = Cuboid::fromSelection($selection);
 			//$cuboid = $cuboid->async();
-			$cuboid->set($plotBeginPos->world, $plotWorld->plotFillBlock->getFullId(), function (float $time, int $changed) use ($plugin) : void {
+			$cuboid->set($plotBeginPos->world, $plotWorld->plotFillBlock, function (float $time, int $changed) use ($plugin) : void {
 				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
 			});
 			$styler->removeSelection(99998);
@@ -895,7 +895,7 @@ class MyPlot extends PluginBase
 			$selection->setPosition(2, new Vector3($xMax, 0, $zMax));
 			$cuboid = Cuboid::fromSelection($selection);
 			//$cuboid = $cuboid->async();
-			$cuboid->set($plotBeginPos->world, $plotWorld->bottomBlock->getFullId(), function (float $time, int $changed) use ($plugin) : void {
+			$cuboid->set($plotBeginPos->world, $plotWorld->bottomBlock, function (float $time, int $changed) use ($plugin) : void {
 				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
 			});
 			$styler->removeSelection(99998);
