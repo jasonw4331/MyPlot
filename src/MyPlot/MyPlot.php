@@ -794,6 +794,10 @@ class MyPlot extends PluginBase
 			$plugin->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from the MyPlot clipboard.');
 		});
 		$styler->removeSelection(99997);
+		foreach($this->getPlotChunks($plotTo) as $id => $chunk) {
+			$coords = explode(';', $id);
+			$level->setChunk($coords[0], $coords[1], $chunk, false);
+		}
 		return true;
 	}
 
@@ -895,8 +899,9 @@ class MyPlot extends PluginBase
 				$plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
 			});
 			$styler->removeSelection(99998);
-			foreach($this->getPlotChunks($plot) as $chunk) {
-				$plotBeginPos->world->setChunk($chunk->getX(), $chunk->getZ(), $chunk, false);
+			foreach($this->getPlotChunks($plot) as $id => $chunk) {
+				$coords = explode(';', $id);
+				$plotBeginPos->getWorld()->setChunk($coords[0], $coords[1], $chunk, false);
 			}
 			$this->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this, $plot), 1);
 			return true;
@@ -985,16 +990,17 @@ class MyPlot extends PluginBase
 		$plotWorld = $this->getLevelSettings($plot->levelName);
 		$world = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
 		$chunks = $this->getPlotChunks($plot);
-		foreach($chunks as $chunk) {
+		foreach($chunks as $id => $chunk) {
+			$coords = explode(';', $id);
 			for($x = 0; $x < 16; ++$x) {
 				for($z = 0; $z < 16; ++$z) {
-					$chunkPlot = $this->getPlotByPosition(new Position(($chunk->getX() << 4) + $x, $plotWorld->groundHeight, ($chunk->getZ() << 4) + $z, $world));
+					$chunkPlot = $this->getPlotByPosition(new Position((((int)$coords[0]) << 4) + $x, $plotWorld->groundHeight, (((int)$coords[1]) << 4) + $z, $world));
 					if($chunkPlot instanceof Plot and $chunkPlot->isSame($plot)) {
 						$chunk->setBiomeId($x, $z, $biome->getId());
 					}
 				}
 			}
-			$world->setChunk($chunk->getX(), $chunk->getZ(), $chunk, false);
+			$world->setChunk($coords[0], $coords[1], $chunk, false);
 		}
 		return !$failed;
 	}
@@ -1133,7 +1139,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @param Plot $plot
 	 *
-	 * @return Chunk[]
+	 * @return array<string, Chunk>
 	 */
 	public function getPlotChunks(Plot $plot) : array {
 		if(!$this->isLevelLoaded($plot->levelName))
@@ -1150,7 +1156,7 @@ class MyPlot extends PluginBase
 			$zMax = ($pos->z + $plotSize) >> 4;
 			for($x = $pos->x >> 4; $x <= $xMax; $x++) {
 				for($z = $pos->z >> 4; $z <= $zMax; $z++) {
-					$chunks[] = $world->getChunk($x, $z);
+					$chunks["$x;$z"] = $world->getChunk($x, $z);
 				}
 			}
 		}
