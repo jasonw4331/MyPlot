@@ -278,7 +278,7 @@ class EventListener implements Listener
 		$sourceBlockInPlot = $this->plugin->getPlotByPosition($event->getSource()->getPos()) instanceof Plot;
 
 		if($newBlockInPlot and $sourceBlockInPlot) {
-			$spreadIsSamePlot = $this->plugin->getPlotByPosition($event->getBlock())->isSame($this->plugin->getPlotByPosition($event->getSource()->getPos()));
+			$spreadIsSamePlot = $this->plugin->getPlotByPosition($event->getBlock()->getPos())->isSame($this->plugin->getPlotByPosition($event->getSource()->getPos()));
 		}else {
 			$spreadIsSamePlot = false;
 		}
