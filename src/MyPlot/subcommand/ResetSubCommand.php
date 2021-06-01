@@ -36,7 +36,7 @@ class ResetSubCommand extends SubCommand
 		}
 		if(isset($args[0]) and $args[0] == $this->translateString("confirm")) {
 			$economy = $this->getPlugin()->getEconomyProvider();
-			$price = $this->getPlugin()->getLevelSettings($plot->levelName)->resetPrice;
+			$price = $this->getPlugin()->getLevelSettings($plot->worldName)->resetPrice;
 			if($economy !== null and !$economy->reduceMoney($sender, $price)) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("reset.nomoney"));
 				return true;

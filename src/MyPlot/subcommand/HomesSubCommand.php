@@ -35,7 +35,7 @@ class HomesSubCommand extends SubCommand
 		for($i = 0; $i < count($plots); $i++) {
 			$plot = $plots[$i];
 			$message = TextFormat::DARK_GREEN . ($i + 1) . ") ";
-			$message .= TextFormat::WHITE . $plot->levelName . " " . $plot;
+			$message .= TextFormat::WHITE . $plot->worldName . " " . $plot;
 			if($plot->name !== "") {
 				$message .= " = " . $plot->name;
 			}

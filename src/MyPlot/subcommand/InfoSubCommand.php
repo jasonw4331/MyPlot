@@ -32,8 +32,8 @@ class InfoSubCommand extends SubCommand
 				$key = ((int) $args[1] - 1) < 1 ? 1 : ((int) $args[1] - 1);
 				/** @var Plot[] $plots */
 				$plots = [];
-				foreach($this->getPlugin()->getPlotLevels() as $levelName => $settings) {
-					$plots = array_merge($plots, $this->getPlugin()->getPlotsOfPlayer($args[0], $levelName));
+				foreach($this->getPlugin()->getPlotLevels() as $worldName => $settings) {
+					$plots = array_merge($plots, $this->getPlugin()->getPlotsOfPlayer($args[0], $worldName));
 				}
 				if(isset($plots[$key])) {
 					$plot = $plots[$key];

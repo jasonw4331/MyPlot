@@ -50,7 +50,7 @@ class CloneSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		$plotLevel = $this->getPlugin()->getLevelSettings($standingPlot->levelName);
+		$plotLevel = $this->getPlugin()->getLevelSettings($standingPlot->worldName);
 		$economy = $this->getPlugin()->getEconomyProvider();
 		if($economy !== null and !$economy->reduceMoney($sender, $plotLevel->clonePrice)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("clone.nomoney"));

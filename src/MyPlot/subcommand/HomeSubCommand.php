@@ -45,15 +45,15 @@ class HomeSubCommand extends SubCommand
 			return true;
 		}
 		usort($plots, function(Plot $plot1, Plot $plot2) {
-			if($plot1->levelName == $plot2->levelName) {
+			if($plot1->worldName == $plot2->worldName) {
 				return 0;
 			}
-			return ($plot1->levelName < $plot2->levelName) ? -1 : 1;
+			return ($plot1->worldName < $plot2->worldName) ? -1 : 1;
 		});
 		/** @var Plot $plot */
 		$plot = $plots[$plotNumber - 1];
 		if($this->getPlugin()->teleportPlayerToPlot($sender, $plot)) {
-			$sender->sendMessage($this->translateString("home.success", [$plot->__toString(), $plot->levelName]));
+			$sender->sendMessage($this->translateString("home.success", [$plot->__toString(), $plot->worldName]));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.error"));
 		}

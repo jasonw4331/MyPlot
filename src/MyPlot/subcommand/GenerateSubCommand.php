@@ -30,16 +30,16 @@ class GenerateSubCommand extends SubCommand
 		if(empty($args)) {
 			return false;
 		}
-		$levelName = $args[0];
-		if($sender->getServer()->getWorldManager()->isWorldGenerated($levelName)) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.exists", [$levelName]));
+		$worldName = $args[0];
+		if($sender->getServer()->getWorldManager()->isWorldGenerated($worldName)) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.exists", [$worldName]));
 			return true;
 		}
-		if($this->getPlugin()->generateLevel($levelName, $args[2] ?? "myplot")) {
+		if($this->getPlugin()->generateLevel($worldName, $args[2] ?? "myplot")) {
 			if(isset($args[1]) and $args[1] == true and $sender instanceof Player) {
-				$this->getPlugin()->teleportPlayerToPlot($sender, new Plot($levelName, 0, 0));
+				$this->getPlugin()->teleportPlayerToPlot($sender, new Plot($worldName, 0, 0));
 			}
-			$sender->sendMessage($this->translateString("generate.success", [$levelName]));
+			$sender->sendMessage($this->translateString("generate.success", [$worldName]));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.error"));
 		}

@@ -36,7 +36,7 @@ class ClearSubCommand extends SubCommand
 		}
 		if(isset($args[0]) and $args[0] == $this->translateString("confirm")) {
 			$economy = $this->getPlugin()->getEconomyProvider();
-			$price = $this->getPlugin()->getLevelSettings($plot->levelName)->clearPrice;
+			$price = $this->getPlugin()->getLevelSettings($plot->worldName)->clearPrice;
 			if($economy !== null and !$economy->reduceMoney($sender, $price)) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("clear.nomoney"));
 				return true;
