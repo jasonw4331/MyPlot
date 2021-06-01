@@ -279,7 +279,7 @@ class MyPlot extends PluginBase
 	 * @return Position|null
 	 */
 	public function getPlotPosition(Plot $plot) : ?Position {
-		$plotWorld = $this->getLevelSettings($plot->levelName);
+		$plotWorld = $this->getLevelSettings($plot->worldName);
 		if($plotWorld === null)
 			return null;
 		$plotSize = $plotWorld->plotSize;
@@ -287,7 +287,7 @@ class MyPlot extends PluginBase
 		$totalSize = $plotSize + $roadWidth;
 		$x = $totalSize * $plot->X;
 		$z = $totalSize * $plot->Z;
-		$world = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
+		$world = $this->getServer()->getWorldManager()->getWorldByName($plot->worldName);
 		return new Position($x, $plotWorld->groundHeight, $z, $world);
 	}
 
@@ -434,7 +434,7 @@ class MyPlot extends PluginBase
 	 * @return AxisAlignedBB|null
 	 */
 	public function getPlotBB(Plot $plot) : ?AxisAlignedBB {
-		$plotWorld = $this->getLevelSettings($plot->levelName);
+		$plotWorld = $this->getLevelSettings($plot->worldName);
 		if($plotWorld === null)
 			return null;
 		$pos = $this->getPlotPosition($plot);
@@ -445,7 +445,7 @@ class MyPlot extends PluginBase
 			0,
 			min($pos->z, $pos->z + $plotSize),
 			max($pos->x, $pos->x + $plotSize),
-			$pos->getWorld()->getWorldHeight(),
+			$pos->getWorld()->getMaxY(),
 			max($pos->z, $pos->z + $plotSize)
 		);
 	}
@@ -469,7 +469,7 @@ class MyPlot extends PluginBase
 		}
 		if($center)
 			return $this->teleportMiddle($player, $plot);
-		$plotWorld = $this->getLevelSettings($plot->levelName);
+		$plotWorld = $this->getLevelSettings($plot->worldName);
 		if($plotWorld === null)
 			return false;
 		$pos = $this->getPlotPosition($plot);
@@ -557,10 +557,10 @@ class MyPlot extends PluginBase
 		}
 		$plotFrom = $ev->getPlot();
 		$plotTo = $ev->getClonePlot();
-		if(!$this->isLevelLoaded($plotFrom->levelName) or !$this->isLevelLoaded($plotTo->levelName)) {
+		if(!$this->isLevelLoaded($plotFrom->worldName) or !$this->isLevelLoaded($plotTo->levelName)) {
 			return false;
 		}
-		$plotLevel = $this->getLevelSettings($plotFrom->levelName);
+		$plotLevel = $this->getLevelSettings($plotFrom->worldName);
 		$plotSize = $plotLevel->plotSize-1;
 		$plotBeginPos = $this->getPlotPosition($plotFrom);
 		$level = $plotBeginPos->getWorld();
@@ -577,7 +577,7 @@ class MyPlot extends PluginBase
 			$plugin->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's to the MyPlot clipboard.');
 		});
 
-		$plotLevel = $this->getLevelSettings($plotTo->levelName);
+		$plotLevel = $this->getLevelSettings($plotTo->worldName);
 		$plotSize = $plotLevel->plotSize-1;
 		$plotBeginPos = $this->getPlotPosition($plotTo);
 		$level = $plotBeginPos->getWorld();
@@ -615,11 +615,11 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		$plot = $ev->getPlot();
-		if(!$this->isLevelLoaded($plot->levelName)) {
+		if(!$this->isLevelLoaded($plot->worldName)) {
 			return false;
 		}
 		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
-		foreach($this->getServer()->getWorldManager()->getWorldByName($plot->levelName)->getEntities() as $entity) {
+		foreach($this->getServer()->getWorldManager()->getWorldByName($plot->worldName)->getEntities() as $entity) {
 			if($this->getPlotBB($plot)->isVectorInXZ($entity->getPosition())) {
 				if(!$entity instanceof Player) {
 					$entity->flagForDespawn();
@@ -633,7 +633,7 @@ class MyPlot extends PluginBase
 			if(!$styler instanceof WorldStyler) {
 				return false;
 			}
-			$plotWorld = $this->getLevelSettings($plot->levelName);
+			$plotWorld = $this->getLevelSettings($plot->worldName);
 			$plotSize = $plotWorld->plotSize-1;
 			$plotBeginPos = $this->getPlotPosition($plot);
 			$plugin = $this;
@@ -750,11 +750,11 @@ class MyPlot extends PluginBase
 		}
 		$plot = $ev->getPlot();
 		$biome = Biome::getBiome(defined(Biome::class."::".$plot->biome) ? constant(Biome::class . "::" . $plot->biome) : Biome::PLAINS);
-		$plotWorld = $this->getLevelSettings($plot->levelName);
+		$plotWorld = $this->getLevelSettings($plot->worldName);
 		if($plotWorld === null) {
 			return false;
 		}
-		$world = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
+		$world = $this->getServer()->getWorldManager()->getWorldByName($plot->worldName);
 		$chunks = $this->getPlotChunks($plot);
 		foreach($chunks as $chunk) {
 			for($x = 0; $x < 16; ++$x) {
@@ -879,11 +879,11 @@ class MyPlot extends PluginBase
 	 * @return Chunk[]
 	 */
 	public function getPlotChunks(Plot $plot) : array {
-		$plotWorld = $this->getLevelSettings($plot->levelName);
+		$plotWorld = $this->getLevelSettings($plot->worldName);
 		if($plotWorld === null) {
 			return [];
 		}
-		$world = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
+		$world = $this->getServer()->getWorldManager()->getWorldByName($plot->worldName);
 		$pos = $this->getPlotPosition($plot);
 		$plotSize = $plotWorld->plotSize;
 		$xMax = ($pos->x + $plotSize) >> 4;
@@ -940,7 +940,7 @@ class MyPlot extends PluginBase
 	 * @return Position|null
 	 */
 	public function getPlotMid(Plot $plot) : ?Position {
-		$plotWorld = $this->getLevelSettings($plot->levelName);
+		$plotWorld = $this->getLevelSettings($plot->worldName);
 		if($plotWorld === null) {
 			return null;
 		}
