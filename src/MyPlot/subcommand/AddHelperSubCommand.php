@@ -43,7 +43,7 @@ class AddHelperSubCommand extends SubCommand
 		}
 		$helper = $this->getPlugin()->getServer()->getPlayer($helperName);
 		if($helper === null)
-			$helper = new OfflinePlayer($this->getPlugin()->getServer(), $helperName);
+			$helper = new OfflinePlayer($helperName, null);
 		if($this->getPlugin()->addPlotHelper($plot, $helper->getName())) {
 			$sender->sendMessage($this->translateString("addhelper.success", [$helper->getName()]));
 		}else{
