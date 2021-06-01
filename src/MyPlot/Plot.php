@@ -7,7 +7,7 @@ use pocketmine\math\Facing;
 class Plot
 {
 	/** @var string $levelName */
-	public $levelName = "";
+	public $worldName = "";
 	/** @var int $X */
 	public $X = -0;
 	/** @var int $Z */
@@ -41,8 +41,8 @@ class Plot
 	 * @param bool|null $pvp
 	 * @param int $id
 	 */
-	public function __construct(string $levelName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, int $id = -1) {
-		$this->levelName = $levelName;
+	public function __construct(string $worldName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, int $id = -1) {
+		$this->worldName = $worldName;
 		$this->X = $X;
 		$this->Z = $Z;
 		$this->name = $name;
@@ -50,7 +50,7 @@ class Plot
 		$this->helpers = $helpers;
 		$this->denied = $denied;
 		$this->biome = strtoupper($biome);
-		$settings = MyPlot::getInstance()->getLevelSettings($levelName);
+		$settings = MyPlot::getInstance()->getLevelSettings($worldName);
 		if(!isset($pvp) and $settings !== null) {
 			$this->pvp = !$settings->restrictPVP;
 		}else{
@@ -169,23 +169,23 @@ class Plot
 	 * @return Plot
 	 */
 	public function getSide(int $side, int $step = 1) : Plot {
-		$levelSettings = MyPlot::getInstance()->getLevelSettings($this->levelName);
+		$levelSettings = MyPlot::getInstance()->getLevelSettings($this->worldName);
 		$pos = MyPlot::getInstance()->getPlotPosition($this);
 		$sidePos = $pos->getSide($side, $step * ($levelSettings->plotSize + $levelSettings->roadWidth));
 		$sidePlot = MyPlot::getInstance()->getPlotByPosition($sidePos);
 		if($sidePlot === null) {
 			switch($side) {
 				case Facing::NORTH:
-					$sidePlot = new self($this->levelName, $this->X, $this->Z - $step);
+					$sidePlot = new self($this->worldName, $this->X, $this->Z - $step);
 				break;
 				case Facing::SOUTH:
-					$sidePlot = new self($this->levelName, $this->X, $this->Z + $step);
+					$sidePlot = new self($this->worldName, $this->X, $this->Z + $step);
 				break;
 				case Facing::WEST:
-					$sidePlot = new self($this->levelName, $this->X - $step, $this->Z);
+					$sidePlot = new self($this->worldName, $this->X - $step, $this->Z);
 				break;
 				case Facing::EAST:
-					$sidePlot = new self($this->levelName, $this->X + $step, $this->Z);
+					$sidePlot = new self($this->worldName, $this->X + $step, $this->Z);
 				break;
 				default:
 					return clone $this;
