@@ -151,6 +151,7 @@ class SQLiteDataProvider extends DataProvider
 
 	public function deletePlot(Plot $plot) : bool {
 		if($plot->isMerged()){
+			$plot = $this->getMergeOrigin($plot);
 			$settings = MyPlot::getInstance()->getLevelSettings($plot->levelName);
 			if ($plot->id >= 0) {
 				$stmt = $this->sqlDisposeMergedPlotById;
@@ -171,7 +172,9 @@ class SQLiteDataProvider extends DataProvider
 			if(!$result instanceof \SQLite3Result) {
 				return false;
 			}
-			$this->cachePlot($this->getMergeOrigin($plot));
+			$plot2 = new Plot($plot->levelName, $plot->X, $plot->Z);
+			$plot2->id = $plot->id;
+			$this->cachePlot($plot2);
 		}else {
 			if($plot->id >= 0) {
 				$stmt = $this->sqlRemovePlotById;

@@ -914,12 +914,7 @@ class MyPlot extends PluginBase
 		if($ev->isCancelled()) {
 			return false;
 		}
-		$failed = false;
-		foreach($this->getProvider()->getMergedPlots($plot) as $merged) {
-			if(!$this->getProvider()->deletePlot($merged))
-				$failed = true;
-		}
-		return !$failed;
+		return !$this->getProvider()->deletePlot($plot);
 	}
 
 	/**
