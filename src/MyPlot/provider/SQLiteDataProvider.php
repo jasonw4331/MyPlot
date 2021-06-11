@@ -145,6 +145,9 @@ class SQLiteDataProvider extends DataProvider
 		if(!$result instanceof \SQLite3Result) {
 			return false;
 		}
+		if($plot->id < 0) {
+		    $plot->id = $this->db->lastInsertRowID();
+		}
 		$this->cachePlot($plot);
 		return true;
 	}

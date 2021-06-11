@@ -86,6 +86,9 @@ class MySQLProvider extends DataProvider {
 			$this->plugin->getLogger()->error($stmt->error);
 			return false;
 		}
+		if($plot->id < 0) {
+		    $plot->id = $this->db->insert_id;
+		}
 		$this->cachePlot($plot);
 		return true;
 	}
