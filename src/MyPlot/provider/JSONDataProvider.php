@@ -232,6 +232,9 @@ class JSONDataProvider extends DataProvider {
 		if(isset($allMerges[$plot->id]))
 			return $plot;
 		$originId = array_search($plot->id, $allMerges);
+		if(!is_int($originId)) {
+			return $plot;
+		}
 		$plotDatums = $this->json->get("plots", []);
 		if(isset($plotDatums[$originId])) {
 			$levelName = $plotDatums[$originId]["level"];
