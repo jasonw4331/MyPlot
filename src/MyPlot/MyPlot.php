@@ -984,7 +984,7 @@ class MyPlot extends PluginBase
 		$failed = false;
 		foreach($this->getProvider()->getMergedPlots($plot) as $merged) {
 			$merged->biome = $plot->biome;
-			if($this->savePlot($merged))
+			if(!$this->savePlot($merged))
 				$failed = true;
 		}
 		$plotWorld = $this->getLevelSettings($plot->levelName);
