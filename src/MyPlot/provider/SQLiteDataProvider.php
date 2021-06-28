@@ -43,53 +43,7 @@ class SQLiteDataProvider extends DataProvider
 		$this->db->exec("CREATE TABLE IF NOT EXISTS plots
 			(level TEXT, X INTEGER, Z INTEGER, name TEXT,
 			 owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INTEGER, price FLOAT, PRIMARY KEY (level, X, Z));");
-		$stmt = $this->db->prepare("SELECT name, owner, helpers, denied, biome, pvp, price FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlGetPlot = $stmt;
-		$stmt = $this->db->prepare("INSERT OR REPLACE INTO plots (level, X, Z, name, owner, helpers, denied, biome, pvp, price) VALUES (:level, :X, :Z, :name, :owner, :helpers, :denied, :biome, :pvp, :price);");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlSavePlot = $stmt;
-		$stmt = $this->db->prepare("DELETE FROM plots WHERE level = :level AND X = :X AND Z = :Z;");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlRemovePlot = $stmt;
-		$stmt = $this->db->prepare("UPDATE plots SET name = '', owner = '', helpers = '', denied = '', biome = :biome, pvp = :pvp, price = :price WHERE level = :level AND X = :X AND Z = :Z;");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlDisposeMergedPlot = $stmt;
-		$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = :owner;");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlGetPlotsByOwner = $stmt;
-		$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = :owner AND level = :level;");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlGetPlotsByOwnerAndLevel = $stmt;
-		$stmt = $this->db->prepare("SELECT X, Z FROM plots WHERE (
-				level = :level
-				AND (
-					(abs(X) = :number AND abs(Z) <= :number) OR
-					(abs(Z) = :number AND abs(X) <= :number)
-				)
-			);");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlGetExistingXZ = $stmt;
-		$this->db->exec("CREATE TABLE IF NOT EXISTS mergedPlotsV2 (level TEXT, originX INTEGER, originZ INTEGER, mergedX INTEGER, mergedZ INTEGER, PRIMARY KEY(level, originX, originZ, mergedX, mergedZ));");
-		$stmt = $this->db->prepare("INSERT OR REPLACE INTO mergedPlotsV2 (level, originX, originZ, mergedX, mergedZ) VALUES (:level, :originX, :originZ, :mergedX, :mergedZ);");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlMergePlot = $stmt;
-		$stmt = $this->db->prepare("SELECT plots.level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plots.level WHERE mergedPlotsV2.level = :level AND mergedX = :mergedX AND mergedZ = :mergedZ;");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlGetMergeOrigin = $stmt;
-		$stmt = $this->db->prepare("SELECT plots.level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plots.level AND mergedPlotsV2.mergedX = plots.X AND mergedPlotsV2.mergedZ = plots.Z WHERE mergedPlotsV2.level = :level AND originX = :originX AND originZ = :originZ;");
-		if($stmt === false)
-			throw new \Exception();
-		$this->sqlGetMergedPlots = $stmt;
+		$this->prepare();
 		$this->plugin->getLogger()->debug("SQLite data provider registered");
 	}
 
@@ -329,5 +283,55 @@ class SQLiteDataProvider extends DataProvider
 			return new Plot((string) $val["level"], (int) $val["X"], (int) $val["Z"], (string) $val["name"], (string) $val["owner"], $helpers, $denied, (string) $val["biome"], $pvp, (float) $val["price"]);
 		}
 		return $plot;
+	}
+
+	private function prepare() : void {
+		$stmt = $this->db->prepare("SELECT name, owner, helpers, denied, biome, pvp, price FROM plotsV2 WHERE level = :level AND X = :X AND Z = :Z;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetPlot = $stmt;
+		$stmt = $this->db->prepare("INSERT OR REPLACE INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price) VALUES (:level, :X, :Z, :name, :owner, :helpers, :denied, :biome, :pvp, :price);");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlSavePlot = $stmt;
+		$stmt = $this->db->prepare("DELETE FROM plotsV2 WHERE level = :level AND X = :X AND Z = :Z;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlRemovePlot = $stmt;
+		$stmt = $this->db->prepare("UPDATE plotsV2 SET name = '', owner = '', helpers = '', denied = '', biome = :biome, pvp = :pvp, price = :price WHERE level = :level AND X = :X AND Z = :Z;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlDisposeMergedPlot = $stmt;
+		$stmt = $this->db->prepare("SELECT * FROM plotsV2 WHERE owner = :owner;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetPlotsByOwner = $stmt;
+		$stmt = $this->db->prepare("SELECT * FROM plotsV2 WHERE owner = :owner AND level = :level;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetPlotsByOwnerAndLevel = $stmt;
+		$stmt = $this->db->prepare("SELECT X, Z FROM plotsV2 WHERE (
+				level = :level
+				AND (
+					(abs(X) = :number AND abs(Z) <= :number) OR
+					(abs(Z) = :number AND abs(X) <= :number)
+				)
+			);");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetExistingXZ = $stmt;
+		$this->db->exec("CREATE TABLE IF NOT EXISTS mergedPlotsV2 (level TEXT, originX INTEGER, originZ INTEGER, mergedX INTEGER, mergedZ INTEGER, PRIMARY KEY(level, originX, originZ, mergedX, mergedZ));");
+		$stmt = $this->db->prepare("INSERT OR REPLACE INTO mergedPlotsV2 (level, originX, originZ, mergedX, mergedZ) VALUES (:level, :originX, :originZ, :mergedX, :mergedZ);");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlMergePlot = $stmt;
+		$stmt = $this->db->prepare("SELECT plotsV2.level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plotsV2 LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plotsV2.level WHERE mergedPlotsV2.level = :level AND mergedX = :mergedX AND mergedZ = :mergedZ;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetMergeOrigin = $stmt;
+		$stmt = $this->db->prepare("SELECT plotsV2.level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plotsV2 LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plotsV2.level AND mergedPlotsV2.mergedX = plotsV2.X AND mergedPlotsV2.mergedZ = plotsV2.Z WHERE mergedPlotsV2.level = :level AND originX = :originX AND originZ = :originZ;");
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetMergedPlots = $stmt;
 	}
 }
