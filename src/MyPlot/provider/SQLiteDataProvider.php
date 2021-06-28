@@ -43,7 +43,9 @@ class SQLiteDataProvider extends DataProvider
 		$this->db->exec("CREATE TABLE IF NOT EXISTS plotsV2
 			(level TEXT, X INTEGER, Z INTEGER, name TEXT,
 			 owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INTEGER, price FLOAT, PRIMARY KEY (level, X, Z));");
-		$this->db->exec("INSERT OR ABORT INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price) SELECT level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots;");
+		$this->db->exec("INSERT OR IGNORE INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price) SELECT level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots;");
+		$this->db->exec("CREATE TABLE IF NOT EXISTS mergedPlotsV2 (level TEXT, originX INTEGER, originZ INTEGER, mergedX INTEGER, mergedZ INTEGER, PRIMARY KEY(level, originX, originZ, mergedX, mergedZ));");
+		$this->db->exec("INSERT OR IGNORE INTO mergedPlotsV2 (level, originX, originZ, mergedX, mergedZ) SELECT r1.level, r1.X, r1.Z, r2.X, r2.Z FROM plots r1, mergedPlots JOIN plots r2 ON r1.id = mergedPlots.originId AND r2.id = mergedPlots.mergedId;");
 		$this->prepare();
 		$this->plugin->getLogger()->debug("SQLite data provider registered");
 	}
@@ -314,7 +316,6 @@ class SQLiteDataProvider extends DataProvider
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlGetExistingXZ = $stmt;
-		$this->db->exec("CREATE TABLE IF NOT EXISTS mergedPlotsV2 (level TEXT, originX INTEGER, originZ INTEGER, mergedX INTEGER, mergedZ INTEGER, PRIMARY KEY(level, originX, originZ, mergedX, mergedZ));");
 		$stmt = $this->db->prepare("INSERT OR REPLACE INTO mergedPlotsV2 (level, originX, originZ, mergedX, mergedZ) VALUES (:level, :originX, :originZ, :mergedX, :mergedZ);");
 		if($stmt === false)
 			throw new \Exception();
