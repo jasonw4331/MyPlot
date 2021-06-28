@@ -53,8 +53,10 @@ class MySQLProvider extends DataProvider {
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
 		if($this->db->connect_error !== null and $this->db->connect_error !== '')
 			throw new \RuntimeException("Failed to connect to the MySQL database: " . $this->db->connect_error);
-		$this->db->query("CREATE TABLE IF NOT EXISTS plots (level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INT, price FLOAT, PRIMARY KEY (level, X, Z));");
+		$this->db->query("CREATE TABLE IF NOT EXISTS plotsV2 (level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INT, price FLOAT, PRIMARY KEY (level, X, Z));");
+		$this->db->query("INSERT IGNORE INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price) SELECT level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots;");
 		$this->db->query("CREATE TABLE IF NOT EXISTS mergedPlotsV2 (level TEXT, originX INT, originZ INT, mergedX INT, mergedZ INT, PRIMARY KEY(level, originX, originZ, mergedX, mergedZ));");
+		$this->db->query("INSERT IGNORE INTO mergedPlotsV2 (level, originX, originZ, mergedX, mergedZ) SELECT r1.level, r1.X, r1.Z, r2.X, r2.Z FROM plots r1, mergedPlots JOIN plots r2 ON r1.id = mergedPlots.originId AND r2.id = mergedPlots.mergedId;");
 		$this->prepare();
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
@@ -316,27 +318,27 @@ class MySQLProvider extends DataProvider {
 	}
 
 	private function prepare() : void {
-		$stmt = $this->db->prepare("SELECT name, owner, helpers, denied, biome, pvp, price FROM plots WHERE level = ? AND X = ? AND Z = ?;");
+		$stmt = $this->db->prepare("SELECT name, owner, helpers, denied, biome, pvp, price FROM plotsV2 WHERE level = ? AND X = ? AND Z = ?;");
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlGetPlot = $stmt;
-		$stmt = $this->db->prepare("INSERT INTO plots (`level`, `X`, `Z`, `name`, `owner`, `helpers`, `denied`, `biome`, `pvp`, `price`) VALUES(?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name = VALUES(name), owner = VALUES(owner), helpers = VALUES(helpers), denied = VALUES(denied), biome = VALUES(biome), pvp = VALUES(pvp), price = VALUES(price);");
+		$stmt = $this->db->prepare("INSERT INTO plotsV2 (`level`, `X`, `Z`, `name`, `owner`, `helpers`, `denied`, `biome`, `pvp`, `price`) VALUES(?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name = VALUES(name), owner = VALUES(owner), helpers = VALUES(helpers), denied = VALUES(denied), biome = VALUES(biome), pvp = VALUES(pvp), price = VALUES(price);");
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlSavePlot = $stmt;
-		$stmt = $this->db->prepare("DELETE FROM plots WHERE level = ? AND X = ? AND Z = ?;");
+		$stmt = $this->db->prepare("DELETE FROM plotsV2 WHERE level = ? AND X = ? AND Z = ?;");
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlRemovePlot = $stmt;
-		$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = ?;");
+		$stmt = $this->db->prepare("SELECT * FROM plotsV2 WHERE owner = ?;");
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlGetPlotsByOwner = $stmt;
-		$stmt = $this->db->prepare("SELECT * FROM plots WHERE owner = ? AND level = ?;");
+		$stmt = $this->db->prepare("SELECT * FROM plotsV2 WHERE owner = ? AND level = ?;");
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlGetPlotsByOwnerAndLevel = $stmt;
-		$stmt = $this->db->prepare("SELECT X, Z FROM plots WHERE (level = ? AND ((abs(X) = ? AND abs(Z) <= ?) OR (abs(Z) = ? AND abs(X) <= ?)));");
+		$stmt = $this->db->prepare("SELECT X, Z FROM plotsV2 WHERE (level = ? AND ((abs(X) = ? AND abs(Z) <= ?) OR (abs(Z) = ? AND abs(X) <= ?)));");
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlGetExistingXZ = $stmt;
@@ -345,15 +347,15 @@ class MySQLProvider extends DataProvider {
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlMergePlot = $stmt;
-		$stmt = $this->db->prepare("SELECT plots.level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plots.level WHERE mergedPlotsV2.level = ? AND mergedX = ? AND mergedZ = ?;");
+		$stmt = $this->db->prepare("SELECT plotsV2.level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plotsV2 LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plotsV2.level WHERE mergedPlotsV2.level = ? AND mergedX = ? AND mergedZ = ?;");
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlGetMergeOrigin = $stmt;
-		$stmt = $this->db->prepare("SELECT plots.level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plots.level AND mergedPlotsV2.mergedX = plots.X AND mergedPlotsV2.mergedZ = plots.Z WHERE mergedPlotsV2.level = ? AND originX = ? AND originZ = ?;");
+		$stmt = $this->db->prepare("SELECT plotsV2.level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plotsV2 LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plotsV2.level AND mergedPlotsV2.mergedX = plotsV2.X AND mergedPlotsV2.mergedZ = plotsV2.Z WHERE mergedPlotsV2.level = ? AND originX = ? AND originZ = ?;");
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlGetMergedPlots = $stmt;
-		$stmt = $this->db->prepare("UPDATE plots SET name = '', owner = '', helpers = '', denied = '', biome = :biome, pvp = :pvp, price = :price WHERE level = :level AND X = :X AND Z = :Z;");
+		$stmt = $this->db->prepare("UPDATE plotsV2 SET name = '', owner = '', helpers = '', denied = '', biome = :biome, pvp = :pvp, price = :price WHERE level = :level AND X = :X AND Z = :Z;");
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlDisposeMergedPlot = $stmt;
