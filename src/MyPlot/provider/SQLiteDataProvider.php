@@ -40,9 +40,10 @@ class SQLiteDataProvider extends DataProvider
 	public function __construct(MyPlot $plugin, int $cacheSize = 0) {
 		parent::__construct($plugin, $cacheSize);
 		$this->db = new \SQLite3($this->plugin->getDataFolder() . "plots.db");
-		$this->db->exec("CREATE TABLE IF NOT EXISTS plots
+		$this->db->exec("CREATE TABLE IF NOT EXISTS plotsV2
 			(level TEXT, X INTEGER, Z INTEGER, name TEXT,
 			 owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INTEGER, price FLOAT, PRIMARY KEY (level, X, Z));");
+		$this->db->exec("INSERT OR ABORT INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price) SELECT level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots;");
 		$this->prepare();
 		$this->plugin->getLogger()->debug("SQLite data provider registered");
 	}
@@ -82,12 +83,6 @@ class SQLiteDataProvider extends DataProvider
 			$stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
 			$stmt->reset();
 			$result = $stmt->execute();
-			if(!$result instanceof \SQLite3Result) {
-				return false;
-			}
-			$plot2 = new Plot($plot->levelName, $plot->X, $plot->Z);
-			$plot2->id = $plot->id;
-			$this->cachePlot($plot2);
 		}else {
 			$stmt = $this->sqlRemovePlot;
 			$stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
@@ -95,12 +90,11 @@ class SQLiteDataProvider extends DataProvider
 			$stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
 			$stmt->reset();
 			$result = $stmt->execute();
-			if(!$result instanceof \SQLite3Result) {
-				return false;
-			}
-			$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
-			$this->cachePlot($plot);
 		}
+		if(!$result instanceof \SQLite3Result) {
+			return false;
+		}
+		$this->cachePlot(new Plot($plot->levelName, $plot->X, $plot->Z));
 		return true;
 	}
 
