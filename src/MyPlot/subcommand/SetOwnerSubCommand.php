@@ -33,7 +33,7 @@ class SetOwnerSubCommand extends SubCommand {
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
 			$level = $this->getPlugin()->getServer()->getWorldManager()->getWorldByName($level);
-			if($level !== null and !$level->isClosed()) {
+			if($level !== null and $level->isLoaded()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
 			}
 		}
