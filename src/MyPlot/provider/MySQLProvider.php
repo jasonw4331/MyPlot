@@ -57,7 +57,7 @@ class MySQLProvider extends DataProvider {
 		parent::__construct($plugin, $cacheSize);
 		$this->settings = $settings;
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
-		if($this->db->connect_error !== '')
+		if($this->db->connect_error !== null)
 			throw new \RuntimeException("Failed to connect to the MySQL database: " . $this->db->connect_error);
 		$this->db->query("CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INT, price FLOAT);");
 		try{
