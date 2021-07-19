@@ -66,6 +66,7 @@ class MySQLProvider extends DataProvider {
 		try{
 			$this->db->query("ALTER TABLE plots ADD COLUMN price FLOAT AFTER pvp;");
 		}catch(\Exception $e) {}
+		$this->db->query("CREATE TABLE IF NOT EXISTS mergedPlots (originId INTEGER, mergedId INTEGER UNIQUE, PRIMARY KEY (originId, mergedId));");
 		$this->prepare();
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
