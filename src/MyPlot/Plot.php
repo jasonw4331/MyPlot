@@ -178,7 +178,7 @@ class Plot
 	 * @return bool
 	 */
 	public function isMerged() : bool {
-		return count(MyPlot::getInstance()->getProvider()->getMergedPlots($this)) > 1;
+		return count(MyPlot::getInstance()->getProvider()->getMergedPlots($this, true)) > 1; // only calculate the adjacent to save resources
 	}
 
 	/**

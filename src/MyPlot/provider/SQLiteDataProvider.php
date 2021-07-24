@@ -104,7 +104,9 @@ class SQLiteDataProvider extends DataProvider
 					(abs(Z) = :number AND abs(X) <= :number)
 				)
 			);");
-
+		if($stmt === false)
+			throw new \Exception();
+		$this->sqlGetExistingXZ = $stmt;
 		$this->db->exec("CREATE TABLE IF NOT EXISTS mergedPlots (originId INTEGER, mergedId INTEGER UNIQUE, PRIMARY KEY (originId, mergedId), FOREIGN KEY (originId) REFERENCES plots (id) ON DELETE CASCADE , FOREIGN KEY (mergedId) REFERENCES plots (id) ON DELETE CASCADE);");
 		$stmt = $this->db->prepare("INSERT OR REPLACE INTO mergedPlots (originId, mergedId) VALUES (:originId, :mergedId);");
 		if($stmt === false)
@@ -151,6 +153,7 @@ class SQLiteDataProvider extends DataProvider
 
 	public function deletePlot(Plot $plot) : bool {
 		if($plot->isMerged()){
+			$plot = $this->getMergeOrigin($plot);
 			$settings = MyPlot::getInstance()->getLevelSettings($plot->levelName);
 			if ($plot->id >= 0) {
 				$stmt = $this->sqlDisposeMergedPlotById;
@@ -171,7 +174,9 @@ class SQLiteDataProvider extends DataProvider
 			if(!$result instanceof \SQLite3Result) {
 				return false;
 			}
-			$this->cachePlot($this->getMergeOrigin($plot));
+			$plot2 = new Plot($plot->levelName, $plot->X, $plot->Z);
+			$plot2->id = $plot->id;
+			$this->cachePlot($plot2);
 		}else {
 			if($plot->id >= 0) {
 				$stmt = $this->sqlRemovePlotById;

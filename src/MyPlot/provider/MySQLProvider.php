@@ -57,7 +57,7 @@ class MySQLProvider extends DataProvider {
 		parent::__construct($plugin, $cacheSize);
 		$this->settings = $settings;
 		$this->db = new \mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DatabaseName'], $settings['Port']);
-		if($this->db->connect_error !== '')
+		if($this->db->connect_error !== null and $this->db->connect_error !== '')
 			throw new \RuntimeException("Failed to connect to the MySQL database: " . $this->db->connect_error);
 		$this->db->query("CREATE TABLE IF NOT EXISTS plots (id INT PRIMARY KEY AUTO_INCREMENT, level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INT, price FLOAT);");
 		try{
@@ -66,6 +66,7 @@ class MySQLProvider extends DataProvider {
 		try{
 			$this->db->query("ALTER TABLE plots ADD COLUMN price FLOAT AFTER pvp;");
 		}catch(\Exception $e) {}
+		$this->db->query("CREATE TABLE IF NOT EXISTS mergedPlots (originId INTEGER, mergedId INTEGER UNIQUE, PRIMARY KEY (originId, mergedId));");
 		$this->prepare();
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
@@ -330,7 +331,7 @@ class MySQLProvider extends DataProvider {
 						Server::getInstance()->unloadLevel($level, true); // force unload to prevent possible griefing
 					}
 				}
-				if($this->db->connect_error !== '')
+				if($this->db->connect_error !== null and $this->db->connect_error !== '')
 					$this->plugin->getLogger()->critical("Failed to connect to the MySQL database: " . $this->db->connect_error);
 				if((bool)$this->plugin->getConfig()->getNested("MySQLSettings.ShutdownOnFailure", false)) {
 					$this->plugin->getServer()->shutdown();
