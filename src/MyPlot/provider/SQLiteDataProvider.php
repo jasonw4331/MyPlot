@@ -120,6 +120,8 @@ class SQLiteDataProvider extends DataProvider
 		if($stmt === false)
 			throw new \Exception();
 		$this->sqlGetMergedPlots = $stmt;
+		$this->db->exec("UPDATE plots SET biome = 'SWAMPLAND' WHERE biome = 'SWAMP';");
+		$this->db->exec("UPDATE plots SET biome = 'EXTREME_HILLS' WHERE biome = 'MOUNTAINS';");
 		$this->plugin->getLogger()->debug("SQLite data provider registered");
 	}
 

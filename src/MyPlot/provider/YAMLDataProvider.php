@@ -23,6 +23,13 @@ class YAMLDataProvider extends DataProvider {
 		parent::__construct($plugin, $cacheSize);
 		@mkdir($this->plugin->getDataFolder() . "Data");
 		$this->yaml = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::YAML, ["count" => -1, "plots" => []]);
+
+		foreach($this->yaml->get("plots", []) as $key => $plot){
+			$biome = $plot["biome"];
+			$plot["biome"] = $biome === "SWAMP" ? "SWAMPLAND" : ($biome === "MOUNTAINS" ? "EXTREME_HILLS" : $biome);
+			$this->yaml->setNested("plots.$key", $plot);
+			$this->yaml->save();
+		}
 	}
 
 	public function savePlot(Plot $plot) : bool {
@@ -52,7 +59,7 @@ class YAMLDataProvider extends DataProvider {
 	}
 
 	public function getPlot(string $levelName, int $X, int $Z) : Plot {
-		if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) !== null) {
+	    if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) !== null) {
 			return $plot;
 		}
 		$plots = $this->yaml->get("plots", []);
@@ -231,6 +238,8 @@ class YAMLDataProvider extends DataProvider {
 		if(isset($allMerges[$plot->id]))
 			return $plot;
 		$originId = array_search($plot->id, $allMerges);
+		if($originId === false)
+		    return $plot;
 		$plotDatums = $this->yaml->get("plots", []);
 		if(isset($plotDatums[$originId])) {
 			$levelName = $plotDatums[$originId]["level"];

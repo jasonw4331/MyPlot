@@ -67,6 +67,8 @@ class MySQLProvider extends DataProvider {
 			$this->db->query("ALTER TABLE plots ADD COLUMN price FLOAT AFTER pvp;");
 		}catch(\Exception $e) {}
 		$this->prepare();
+		$this->db->query("UPDATE plots SET biome = 'SWAMPLAND' WHERE biome = 'SWAMP';");
+		$this->db->query("UPDATE plots SET biome = 'EXTREME_HILLS' WHERE biome = 'MOUNTAINS';");
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
 

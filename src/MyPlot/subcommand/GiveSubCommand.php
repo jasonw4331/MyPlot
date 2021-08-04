@@ -47,7 +47,7 @@ class GiveSubCommand extends SubCommand
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
 			$level = $this->getPlugin()->getServer()->getWorldManager()->getWorldByName((string)$level);
-			if($level !== null and !$level->isClosed()) {
+			if($level !== null and !$level->isLoaded()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(), $level->getFolderName()));
 			}
 		}
