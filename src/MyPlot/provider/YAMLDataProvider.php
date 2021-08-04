@@ -25,11 +25,11 @@ class YAMLDataProvider extends DataProvider {
 		$this->yaml = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::YAML, ["count" => -1, "plots" => []]);
 
 		foreach($this->yaml->get("plots", []) as $key => $plot){
-            $biome = $plot["biome"];
-            $plot["biome"] = $biome === "SWAMP" ? "SWAMPLAND" : ($biome === "MOUNTAINS" ? "EXTREME_HILLS" : $biome);
-            $this->yaml->setNested("plots.$key", $plot);
-            $this->yaml->save();
-        }
+			$biome = $plot["biome"];
+			$plot["biome"] = $biome === "SWAMP" ? "SWAMPLAND" : ($biome === "MOUNTAINS" ? "EXTREME_HILLS" : $biome);
+			$this->yaml->setNested("plots.$key", $plot);
+			$this->yaml->save();
+		}
 	}
 
 	public function savePlot(Plot $plot) : bool {

@@ -25,11 +25,11 @@ class JSONDataProvider extends DataProvider {
 		$this->json = new Config($this->plugin->getDataFolder() . "Data" . DIRECTORY_SEPARATOR . "plots.yml", Config::JSON, ["count" => -1, "plots" => []]);
 
 		foreach($this->json->get("plots", []) as $key => $plot){
-            $biome = $plot["biome"];
-            $plot["biome"] = $biome === "SWAMP" ? "SWAMPLAND" : ($biome === "MOUNTAINS" ? "EXTREME_HILLS" : $biome);
-            $this->json->setNested("plots.$key", $plot);
-            $this->json->save();
-        }
+			$biome = $plot["biome"];
+			$plot["biome"] = $biome === "SWAMP" ? "SWAMPLAND" : ($biome === "MOUNTAINS" ? "EXTREME_HILLS" : $biome);
+			$this->json->setNested("plots.$key", $plot);
+			$this->json->save();
+		}
 	}
 
 	public function savePlot(Plot $plot) : bool {
