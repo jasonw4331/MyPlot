@@ -26,12 +26,7 @@ class YAMLDataProvider extends DataProvider {
 
 		foreach($this->yaml->get("plots", []) as $key => $plot){
 		    $biome = $plot["biome"];
-
-		    if($biome === "SWAMP"){
-		        $plot["biome"] = "SWAMPLAND";
-            }elseif($biome === "MOUNTAINS"){
-                $plot["biome"] = "EXTREME_HILLS";
-            }
+		    $plot["biome"] = $biome === "SWAMP" ? "SWAMPLAND" : ($biome === "MOUNTAINS" ? "EXTREME_HILLS" : $biome);
 		    $this->yaml->setNested("plots.$key", $plot);
 		    $this->yaml->save();
         }
