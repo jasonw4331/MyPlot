@@ -601,8 +601,12 @@ class MyPlot extends PluginBase
 		$pos->z -= 1;
 		$world = Server::getInstance()->getWorldManager()->getWorldByName($plot->levelName);
 		if($world->getOrLoadChunkAtPosition($pos) === null) {
-			$world->orderChunkPopulation($pos->getFloorX() >> 4, $pos->getFloorZ() >> 4, null);
+			$world->orderChunkPopulation($pos->getFloorX() >> 4, $pos->getFloorZ() >> 4, null)->onCompletion(function ()use($player, $pos): void{
+			    if($player->isOnline()) $player->teleport($pos);
+            }, function (): void{});
+			return true;
 		}
+
 		return $player->teleport($pos);
 	}
 
@@ -1000,7 +1004,7 @@ class MyPlot extends PluginBase
 					}
 				}
 			}
-			$world->setChunk($coords[0], $coords[1], $chunk, false);
+			$world->setChunk((int)$coords[0], (int)$coords[1], $chunk, false);
 		}
 		return !$failed;
 	}
