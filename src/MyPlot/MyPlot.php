@@ -48,7 +48,7 @@ class MyPlot extends PluginBase
 	/** @var PlotLevelSettings[] $levels */
 	private array $levels = [];
 	private DataProvider $dataProvider;
-	private EconomyProvider $economyProvider;
+	private ?EconomyProvider $economyProvider = null;
 	private BaseLang $baseLang;
 
 	public static function getInstance() : self {
