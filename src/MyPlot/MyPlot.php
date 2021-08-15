@@ -905,7 +905,7 @@ class MyPlot extends PluginBase
 		if($ev->isCancelled()) {
 			return false;
 		}
-		return !$this->getProvider()->deletePlot($plot);
+		return $this->getProvider()->deletePlot($plot);
 	}
 
 	/**
