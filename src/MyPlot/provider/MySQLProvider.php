@@ -10,7 +10,7 @@ use pocketmine\Server;
 class MySQLProvider extends DataProvider {
 	protected MyPlot $plugin;
 	protected \mysqli $db;
-	/** @var string[] $settings */
+	/** @var null[]|int[]|string[] $settings */
 	protected array $settings;
 	protected \mysqli_stmt $sqlGetPlot;
 	protected \mysqli_stmt $sqlSavePlot;

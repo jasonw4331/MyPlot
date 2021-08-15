@@ -53,10 +53,11 @@ class MyPlotGenerationEvent extends Event implements Cancellable {
 	 * @param string[] $settings
 	 *
 	 * @return self
+	 * @throws \JsonException
 	 */
 	public function setSettings(array $settings) : self {
 		$this->settings = $settings;
-		$this->settings["preset"] = json_encode($settings);
+		$this->settings["preset"] = json_encode($settings, JSON_THROW_ON_ERROR);
 		return $this;
 	}
 }
