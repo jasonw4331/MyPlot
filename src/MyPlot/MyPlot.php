@@ -14,13 +14,12 @@ use MyPlot\events\MyPlotMergeEvent;
 use MyPlot\events\MyPlotResetEvent;
 use MyPlot\events\MyPlotSettingEvent;
 use MyPlot\events\MyPlotTeleportEvent;
+use MyPlot\provider\ConfigDataProvider;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
-use MyPlot\provider\JSONDataProvider;
 use MyPlot\provider\MySQLProvider;
 use MyPlot\provider\SQLiteDataProvider;
-use MyPlot\provider\YAMLDataProvider;
 use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
 use MyPlot\task\RoadFillTask;
@@ -1300,10 +1299,10 @@ class MyPlot extends PluginBase
 					break;
 					case "yaml":
 						if(extension_loaded("yaml")) {
-							$this->dataProvider = new YAMLDataProvider($this, $cacheSize);
+							$this->dataProvider = new ConfigDataProvider($this, $cacheSize, true);
 						}else {
 							$this->getLogger()->warning("YAML is not installed in your php build! JSON will be used instead.");
-							$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+							$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
 						}
 					break;
 					case "sqlite3":
@@ -1312,17 +1311,17 @@ class MyPlot extends PluginBase
 							$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
 						}else {
 							$this->getLogger()->warning("SQLite3 is not installed in your php build! JSON will be used instead.");
-							$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+							$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
 						}
 					break;
 					case "json":
 					default:
-						$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+						$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
 					break;
 				}
 			}catch(\Exception $e) {
 				$this->getLogger()->error("The selected data provider crashed. JSON will be used instead.");
-				$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+				$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
 			}
 		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings");
 		if($this->getConfig()->get("FastClearing", false) and $this->getServer()->getPluginManager()->getPlugin("WorldStyler") === null) {
