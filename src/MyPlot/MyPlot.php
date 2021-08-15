@@ -1283,7 +1283,7 @@ class MyPlot extends PluginBase
 		$cacheSize = $this->getConfig()->get("PlotCacheSize", 256);
 		$dataProvider = $this->getConfig()->get("DataProvider", "sqlite3");
 		if(!is_string($dataProvider))
-			$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+			$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
 		else
 			try {
 				switch(strtolower($dataProvider)) {
@@ -1294,7 +1294,7 @@ class MyPlot extends PluginBase
 							$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
 						}else {
 							$this->getLogger()->warning("MySQLi is not installed in your php build! JSON will be used instead.");
-							$this->dataProvider = new JSONDataProvider($this, $cacheSize);
+							$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
 						}
 					break;
 					case "yaml":
