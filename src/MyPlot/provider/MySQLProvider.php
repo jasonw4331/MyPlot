@@ -54,9 +54,13 @@ class MySQLProvider extends DataProvider {
 		if($this->db->connect_error !== null and $this->db->connect_error !== '')
 			throw new \RuntimeException("Failed to connect to the MySQL database: " . $this->db->connect_error);
 		$this->db->query("CREATE TABLE IF NOT EXISTS plotsV2 (level TEXT, X INT, Z INT, name TEXT, owner TEXT, helpers TEXT, denied TEXT, biome TEXT, pvp INT, price FLOAT, PRIMARY KEY (level, X, Z));");
-		$this->db->query("INSERT IGNORE INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price) SELECT level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots;");
+		$res = $this->db->query("SELECT count(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA='{$settings['DatabaseName']}' AND TABLE_NAME='plots'");
+		if($res instanceof \mysqli_result and $res->fetch_array()[0] > 0)
+			$this->db->query("INSERT IGNORE INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price) SELECT level, X, Z, name, owner, helpers, denied, biome, pvp, price FROM plots;");
 		$this->db->query("CREATE TABLE IF NOT EXISTS mergedPlotsV2 (level TEXT, originX INT, originZ INT, mergedX INT, mergedZ INT, PRIMARY KEY(level, originX, originZ, mergedX, mergedZ));");
-		$this->db->query("INSERT IGNORE INTO mergedPlotsV2 (level, originX, originZ, mergedX, mergedZ) SELECT r1.level, r1.X, r1.Z, r2.X, r2.Z FROM plots r1, mergedPlots JOIN plots r2 ON r1.id = mergedPlots.originId AND r2.id = mergedPlots.mergedId;");
+		$res = $this->db->query("SELECT count(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA='{$settings['DatabaseName']}' AND TABLE_NAME='mergedPlots';");
+		if($res instanceof \mysqli_result and $res->fetch_array()[0] > 0)
+			$this->db->query("INSERT IGNORE INTO mergedPlotsV2 (level, originX, originZ, mergedX, mergedZ) SELECT r1.level, r1.X, r1.Z, r2.X, r2.Z FROM plots r1, mergedPlots JOIN plots r2 ON r1.id = mergedPlots.originId AND r2.id = mergedPlots.mergedId;");
 		$this->prepare();
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
