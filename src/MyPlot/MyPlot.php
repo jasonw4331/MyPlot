@@ -539,11 +539,6 @@ class MyPlot extends PluginBase
 			return false;
 		}
 		foreach ($toMerge as $pair) {
-
-			//if ($pair[1]->id === -1) {
-			//	$this->getLogger()->debug("Failed to merge due to invalid Id");
-			//	return false;
-			//} else
 			if ($pair[1]->owner === "") {
 				$this->getLogger()->debug("Failed to merge due to plot not claimed");
 				return false;

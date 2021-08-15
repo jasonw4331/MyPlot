@@ -26,8 +26,6 @@ class Plot
 	public $pvp = true;
 	/** @var float $price */
 	public $price = 0.0;
-	/** @var int $id */
-	public $id = -1;
 
 	/**
 	 * Plot constructor.
@@ -42,9 +40,8 @@ class Plot
 	 * @param string $biome
 	 * @param bool|null $pvp
 	 * @param float $price
-	 * @param int $id
 	 */
-	public function __construct(string $levelName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, float $price = -1, int $id = -1) {
+	public function __construct(string $levelName, int $X, int $Z, string $name = "", string $owner = "", array $helpers = [], array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, float $price = -1) {
 		$this->levelName = $levelName;
 		$this->X = $X;
 		$this->Z = $Z;
@@ -63,7 +60,6 @@ class Plot
 			$this->price = $price < 0 ? $settings->claimPrice : $price;
 		else
 			$this->price = 0;
-		$this->id = $id;
 	}
 
 	/**
