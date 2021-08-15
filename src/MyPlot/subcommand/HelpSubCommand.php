@@ -11,8 +11,7 @@ use pocketmine\utils\TextFormat;
 
 class HelpSubCommand extends SubCommand
 {
-	/** @var Commands $cmds */
-	private $cmds;
+	private Commands $cmds;
 
 	/**
 	 * HelpSubCommand constructor.

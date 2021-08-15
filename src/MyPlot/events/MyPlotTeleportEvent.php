@@ -6,8 +6,7 @@ use MyPlot\Plot;
 use pocketmine\Player;
 
 class MyPlotTeleportEvent extends MyPlotPlayerEnterPlotEvent {
-	/** @var bool $center */
-	private $center = false;
+	private bool $center;
 
 	public function __construct(Plot $plot, Player $player, bool $center = false) {
 		$this->center = $center;

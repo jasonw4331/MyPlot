@@ -8,10 +8,8 @@ use pocketmine\math\Vector3;
 use pocketmine\utils\Config;
 
 class ConfigDataProvider extends DataProvider {
-	/** @var MyPlot $plugin */
-	protected $plugin;
-	/** @var Config $config */
-	private $config;
+	protected MyPlot $plugin;
+	private Config $config;
 
 	/**
 	 * JSONDataProvider constructor.

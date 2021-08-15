@@ -13,40 +13,24 @@ use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
 
 class BorderCorrectionTask extends Task{
-	/** @var MyPlot $plugin */
-	protected $plugin;
-	/** @var Plot $start */
-	protected $start;
-	/** @var Level $level */
-	protected $level;
-	/** @var int $height */
-	protected $height;
-	/** @var Block $plotWallBlock */
-	protected $plotWallBlock;
+	protected MyPlot $plugin;
+	protected Plot $start;
+	protected Level $level;
+	protected int $height;
+	protected Block $plotWallBlock;
 	/** @var Position|Vector3 $plotBeginPos */
-	protected $plotBeginPos;
-	/** @var int $xMax */
-	protected $xMax;
-	/** @var int $zMax */
-	protected $zMax;
-	/** @var int $direction */
-	protected $direction;
-	/** @var Block $roadBlock */
-	protected $roadBlock;
-	/** @var Block $groundBlock */
-	protected $groundBlock;
-	/** @var Block $bottomBlock */
-	protected $bottomBlock;
-	/** @var Plot $end */
-	protected $end;
-	/** @var bool $fillCorner */
-	protected $fillCorner;
-	/** @var int $cornerDirection */
-	protected $cornerDirection;
-	/** @var Vector3 $pos */
-	protected $pos;
-	/** @var int */
-	protected $maxBlocksPerTick;
+	protected Vector3 $plotBeginPos;
+	protected int $xMax;
+	protected int $zMax;
+	protected int $direction;
+	protected Block $roadBlock;
+	protected Block $groundBlock;
+	protected Block $bottomBlock;
+	protected Plot $end;
+	protected bool $fillCorner;
+	protected int $cornerDirection;
+	protected Vector3 $pos;
+	protected int $maxBlocksPerTick;
 
 	public function __construct(MyPlot $plugin, Plot $start, Plot $end, bool $fillCorner = false, int $cornerDirection = -1, int $maxBlocksPerTick = 256) {
 		$this->plugin = $plugin;

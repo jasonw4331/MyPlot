@@ -11,7 +11,7 @@ use pocketmine\utils\TextFormat;
 
 class KickForm extends ComplexMyPlotForm {
 	/** @var string[] $players */
-	private $players = [];
+	private array $players = [];
 
 	public function __construct() {
 		$plugin = MyPlot::getInstance();

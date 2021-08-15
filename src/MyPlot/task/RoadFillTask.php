@@ -5,6 +5,7 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
+use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -12,36 +13,22 @@ use pocketmine\Player;
 use pocketmine\scheduler\Task;
 
 class RoadFillTask extends Task{
-	/** @var MyPlot $plugin */
-	protected $plugin;
-	/** @var Plot $start */
-	protected $start;
-	/** @var Plot $end */
-	protected $end;
-	/** @var Level $level */
-	protected $level;
-	/** @var int $height */
-	protected $height;
+	protected MyPlot $plugin;
+	protected Plot $start;
+	protected Plot $end;
+	protected Level $level;
+	protected int $height;
 	/** @var Position|Vector3|null $plotBeginPos */
-	protected $plotBeginPos;
-	/** @var int $xMax */
-	protected $xMax;
-	/** @var int $zMax */
-	protected $zMax;
-	/** @var Block $roadBlock */
-	protected $roadBlock;
-	/** @var Block $groundBlock */
-	protected $groundBlock;
-	/** @var Block $bottomBlock */
-	protected $bottomBlock;
-	/** @var int $maxBlocksPerTick */
-	protected $maxBlocksPerTick;
-	/** @var Vector3 $pos */
-	protected $pos;
-	/** @var bool $fillCorner */
-	protected $fillCorner;
-	/** @var int $cornerDirection */
-	protected $cornerDirection = -1;
+	protected ?Vector3 $plotBeginPos;
+	protected int $xMax;
+	protected int $zMax;
+	protected Block $roadBlock;
+	protected Block $groundBlock;
+	protected Block $bottomBlock;
+	protected int $maxBlocksPerTick;
+	protected Vector3 $pos;
+	protected bool $fillCorner;
+	protected int $cornerDirection = -1;
 
 	public function __construct(MyPlot $plugin, Plot $start, Plot $end, bool $fillCorner = false, int $cornerDirection = -1, int $maxBlocksPerTick = 256) {
 		if($start->isSame($end))
@@ -111,7 +98,7 @@ class RoadFillTask extends Task{
 					elseif($this->pos->y === $this->height)
 						$block = $this->roadBlock;
 					else
-						$block = Block::get(Block::AIR);
+						$block = Block::get(BlockIds::AIR);
 
 					$this->level->setBlock($this->pos, $block, false, false);
 					$this->pos->y++;

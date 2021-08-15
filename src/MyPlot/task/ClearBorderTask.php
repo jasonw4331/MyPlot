@@ -12,28 +12,17 @@ use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
 
 class ClearBorderTask extends Task {
-	/** @var MyPlot $plugin */
-	protected $plugin;
-	/** @var Plot $plot */
-	protected $plot;
-	/** @var Level $level */
-	protected $level;
-	/** @var int $height */
-	protected $height;
-	/** @var Block $plotWallBlock */
-	protected $plotWallBlock;
-	/** @var Vector3 $plotBeginPos */
-	protected $plotBeginPos;
-	/** @var int $xMax */
-	protected $xMax;
-	/** @var int $zMax */
-	protected $zMax;
-	/** @var Block $roadBlock */
-	protected $roadBlock;
-	/** @var Block $groundBlock */
-	protected $groundBlock;
-	/** @var Block $bottomBlock */
-	protected $bottomBlock;
+	protected MyPlot $plugin;
+	protected Plot $plot;
+	protected Level $level;
+	protected int $height;
+	protected Block $plotWallBlock;
+	protected Vector3 $plotBeginPos;
+	protected int $xMax;
+	protected int $zMax;
+	protected Block $roadBlock;
+	protected Block $groundBlock;
+	protected Block $bottomBlock;
 
 	/**
 	 * ClearBorderTask constructor.

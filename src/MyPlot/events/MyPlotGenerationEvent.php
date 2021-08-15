@@ -6,19 +6,17 @@ use pocketmine\event\Cancellable;
 use pocketmine\event\Event;
 
 class MyPlotGenerationEvent extends Event implements Cancellable {
-	/** @var string $levelName */
-	private $levelName;
-	/** @var string $generator */
-	private $generator = "myplot";
-	/** @var mixed[] $settings */
-	private $settings = [];
+	private string $levelName;
+	private string $generator;
+	/** @var string[] $settings */
+	private array $settings;
 
 	/**
 	 * MyPlotGenerationEvent constructor.
 	 *
 	 * @param string $levelName
 	 * @param string $generator
-	 * @param mixed[] $settings
+	 * @param string[] $settings
 	 */
 	public function __construct(string $levelName, string $generator = "myplot", array $settings = []) {
 		$this->levelName = $levelName;
@@ -45,14 +43,14 @@ class MyPlotGenerationEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * @return mixed[]
+	 * @return string[]
 	 */
 	public function getSettings() : array {
 		return $this->settings;
 	}
 
 	/**
-	 * @param mixed[] $settings
+	 * @param string[] $settings
 	 *
 	 * @return self
 	 */

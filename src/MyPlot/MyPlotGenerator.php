@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use pocketmine\block\Block;
+use pocketmine\block\BlockIds;
 use pocketmine\level\biome\Biome;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\format\Chunk;
@@ -11,26 +12,17 @@ use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 
 class MyPlotGenerator extends Generator {
-	/** @var ChunkManager $level */
-	protected $level;
+	protected ChunkManager $level;
 	/** @var string[] $settings */
-	private $settings;
-	/** @var Block $roadBlock */
-	protected $roadBlock;
-	/** @var Block $bottomBlock */
-	protected $bottomBlock;
-	/** @var Block $plotFillBlock */
-	protected $plotFillBlock;
-	/** @var Block $plotFloorBlock */
-	protected $plotFloorBlock;
-	/** @var Block $wallBlock */
-	protected $wallBlock;
-	/** @var int $roadWidth */
-	protected $roadWidth = 7;
-	/** @var int $groundHeight */
-	protected $groundHeight = 64;
-	/** @var int $plotSize */
-	protected $plotSize = 32;
+	private array $settings;
+	protected Block $roadBlock;
+	protected Block $bottomBlock;
+	protected Block $plotFillBlock;
+	protected Block $plotFloorBlock;
+	protected Block $wallBlock;
+	protected int $roadWidth = 7;
+	protected int $groundHeight = 64;
+	protected int $plotSize = 32;
 	public const PLOT = 0;
 	public const ROAD = 1;
 	public const WALL = 2;
@@ -50,11 +42,11 @@ class MyPlotGenerator extends Generator {
 		}else{
 			$settings = [];
 		}
-		$this->roadBlock = PlotLevelSettings::parseBlock($settings, "RoadBlock", Block::get(Block::PLANKS));
-		$this->wallBlock = PlotLevelSettings::parseBlock($settings, "WallBlock", Block::get(Block::STONE_SLAB));
-		$this->plotFloorBlock = PlotLevelSettings::parseBlock($settings, "PlotFloorBlock", Block::get(Block::GRASS));
-		$this->plotFillBlock = PlotLevelSettings::parseBlock($settings, "PlotFillBlock", Block::get(Block::DIRT));
-		$this->bottomBlock = PlotLevelSettings::parseBlock($settings, "BottomBlock", Block::get(Block::BEDROCK));
+		$this->roadBlock = PlotLevelSettings::parseBlock($settings, "RoadBlock", Block::get(BlockIds::PLANKS));
+		$this->wallBlock = PlotLevelSettings::parseBlock($settings, "WallBlock", Block::get(BlockIds::STONE_SLAB));
+		$this->plotFloorBlock = PlotLevelSettings::parseBlock($settings, "PlotFloorBlock", Block::get(BlockIds::GRASS));
+		$this->plotFillBlock = PlotLevelSettings::parseBlock($settings, "PlotFillBlock", Block::get(BlockIds::DIRT));
+		$this->bottomBlock = PlotLevelSettings::parseBlock($settings, "BottomBlock", Block::get(BlockIds::BEDROCK));
 		$this->roadWidth = PlotLevelSettings::parseNumber($settings, "RoadWidth", 7);
 		$this->plotSize = PlotLevelSettings::parseNumber($settings, "PlotSize", 32);
 		$this->groundHeight = PlotLevelSettings::parseNumber($settings, "GroundHeight", 64);
@@ -76,7 +68,7 @@ class MyPlotGenerator extends Generator {
 	}
 
 	/**
-	 * @return mixed[]
+	 * @return string[]
 	 * @phpstan-return array<string, mixed>
 	 */
 	public function getSettings() : array {
@@ -131,7 +123,7 @@ class MyPlotGenerator extends Generator {
 	 *
 	 * @return \SplFixedArray<int>
 	 */
-	public function getShape(int $x, int $z) {
+	public function getShape(int $x, int $z) : \SplFixedArray {
 		$totalSize = $this->plotSize + $this->roadWidth;
 		if($x >= 0) {
 			$X = $x % $totalSize;

@@ -44,9 +44,9 @@ use pocketmine\utils\TextFormat;
 class Commands extends PluginCommand
 {
 	/** @var SubCommand[] $subCommands */
-	private $subCommands = [];
+	private array $subCommands = [];
 	/** @var SubCommand[] $aliasSubCommands */
-	private $aliasSubCommands = [];
+	private array $aliasSubCommands = [];
 
 	/**
 	 * Commands constructor.

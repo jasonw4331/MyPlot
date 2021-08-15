@@ -6,8 +6,7 @@ use MyPlot\Plot;
 use pocketmine\event\Cancellable;
 
 class MyPlotCloneEvent extends MyPlotPlotEvent implements Cancellable {
-	/** @var Plot $clonePlot **/
-	protected $clonePlot;
+	protected Plot $clonePlot;
 
 	/**
 	 * MyPlotCloneEvent constructor.

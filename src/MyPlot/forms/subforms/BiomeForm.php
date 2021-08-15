@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class BiomeForm extends SimpleMyPlotForm {
 	/** @var string[] $biomeNames */
-	private $biomeNames = [];
+	private array $biomeNames;
 
 	/**
 	 * BiomeForm constructor.

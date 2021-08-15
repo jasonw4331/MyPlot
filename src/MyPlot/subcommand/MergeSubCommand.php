@@ -10,11 +10,6 @@ use pocketmine\utils\TextFormat;
 
 class MergeSubCommand extends SubCommand
 {
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and ($sender->hasPermission("myplot.command.merge"));
 	}
@@ -104,11 +99,10 @@ class MergeSubCommand extends SubCommand
 		if($this->getPlugin()->mergePlots($plot, $direction, $maxBlocksPerTick)) {
 			$plot = TextFormat::GREEN . $plot . TextFormat::WHITE;
 			$sender->sendMessage($this->translateString("merge.success", [$plot, $args[0]]));
-			return true;
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
-			return true;
 		}
+		return true;
 	}
 
     public function getForm(?Player $player = null) : ?MyPlotForm {

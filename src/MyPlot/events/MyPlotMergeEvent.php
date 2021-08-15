@@ -8,7 +8,7 @@ use pocketmine\event\Cancellable;
 class MyPlotMergeEvent extends MyPlotPlotEvent implements Cancellable {
 
     /** @var Plot[][] $toMerge */
-    private $toMerge;
+    private array $toMerge;
 
 
     /**

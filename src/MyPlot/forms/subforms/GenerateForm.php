@@ -15,7 +15,7 @@ use pocketmine\utils\TextFormat;
 
 class GenerateForm extends ComplexMyPlotForm {
 	/** @var string[] $keys */
-	private $keys = [];
+	private array $keys = [];
 
 	public function __construct() {
 		$plugin = MyPlot::getInstance();

@@ -11,7 +11,7 @@ use pocketmine\utils\TextFormat;
 class MainForm extends SimpleMyPlotForm {
 
 	/** @var SubCommand[] $link */
-	private $link = [];
+	private array $link = [];
 
 	/**
 	 * MainForm constructor.

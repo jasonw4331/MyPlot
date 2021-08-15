@@ -31,8 +31,7 @@ use pocketmine\utils\TextFormat;
 
 class EventListener implements Listener
 {
-	/** @var MyPlot $plugin */
-	private $plugin;
+	private MyPlot $plugin;
 
 	/**
 	 * EventListener constructor.

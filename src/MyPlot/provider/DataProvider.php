@@ -8,11 +8,9 @@ use MyPlot\Plot;
 abstract class DataProvider
 {
 	/** @var Plot[] $cache */
-	private $cache = [];
-	/** @var int $cacheSize */
-	private $cacheSize;
-	/** @var MyPlot $plugin */
-	protected $plugin;
+	private array $cache = [];
+	private int $cacheSize;
+	protected MyPlot $plugin;
 
 	/**
 	 * DataProvider constructor.

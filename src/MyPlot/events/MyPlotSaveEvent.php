@@ -11,8 +11,7 @@ class MyPlotSaveEvent extends MyPlotPlotEvent implements Cancellable {
 	public const JSON = 2;
 	public const YAML = 3;
 	public const OTHER = -1;
-	/** @var int $type */
-	private $type;
+	private int $type;
 
 	public function __construct(int $type, Plot $plot) {
 		$this->type = $type;

@@ -11,10 +11,8 @@ use pocketmine\plugin\Plugin;
 
 abstract class SubCommand implements PluginIdentifiableCommand
 {
-	/** @var MyPlot $plugin */
-    private $plugin;
-	/** @var string $name */
-    private $name;
+	private MyPlot $plugin;
+	private string $name;
 
 	public function __construct(MyPlot $plugin, string $name) {
         $this->plugin = $plugin;

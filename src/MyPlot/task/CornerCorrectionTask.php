@@ -5,6 +5,7 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
+use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -13,34 +14,21 @@ use pocketmine\scheduler\Task;
 
 class CornerCorrectionTask extends Task{
 
-	/** @var MyPlot $plugin */
-	protected $plugin;
-	/** @var Plot $start */
-	protected $start;
-	/** @var Level|null $level */
-	protected $level;
-	/** @var int $height */
-	protected $height;
-	/** @var Block $plotWallBlock */
-	protected $plotWallBlock;
-	/** @var int $maxBlocksPerTick */
-	protected $maxBlocksPerTick;
+	protected MyPlot $plugin;
+	protected Plot $start;
+	protected ?Level $level;
+	protected int $height;
+	protected Block $plotWallBlock;
+	protected int $maxBlocksPerTick;
 	/** @var Position|Vector3|null $plotBeginPos */
-	protected $plotBeginPos;
-	/** @var int $xMax */
-	protected $xMax;
-	/** @var int $zMax */
-	protected $zMax;
-	/** @var int $direction */
-	protected $direction;
-	/** @var Block $roadBlock */
-	protected $roadBlock;
-	/** @var Block $groundBlock */
-	protected $groundBlock;
-	/** @var Block $bottomBlock */
-	protected $bottomBlock;
-	/** @var Vector3 $pos */
-	protected $pos;
+	protected ?Vector3 $plotBeginPos;
+	protected int $xMax;
+	protected int $zMax;
+	protected int $direction;
+	protected Block $roadBlock;
+	protected Block $groundBlock;
+	protected Block $bottomBlock;
+	protected Vector3 $pos;
 
 	public function __construct(MyPlot $plugin, Plot $start, Plot $end, int $cornerDirection, int $maxBlocksPerTick = 256) {
 		$this->plugin = $plugin;
@@ -117,7 +105,7 @@ class CornerCorrectionTask extends Task{
 					elseif($this->pos->y === $this->height)
 						$block = $this->roadBlock;
 					else
-						$block = Block::get(Block::AIR);
+						$block = Block::get(BlockIds::AIR);
 
 					$this->level->setBlock($this->pos, $block, false, false);
 					$this->pos->y++;

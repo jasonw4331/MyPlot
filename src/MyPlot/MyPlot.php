@@ -44,16 +44,12 @@ use pocketmine\utils\TextFormat as TF;
 
 class MyPlot extends PluginBase
 {
-	/** @var MyPlot $instance */
-	private static $instance;
+	private static MyPlot $instance;
 	/** @var PlotLevelSettings[] $levels */
-	private $levels = [];
-	/** @var DataProvider $dataProvider */
-	private $dataProvider = null;
-	/** @var EconomyProvider $economyProvider */
-	private $economyProvider = null;
-	/** @var BaseLang $baseLang */
-	private $baseLang = null;
+	private array $levels = [];
+	private DataProvider $dataProvider;
+	private EconomyProvider $economyProvider;
+	private BaseLang $baseLang;
 
 	public static function getInstance() : self {
 		return self::$instance;
@@ -230,6 +226,7 @@ class MyPlot extends PluginBase
 	 * @api
 	 *
 	 * @param Position $position
+	 * @param bool $blockRecursion
 	 *
 	 * @return Plot|null
 	 */
@@ -1370,7 +1367,6 @@ class MyPlot extends PluginBase
 	}
 
 	public function onDisable() : void {
-		if($this->dataProvider !== null)
-			$this->dataProvider->close();
+		$this->dataProvider->close();
 	}
 }

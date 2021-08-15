@@ -5,6 +5,7 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
+use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
@@ -13,32 +14,19 @@ use pocketmine\Player;
 use pocketmine\scheduler\Task;
 
 class ClearPlotTask extends Task {
-	/** @var MyPlot $plugin */
-	protected $plugin;
-	/** @var Plot $plot */
-	protected $plot;
-	/** @var Level $level */
-	protected $level;
-	/** @var int $height */
-	protected $height;
-	/** @var Block $bottomBlock */
-	protected $bottomBlock;
-	/** @var Block $plotFillBlock */
-	protected $plotFillBlock;
-	/** @var Block $plotFloorBlock */
-	protected $plotFloorBlock;
-	/** @var Position $plotBeginPos */
-	protected $plotBeginPos;
-	/** @var int $xMax */
-	protected $xMax;
-	/** @var int $zMax */
-	protected $zMax;
-	/** @var int $maxBlocksPerTick */
-	protected $maxBlocksPerTick;
-	/** @var Vector3 $pos */
-	protected $pos;
-    /** @var AxisAlignedBB|null $plotBB */
-    protected $plotBB;
+	protected MyPlot $plugin;
+	protected Plot $plot;
+	protected Level $level;
+	protected int $height;
+	protected Block $bottomBlock;
+	protected Block $plotFillBlock;
+	protected Block $plotFloorBlock;
+	protected Position $plotBeginPos;
+	protected int $xMax;
+	protected int $zMax;
+	protected int $maxBlocksPerTick;
+	protected Vector3 $pos;
+	protected ?AxisAlignedBB $plotBB;
 
 	/**
 	 * ClearPlotTask constructor.
@@ -99,7 +87,7 @@ class ClearPlotTask extends Task {
 					}elseif($this->pos->y === $this->height) {
 						$block = $this->plotFloorBlock;
 					}else{
-						$block = Block::get(Block::AIR);
+						$block = Block::get(BlockIds::AIR);
 					}
 					$this->level->setBlock($this->pos, $block, false, false);
 					$blocks++;

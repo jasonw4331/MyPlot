@@ -8,32 +8,20 @@ use pocketmine\math\Vector3;
 use pocketmine\Server;
 
 class MySQLProvider extends DataProvider {
-	/** @var MyPlot $plugin */
-	protected $plugin;
-	/** @var \mysqli $db */
-	protected $db;
-	/** @var mixed[] $settings */
-	protected $settings;
-	/** @var \mysqli_stmt $sqlGetPlot */
-	protected $sqlGetPlot;
-	/** @var \mysqli_stmt $sqlSavePlot */
-	protected $sqlSavePlot;
-	/** @var \mysqli_stmt $sqlRemovePlot */
-	protected $sqlRemovePlot;
-	/** @var \mysqli_stmt $sqlGetPlotsByOwner */
-	protected $sqlGetPlotsByOwner;
-	/** @var \mysqli_stmt $sqlGetPlotsByOwnerAndLevel */
-	protected $sqlGetPlotsByOwnerAndLevel;
-	/** @var \mysqli_stmt $sqlGetExistingXZ */
-	protected $sqlGetExistingXZ;
-	/** @var \mysqli_stmt $sqlMergePlot */
-	protected $sqlMergePlot;
-	/** @var \mysqli_stmt $sqlGetMergeOrigin */
-	protected $sqlGetMergeOrigin;
-	/** @var \mysqli_stmt $sqlGetMergedPlots */
-	protected $sqlGetMergedPlots;
-    /** @var \mysqli_stmt $sqlDisposeMergedPlot */
-    protected $sqlDisposeMergedPlot;
+	protected MyPlot $plugin;
+	protected \mysqli $db;
+	/** @var string[] $settings */
+	protected array $settings;
+	protected \mysqli_stmt $sqlGetPlot;
+	protected \mysqli_stmt $sqlSavePlot;
+	protected \mysqli_stmt $sqlRemovePlot;
+	protected \mysqli_stmt $sqlGetPlotsByOwner;
+	protected \mysqli_stmt $sqlGetPlotsByOwnerAndLevel;
+	protected \mysqli_stmt $sqlGetExistingXZ;
+	protected \mysqli_stmt $sqlMergePlot;
+	protected \mysqli_stmt $sqlGetMergeOrigin;
+	protected \mysqli_stmt $sqlGetMergedPlots;
+	protected \mysqli_stmt $sqlDisposeMergedPlot;
 
 	/**
 	 * MySQLProvider constructor.

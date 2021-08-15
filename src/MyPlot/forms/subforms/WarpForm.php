@@ -12,8 +12,6 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class WarpForm extends ComplexMyPlotForm {
-	/** @var Player $player */
-	private $player;
 
 	public function __construct(Player $player) {
 		$plugin = MyPlot::getInstance();

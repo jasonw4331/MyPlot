@@ -8,28 +8,17 @@ use pocketmine\math\Vector3;
 
 class SQLiteDataProvider extends DataProvider
 {
-	/** @var \SQLite3 $db */
-	private $db;
-	/** @var \SQLite3Stmt $sqlGetPlot */
-	protected $sqlGetPlot;
-	/** @var \SQLite3Stmt $sqlSavePlot */
-	protected $sqlSavePlot;
-	/** @var \SQLite3Stmt $sqlRemovePlot */
-	protected $sqlRemovePlot;
-    /** @var \SQLite3Stmt $sqlDisposeMergedPlot */
-    protected $sqlDisposeMergedPlot;
-	/** @var \SQLite3Stmt $sqlGetPlotsByOwner */
-	protected $sqlGetPlotsByOwner;
-	/** @var \SQLite3Stmt $sqlGetPlotsByOwnerAndLevel */
-	protected $sqlGetPlotsByOwnerAndLevel;
-	/** @var \SQLite3Stmt $sqlGetExistingXZ */
-	protected $sqlGetExistingXZ;
-	/** @var \SQLite3Stmt $sqlMergePlot */
-	protected $sqlMergePlot;
-	/** @var \SQLite3Stmt $sqlGetMergeOrigin */
-	protected $sqlGetMergeOrigin;
-	/** @var \SQLite3Stmt $sqlGetMergedPlots */
-	protected $sqlGetMergedPlots;
+	private \SQLite3 $db;
+	protected \SQLite3Stmt $sqlGetPlot;
+	protected \SQLite3Stmt $sqlSavePlot;
+	protected \SQLite3Stmt $sqlRemovePlot;
+	protected \SQLite3Stmt $sqlDisposeMergedPlot;
+	protected \SQLite3Stmt $sqlGetPlotsByOwner;
+	protected \SQLite3Stmt $sqlGetPlotsByOwnerAndLevel;
+	protected \SQLite3Stmt $sqlGetExistingXZ;
+	protected \SQLite3Stmt $sqlMergePlot;
+	protected \SQLite3Stmt $sqlGetMergeOrigin;
+	protected \SQLite3Stmt $sqlGetMergedPlots;
 
 	/**
 	 * SQLiteDataProvider constructor.
@@ -259,11 +248,6 @@ class SQLiteDataProvider extends DataProvider
 		return $plots;
 	}
 
-	/**
-	 * @param Plot $plot
-	 *
-	 * @return Plot
-	 */
 	public function getMergeOrigin(Plot $plot) : Plot {
 		$stmt = $this->sqlGetMergeOrigin;
 		$stmt->bindValue(":level", $plot->levelName);

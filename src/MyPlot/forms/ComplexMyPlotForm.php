@@ -8,8 +8,7 @@ use MyPlot\Plot;
 use pocketmine\Player;
 
 abstract class ComplexMyPlotForm extends CustomForm implements MyPlotForm {
-	/** @var Plot|null $plot */
-	protected $plot;
+	protected ?Plot $plot;
 
 	public function __construct(string $title, array $elements, \Closure $onSubmit) {
 		parent::__construct($title, $elements, $onSubmit,
