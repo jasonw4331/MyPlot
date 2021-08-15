@@ -12,7 +12,6 @@ use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 
 class MyPlotGenerator extends Generator {
-	protected ChunkManager $level;
 	/** @var string[] $settings */
 	private array $settings;
 	protected Block $roadBlock;
