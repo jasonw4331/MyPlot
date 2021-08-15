@@ -50,7 +50,7 @@ class ConfigDataProvider extends DataProvider {
 			return $plot;
 		}
 		$plots = (array)$this->config->get("plots", []);
-		$key = $plot->levelName.';'.$plot->X.';'.$plot->Z;
+		$key = $levelName.';'.$X.';'.$Z;
 		if(isset($plots[$key])) {
 			$plotName = (string)$plots[$key]["name"];
 			$owner = (string)$plots[$key]["owner"];
