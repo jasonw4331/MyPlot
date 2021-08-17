@@ -304,9 +304,9 @@ class MyPlot extends PluginBase
 			$Z = (int) ceil(($z - $plotSize + 1) / $totalSize);
 			$difZ = abs(($z - $plotSize + 1) % $totalSize);
 		}
-		if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
+		if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1))
 			return null;
-		}
+
 		return $this->dataProvider->getMergeOrigin($this->dataProvider->getPlot($plotLevel->name, $X, $Z));
 	}
 
