@@ -226,18 +226,67 @@ class MyPlot extends PluginBase
 	 * @api
 	 *
 	 * @param Position $position
-	 * @param bool $blockRecursion
 	 *
 	 * @return Plot|null
 	 */
-	public function getPlotByPosition(Position $position, bool $blockRecursion = false) : ?Plot {
+	public function getPlotByPosition(Position $position) : ?Plot {
 		$x = $position->x;
 		$z = $position->z;
 		$levelName = $position->getLevelNonNull()->getFolderName();
 		if(!$this->isLevelLoaded($levelName))
 			return null;
-
 		$plotLevel = $this->getLevelSettings($levelName);
+
+		$plot = $this->getPlotFast($x, $z, $plotLevel);
+		if($plot instanceof Plot)
+			return $plot;
+
+		// no plot found at current location yet, so search cardinal directions
+		$posN = $position->getSide(Vector3::SIDE_NORTH, $plotLevel->roadWidth + 1);
+		$plot = $this->getPlotFast($posN->x, $posN->z, $plotLevel);
+		if($plot instanceof Plot)
+			return $plot;
+
+		$posS = $position->getSide(Vector3::SIDE_SOUTH, $plotLevel->roadWidth + 1);
+		$plot = $this->getPlotFast($posS->x, $posS->z, $plotLevel);
+		if($plot instanceof Plot)
+			return $plot;
+
+		$posE = $position->getSide(Vector3::SIDE_EAST, $plotLevel->roadWidth + 1);
+		$plot = $this->getPlotFast($posE->x, $posE->z, $plotLevel);
+		if($plot instanceof Plot)
+			return $plot;
+
+		$posW = $position->getSide(Vector3::SIDE_WEST, $plotLevel->roadWidth + 1);
+		$plot = $this->getPlotFast($posW->x, $posW->z, $plotLevel);
+		if($plot instanceof Plot)
+			return $plot;
+
+		// no plots found straight cardinally, so check diagonals
+		$posNE = $posN->getSide(Vector3::SIDE_EAST, $plotLevel->roadWidth + 1);
+		$plot = $this->getPlotFast($posNE->x, $posNE->z, $plotLevel);
+		if($plot instanceof Plot)
+			return $plot;
+
+		$posNW = $posN->getSide(Vector3::SIDE_WEST, $plotLevel->roadWidth + 1);
+		$plot = $this->getPlotFast($posNW->x, $posNW->z, $plotLevel);
+		if($plot instanceof Plot)
+			return $plot;
+
+		$posSE = $posS->getSide(Vector3::SIDE_EAST, $plotLevel->roadWidth + 1);
+		$plot = $this->getPlotFast($posSE->x, $posSE->z, $plotLevel);
+		if($plot instanceof Plot)
+			return $plot;
+
+		$posSW = $posS->getSide(Vector3::SIDE_WEST, $plotLevel->roadWidth + 1);
+		$plot = $this->getPlotFast($posSW->x, $posSW->z, $plotLevel);
+		if($plot instanceof Plot)
+			return $plot;
+
+		return null; // this is the road and there are no plots here
+	}
+
+	private function getPlotFast(float $x, float $z, PlotLevelSettings $plotLevel) : ?Plot {
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
@@ -256,43 +305,9 @@ class MyPlot extends PluginBase
 			$difZ = abs(($z - $plotSize + 1) % $totalSize);
 		}
 		if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
-			if($blockRecursion)
-				return null;
-
-			$coordinateOffset = 14;
-			$northOrigin = $this->getPlotByPosition($position->getSide(Vector3::SIDE_NORTH, $coordinateOffset), true);
-			$southOrigin = $this->getPlotByPosition($position->getSide(Vector3::SIDE_SOUTH, $coordinateOffset), true);
-			if($northOrigin instanceof Plot) $northOrigin = $this->dataProvider->getMergeOrigin($northOrigin);
-			if($southOrigin instanceof Plot) $southOrigin = $this->dataProvider->getMergeOrigin($southOrigin);
-			if($northOrigin instanceof Plot and $southOrigin instanceof Plot and $northOrigin->isSame($southOrigin)) return $northOrigin;
-
-			$eastOrigin = $this->getPlotByPosition($position->getSide(Vector3::SIDE_EAST, $coordinateOffset), true);
-			$westOrigin = $this->getPlotByPosition($position->getSide(Vector3::SIDE_WEST, $coordinateOffset), true);
-			if($eastOrigin instanceof Plot) $eastOrigin = $this->dataProvider->getMergeOrigin($eastOrigin);
-			if($westOrigin instanceof Plot) $westOrigin = $this->dataProvider->getMergeOrigin($westOrigin);
-			if($eastOrigin instanceof Plot and $westOrigin instanceof Plot and $eastOrigin->isSame($westOrigin)) return $eastOrigin;
-
-			$southEastOrigin = $this->getPlotByPosition(Position::fromObject($position->add($coordinateOffset, 0, $coordinateOffset), $position->getLevelNonNull()), true);
-			$northEastOrigin = $this->getPlotByPosition(Position::fromObject($position->add(-$coordinateOffset, 0, $coordinateOffset), $position->getLevelNonNull()), true);
-			$southWestOrigin = $this->getPlotByPosition(Position::fromObject($position->add($coordinateOffset, 0, -$coordinateOffset), $position->getLevelNonNull()), true);
-			$northWestOrigin = $this->getPlotByPosition(Position::fromObject($position->add(-$coordinateOffset, 0, -$coordinateOffset), $position->getLevelNonNull()), true);
-			if($southEastOrigin instanceof Plot) $southEastOrigin = $this->dataProvider->getMergeOrigin($southEastOrigin);
-			if($northEastOrigin instanceof Plot) $northEastOrigin = $this->dataProvider->getMergeOrigin($northEastOrigin);
-			if($southWestOrigin instanceof Plot) $southWestOrigin = $this->dataProvider->getMergeOrigin($southWestOrigin);
-			if($northWestOrigin instanceof Plot) $northWestOrigin = $this->dataProvider->getMergeOrigin($northWestOrigin);
-
-			if($southEastOrigin instanceof Plot
-				and $northEastOrigin instanceof Plot
-				and $southWestOrigin instanceof Plot
-				and $northWestOrigin instanceof Plot
-				and $southEastOrigin->isSame($northEastOrigin)
-				and $southEastOrigin->isSame($southWestOrigin)
-				and $southEastOrigin->isSame($northWestOrigin)){
-				return $southEastOrigin;
-			}
-			return null; // this is the road and there are no plots here
+			return null;
 		}
-		return $this->dataProvider->getMergeOrigin($this->dataProvider->getPlot($levelName, $X, $Z));
+		return $this->dataProvider->getMergeOrigin($this->dataProvider->getPlot($plotLevel->name, $X, $Z));
 	}
 
 	/**
