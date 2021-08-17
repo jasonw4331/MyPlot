@@ -279,11 +279,7 @@ class MyPlot extends PluginBase
 			return $plot;
 
 		$posSW = $posS->getSide(Vector3::SIDE_WEST, $plotLevel->roadWidth + 1);
-		$plot = $this->getPlotFast($posSW->x, $posSW->z, $plotLevel);
-		if($plot instanceof Plot)
-			return $plot;
-
-		return null; // this is the road and there are no plots here
+		return $this->getPlotFast($posSW->x, $posSW->z, $plotLevel);
 	}
 
 	private function getPlotFast(float $x, float $z, PlotLevelSettings $plotLevel) : ?Plot {
