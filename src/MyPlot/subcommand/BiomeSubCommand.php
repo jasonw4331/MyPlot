@@ -12,7 +12,7 @@ use pocketmine\utils\TextFormat;
 
 class BiomeSubCommand extends SubCommand
 {
-	public CONST BIOMES = ["PLAINS" => Biome::PLAINS, "DESERT" => Biome::DESERT, "MOUNTAINS" => Biome::MOUNTAINS, "FOREST" => Biome::FOREST, "TAIGA" => Biome::TAIGA, "SWAMP" => Biome::SWAMP, "NETHER" => Biome::HELL, "HELL" => Biome::HELL, "ICE_PLAINS" => Biome::ICE_PLAINS];
+	public CONST BIOMES = ["PLAINS" => Biome::PLAINS, "DESERT" => Biome::DESERT, "MOUNTAINS" => Biome::MOUNTAINS, "FOREST" => Biome::FOREST, "TAIGA" => Biome::TAIGA, "SWAMP" => Biome::SWAMP, "NETHER" => Biome::HELL, "HELL" => Biome::HELL, "ICE_PLAINS" => Biome::ICE_PLAINS, "END" => 9];
 
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.biome");
