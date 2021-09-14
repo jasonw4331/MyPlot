@@ -19,8 +19,8 @@ class FillPlotTask extends Task {
 	/** @var int $height */
 	protected $height;
 	/** @var Block $fillBlock */
-	protected $plotFillBlock;
-	/** @var Block $fillBlock */
+	protected $fillBlock;
+	/** @var Block $bottomBlock */
 	protected $bottomBlock;
 	/** @var \pocketmine\level\Position|null $plotBeginPos */
 	protected $plotBeginPos;
@@ -52,6 +52,7 @@ class FillPlotTask extends Task {
 		$this->height = $plotLevel->groundHeight;
 		$this->fillBlock = $plotFillBlock;
 		$this->bottomBlock = $plotLevel->bottomBlock;
+		$this->maxBlocksPerTick = $maxBlocksPerTick;
 		$this->pos = new Vector3($this->plotBeginPos->x, 0, $this->plotBeginPos->z);
 		$this->plugin = $plugin;
 		$plugin->getLogger()->debug("Plot Fill Task started at plot {$plot->X};{$plot->Z}");
@@ -77,7 +78,7 @@ class FillPlotTask extends Task {
 					if($this->pos->y === 0) {
 						$block = $this->bottomBlock;
 					}elseif($this->pos->y <= $this->height) {
-						$block = $this->plotFillBlock;
+						$block = $this->fillBlock;
 					}else {
 						$block = Block::get(Block::AIR);
 					}
