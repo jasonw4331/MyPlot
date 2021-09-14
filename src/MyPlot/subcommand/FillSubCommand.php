@@ -12,7 +12,7 @@ use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class FillSubcommand extends SubCommand {
+class FillSubCommand extends SubCommand {
 	/**
 	 * @param CommandSender $sender
 	 *
