@@ -22,6 +22,7 @@ use MyPlot\subcommand\HomeSubCommand;
 use MyPlot\subcommand\InfoSubCommand;
 use MyPlot\subcommand\KickSubCommand;
 use MyPlot\subcommand\ListSubCommand;
+use MyPlot\subcommand\MergeSubCommand;
 use MyPlot\subcommand\MiddleSubCommand;
 use MyPlot\subcommand\NameSubCommand;
 use MyPlot\subcommand\PvpSubCommand;
@@ -44,9 +45,9 @@ use pocketmine\utils\TextFormat;
 class Commands extends PluginCommand
 {
 	/** @var SubCommand[] $subCommands */
-	private $subCommands = [];
+	private array $subCommands = [];
 	/** @var SubCommand[] $aliasSubCommands */
-	private $aliasSubCommands = [];
+	private array $aliasSubCommands = [];
 
 	/**
 	 * Commands constructor.
@@ -83,6 +84,7 @@ class Commands extends PluginCommand
 		$this->loadSubCommand(new ListSubCommand($plugin, "list"));
 		$this->loadSubCommand(new PvpSubCommand($plugin, "pvp"));
 		$this->loadSubCommand(new KickSubCommand($plugin, "kick"));
+		$this->loadSubCommand(new MergeSubCommand($plugin, "merge"));
 		if($plugin->getEconomyProvider() !== null) {
 			$this->loadSubCommand(new SellSubCommand($plugin, "sell"));
 			$this->loadSubCommand(new BuySubCommand($plugin, "buy"));
@@ -118,7 +120,7 @@ class Commands extends PluginCommand
 				preg_match_all('/(\s?[<\[]?\s*)([a-zA-Z0-9|]+)(?:\s*:?\s*)(string|int|x y z|float|mixed|target|message|text|json|command|boolean|bool)?(?:\s*[>\]]?\s?)/iu', $usage, $matches, PREG_PATTERN_ORDER, strlen($commandString));
 				$argumentCount = count($matches[0])-1;
 				for($argNumber = 1; $argNumber <= $argumentCount; ++$argNumber) {
-					$optional = empty($matches[1][$argNumber]) ? false : ($matches[1][$argNumber] === '[');
+					$optional = $matches[1][$argNumber] === '' ? false : ($matches[1][$argNumber] === '[');
 					$paramName = strtolower($matches[2][$argNumber]);
 					if(stripos($paramName, "|") === false) {
 						switch(strtolower($matches[3][$argNumber])) {
@@ -191,9 +193,6 @@ class Commands extends PluginCommand
 		return $this->subCommands;
 	}
 
-	/**
-	 * @param SubCommand $command
-	 */
 	public function loadSubCommand(SubCommand $command) : void {
 		$this->subCommands[$command->getName()] = $command;
 		if($command->getAlias() != "") {
@@ -201,9 +200,6 @@ class Commands extends PluginCommand
 		}
 	}
 
-	/**
-	 * @param string $name
-	 */
 	public function unloadSubCommand(string $name) : void {
 		$subcommand = $this->subCommands[$name] ?? $this->aliasSubCommands[$name] ?? null;
 		if($subcommand !== null) {
@@ -234,7 +230,7 @@ class Commands extends PluginCommand
 				return true;
 			}
 		}
-		$subCommand = strtolower(array_shift($args));
+		$subCommand = strtolower((string)array_shift($args));
 		if(isset($this->subCommands[$subCommand])) {
 			$command = $this->subCommands[$subCommand];
 		}elseif(isset($this->aliasSubCommands[$subCommand])) {

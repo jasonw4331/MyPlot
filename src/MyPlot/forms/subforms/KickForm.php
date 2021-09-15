@@ -11,13 +11,16 @@ use pocketmine\utils\TextFormat;
 
 class KickForm extends ComplexMyPlotForm {
 	/** @var string[] $players */
-	private $players = [];
+	private array $players = [];
 
 	public function __construct() {
 		$plugin = MyPlot::getInstance();
 		$players = [];
 		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
-			if(isset($this->plot) and !$plugin->getPlotByPosition($player)->isSame($this->plot))
+			$plot = $plugin->getPlotByPosition($player);
+			if($plot === null)
+				continue;
+			if($this->plot !== null and !$plot->isSame($this->plot))
 				continue;
 			$players[] = $player->getDisplayName();
 			$this->players[] = $player->getName();

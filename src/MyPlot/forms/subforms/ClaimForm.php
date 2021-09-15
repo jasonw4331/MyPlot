@@ -12,9 +12,6 @@ use pocketmine\utils\TextFormat;
 
 class ClaimForm extends ComplexMyPlotForm {
 
-	/** @var Player $player */
-	private $player;
-
 	public function __construct(Player $player) {
 		$plugin = MyPlot::getInstance();
 		$plot = $plugin->getPlotByPosition($player);
@@ -42,20 +39,20 @@ class ClaimForm extends ComplexMyPlotForm {
 					"2",
 					$plugin->getLanguage()->get("claim.formworld"),
 					"world",
-					$player->getLevel()->getFolderName()
+					$player->getLevelNonNull()->getFolderName()
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
-				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")))
+				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")) and $plugin->isLevelLoaded($response->getString("2")))
 					$data = MyPlot::getInstance()->getProvider()->getPlot(
-						empty($response->getString("2")) ? $this->player->getLevel()->getFolderName() : $response->getString("2"),
+						$response->getString("2") === '' ? $player->getLevelNonNull()->getFolderName() : $response->getString("2"),
 						(int)$response->getString("0"),
 						(int)$response->getString("1")
 					);
-				elseif(empty($response->getString("0")) or empty($response->getString("1"))) {
-					$plot = MyPlot::getInstance()->getPlotByPosition($this->player);
+				elseif($response->getString("0") === '' or $response->getString("1") === '') {
+					$plot = MyPlot::getInstance()->getPlotByPosition($player);
 					if($plot === null) {
-						$this->player->sendForm(new self($this->player));
+						$player->sendForm(new self($player));
 						throw new FormValidationException("Unexpected form data returned");
 					}
 					$data = $plot;
@@ -75,7 +72,7 @@ class ClaimForm extends ComplexMyPlotForm {
 				$plotsOfPlayer = 0;
 				foreach($plugin->getPlotLevels() as $level => $settings) {
 					$level = $plugin->getServer()->getLevelByName((string)$level);
-					if(!$level->isClosed()) {
+					if($level !== null and !$level->isClosed()) {
 						$plotsOfPlayer += count($plugin->getPlotsOfPlayer($player->getName(), $level->getFolderName()));
 					}
 				}

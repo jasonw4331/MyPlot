@@ -9,11 +9,6 @@ use pocketmine\utils\TextFormat;
 
 class BuySubCommand extends SubCommand
 {
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.buy");
 	}
@@ -46,7 +41,7 @@ class BuySubCommand extends SubCommand
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
 			$level = $this->getPlugin()->getServer()->getLevelByName((string)$level);
-			if(!$level->isClosed()) {
+			if($level !== null and !$level->isClosed()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
 			}
 		}

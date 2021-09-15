@@ -11,11 +11,6 @@ use pocketmine\utils\TextFormat;
 
 class KickSubCommand extends SubCommand
 {
-	/**
-	 * @param CommandSender $sender
-	 *
- 	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.kick");
 	}
@@ -61,7 +56,7 @@ class KickSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
 			return new KickForm();
 		return null;
 	}

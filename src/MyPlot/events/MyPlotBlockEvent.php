@@ -13,12 +13,10 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\Player;
 
 class MyPlotBlockEvent extends MyPlotPlotEvent implements Cancellable {
-	/** @var Block $block */
-	private $block;
+	private Block $block;
 	/** @var BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent|SignChangeEvent $event */
 	private $event;
-	/** @var Player $player */
-	private $player;
+	private Player $player;
 
 	/**
 	 * MyPlotBlockEvent constructor.
@@ -35,9 +33,6 @@ class MyPlotBlockEvent extends MyPlotPlotEvent implements Cancellable {
 		parent::__construct($plot);
 	}
 
-	/**
-	 * @return Block
-	 */
 	public function getBlock() : Block {
 		return $this->block;
 	}
@@ -49,9 +44,6 @@ class MyPlotBlockEvent extends MyPlotPlotEvent implements Cancellable {
 		return $this->event;
 	}
 
-	/**
-	 * @return Player
-	 */
 	public function getPlayer() : Player {
 		return $this->player;
 	}

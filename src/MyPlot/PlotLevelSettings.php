@@ -6,54 +6,36 @@ use pocketmine\block\Block;
 
 class PlotLevelSettings
 {
-	/** @var string $name */
-	public $name;
-	/** @var Block $roadBlock */
-	public $roadBlock;
-	/** @var Block $bottomBlock */
-	public $bottomBlock;
-	/** @var Block $plotFillBlock */
-	public $plotFillBlock;
-	/** @var Block $plotFloorBlock */
-	public $plotFloorBlock;
-	/** @var Block $wallBlock */
-	public $wallBlock;
-	/** @var int $roadWidth */
-	public $roadWidth = 7;
-	/** @var int $plotSize */
-	public $plotSize = 32;
-	/** @var int $groundHeight */
-	public $groundHeight = 64;
-	/** @var int $claimPrice */
-	public $claimPrice = 0;
-	/** @var int $clearPrice */
-	public $clearPrice = 0;
-	/** @var int $disposePrice */
-	public $disposePrice = 0;
-	/** @var int $resetPrice */
-	public $resetPrice = 0;
-	/** @var int $clonePrice */
-	public $clonePrice = 0;
-	/** @var bool $restrictEntityMovement */
-	public $restrictEntityMovement = true;
-	/** @var bool $restrictPVP */
-	public $restrictPVP = false;
-	/** @var bool $updatePlotLiquids */
-	public $updatePlotLiquids = false;
-	/** @var bool $displayDoneNametags */
-	public $displayDoneNametags = false;
-	/** @var bool $editBorderBlocks */
-	public $editBorderBlocks = true;
+	public string $name;
+	public Block $roadBlock;
+	public Block $bottomBlock;
+	public Block $plotFillBlock;
+	public Block $plotFloorBlock;
+	public Block $wallBlock;
+	public int $roadWidth = 7;
+	public int $plotSize = 32;
+	public int $groundHeight = 64;
+	public int $claimPrice = 0;
+	public int $clearPrice = 0;
+	public int $disposePrice = 0;
+	public int $resetPrice = 0;
+	public int $clonePrice = 0;
+	public bool $restrictEntityMovement = true;
+	public bool $restrictPVP = false;
+	public bool $updatePlotLiquids = false;
+	public bool $allowOutsidePlotSpread = false;
+	public bool $displayDoneNametags = false;
+	public bool $editBorderBlocks = true;
 
 	/**
 	 * PlotLevelSettings constructor.
 	 *
 	 * @param string $name
-	 * @param array $settings
+	 * @param mixed[] $settings
 	 */
 	public function __construct(string $name, array $settings = []) {
 		$this->name = $name;
-		if(!empty($settings)) {
+		if(count($settings) > 0) {
 			$this->roadBlock = self::parseBlock($settings, "RoadBlock", Block::get(Block::PLANKS));
 			$this->wallBlock = self::parseBlock($settings, "WallBlock", Block::get(Block::STONE_SLAB));
 			$this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", Block::get(Block::GRASS));
@@ -70,12 +52,13 @@ class PlotLevelSettings
 			$this->restrictEntityMovement = self::parseBool($settings, "RestrictEntityMovement", true);
 			$this->restrictPVP = self::parseBool($settings, "RestrictPVP", false);
 			$this->updatePlotLiquids = self::parseBool($settings, "UpdatePlotLiquids", false);
+			$this->allowOutsidePlotSpread = self::parseBool($settings, "AllowOutsidePlotSpread", false);
 			$this->editBorderBlocks = self::parseBool($settings, "EditBorderBlocks", true);
 		}
 	}
 
 	/**
-	 * @param array $array
+	 * @param string[] $array
 	 * @param string|int $key
 	 * @param Block $default
 	 *
@@ -101,7 +84,7 @@ class PlotLevelSettings
 	}
 
 	/**
-	 * @param array $array
+	 * @param string[] $array
 	 * @param string|int $key
 	 * @param int $default
 	 *
@@ -116,7 +99,7 @@ class PlotLevelSettings
 	}
 
 	/**
-	 * @param array $array
+	 * @param mixed[] $array
 	 * @param string|int $key
 	 * @param bool $default
 	 *
@@ -124,7 +107,7 @@ class PlotLevelSettings
 	 */
 	public static function parseBool(array &$array, $key, bool $default) : bool {
 		if(isset($array[$key]) and is_bool($array[$key])) {
-			return (bool) $array[$key];
+			return $array[$key];
 		}else{
 			return $default;
 		}

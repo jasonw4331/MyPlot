@@ -7,12 +7,10 @@ use pocketmine\event\Cancellable;
 use pocketmine\IPlayer;
 
 class MyPlotDenyEvent extends MyPlotPlotEvent implements Cancellable {
-	const ADD = 0;
-	const REMOVE = 1;
-	/** @var int $type */
-	private $type;
-	/** @var string $player */
-	private $player;
+	public const ADD = 0;
+	public const REMOVE = 1;
+	private int $type;
+	private string $player;
 
 	/**
 	 * MyPlotDenyEvent constructor.
@@ -27,26 +25,15 @@ class MyPlotDenyEvent extends MyPlotPlotEvent implements Cancellable {
 		parent::__construct($plot);
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getType() : int {
 		return $this->type;
 	}
 
-	/**
-	 * @param int $type
-	 *
-	 * @return self
-	 */
 	public function setType(int $type) : self {
 		$this->type = $type;
 		return $this;
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getDenied() : string {
 		return $this->player;
 	}

@@ -11,8 +11,7 @@ use pocketmine\utils\TextFormat;
 
 class HelpSubCommand extends SubCommand
 {
-	/** @var Commands $cmds */
-	private $cmds;
+	private Commands $cmds;
 
 	/**
 	 * HelpSubCommand constructor.
@@ -26,11 +25,6 @@ class HelpSubCommand extends SubCommand
 		$this->cmds = $cmds;
 	}
 
-	/**
-	 * @param CommandSender $sender
-	 *
-	 * @return bool
-	 */
 	public function canUse(CommandSender $sender) : bool {
 		return $sender->hasPermission("myplot.command.help");
 	}
@@ -41,7 +35,7 @@ class HelpSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) === 0) {
 			$pageNumber = 1;
 		}elseif(is_numeric($args[0])) {
 			$pageNumber = (int) array_shift($args);
@@ -61,7 +55,7 @@ class HelpSubCommand extends SubCommand
 		ksort($commands, SORT_NATURAL | SORT_FLAG_CASE);
 		$commands = array_chunk($commands, (int) ($sender->getScreenLineHeight()/2));
 		/** @var SubCommand[][] $commands */
-		$pageNumber = (int) min(count($commands), $pageNumber);
+		$pageNumber = min(count($commands), $pageNumber);
 
 		$sender->sendMessage(TextFormat::GREEN.$this->translateString("help.header", [$pageNumber, count($commands)]));
 		foreach($commands[$pageNumber - 1] as $command) {

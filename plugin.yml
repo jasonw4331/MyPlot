@@ -2,7 +2,7 @@ name: MyPlot
 main: MyPlot\MyPlot
 version: 2.1.0
 api:
-- 3.4.0
+- 3.21.0
 authors:
 - Wiez
 - Exxarion
@@ -62,6 +62,8 @@ permissions:
         default: true
       myplot.command.middle:
         default: true
+      myplot.command.merge:
+        default: true
       myplot.command.list:
         default: true
       myplot.command.pvp:
@@ -113,6 +115,8 @@ permissions:
         default: op
       myplot.admin.middle:
         default: true
+      myplot.admin.merge:
+        default: op
       myplot.admin.list:
         default: op
       myplot.admin.pvp:

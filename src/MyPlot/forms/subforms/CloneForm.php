@@ -13,8 +13,7 @@ use pocketmine\utils\TextFormat;
 
 class CloneForm extends ComplexMyPlotForm {
 
-	/** @var Player $player */
-	private $player;
+	private Player $player;
 
 	public function __construct(Player $player) {
 		$plugin = MyPlot::getInstance();
@@ -47,7 +46,7 @@ class CloneForm extends ComplexMyPlotForm {
 					"3",
 					$plugin->getLanguage()->get("clone.formworld"),
 					"world",
-					$player->getLevel()->getFolderName()
+					$player->getLevelNonNull()->getFolderName()
 				),
 				new Label(
 					"4",
@@ -67,13 +66,13 @@ class CloneForm extends ComplexMyPlotForm {
 					"7",
 					$plugin->getLanguage()->get("clone.formworld"),
 					"world",
-					$player->getLevel()->getFolderName()
+					$player->getLevelNonNull()->getFolderName()
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
 				if(is_numeric($response->getString("1")) and is_numeric($response->getString("2")) and is_numeric($response->getString("5")) and is_numeric($response->getString("6"))) {
-					$originPlot = MyPlot::getInstance()->getProvider()->getPlot(empty($response->getString("3")) ? $this->player->getLevel()->getFolderName() : $response->getString("3"), (int)$response->getString("1"), (int)$response->getString("2"));
-					$clonedPlot = MyPlot::getInstance()->getProvider()->getPlot(empty($response->getString("7")) ? $this->player->getLevel()->getFolderName() : $response->getString("7"), (int)$response->getString("5"), (int)$response->getString("6"));
+					$originPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("3") === '' ? $this->player->getLevelNonNull()->getFolderName() : $response->getString("3"), (int)$response->getString("1"), (int)$response->getString("2"));
+					$clonedPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("7") === '' ? $this->player->getLevelNonNull()->getFolderName() : $response->getString("7"), (int)$response->getString("5"), (int)$response->getString("6"));
 				}else
 					throw new FormValidationException("Unexpected form data returned");
 
@@ -85,6 +84,8 @@ class CloneForm extends ComplexMyPlotForm {
 					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("notowner"));
 					return;
 				}
+				if(!$plugin->isLevelLoaded($originPlot->levelName))
+					throw new FormValidationException("Invalid world given");
 				$plotLevel = $plugin->getLevelSettings($originPlot->levelName);
 				$economy = $plugin->getEconomyProvider();
 				if($economy !== null and !$economy->reduceMoney($player, $plotLevel->clonePrice)) {
