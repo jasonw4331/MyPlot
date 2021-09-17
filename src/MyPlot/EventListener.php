@@ -4,6 +4,7 @@ namespace MyPlot;
 
 use MyPlot\events\MyPlotBlockEvent;
 use MyPlot\events\MyPlotBorderChangeEvent;
+use MyPlot\events\MyPlotChildPvpEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
@@ -11,10 +12,12 @@ use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
+use pocketmine\entity\Entity;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\event\block\SignChangeEvent;
+use pocketmine\event\entity\EntityDamageByChildEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
@@ -412,4 +415,34 @@ class EventListener implements Listener
 			}
 		}
 	}
+
+	/**
+	 * @ignoreCancelled false
+	 * @priority LOWEST
+	 *
+	 * @param EntityDamageByChildEntityEvent $event
+	 */
+	public function onChildEntityDamage(EntityDamageByChildEntityEvent $event)
+    {
+        $damaged = $event->getEntity();
+		$damager = $event->getDamager();
+		if($damaged instanceof Player and $damager instanceof Entity and !$event->isCancelled()) {
+            $levelName = $damaged->getLevelNonNull()->getFolderName();
+            if (!$this->plugin->isLevelLoaded($levelName)) {
+                return;
+            }
+            $settings = $this->plugin->getLevelSettings($levelName);
+            $plot = $this->plugin->getPlotByPosition($damaged);
+            if ($plot !== null) {
+                $ev = new MyPlotChildPvpEvent($plot, $damager, $damaged, $event);
+                if (!$plot->pvp) {
+                    $ev->setCancelled();
+                    $this->plugin->getLogger()->debug("Cancelled pvp event in plot " . $plot->X . ";" . $plot->Z . " on level '" . $levelName . "'");
+                }
+                $ev->call();
+                $event->setCancelled($ev->isCancelled());
+                return;
+            }
+        }
+    }
 }
