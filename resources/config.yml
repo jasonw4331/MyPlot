@@ -64,9 +64,16 @@ ShowPlotPopup: true
 # If WorldStyler is installed, MyPlot will use that to clear the entire plot at once
 FastClearing: false
 
+# If WorldStyler is installed, MyPlot will use that to fill the entire plot at once
+FastFilling: false
+
 # Amount of blocks to reset per tick. This only applies if FastClearing is disabled
 # Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
 ClearBlocksPerTick: 256
+
+# Amount of blocks to fill per tick. This only applies if FastFilling is disabled
+# Increasing this number will speed up '/p fill' but also increases lag
+FillBlocksPerTick: 256
 
 # These settings will be used when creating a new world with the default generator.
 DefaultWorld:
