@@ -40,10 +40,10 @@ class FillSubCommand extends SubCommand {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("notowner"));
 			return true;
 		}
-		if(($item = Item::fromString($args[0])) instanceof Item && $item->getBlock()->getId() !== BlockIds::AIR) {
+		if(($item = Item::fromString($args[0])) instanceof Item and $item->getBlock()->getId() !== BlockIds::AIR) {
 			$maxBlocksPerTick = (int)$this->getPlugin()->getConfig()->get("FillBlocksPerTick", 256);
-			if($this->getPlugin()->fillPlot($plot, Item::fromString($args[0])->getBlock(), $maxBlocksPerTick)) {
-				$sender->sendMessage($this->translateString("fill.success", [Item::fromString($args[0])->getBlock()->getName()]));
+			if($this->getPlugin()->fillPlot($plot, $item->getBlock(), $maxBlocksPerTick)) {
+				$sender->sendMessage($this->translateString("fill.success", [$item->getBlock()->getName()]));
 			}else {
 				$sender->sendMessage(TextFormat::RED.$this->translateString("error"));
 			}
