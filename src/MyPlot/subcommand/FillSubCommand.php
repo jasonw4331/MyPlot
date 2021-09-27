@@ -1,12 +1,11 @@
 <?php
 declare(strict_types=1);
-
 namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\FillForm;
 use MyPlot\Plot;
-use pocketmine\block\Block;
+use pocketmine\block\BlockIds;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
 use pocketmine\Player;
@@ -41,7 +40,7 @@ class FillSubCommand extends SubCommand {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("notowner"));
 			return true;
 		}
-		if(Item::fromString($args[0]) !== null && Item::fromString($args[0])->getBlock()->getId() !== Block::AIR) {
+		if(($item = Item::fromString($args[0])) instanceof Item && $item->getBlock()->getId() !== BlockIds::AIR) {
 			$maxBlocksPerTick = (int)$this->getPlugin()->getConfig()->get("FillBlocksPerTick", 256);
 			if($this->getPlugin()->fillPlot($plot, Item::fromString($args[0])->getBlock(), $maxBlocksPerTick)) {
 				$sender->sendMessage($this->translateString("fill.success", [Item::fromString($args[0])->getBlock()->getName()]));

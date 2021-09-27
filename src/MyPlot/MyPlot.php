@@ -909,8 +909,8 @@ class MyPlot extends PluginBase
 	 * @api
 	 *
 	 * @param Plot $plot
-	 * @param int $plotFillBlock
-	 * @param Block $maxBlocksPerTick
+	 * @param Block $plotFillBlock
+	 * @param int $maxBlocksPerTick
 	 *
 	 * @return bool
 	 */
