@@ -104,6 +104,6 @@ class FillPlotTask extends Task {
 				}
 			}
 		}
-		$this->plugin->getLogger()->debug("Plot Clear task completed at {$this->plotBeginPos->x};{$this->plotBeginPos->z}");
+		$this->plugin->getLogger()->debug("Plot Fill task completed at {$this->plotBeginPos->x};{$this->plotBeginPos->z}");
 	}
 }
