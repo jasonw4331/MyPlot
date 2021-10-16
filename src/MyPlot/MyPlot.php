@@ -241,47 +241,29 @@ class MyPlot extends PluginBase
 
 		$plot = $this->getPlotFast($x, $z, $plotLevel);
 		if($plot instanceof Plot)
-			return $plot;
+			return $this->dataProvider->getMergeOrigin($plot);
+
+		if(!($basePlot = $this->dataProvider->getPlot($levelName, $x, $z))->isMerged())
+			return null;
 
 		// no plot found at current location yet, so search cardinal directions
-		$posN = $position->getSide(Vector3::SIDE_NORTH, $plotLevel->roadWidth + 1);
-		$plot = $this->getPlotFast($posN->x, $posN->z, $plotLevel);
-		if($plot instanceof Plot)
-			return $plot;
+		$plotN = $basePlot->getSide(Vector3::SIDE_NORTH);
+		if($plotN->isSame($basePlot))
+			return $this->dataProvider->getMergeOrigin($plotN);
 
-		$posS = $position->getSide(Vector3::SIDE_SOUTH, $plotLevel->roadWidth + 1);
-		$plot = $this->getPlotFast($posS->x, $posS->z, $plotLevel);
-		if($plot instanceof Plot)
-			return $plot;
+		$plotS = $basePlot->getSide(Vector3::SIDE_SOUTH);
+		if($plotS->isSame($basePlot))
+			return $this->dataProvider->getMergeOrigin($plotS);
 
-		$posE = $position->getSide(Vector3::SIDE_EAST, $plotLevel->roadWidth + 1);
-		$plot = $this->getPlotFast($posE->x, $posE->z, $plotLevel);
-		if($plot instanceof Plot)
-			return $plot;
+		$plotE = $basePlot->getSide(Vector3::SIDE_EAST);
+		if($plotE->isSame($basePlot))
+			return $this->dataProvider->getMergeOrigin($plotE);
 
-		$posW = $position->getSide(Vector3::SIDE_WEST, $plotLevel->roadWidth + 1);
-		$plot = $this->getPlotFast($posW->x, $posW->z, $plotLevel);
-		if($plot instanceof Plot)
-			return $plot;
+		$plotW = $basePlot->getSide(Vector3::SIDE_WEST);
+		if($plotW->isSame($basePlot))
+			return $this->dataProvider->getMergeOrigin($plotW);
 
-		// no plots found straight cardinally, so check diagonals
-		$posNE = $posN->getSide(Vector3::SIDE_EAST, $plotLevel->roadWidth + 1);
-		$plot = $this->getPlotFast($posNE->x, $posNE->z, $plotLevel);
-		if($plot instanceof Plot)
-			return $plot;
-
-		$posNW = $posN->getSide(Vector3::SIDE_WEST, $plotLevel->roadWidth + 1);
-		$plot = $this->getPlotFast($posNW->x, $posNW->z, $plotLevel);
-		if($plot instanceof Plot)
-			return $plot;
-
-		$posSE = $posS->getSide(Vector3::SIDE_EAST, $plotLevel->roadWidth + 1);
-		$plot = $this->getPlotFast($posSE->x, $posSE->z, $plotLevel);
-		if($plot instanceof Plot)
-			return $plot;
-
-		$posSW = $posS->getSide(Vector3::SIDE_WEST, $plotLevel->roadWidth + 1);
-		return $this->getPlotFast($posSW->x, $posSW->z, $plotLevel);
+		return null;
 	}
 
 	/**
@@ -312,7 +294,7 @@ class MyPlot extends PluginBase
 		if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1))
 			return null;
 
-		return $this->dataProvider->getMergeOrigin($this->dataProvider->getPlot($plotLevel->name, $x, $z));
+		return $this->dataProvider->getPlot($plotLevel->name, $x, $z);
 	}
 
 	/**
