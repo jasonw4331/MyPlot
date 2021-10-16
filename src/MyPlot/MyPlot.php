@@ -284,28 +284,35 @@ class MyPlot extends PluginBase
 		return $this->getPlotFast($posSW->x, $posSW->z, $plotLevel);
 	}
 
-	private function getPlotFast(float $x, float $z, PlotLevelSettings $plotLevel) : ?Plot {
+	/**
+	 * @param float             $x
+	 * @param float             $z
+	 * @param PlotLevelSettings $plotLevel
+	 *
+	 * @return Plot|null
+	 */
+	private function getPlotFast(float &$x, float &$z, PlotLevelSettings $plotLevel) : ?Plot {
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
 		if($x >= 0) {
-			$X = (int) floor($x / $totalSize);
 			$difX = $x % $totalSize;
+			$x = (int) floor($x / $totalSize);
 		}else{
-			$X = (int) ceil(($x - $plotSize + 1) / $totalSize);
 			$difX = abs(($x - $plotSize + 1) % $totalSize);
+			$x = (int) ceil(($x - $plotSize + 1) / $totalSize);
 		}
 		if($z >= 0) {
-			$Z = (int) floor($z / $totalSize);
 			$difZ = $z % $totalSize;
+			$z = (int) floor($z / $totalSize);
 		}else{
-			$Z = (int) ceil(($z - $plotSize + 1) / $totalSize);
 			$difZ = abs(($z - $plotSize + 1) % $totalSize);
+			$z = (int) ceil(($z - $plotSize + 1) / $totalSize);
 		}
 		if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1))
 			return null;
 
-		return $this->dataProvider->getMergeOrigin($this->dataProvider->getPlot($plotLevel->name, $X, $Z));
+		return $this->dataProvider->getMergeOrigin($this->dataProvider->getPlot($plotLevel->name, $x, $z));
 	}
 
 	/**
