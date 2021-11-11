@@ -24,7 +24,7 @@ jobs:
 
   phpstan:
     name: PHPStan analysis
-    needs: build-pocketmine
+    needs: build-php
     runs-on: ${{ matrix.image }}
 
     strategy:
@@ -77,7 +77,7 @@ jobs:
 
   phpunit:
     name: PHPUnit tests
-    needs: build-pocketmine
+    needs: build-php
     runs-on: ${{ matrix.image }}
     strategy:
       fail-fast: false
@@ -126,7 +126,7 @@ jobs:
 
   integration:
     name: Integration tests
-    needs: build-pocketmine
+    needs: build-php
     runs-on: ${{ matrix.image }}
     strategy:
       fail-fast: false
