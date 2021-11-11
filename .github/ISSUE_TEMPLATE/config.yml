@@ -5,4 +5,4 @@ contact_links:
     about: We don't accept support requests on the issue tracker. Please try asking on Discord instead.
   - name: Documentation
     url: https://github.com/jasonwynn10/MyPlot/wiki
-    about: PocketMine-MP documentation
+    about: MyPlot documentation
