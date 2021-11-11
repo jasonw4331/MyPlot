@@ -28,7 +28,6 @@ parameters:
 		- tests/phpunit
 		- tests/plugins/TesterPlugin
 		- plugins
-		- virions
 	excludePaths:
 		analyseAndScan:
 			- build/php
