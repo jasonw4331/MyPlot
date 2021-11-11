@@ -81,7 +81,7 @@ jobs:
           path: "./plugins/${{ github.event.repository.name }}"
 
       - name: Replace PocketMine Phpstan config
-        run: cp -f ./plugins/tests/phpstan.neon.dist phpstan.neon.dist
+        run: cp -f ./plugins/${{ github.event.repository.name }}/tests/phpstan.neon.dist phpstan.neon.dist
 
       - name: Setup PHP
         uses: pmmp/setup-php-action@e232f72a4330a07aae8418e8aa56b64efcdda636
