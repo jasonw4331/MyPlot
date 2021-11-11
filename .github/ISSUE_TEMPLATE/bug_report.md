@@ -21,15 +21,18 @@ assignees: ''
 * Plugin Version:
 * PocketMine-MP:
 * PHP:
-* Game version: PE/Win10 (delete as appropriate)
+* Using JIT: yes/no (delete as appropriate) <!-- look for the giant yellow warning in the log that says you're using JIT -->
+* Server OS:
+* Game version: Android/iOS/Win10/Xbox/PS4/Switch (delete as appropriate)
 
 ### Other Plugins
 <!--- use the `plugins` command and paste the output below -->
 
-- If you remove all other plugins, does the issue still occur? Yes/No (delete as appropriate)
+- If you remove all other plugins, does the issue still occur?
 - If the issue is **not** reproducible without other plugins:
   - Have you asked for help in the community discord before creating an issue?
   - Can you provide sample, *minimal* reproducing code for the issue? If so, paste it in the bottom section.
 
-### Console error, backtrace or other files
-<!--- Link a screenshot of the console error message here -->
+### Crashdump, backtrace or other files
+<!--- Submit crashdumps at https://crash.pmmp.io and paste a link -->
+<!--- Use gist or anything else to add other files and add links here -->

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Help & support on Discord
+    url: https://discord.gg/qqcpp9q
+    about: We don't accept support requests on the issue tracker. Please try asking on Discord instead.
+  - name: Documentation
+    url: https://github.com/jasonwynn10/MyPlot/wiki
+    about: PocketMine-MP documentation
