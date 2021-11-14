@@ -1,0 +1,387 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Only booleans are allowed in &&, mixed given on the right side\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/Commands.php
+
+		-
+			message: "#^Cannot call method isSame\\(\\) on MyPlot\\\\Plot\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/EventListener.php
+
+		-
+			message: "#^Anonymous function uses \\$this assigned to variable \\$plugin\\. Use \\$this directly in the function body\\.$#"
+			count: 8
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Call to method getSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
+			count: 7
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Call to method removeSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\WorldStyler\\.$#"
+			count: 7
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Call to method setPosition\\(\\) on an unknown class muqsit\\\\worldstyler\\\\Selection\\.$#"
+			count: 12
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Call to static method fromSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\shapes\\\\CommonShape\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Call to static method fromSelection\\(\\) on an unknown class muqsit\\\\worldstyler\\\\shapes\\\\Cuboid\\.$#"
+			count: 7
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Cannot call method getEntities\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Cannot call method setChunk\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Class muqsit\\\\worldstyler\\\\WorldStyler not found\\.$#"
+			count: 3
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Class onebone\\\\economyapi\\\\EconomyAPI not found\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Instantiated class muqsit\\\\worldstyler\\\\Selection not found\\.$#"
+			count: 5
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Method MyPlot\\\\MyPlot\\:\\:getPlotChunks\\(\\) should return array\\<pocketmine\\\\level\\\\format\\\\Chunk\\> but returns array\\<int, pocketmine\\\\level\\\\format\\\\Chunk\\|null\\>\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Only booleans are allowed in &&, mixed given on the left side\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Only booleans are allowed in an if condition, mixed given\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^Parameter \\#1 \\$stream of function fclose expects resource, resource\\|false given\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^For loop initial assignment overwrites variable \\$X\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlotGenerator.php
+
+		-
+			message: "#^For loop initial assignment overwrites variable \\$x\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlotGenerator.php
+
+		-
+			message: "#^For loop initial assignment overwrites variable \\$z\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlotGenerator.php
+
+		-
+			message: "#^Method MyPlot\\\\forms\\\\ComplexMyPlotForm\\:\\:__construct\\(\\) has parameter \\$onSubmit with no signature specified for Closure\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/forms/ComplexMyPlotForm.php
+
+		-
+			message: "#^Method MyPlot\\\\forms\\\\SimpleMyPlotForm\\:\\:__construct\\(\\) has parameter \\$onClose with no signature specified for Closure\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/forms/SimpleMyPlotForm.php
+
+		-
+			message: "#^Method MyPlot\\\\forms\\\\SimpleMyPlotForm\\:\\:__construct\\(\\) has parameter \\$onSubmit with no signature specified for Closure\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/forms/SimpleMyPlotForm.php
+
+		-
+			message: "#^Construct empty\\(\\) is not allowed\\. Use more strict comparison\\.$#"
+			count: 2
+			path: plugins/MyPlot/src/MyPlot/forms/subforms/RemoveHelperForm.php
+
+		-
+			message: "#^Construct empty\\(\\) is not allowed\\. Use more strict comparison\\.$#"
+			count: 2
+			path: plugins/MyPlot/src/MyPlot/forms/subforms/UndenyPlayerForm.php
+
+		-
+			message: "#^Method MyPlot\\\\provider\\\\DataProvider\\:\\:findEmptyPlotSquared\\(\\) has parameter \\$plots with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/provider/DataProvider.php
+
+		-
+			message: "#^Access to constant RET_SUCCESS on an unknown class onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			count: 2
+			path: plugins/MyPlot/src/MyPlot/provider/EconomySProvider.php
+
+		-
+			message: "#^Call to method addMoney\\(\\) on an unknown class onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/provider/EconomySProvider.php
+
+		-
+			message: "#^Call to method getLogger\\(\\) on an unknown class onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			count: 4
+			path: plugins/MyPlot/src/MyPlot/provider/EconomySProvider.php
+
+		-
+			message: "#^Call to method reduceMoney\\(\\) on an unknown class onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/provider/EconomySProvider.php
+
+		-
+			message: "#^Parameter \\$plugin of method MyPlot\\\\provider\\\\EconomySProvider\\:\\:__construct\\(\\) has invalid type onebone\\\\economyapi\\\\EconomyAPI\\.$#"
+			count: 2
+			path: plugins/MyPlot/src/MyPlot/provider/EconomySProvider.php
+
+		-
+			message: "#^Property MyPlot\\\\provider\\\\EconomySProvider\\:\\:\\$plugin has unknown class onebone\\\\economyapi\\\\EconomyAPI as its type\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/provider/EconomySProvider.php
+
+		-
+			message: "#^Offset 0 does not exist on array\\|null\\.$#"
+			count: 2
+			path: plugins/MyPlot/src/MyPlot/provider/MySQLProvider.php
+
+		-
+			message: "#^Only booleans are allowed in &&, array\\|null given on the right side\\.$#"
+			count: 2
+			path: plugins/MyPlot/src/MyPlot/provider/MySQLProvider.php
+
+		-
+			message: "#^Only booleans are allowed in &&, array\\|false given on the right side\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/provider/SQLiteDataProvider.php
+
+		-
+			message: "#^Only booleans are allowed in an if condition, array\\|false given\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/provider/SQLiteDataProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\AddHelperSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/AddHelperSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\AutoSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/AutoSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\BiomeSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/BiomeSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\BuySubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/BuySubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\ClaimSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/ClaimSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\ClearSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/ClearSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\CloneSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/CloneSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\DenyPlayerSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/DenyPlayerSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\DisposeSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/DisposeSubCommand.php
+
+		-
+			message: "#^Construct empty\\(\\) is not allowed\\. Use more strict comparison\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/FillSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$player of class MyPlot\\\\forms\\\\subforms\\\\FillForm constructor expects pocketmine\\\\Player, pocketmine\\\\Player\\|null given\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/FillSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$position of method MyPlot\\\\MyPlot\\:\\:getPlotByPosition\\(\\) expects pocketmine\\\\level\\\\Position, pocketmine\\\\Player\\|null given\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/FillSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\FillSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/FillSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\GiveSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/GiveSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\HomeSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/HomeSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\HomesSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/HomesSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\InfoSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/InfoSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\KickSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/KickSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\ListSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/ListSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\MergeSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/MergeSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\MiddleSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/MiddleSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\NameSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/NameSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\PvpSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/PvpSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\RemoveHelperSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/RemoveHelperSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\ResetSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/ResetSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\SellSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/SellSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\SetOwnerSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/SetOwnerSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\UnDenySubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/UnDenySubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\WarpSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/WarpSubCommand.php
+
+		-
+			message: "#^Cannot call method isVectorInXZ\\(\\) on pocketmine\\\\math\\\\AxisAlignedBB\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/ClearPlotTask.php
+
+		-
+			message: "#^Cannot access property \\$z on pocketmine\\\\math\\\\Vector3\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/CornerCorrectionTask.php
+
+		-
+			message: "#^Cannot call method getEntities\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/CornerCorrectionTask.php
+
+		-
+			message: "#^Cannot call method getWorldHeight\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/CornerCorrectionTask.php
+
+		-
+			message: "#^Cannot call method setBlock\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/CornerCorrectionTask.php
+
+		-
+			message: "#^Cannot access property \\$x on pocketmine\\\\level\\\\Position\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/FillPlotTask.php
+
+		-
+			message: "#^Cannot access property \\$z on pocketmine\\\\level\\\\Position\\|null\\.$#"
+			count: 2
+			path: plugins/MyPlot/src/MyPlot/task/FillPlotTask.php
+
+		-
+			message: "#^Cannot call method getEntities\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/FillPlotTask.php
+
+		-
+			message: "#^Cannot call method getTiles\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/FillPlotTask.php
+
+		-
+			message: "#^Cannot call method getWorldHeight\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/FillPlotTask.php
+
+		-
+			message: "#^Cannot call method setBlock\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/FillPlotTask.php
+
+		-
+			message: "#^Cannot access property \\$z on pocketmine\\\\math\\\\Vector3\\|null\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/task/RoadFillTask.php
+
