@@ -32,6 +32,8 @@ parameters:
 		anyCallable: 'callable(never, never, never, never, never, never, never, never, never, never) : mixed'
 		anyClosure: '\Closure(never, never, never, never, never, never, never, never, never, never) : mixed'
 	ignoreErrors:
-		- '*form*'
+		- '*Form*'
+		- '*pmforms*'
 		- '*economyapi*'
 		- '*worldstyler*'
+		- '*EasyCommandAutofill*'
