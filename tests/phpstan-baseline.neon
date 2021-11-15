@@ -1,0 +1,167 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\$stream of function fclose expects resource, resource\\|false given\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlot.php
+
+		-
+			message: "#^For loop initial assignment overwrites variable \\$X\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlotGenerator.php
+
+		-
+			message: "#^For loop initial assignment overwrites variable \\$x\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlotGenerator.php
+
+		-
+			message: "#^For loop initial assignment overwrites variable \\$z\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/MyPlotGenerator.php
+
+		-
+			message: "#^Method MyPlot\\\\forms\\\\ComplexMyPlotForm\\:\\:__construct\\(\\) has parameter \\$onSubmit with no signature specified for Closure\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/forms/ComplexMyPlotForm.php
+
+		-
+			message: "#^Method MyPlot\\\\forms\\\\SimpleMyPlotForm\\:\\:__construct\\(\\) has parameter \\$onClose with no signature specified for Closure\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/forms/SimpleMyPlotForm.php
+
+		-
+			message: "#^Method MyPlot\\\\forms\\\\SimpleMyPlotForm\\:\\:__construct\\(\\) has parameter \\$onSubmit with no signature specified for Closure\\.$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/forms/SimpleMyPlotForm.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\AddHelperSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/AddHelperSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\AutoSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/AutoSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\BiomeSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/BiomeSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\BuySubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/BuySubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\ClaimSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/ClaimSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\ClearSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/ClearSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\CloneSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/CloneSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\DenyPlayerSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/DenyPlayerSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\DisposeSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/DisposeSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\FillSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/FillSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\GiveSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/GiveSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\HomeSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/HomeSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\HomesSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/HomesSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\InfoSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/InfoSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\KickSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/KickSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\ListSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/ListSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\MergeSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/MergeSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\MiddleSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/MiddleSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\NameSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/NameSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\PvpSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/PvpSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\RemoveHelperSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/RemoveHelperSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\ResetSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/ResetSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\SellSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/SellSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\SetOwnerSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/SetOwnerSubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\UnDenySubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/UnDenySubCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\Player\\) of method MyPlot\\\\subcommand\\\\WarpSubCommand\\:\\:execute\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method MyPlot\\\\subcommand\\\\SubCommand\\:\\:execute\\(\\)$#"
+			count: 1
+			path: plugins/MyPlot/src/MyPlot/subcommand/WarpSubCommand.php
+

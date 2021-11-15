@@ -1,0 +1,40 @@
+includes:
+	- vendor/phpstan/phpstan-phpunit/extension.neon
+	- vendor/phpstan/phpstan-phpunit/rules.neon
+	- vendor/phpstan/phpstan-strict-rules/rules.neon
+	- plugins/MyPlot/tests/phpstan-baseline.neon
+
+parameters:
+	level: 7
+	checkMissingCallableSignature: true
+	treatPhpDocTypesAsCertain: false
+	bootstrapFiles:
+		- tests/phpstan/bootstrap.php
+	scanDirectories:
+		- src
+		- plugins
+	paths:
+		- plugins/MyPlot/src
+	dynamicConstantNames:
+		- pocketmine\DEBUG
+		- pocketmine\IS_DEVELOPMENT_BUILD
+	stubFiles:
+		- tests/phpstan/stubs/chunkutils.stub
+		- tests/phpstan/stubs/leveldb.stub
+		- tests/phpstan/stubs/pthreads.stub
+	reportUnmatchedIgnoredErrors: false #no other way to silence platform-specific non-warnings
+	staticReflectionClassNamePatterns:
+		- "#^COM$#"
+	typeAliases:
+		#variadics don't work for this - mixed probably shouldn't work either, but for now it does
+		#what we actually need is something that accepts an infinite number of parameters, but in the absence of that,
+		#we'll just fill it with 10 - it's very unlikely to encounter a callable with 10 parameters anyway.
+		anyCallable: 'callable(never, never, never, never, never, never, never, never, never, never) : mixed'
+		anyClosure: '\Closure(never, never, never, never, never, never, never, never, never, never) : mixed'
+	ignoreErrors:
+		- '*CustomForm*'
+		- '*MenuForm*'
+		- '*pmforms*'
+		- '*economyapi*'
+		- '*worldstyler*'
+		- '*EasyCommandAutofill*'
