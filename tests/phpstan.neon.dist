@@ -2,10 +2,10 @@ includes:
 	- vendor/phpstan/phpstan-phpunit/extension.neon
 	- vendor/phpstan/phpstan-phpunit/rules.neon
 	- vendor/phpstan/phpstan-strict-rules/rules.neon
-#	- plugins/MyPlot/tests/phpstan-baseline.neon
+	- plugins/MyPlot/tests/phpstan-baseline.neon
 
 parameters:
-	level: 8
+	level: 7
 	checkMissingCallableSignature: true
 	treatPhpDocTypesAsCertain: false
 	bootstrapFiles:
@@ -32,7 +32,8 @@ parameters:
 		anyCallable: 'callable(never, never, never, never, never, never, never, never, never, never) : mixed'
 		anyClosure: '\Closure(never, never, never, never, never, never, never, never, never, never) : mixed'
 	ignoreErrors:
-		- '*Form*'
+		- '*CustomForm*'
+		- '*MenuForm*'
 		- '*pmforms*'
 		- '*economyapi*'
 		- '*worldstyler*'
