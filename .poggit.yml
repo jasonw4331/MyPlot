@@ -6,4 +6,14 @@ projects:
     libs:
       - src: dktapps-pm-pl/pmforms/pmforms
         version: ^1.0.0
+    lint:
+      phpstan: false
+    excludeDirs:
+      - tests
+      - .github
+    excludeFiles:
+      - .php-cs-fixer.php
+      - .gitignore
+      - CONTRIBUTING.md
+      - SECURITY.md
 ...
