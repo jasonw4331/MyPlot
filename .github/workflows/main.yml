@@ -72,7 +72,7 @@ jobs:
       - name: Install Composer dependencies
         run: php composer.phar install --prefer-dist --no-interaction
 
-      - name: Install Composer dependencies
+      - name: LS
         run: ls plugins/MyPlot/tests
 
       - name: Run PHPStan
