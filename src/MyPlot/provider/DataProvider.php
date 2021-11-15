@@ -33,7 +33,7 @@ abstract class DataProvider
 				array_shift($this->cache);
 			}
 			$this->cache = array_merge([$key => clone $plot], $this->cache);
-			$this->plugin->getLogger()->debug("Plot {$plot->X};{$plot->Z} has been cached");
+			$this->plugin->getLogger()->debug("Plot $plot->X;$plot->Z has been cached");
 		}
 	}
 
@@ -80,7 +80,7 @@ abstract class DataProvider
 	/**
 	 * @param int $a
 	 * @param int $b
-	 * @param array[] $plots
+	 * @param bool[][] $plots
 	 *
 	 * @return int[]|null
 	 */

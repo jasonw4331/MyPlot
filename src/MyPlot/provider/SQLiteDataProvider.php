@@ -24,7 +24,9 @@ class SQLiteDataProvider extends DataProvider
 	 * SQLiteDataProvider constructor.
 	 *
 	 * @param MyPlot $plugin
-	 * @param int $cacheSize
+	 * @param int    $cacheSize
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(MyPlot $plugin, int $cacheSize = 0) {
 		parent::__construct($plugin, $cacheSize);
@@ -71,19 +73,14 @@ class SQLiteDataProvider extends DataProvider
 			$stmt = $this->sqlDisposeMergedPlot;
 			$stmt->bindValue(":pvp", !$settings->restrictPVP, SQLITE3_INTEGER);
 			$stmt->bindValue(":price", $settings->claimPrice, SQLITE3_FLOAT);
-			$stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
-			$stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
-			$stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
-			$stmt->reset();
-			$result = $stmt->execute();
 		}else {
 			$stmt = $this->sqlRemovePlot;
-			$stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
-			$stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
-			$stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
-			$stmt->reset();
-			$result = $stmt->execute();
 		}
+		$stmt->bindValue(":level", $plot->levelName, SQLITE3_TEXT);
+		$stmt->bindValue(":X", $plot->X, SQLITE3_INTEGER);
+		$stmt->bindValue(":Z", $plot->Z, SQLITE3_INTEGER);
+		$stmt->reset();
+		$result = $stmt->execute();
 		if(!$result instanceof \SQLite3Result) {
 			return false;
 		}
@@ -231,7 +228,7 @@ class SQLiteDataProvider extends DataProvider
 		$stmt->reset();
 		$result = $stmt->execute();
 		$plots = [$origin];
-		while($result !== false and $val = $result->fetchArray(SQLITE3_ASSOC)) {
+		while($result !== false and ($val = $result->fetchArray(SQLITE3_ASSOC)) !== false) {
 			$helpers = explode(",", (string) $val["helpers"]);
 			$denied = explode(",", (string) $val["denied"]);
 			$pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
@@ -258,7 +255,7 @@ class SQLiteDataProvider extends DataProvider
 		if(!$result instanceof \SQLite3Result) {
 			return $plot;
 		}
-		if($val = $result->fetchArray(SQLITE3_ASSOC)) {
+		if(($val = $result->fetchArray(SQLITE3_ASSOC)) !== false) {
 			$helpers = explode(",", (string) $val["helpers"]);
 			$denied = explode(",", (string) $val["denied"]);
 			$pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;

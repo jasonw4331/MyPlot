@@ -28,7 +28,7 @@ class FillSubCommand extends SubCommand {
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		if(empty($args)) {
+		if(count($args) < 1) {
 			return false;
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender);
@@ -54,7 +54,7 @@ class FillSubCommand extends SubCommand {
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->getPlugin()->getPlotByPosition($player) instanceof Plot) {
+		if($this->getPlugin()->getPlotByPosition($player->asPosition()) instanceof Plot) {
 			return new FillForm($player);
 		}
 		return null;

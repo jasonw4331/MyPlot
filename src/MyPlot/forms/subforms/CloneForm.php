@@ -13,8 +13,6 @@ use pocketmine\utils\TextFormat;
 
 class CloneForm extends ComplexMyPlotForm {
 
-	private Player $player;
-
 	public function __construct(Player $player) {
 		$plugin = MyPlot::getInstance();
 		$plot = $plugin->getPlotByPosition($player);
@@ -71,8 +69,8 @@ class CloneForm extends ComplexMyPlotForm {
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
 				if(is_numeric($response->getString("1")) and is_numeric($response->getString("2")) and is_numeric($response->getString("5")) and is_numeric($response->getString("6"))) {
-					$originPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("3") === '' ? $this->player->getLevelNonNull()->getFolderName() : $response->getString("3"), (int)$response->getString("1"), (int)$response->getString("2"));
-					$clonedPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("7") === '' ? $this->player->getLevelNonNull()->getFolderName() : $response->getString("7"), (int)$response->getString("5"), (int)$response->getString("6"));
+					$originPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("3") === '' ? $player->getLevelNonNull()->getFolderName() : $response->getString("3"), (int)$response->getString("1"), (int)$response->getString("2"));
+					$clonedPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("7") === '' ? $player->getLevelNonNull()->getFolderName() : $response->getString("7"), (int)$response->getString("5"), (int)$response->getString("6"));
 				}else
 					throw new FormValidationException("Unexpected form data returned");
 

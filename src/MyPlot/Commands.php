@@ -120,48 +120,24 @@ class Commands extends PluginCommand
 				preg_match_all('/(\s?[<\[]?\s*)([a-zA-Z0-9|]+)(?:\s*:?\s*)(string|int|x y z|float|mixed|target|message|text|json|command|boolean|bool)?(?:\s*[>\]]?\s?)/iu', $usage, $matches, PREG_PATTERN_ORDER, strlen($commandString));
 				$argumentCount = count($matches[0])-1;
 				for($argNumber = 1; $argNumber <= $argumentCount; ++$argNumber) {
-					$optional = $matches[1][$argNumber] === '' ? false : ($matches[1][$argNumber] === '[');
+					$optional = !($matches[1][$argNumber] === '') && $matches[1][$argNumber] === '[';
 					$paramName = strtolower($matches[2][$argNumber]);
 					if(stripos($paramName, "|") === false) {
-						switch(strtolower($matches[3][$argNumber])) {
-							default:
-							case "string":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
-							break;
-							case "int":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_INT;
-							break;
-							case "x y z":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_POSITION;
-							break;
-							case "float":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_FLOAT;
-							break;
-							case "target":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_TARGET;
-							break;
-							case "message":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_MESSAGE;
-							break;
-							case "json":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_JSON;
-							break;
-							case "command":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_COMMAND;
-							break;
-							case "boolean":
-							case "mixed":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_VALUE;
-							break;
-							case "text":
-								$paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_RAWTEXT;
-							break;
-						}
+						$paramType = match (strtolower($matches[3][$argNumber])) {
+							default => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING,
+							"int" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_INT,
+							"x y z" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_POSITION,
+							"float" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_FLOAT,
+							"target" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_TARGET,
+							"message" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_MESSAGE,
+							"json" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_JSON,
+							"command" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_COMMAND,
+							"boolean", "mixed" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_VALUE,
+							"text" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_RAWTEXT,
+						};
 						$parameter = new CommandParameter();
 						$parameter->paramName = $paramName;
 						$parameter->paramType = $paramType;
-						$parameter->isOptional = $optional;
-						$data->overloads[$tree][$argNumber] = $parameter;
 					}else{
 						$enumValues = explode("|", $paramName);
 						$parameter = new CommandParameter();
@@ -172,9 +148,9 @@ class Commands extends PluginCommand
 						$enum->enumValues = $enumValues;
 						$parameter->enum = $enum;
 						$parameter->flags = 1;
-						$parameter->isOptional = $optional;
-						$data->overloads[$tree][$argNumber] = $parameter;
 					}
+					$parameter->isOptional = $optional;
+					$data->overloads[$tree][$argNumber] = $parameter;
 				}
 				$tree++;
 			}
@@ -225,7 +201,7 @@ class Commands extends PluginCommand
 		}
 		if(!isset($args[0])) {
 			$args[0] = "help";
-			if($sender instanceof Player and $plugin->getConfig()->get("UI Forms", true)) {
+			if($sender instanceof Player and $plugin->getConfig()->get("UI Forms", true) === true) {
 				$sender->sendForm(new MainForm($sender, $this->subCommands));
 				return true;
 			}

@@ -26,9 +26,11 @@ class MySQLProvider extends DataProvider {
 	/**
 	 * MySQLProvider constructor.
 	 *
-	 * @param MyPlot $plugin
-	 * @param int $cacheSize
+	 * @param MyPlot  $plugin
+	 * @param int     $cacheSize
 	 * @param mixed[] $settings
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(MyPlot $plugin, int $cacheSize = 0, array $settings = []) {
 		ini_set("mysqli.reconnect", "1");
@@ -53,6 +55,9 @@ class MySQLProvider extends DataProvider {
 		$this->plugin->getLogger()->debug("MySQL data provider registered");
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function savePlot(Plot $plot) : bool {
 		$this->reconnect();
 		$helpers = implode(',', $plot->helpers);
@@ -68,6 +73,9 @@ class MySQLProvider extends DataProvider {
 		return true;
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function deletePlot(Plot $plot) : bool {
 		$this->reconnect();
 		$settings = MyPlot::getInstance()->getLevelSettings($plot->levelName);
@@ -96,6 +104,9 @@ class MySQLProvider extends DataProvider {
 		return true;
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function getPlot(string $levelName, int $X, int $Z) : Plot {
 		$this->reconnect();
 		if(($plot = $this->getPlotFromCache($levelName, $X, $Z)) != null) {
@@ -136,6 +147,7 @@ class MySQLProvider extends DataProvider {
 	 * @param string $levelName
 	 *
 	 * @return Plot[]
+	 * @throws \Exception
 	 */
 	public function getPlotsByOwner(string $owner, string $levelName = "") : array {
 		$this->reconnect();
@@ -170,6 +182,9 @@ class MySQLProvider extends DataProvider {
 		return $plots;
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?Plot {
 		$this->reconnect();
 		$i = 0;
@@ -239,7 +254,7 @@ class MySQLProvider extends DataProvider {
             return $plots;
         }
         $result = $stmt->get_result();
-        while($result !== false and $val = $result->fetch_array()) {
+        while($result !== false and ($val = $result->fetch_array()) !== null) {
             $helpers = explode(",", (string) $val["helpers"]);
             $denied = explode(",", (string) $val["denied"]);
             $pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
@@ -265,7 +280,7 @@ class MySQLProvider extends DataProvider {
             return $plot;
         }
         $result = $stmt->get_result();
-        if($result !== false and $val = $result->fetch_array()) {
+        if($result !== false and ($val = $result->fetch_array()) !== null) {
             $helpers = explode(",", (string) $val["helpers"]);
             $denied = explode(",", (string) $val["denied"]);
             $pvp = is_numeric($val["pvp"]) ? (bool)$val["pvp"] : null;
@@ -279,7 +294,10 @@ class MySQLProvider extends DataProvider {
 			$this->plugin->getLogger()->debug("MySQL database closed!");
 	}
 
-	private function reconnect() : bool {
+	/**
+	 * @throws \Exception
+	 */
+	private function reconnect() : void{
 		if(!$this->db->ping()) {
 			$this->plugin->getLogger()->error("The MySQL server can not be reached! Trying to reconnect!");
 			$this->close();
@@ -287,7 +305,6 @@ class MySQLProvider extends DataProvider {
 			$this->prepare();
 			if($this->db->ping()) {
 				$this->plugin->getLogger()->notice("The MySQL connection has been re-established!");
-				return true;
 			}else{
 				$this->plugin->getLogger()->critical("The MySQL connection could not be re-established!");
 				$this->plugin->getLogger()->critical("Closing level to prevent griefing!");
@@ -300,13 +317,11 @@ class MySQLProvider extends DataProvider {
 				}
 				if($this->db->connect_error !== null and $this->db->connect_error !== '')
 					$this->plugin->getLogger()->critical("Failed to connect to the MySQL database: " . $this->db->connect_error);
-				if((bool)$this->plugin->getConfig()->getNested("MySQLSettings.ShutdownOnFailure", false)) {
+				if($this->plugin->getConfig()->getNested("MySQLSettings.ShutdownOnFailure", false) === true) {
 					$this->plugin->getServer()->shutdown();
 				}
-				return false;
 			}
 		}
-		return true;
 	}
 
 	private function prepare() : void {

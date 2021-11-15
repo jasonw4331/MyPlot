@@ -47,6 +47,8 @@ class EventListener implements Listener
 	 * @priority LOWEST
 	 *
 	 * @param LevelLoadEvent $event
+	 *
+	 * @throws \ReflectionException
 	 */
 	public function onLevelLoad(LevelLoadEvent $event) : void {
 		if(file_exists($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$event->getLevel()->getFolderName().".yml")) {
@@ -139,10 +141,7 @@ class EventListener implements Listener
 		$this->onEventOnBlock($event);
 	}
 
-	/**
-	 * @param BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent|SignChangeEvent $event
-	 */
-	private function onEventOnBlock($event) : void {
+	private function onEventOnBlock(BlockPlaceEvent|SignChangeEvent|PlayerInteractEvent|BlockBreakEvent $event) : void {
 		if(!$event->getBlock()->isValid())
 			return;
 		$levelName = $event->getBlock()->getLevelNonNull()->getFolderName();
@@ -270,14 +269,10 @@ class EventListener implements Listener
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
 
-		$newBlockInPlot = $this->plugin->getPlotByPosition($event->getBlock()) instanceof Plot;
-		$sourceBlockInPlot = $this->plugin->getPlotByPosition($event->getSource()) instanceof Plot;
+		$newBlockInPlot = ($plotA = $this->plugin->getPlotByPosition($event->getBlock())) instanceof Plot;
+		$sourceBlockInPlot = ($plotB = $this->plugin->getPlotByPosition($event->getSource())) instanceof Plot;
 
-		if($newBlockInPlot and $sourceBlockInPlot) {
-			$spreadIsSamePlot = $this->plugin->getPlotByPosition($event->getBlock())->isSame($this->plugin->getPlotByPosition($event->getSource()));
-		}else {
-			$spreadIsSamePlot = false;
-		}
+		$spreadIsSamePlot = (($newBlockInPlot and $sourceBlockInPlot)) && $plotA->isSame($plotB);
 
 		if($event->getSource() instanceof Liquid) {
 			if(!$settings->updatePlotLiquids and ($sourceBlockInPlot or $this->plugin->isPositionBorderingPlot($event->getSource()))) {
@@ -316,18 +311,14 @@ class EventListener implements Listener
 		}
 	}
 
-	/**
-	 * @param Player $player
-	 * @param PlayerMoveEvent|EntityTeleportEvent $event
-	 */
-	private function onEventOnMove(Player $player, $event) : void {
+	private function onEventOnMove(Player $player, EntityTeleportEvent|PlayerMoveEvent $event) : void {
 		$levelName = $player->getLevelNonNull()->getFolderName();
 		if (!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
 		if($plot !== null and ($plotFrom === null or !$plot->isSame($plotFrom))) {
-			if(strpos((string) $plot, "-0") !== false) {
+			if(str_contains((string) $plot, "-0")) {
 				return;
 			}
 			$ev = new MyPlotPlayerEnterPlotEvent($plot, $player);
@@ -361,7 +352,7 @@ class EventListener implements Listener
 			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			$ev->getPlayer()->sendTip($popup);
 		}elseif($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
-			if(strpos((string) $plotFrom, "-0") !== false) {
+			if(str_contains((string) $plotFrom, "-0")) {
 				return;
 			}
 			$ev = new MyPlotPlayerLeavePlotEvent($plotFrom, $player);
