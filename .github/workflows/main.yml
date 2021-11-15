@@ -50,6 +50,9 @@ jobs:
       - name: Replace PocketMine Phpstan config
         run: cp -f ./plugins/${{ github.event.repository.name }}/tests/phpstan.neon.dist phpstan.neon.dist
 
+      - name: Delete poggit Phpstan config
+        run: rm -f ./plugins/${{ github.event.repository.name }}/phpstan.neon.dist
+
       - name: Setup PHP
         uses: pmmp/setup-php-action@e232f72a4330a07aae8418e8aa56b64efcdda636
         with:
