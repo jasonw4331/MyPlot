@@ -72,9 +72,6 @@ jobs:
       - name: Install Composer dependencies
         run: php composer.phar install --prefer-dist --no-interaction
 
-      - name: LS
-        run: ls plugins/MyPlot/tests
-
       - name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-progress --memory-limit=2G
 

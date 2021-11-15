@@ -11,23 +11,9 @@ parameters:
 	bootstrapFiles:
 		- tests/phpstan/bootstrap.php
 	scanDirectories:
-		- build
-		- tests/plugins/TesterPlugin
-	scanFiles:
-		- src/pocketmine/PocketMine.php
-	paths:
-		- build
 		- src
-		- tests/phpunit
-		- tests/plugins/TesterPlugin
-		- plugins
-	excludePaths:
-		analyseAndScan:
-			- build/php
-			- build/preprocessor
-		analyse:
-			- src/pocketmine/block/StoneSlab.php #overrides STONE constant
-			- src/pocketmine/item/Potion.php #overrides WATER constant
+	paths:
+		- plugins/MyPlot/src
 	dynamicConstantNames:
 		- pocketmine\DEBUG
 		- pocketmine\IS_DEVELOPMENT_BUILD
