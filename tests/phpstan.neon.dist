@@ -12,6 +12,7 @@ parameters:
 		- tests/phpstan/bootstrap.php
 	scanDirectories:
 		- src
+		- plugins
 	paths:
 		- plugins/MyPlot/src
 	dynamicConstantNames:
@@ -30,3 +31,7 @@ parameters:
 		#we'll just fill it with 10 - it's very unlikely to encounter a callable with 10 parameters anyway.
 		anyCallable: 'callable(never, never, never, never, never, never, never, never, never, never) : mixed'
 		anyClosure: '\Closure(never, never, never, never, never, never, never, never, never, never) : mixed'
+	ignoreErrors:
+		- '#*form*#'
+		- '#*economyapi*#'
+		- '#*worldstyler*#'
