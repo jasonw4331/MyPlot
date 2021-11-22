@@ -7,7 +7,7 @@ use MyPlot\forms\subforms\GenerateForm;
 use MyPlot\MyPlotGenerator;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class GenerateSubCommand extends SubCommand
@@ -27,7 +27,7 @@ class GenerateSubCommand extends SubCommand
 			return false;
 		}
 		$levelName = $args[0];
-		if($sender->getServer()->isLevelGenerated($levelName)) {
+		if($sender->getServer()->getWorldManager()->isWorldGenerated($levelName)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("generate.exists", [$levelName]));
 			return true;
 		}

@@ -6,7 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 
 abstract class SubCommand implements PluginIdentifiableCommand

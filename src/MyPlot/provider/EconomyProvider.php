@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace MyPlot\provider;
 
 use pocketmine\IPlayer;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 interface EconomyProvider {
 	public function reduceMoney(Player $player, float $amount) : bool;

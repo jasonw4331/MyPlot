@@ -6,11 +6,11 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
+use pocketmine\world\World as Level;
+use pocketmine\world\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 
 class ClearPlotTask extends Task {
@@ -60,7 +60,7 @@ class ClearPlotTask extends Task {
 		    if($this->xMax < $xMaxPlot) $this->xMax = $xMaxPlot;
 		    if($this->zMax < $zMaxPlot) $this->zMax = $zMaxPlot;
         }
-        $this->level = $this->plotBeginPos->getLevelNonNull();
+        $this->level = $this->plotBeginPos->getWorld();
         $this->pos = new Vector3($this->plotBeginPos->x, 0, $this->plotBeginPos->z);
         $this->plotBB = $this->plugin->getPlotBB($plot);
 		$plugin->getLogger()->debug("Plot Clear Task started at plot {$plot->X};{$plot->Z}");

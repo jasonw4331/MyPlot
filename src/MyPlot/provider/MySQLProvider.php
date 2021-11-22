@@ -309,7 +309,7 @@ class MySQLProvider extends DataProvider {
 				$this->plugin->getLogger()->critical("The MySQL connection could not be re-established!");
 				$this->plugin->getLogger()->critical("Closing level to prevent griefing!");
 				foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
-					$level = $this->plugin->getServer()->getLevelByName($levelName);
+					$level = $this->plugin->getServer()->getWorldManager()->getWorldByName($levelName);
 					if($level !== null) {
 						$level->save(); // don't force in case owner doesn't want it saved
 						Server::getInstance()->unloadLevel($level, true); // force unload to prevent possible griefing

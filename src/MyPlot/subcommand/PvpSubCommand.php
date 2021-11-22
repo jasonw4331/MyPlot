@@ -4,7 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class PvpSubCommand extends SubCommand {
@@ -29,7 +29,7 @@ class PvpSubCommand extends SubCommand {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("notowner"));
 			return true;
 		}
-		$levelSettings = $this->getPlugin()->getLevelSettings($sender->getLevelNonNull()->getFolderName());
+		$levelSettings = $this->getPlugin()->getLevelSettings($sender->getWorld()->getFolderName());
 		if($levelSettings->restrictPVP) {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("pvp.world"));
 			return true;

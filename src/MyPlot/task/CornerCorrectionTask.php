@@ -6,10 +6,10 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
+use pocketmine\world\World as Level;
+use pocketmine\world\Position;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 
 class CornerCorrectionTask extends Task{
@@ -34,7 +34,7 @@ class CornerCorrectionTask extends Task{
 		$this->plugin = $plugin;
 		$this->start = $start;
 		$this->plotBeginPos = $plugin->getPlotPosition($start, false);
-		$this->level = $this->plotBeginPos->getLevelNonNull();
+		$this->level = $this->plotBeginPos->getWorld();
 		$this->maxBlocksPerTick = $maxBlocksPerTick;
 
 		$plotLevel = $plugin->getLevelSettings($start->levelName);

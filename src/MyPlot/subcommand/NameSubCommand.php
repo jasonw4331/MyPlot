@@ -6,7 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\NameForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class NameSubCommand extends SubCommand

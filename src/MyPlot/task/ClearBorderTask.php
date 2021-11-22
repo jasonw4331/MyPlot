@@ -7,7 +7,7 @@ use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
+use pocketmine\world\World as Level;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
 
@@ -51,7 +51,7 @@ class ClearBorderTask extends Task {
 
         --$this->plotBeginPos->x;
         --$this->plotBeginPos->z;
-        $this->level = $this->plotBeginPos->getLevelNonNull();
+        $this->level = $this->plotBeginPos->getWorld();
 		$this->height = $plotLevel->groundHeight;
 		$this->plotWallBlock = $plotLevel->wallBlock;
 		$this->roadBlock = $plotLevel->roadBlock;

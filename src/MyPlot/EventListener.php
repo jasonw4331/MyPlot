@@ -19,13 +19,13 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
-use pocketmine\event\level\LevelLoadEvent;
-use pocketmine\event\level\LevelUnloadEvent;
+use pocketmine\event\world\WorldLoadEvent;
+use pocketmine\event\world\WorldUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use pocketmine\world\World as Level;
+use pocketmine\player\Player;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 
@@ -144,7 +144,7 @@ class EventListener implements Listener
 	private function onEventOnBlock(BlockPlaceEvent|SignChangeEvent|PlayerInteractEvent|BlockBreakEvent $event) : void {
 		if(!$event->getBlock()->isValid())
 			return;
-		$levelName = $event->getBlock()->getLevelNonNull()->getFolderName();
+		$levelName = $event->getBlock()->getWorld()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName)) {
 			return;
 		}
@@ -208,7 +208,7 @@ class EventListener implements Listener
 		if($event->isCancelled()) {
 			return;
 		}
-		$levelName = $event->getEntity()->getLevelNonNull()->getFolderName();
+		$levelName = $event->getEntity()->getWorld()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getPosition());
@@ -264,7 +264,7 @@ class EventListener implements Listener
 		if($event->isCancelled()) {
 			return;
 		}
-		$levelName = $event->getBlock()->getLevelNonNull()->getFolderName();
+		$levelName = $event->getBlock()->getWorld()->getFolderName();
 		if(!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$settings = $this->plugin->getLevelSettings($levelName);
@@ -312,7 +312,7 @@ class EventListener implements Listener
 	}
 
 	private function onEventOnMove(Player $player, EntityTeleportEvent|PlayerMoveEvent $event) : void {
-		$levelName = $player->getLevelNonNull()->getFolderName();
+		$levelName = $player->getWorld()->getFolderName();
 		if (!$this->plugin->isLevelLoaded($levelName))
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
@@ -374,7 +374,7 @@ class EventListener implements Listener
 		$damaged = $event->getEntity();
 		$damager = $event->getDamager();
 		if($damaged instanceof Player and $damager instanceof Player and !$event->isCancelled()) {
-			$levelName = $damaged->getLevelNonNull()->getFolderName();
+			$levelName = $damaged->getWorld()->getFolderName();
 			if(!$this->plugin->isLevelLoaded($levelName)) {
 				return;
 			}

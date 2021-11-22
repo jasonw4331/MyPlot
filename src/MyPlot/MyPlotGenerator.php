@@ -4,10 +4,10 @@ namespace MyPlot;
 
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
-use pocketmine\level\biome\Biome;
-use pocketmine\level\ChunkManager;
-use pocketmine\level\format\Chunk;
-use pocketmine\level\generator\Generator;
+use pocketmine\world\biome\Biome;
+use pocketmine\world\ChunkManager;
+use pocketmine\world\format\Chunk;
+use pocketmine\world\generator\Generator;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 

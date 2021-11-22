@@ -10,7 +10,7 @@ use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\BlockIds;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class GenerateForm extends ComplexMyPlotForm {
@@ -64,7 +64,7 @@ class GenerateForm extends ComplexMyPlotForm {
 				$data = $copy;
 
 				$world = array_shift($data);
-				if($player->getServer()->isLevelGenerated($world)) {
+				if($player->getServer()->getWorldManager()->isWorldGenerated($world)) {
 					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("generate.exists", [$world]));
 					return;
 				}

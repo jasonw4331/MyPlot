@@ -7,7 +7,7 @@ use MyPlot\forms\subforms\UndenyPlayerForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\OfflinePlayer;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class UnDenySubCommand extends SubCommand

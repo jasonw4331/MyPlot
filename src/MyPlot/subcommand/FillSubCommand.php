@@ -8,7 +8,7 @@ use MyPlot\Plot;
 use pocketmine\block\BlockIds;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class FillSubCommand extends SubCommand {

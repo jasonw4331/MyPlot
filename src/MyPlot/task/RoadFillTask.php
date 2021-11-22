@@ -6,10 +6,10 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
+use pocketmine\world\World as Level;
+use pocketmine\world\Position;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 
 class RoadFillTask extends Task{
@@ -41,7 +41,7 @@ class RoadFillTask extends Task{
 		$this->cornerDirection = $cornerDirection === -1 ? -1 : Vector3::getOppositeSide($cornerDirection);
 
 		$this->plotBeginPos = $plugin->getPlotPosition($start, false);
-		$this->level = $this->plotBeginPos->getLevelNonNull();
+		$this->level = $this->plotBeginPos->getWorld();
 
 		$plotLevel = $plugin->getLevelSettings($start->levelName);
 		$plotSize = $plotLevel->plotSize;

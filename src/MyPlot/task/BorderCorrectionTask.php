@@ -7,8 +7,8 @@ use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
+use pocketmine\world\World as Level;
+use pocketmine\world\Position;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
 
@@ -41,7 +41,7 @@ class BorderCorrectionTask extends Task{
 		$this->maxBlocksPerTick = $maxBlocksPerTick;
 
 		$this->plotBeginPos = $plugin->getPlotPosition($start, false);
-		$this->level = $this->plotBeginPos->getLevelNonNull();
+		$this->level = $this->plotBeginPos->getWorld();
 
 		$plotLevel = $plugin->getLevelSettings($start->levelName);
 		$plotSize = $plotLevel->plotSize;

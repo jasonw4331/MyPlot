@@ -7,7 +7,7 @@ use dktapps\pmforms\element\Input;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\form\FormValidationException;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class ClaimForm extends ComplexMyPlotForm {
@@ -39,13 +39,13 @@ class ClaimForm extends ComplexMyPlotForm {
 					"2",
 					$plugin->getLanguage()->get("claim.formworld"),
 					"world",
-					$player->getLevelNonNull()->getFolderName()
+					$player->getWorld()->getFolderName()
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
 				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")) and $plugin->isLevelLoaded($response->getString("2")))
 					$data = MyPlot::getInstance()->getProvider()->getPlot(
-						$response->getString("2") === '' ? $player->getLevelNonNull()->getFolderName() : $response->getString("2"),
+						$response->getString("2") === '' ? $player->getWorld()->getFolderName() : $response->getString("2"),
 						(int)$response->getString("0"),
 						(int)$response->getString("1")
 					);
@@ -71,7 +71,7 @@ class ClaimForm extends ComplexMyPlotForm {
 				$maxPlots = $plugin->getMaxPlotsOfPlayer($player);
 				$plotsOfPlayer = 0;
 				foreach($plugin->getPlotLevels() as $level => $settings) {
-					$level = $plugin->getServer()->getLevelByName((string)$level);
+					$level = $plugin->getServer()->getWorldManager()->getWorldByName((string)$level);
 					if($level !== null and !$level->isClosed()) {
 						$plotsOfPlayer += count($plugin->getPlotsOfPlayer($player->getName(), $level->getFolderName()));
 					}

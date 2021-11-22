@@ -6,8 +6,8 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\BiomeForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\level\biome\Biome;
-use pocketmine\Player;
+use pocketmine\world\biome\Biome;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class BiomeSubCommand extends SubCommand

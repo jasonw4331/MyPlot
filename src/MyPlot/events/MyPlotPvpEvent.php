@@ -5,7 +5,7 @@ namespace MyPlot\events;
 use MyPlot\Plot;
 use pocketmine\event\Cancellable;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class MyPlotPvpEvent extends MyPlotPlotEvent implements Cancellable {
 	private Player $attacker;

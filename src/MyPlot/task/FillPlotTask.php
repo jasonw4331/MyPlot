@@ -6,7 +6,7 @@ use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 
 class FillPlotTask extends Task {
@@ -14,7 +14,7 @@ class FillPlotTask extends Task {
 	protected $plugin;
 	/** @var Plot $plot */
 	protected $plot;
-	/** @var \pocketmine\level\Level|null $level */
+	/** @var \pocketmine\world\World as Level|null $level */
 	protected $level;
 	/** @var int $height */
 	protected $height;
@@ -22,7 +22,7 @@ class FillPlotTask extends Task {
 	protected $fillBlock;
 	/** @var Block $bottomBlock */
 	protected $bottomBlock;
-	/** @var \pocketmine\level\Position|null $plotBeginPos */
+	/** @var \pocketmine\world\Position|null $plotBeginPos */
 	protected $plotBeginPos;
 	/** @var int $xMax */
 	protected $xMax;

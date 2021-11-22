@@ -8,7 +8,7 @@ use dktapps\pmforms\element\Label;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use MyPlot\subcommand\BiomeSubCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class InfoForm extends ComplexMyPlotForm {
