@@ -35,15 +35,15 @@ class CloneSubCommand extends SubCommand
 		$selectedPlot = $this->getPlugin()->getProvider()->getPlot($levelName, (int) $plotIdArray[0], (int) $plotIdArray[1]);
 		$standingPlot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($standingPlot === null) {
-			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du stehst auf keinem Grundstück!");
+			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
 		}
 		if($standingPlot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.clone")) {
-			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du bist nicht Besitzer dieses Grundstücks!");
+			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
 		if($selectedPlot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.clone")) {
-			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du bist nicht Besitzer dieses Grundstücks!");
+			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
 		$plotLevel = $this->getPlugin()->getLevelSettings($standingPlot->levelName);
