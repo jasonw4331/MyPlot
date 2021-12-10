@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\CloneForm;
+use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -34,15 +35,15 @@ class CloneSubCommand extends SubCommand
 		$selectedPlot = $this->getPlugin()->getProvider()->getPlot($levelName, (int) $plotIdArray[0], (int) $plotIdArray[1]);
 		$standingPlot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($standingPlot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($standingPlot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.clone")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		if($selectedPlot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.clone")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		$plotLevel = $this->getPlugin()->getLevelSettings($standingPlot->levelName);

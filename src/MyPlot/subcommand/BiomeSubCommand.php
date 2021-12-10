@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\BiomeForm;
+use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\data\bedrock\BiomeIds;
@@ -38,11 +39,11 @@ class BiomeSubCommand extends SubCommand
 		$biome = strtoupper($args[0]);
 		$plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
 		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du stehst auf keinem Grundstück!");
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.biome")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du bist nicht Besitzer dieses Grundstücks!");
 			return true;
 		}
 		if(is_numeric($biome)) {
