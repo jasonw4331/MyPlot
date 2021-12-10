@@ -7,10 +7,12 @@ use dktapps\pmforms\element\Dropdown;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
+use pocketmine\form\FormValidationException;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class AddHelperForm extends ComplexMyPlotForm {
+
 	/** @var string[] $players */
 	private array $players = [];
 

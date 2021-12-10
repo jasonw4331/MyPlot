@@ -23,7 +23,7 @@ class KickSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if (!isset($args[0])) return false;
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
@@ -32,12 +32,12 @@ class KickSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		$target = $this->getPlugin()->getServer()->getPlayer($args[0]);
+		$target = $this->getPlugin()->getServer()->getPlayerExact($args[0]);
 		if ($target === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.noPlayer"));
 			return true;
 		}
-		if (($targetPlot = $this->getPlugin()->getPlotByPosition($target)) === null or !$plot->isSame($targetPlot)) {
+		if (($targetPlot = $this->getPlugin()->getPlotByPosition($target->getPosition())) === null or !$plot->isSame($targetPlot)) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.notInPlot"));
 			return true;
 		}
@@ -56,7 +56,7 @@ class KickSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player->getPosition()) instanceof Plot)
 			return new KickForm();
 		return null;
 	}

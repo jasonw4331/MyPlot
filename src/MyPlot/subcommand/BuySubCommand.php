@@ -24,7 +24,7 @@ class BuySubCommand extends SubCommand
 			$command = new ClaimSubCommand($this->getPlugin(), "claim");
 			return $command->execute($sender, []);
 		}
-		$plot = $this->getPlugin()->getPlotByPosition($sender->asPosition());
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null){
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
@@ -41,7 +41,7 @@ class BuySubCommand extends SubCommand
 		$plotsOfPlayer = 0;
 		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
 			$level = $this->getPlugin()->getServer()->getWorldManager()->getWorldByName((string)$level);
-			if($level !== null and !$level->isClosed()) {
+			if($level !== null and $level->isLoaded()) {
 				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($sender->getName(), $level->getFolderName()));
 			}
 		}
@@ -54,7 +54,7 @@ class BuySubCommand extends SubCommand
 			$sender->sendMessage($this->translateString("buy.confirm", ["{$plot->X};{$plot->Z}", $price]));
 			return true;
 		}
-		$oldOwner = $this->getPlugin()->getServer()->getPlayer($plot->owner);
+		$oldOwner = $this->getPlugin()->getServer()->getPlayerExact($plot->owner);
 		if($this->getPlugin()->buyPlot($plot, $sender)) {
 			$sender->sendMessage($this->translateString("buy.success", ["{$plot->X};{$plot->Z}", $price]));
 			if($oldOwner !== null)

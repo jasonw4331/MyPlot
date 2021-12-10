@@ -5,8 +5,7 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\world\World as Level;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
@@ -60,11 +59,11 @@ class ClearBorderTask extends Task {
 		$plugin->getLogger()->debug("Border Clear Task started at plot {$plot->X};{$plot->Z}");
 	}
 
-	public function onRun(int $currentTick) : void {
+	public function onRun() : void {
 		for($x = $this->plotBeginPos->x; $x <= $this->xMax; $x++) {
-			for($y = 0; $y < $this->level->getWorldHeight(); ++$y) {
+			for($y = 0; $y < $this->level->getMaxY(); ++$y) {
 				if($y > $this->height + 1)
-					$block = BlockFactory::get(BlockIds::AIR);
+					$block = VanillaBlocks::AIR();
 				elseif($y === $this->height + 1)
 					$block = $this->plotWallBlock;
 				elseif($y === $this->height)
@@ -78,9 +77,9 @@ class ClearBorderTask extends Task {
 			}
 		}
 		for($z = $this->plotBeginPos->z; $z <= $this->zMax; $z++) {
-			for($y = 0; $y < $this->level->getWorldHeight(); ++$y) {
+			for($y = 0; $y < $this->level->getMaxY(); ++$y) {
 				if($y > $this->height+1)
-					$block = BlockFactory::get(BlockIds::AIR);
+					$block = VanillaBlocks::AIR();
 				elseif($y === $this->height + 1)
 					$block = $this->plotWallBlock;
 				elseif($y === $this->height)

@@ -24,7 +24,7 @@ class MainForm extends SimpleMyPlotForm {
 	public function __construct(Player $player, array $subCommands) {
 		$plugin = MyPlot::getInstance();
 
-		$this->plot = $plugin->getPlotByPosition($player);
+		$this->plot = $plugin->getPlotByPosition($player->getPosition());
 
 		$elements = [];
 		foreach($subCommands as $name => $command) {

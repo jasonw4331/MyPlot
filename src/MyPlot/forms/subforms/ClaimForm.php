@@ -14,7 +14,7 @@ class ClaimForm extends ComplexMyPlotForm {
 
 	public function __construct(Player $player) {
 		$plugin = MyPlot::getInstance();
-		$plot = $plugin->getPlotByPosition($player);
+		$plot = $plugin->getPlotByPosition($player->getPosition());
 		if($plot === null) {
 			$plot = new \stdClass();
 			$plot->X = "";
@@ -50,7 +50,7 @@ class ClaimForm extends ComplexMyPlotForm {
 						(int)$response->getString("1")
 					);
 				elseif($response->getString("0") === '' or $response->getString("1") === '') {
-					$plot = MyPlot::getInstance()->getPlotByPosition($player);
+					$plot = MyPlot::getInstance()->getPlotByPosition($player->getPosition());
 					if($plot === null) {
 						$player->sendForm(new self($player));
 						throw new FormValidationException("Unexpected form data returned");
@@ -72,7 +72,7 @@ class ClaimForm extends ComplexMyPlotForm {
 				$plotsOfPlayer = 0;
 				foreach($plugin->getPlotLevels() as $level => $settings) {
 					$level = $plugin->getServer()->getWorldManager()->getWorldByName((string)$level);
-					if($level !== null and !$level->isClosed()) {
+					if($level !== null and $level->isLoaded()) {
 						$plotsOfPlayer += count($plugin->getPlotsOfPlayer($player->getName(), $level->getFolderName()));
 					}
 				}

@@ -4,6 +4,7 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use pocketmine\command\CommandSender;
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -21,7 +22,7 @@ class MergeSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
@@ -35,21 +36,21 @@ class MergeSubCommand extends SubCommand
 			$sender->sendMessage($this->translateString("merge.confirmface", [$plotId]));
 			return true;
 		}elseif($args[0] === $this->translateString("confirm")) {
-			$rotation = ($sender->getYaw() - 180) % 360;
+			$rotation = ($sender->getLocation()->getYaw() - 180) % 360;
 			if($rotation < 0) {
 				$rotation += 360.0;
 			}
 			if((0 <= $rotation and $rotation < 45) or (315 <= $rotation and $rotation < 360)) {
-				$direction = Vector3::SIDE_NORTH; //North
+				$direction = Facing::NORTH; //North
 				$args[0] = $this->translateString("merge.north");
 			}elseif(45 <= $rotation and $rotation < 135) {
-				$direction = Vector3::SIDE_EAST; //East
+				$direction = Facing::EAST; //East
 				$args[0] = $this->translateString("merge.east");
 			}elseif(135 <= $rotation and $rotation < 225) {
-				$direction = Vector3::SIDE_SOUTH; //South
+				$direction = Facing::SOUTH; //South
 				$args[0] = $this->translateString("merge.south");
 			}elseif(225 <= $rotation and $rotation < 315) {
-				$direction = Vector3::SIDE_WEST; //West
+				$direction = Facing::WEST; //West
 				$args[0] = $this->translateString("merge.west");
 			}else{
 				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
@@ -61,28 +62,28 @@ class MergeSubCommand extends SubCommand
 				case "-z":
 				case "z-":
 				case $this->translateString("merge.north"):
-					$direction = Vector3::SIDE_NORTH;
+					$direction = Facing::NORTH;
 					$args[0] = $this->translateString("merge.north");
 				break;
 				case "east":
 				case "+x":
 				case "x+":
 				case $this->translateString("merge.east"):
-					$direction = Vector3::SIDE_EAST;
+					$direction = Facing::EAST;
 					$args[0] = $this->translateString("merge.east");
 				break;
 				case "south":
 				case "+z":
 				case "z+":
 				case $this->translateString("merge.south"):
-					$direction = Vector3::SIDE_SOUTH;
+					$direction = Facing::SOUTH;
 					$args[0] = $this->translateString("merge.south");
 				break;
 				case "west":
 				case "-x":
 				case "x-":
 				case $this->translateString("merge.west"):
-					$direction = Vector3::SIDE_WEST;
+					$direction = Facing::WEST;
 					$args[0] = $this->translateString("merge.west");
 				break;
 				default:

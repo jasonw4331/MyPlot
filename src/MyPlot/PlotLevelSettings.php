@@ -3,6 +3,8 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use pocketmine\block\Block;
+use pocketmine\block\BlockFactory;
+use pocketmine\block\VanillaBlocks;
 
 class PlotLevelSettings
 {
@@ -36,11 +38,11 @@ class PlotLevelSettings
 	public function __construct(string $name, array $settings = []) {
 		$this->name = $name;
 		if(count($settings) > 0) {
-			$this->roadBlock = self::parseBlock($settings, "RoadBlock", Block::get(Block::PLANKS));
-			$this->wallBlock = self::parseBlock($settings, "WallBlock", Block::get(Block::STONE_SLAB));
-			$this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", Block::get(Block::GRASS));
-			$this->plotFillBlock = self::parseBlock($settings, "PlotFillBlock", Block::get(Block::DIRT));
-			$this->bottomBlock = self::parseBlock($settings, "BottomBlock", Block::get(Block::BEDROCK));
+			$this->roadBlock = self::parseBlock($settings, "RoadBlock", VanillaBlocks::OAK_PLANKS());
+			$this->wallBlock = self::parseBlock($settings, "WallBlock", VanillaBlocks::STONE_SLAB());
+			$this->plotFloorBlock = self::parseBlock($settings, "PlotFloorBlock", VanillaBlocks::GRASS());
+			$this->plotFillBlock = self::parseBlock($settings, "PlotFillBlock", VanillaBlocks::DIRT());
+			$this->bottomBlock = self::parseBlock($settings, "BottomBlock", VanillaBlocks::BEDROCK());
 			$this->roadWidth = self::parseNumber($settings, "RoadWidth", 7);
 			$this->plotSize = self::parseNumber($settings, "PlotSize", 32);
 			$this->groundHeight = self::parseNumber($settings, "GroundHeight", 64);
@@ -68,11 +70,11 @@ class PlotLevelSettings
 		if(isset($array[$key])) {
 			$id = $array[$key];
 			if(is_numeric($id)) {
-				$block = Block::get((int) $id);
+				$block = BlockFactory::getInstance()->get(((int)$id));
 			}else{
 				$split = explode(":", $id);
 				if(count($split) === 2 and is_numeric($split[0]) and is_numeric($split[1])) {
-					$block = Block::get((int) $split[0], (int) $split[1]);
+					$block = BlockFactory::getInstance()->get(((int)$split[0]), ((int)$split[1]));
 				}else{
 					$block = $default;
 				}

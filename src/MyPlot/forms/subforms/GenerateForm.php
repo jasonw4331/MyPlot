@@ -9,7 +9,7 @@ use dktapps\pmforms\element\Toggle;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds as BlockIds;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 

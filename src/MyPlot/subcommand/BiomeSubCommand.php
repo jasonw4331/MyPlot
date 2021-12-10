@@ -6,13 +6,15 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\BiomeForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
+use pocketmine\data\bedrock\BiomeIds;
 use pocketmine\world\biome\Biome;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\biome\BiomeRegistry;
 
 class BiomeSubCommand extends SubCommand
 {
-	public CONST BIOMES = ["PLAINS" => Biome::PLAINS, "DESERT" => Biome::DESERT, "MOUNTAINS" => Biome::MOUNTAINS, "FOREST" => Biome::FOREST, "TAIGA" => Biome::TAIGA, "SWAMP" => Biome::SWAMP, "NETHER" => Biome::HELL, "HELL" => Biome::HELL, "ICE_PLAINS" => Biome::ICE_PLAINS];
+	public CONST BIOMES = ["PLAINS" => BiomeIds::PLAINS, "DESERT" => BiomeIds::DESERT, "MOUNTAINS" => BiomeIds::EXTREME_HILLS, "FOREST" => BiomeIds::FOREST, "TAIGA" => BiomeIds::TAIGA, "SWAMP" => BiomeIds::SWAMPLAND, "NETHER" => BiomeIds::HELL, "HELL" => BiomeIds::HELL, "ICE_PLAINS" => BiomeIds::ICE_PLAINS];
 
 	public function canUse(CommandSender $sender) : bool {
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.biome");
@@ -34,7 +36,7 @@ class BiomeSubCommand extends SubCommand
 		if($player === null)
 			return true;
 		$biome = strtoupper($args[0]);
-		$plot = $this->getPlugin()->getPlotByPosition($player);
+		$plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
@@ -51,17 +53,17 @@ class BiomeSubCommand extends SubCommand
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
 				return true;
 			}
-			$biome = Biome::getBiome($biome);
+			$biome = BiomeRegistry::getInstance()->getBiome($biome);
 		}else{
 			$biome = ($biome === "NETHER" ? "HELL" : $biome);
 			$biome = ($biome === "ICE PLAINS" ? "ICE_PLAINS" : $biome);
-			if(!defined(Biome::class."::".$biome) or !is_int(constant(Biome::class."::".$biome))) {
+			if(!defined(BiomeIds::class."::".$biome) or !is_int(constant(BiomeIds::class."::".$biome))) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.invalid"));
 				$biomes = implode(", ", array_keys(self::BIOMES));
 				$sender->sendMessage(TextFormat::RED . $this->translateString("biome.possible", [$biomes]));
 				return true;
 			}
-			$biome = Biome::getBiome(constant(Biome::class."::".$biome));
+			$biome = BiomeRegistry::getInstance()->getBiome(constant(BiomeIds::class."::".$biome));
 		}
 		if($this->getPlugin()->setPlotBiome($plot, $biome)) {
 			$sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
@@ -72,7 +74,7 @@ class BiomeSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player->getPosition()) instanceof Plot)
 			return new BiomeForm(array_keys(self::BIOMES));
 		return null;
 	}

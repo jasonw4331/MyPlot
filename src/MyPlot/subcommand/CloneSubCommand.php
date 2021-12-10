@@ -32,7 +32,7 @@ class CloneSubCommand extends SubCommand
 		}
 		$levelName = $args[1] ?? $sender->getWorld()->getFolderName();
 		$selectedPlot = $this->getPlugin()->getProvider()->getPlot($levelName, (int) $plotIdArray[0], (int) $plotIdArray[1]);
-		$standingPlot = $this->getPlugin()->getPlotByPosition($sender);
+		$standingPlot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($standingPlot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;

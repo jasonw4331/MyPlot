@@ -47,7 +47,7 @@ class InfoSubCommand extends SubCommand
 				return false;
 			}
 		}else{
-			$plot = $this->getPlugin()->getPlotByPosition($sender);
+			$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 			if($plot === null) {
 				$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 				return true;
@@ -65,7 +65,7 @@ class InfoSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->getPlugin()->getPlotByPosition($player->getPosition()) instanceof Plot)
 			return new InfoForm($player);
 		return null;
 	}

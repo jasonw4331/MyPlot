@@ -16,7 +16,7 @@ class InfoForm extends ComplexMyPlotForm {
 		$plugin = MyPlot::getInstance();
 
 		if(!isset($this->plot))
-			$this->plot = $plugin->getPlotByPosition($player);
+			$this->plot = $plugin->getPlotByPosition($player->getPosition());
 		if(!isset($this->plot))
 			return;
 

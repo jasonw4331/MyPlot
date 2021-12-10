@@ -34,15 +34,15 @@ use MyPlot\subcommand\SubCommand;
 use MyPlot\subcommand\UnDenySubCommand;
 use MyPlot\subcommand\WarpSubCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
+use pocketmine\command\defaults\PluginsCommand;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
-use pocketmine\network\mcpe\protocol\types\CommandData;
-use pocketmine\network\mcpe\protocol\types\CommandEnum;
-use pocketmine\network\mcpe\protocol\types\CommandParameter;
+use pocketmine\network\mcpe\protocol\types\command\CommandData;
+use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
+use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
-class Commands extends PluginCommand
+class Commands extends PluginsCommand
 {
 	/** @var SubCommand[] $subCommands */
 	private array $subCommands = [];
@@ -95,7 +95,7 @@ class Commands extends PluginCommand
 		}
 		$plugin->getLogger()->debug("Commands Registered to MyPlot");
 
-		$autofill = $plugin->getServer()->getPluginManager()->getPlugin("EasyCommandAutofill");
+		/*$autofill = $plugin->getServer()->getPluginManager()->getPlugin("EasyCommandAutofill");
 		if($autofill instanceof Main) {
 			$data = new CommandData();
 			$data->commandName = $this->getName();
@@ -159,7 +159,7 @@ class Commands extends PluginCommand
 			$data->aliases->enumValues = array_merge([$this->getName()], $this->getAliases());
 			$autofill->addManualOverride($this->getName(), $data);
 			$plugin->getLogger()->debug("Command Autofill Enabled");
-		}
+		}*/
 	}
 
 	/**
@@ -194,7 +194,7 @@ class Commands extends PluginCommand
 	 */
 	public function execute(CommandSender $sender, string $alias, array $args) : bool {
 		/** @var MyPlot $plugin */
-		$plugin = $this->getPlugin();
+		$plugin = MyPlot::getInstance();
 		if($plugin->isDisabled()) {
 			$sender->sendMessage($plugin->getLanguage()->get("plugin.disabled"));
 			return true;
@@ -225,4 +225,12 @@ class Commands extends PluginCommand
 		}
 		return true;
 	}
+
+    /**
+     * @return MyPlot
+     */
+    public function getPlugin(): MyPlot
+    {
+        return MyPlot::getInstance();
+    }
 }

@@ -5,11 +5,11 @@ namespace MyPlot\subcommand;
 use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 
-abstract class SubCommand implements PluginIdentifiableCommand
+abstract class SubCommand implements PluginOwned
 {
 	private MyPlot $plugin;
 	private string $name;
@@ -17,6 +17,13 @@ abstract class SubCommand implements PluginIdentifiableCommand
 	public function __construct(MyPlot $plugin, string $name) {
         $this->plugin = $plugin;
         $this->name = $name;
+    }
+
+    /**
+     * @return MyPlot
+     */
+	public final function getOwningPlugin() : Plugin {
+        return $this->plugin;
     }
 
     /**

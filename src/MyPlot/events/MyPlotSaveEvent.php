@@ -4,8 +4,11 @@ namespace MyPlot\events;
 
 use MyPlot\Plot;
 use pocketmine\event\Cancellable;
+use pocketmine\event\CancellableTrait;
 
 class MyPlotSaveEvent extends MyPlotPlotEvent implements Cancellable {
+    use CancellableTrait;
+
 	public const SQLITE3 = 0;
 	public const MySQL = 1;
 	public const JSON = 2;

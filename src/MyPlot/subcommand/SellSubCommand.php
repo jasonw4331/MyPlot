@@ -23,7 +23,7 @@ class SellSubCommand extends SubCommand
 		if(count($args) === 0) {
 			return false;
 		}
-		$plot = $this->getPlugin()->getPlotByPosition($sender->asPosition());
+		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null){
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
