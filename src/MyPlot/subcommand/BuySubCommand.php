@@ -27,7 +27,7 @@ class BuySubCommand extends SubCommand
 		}
 		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null){
-			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du stehst auf keinem Grundstück!");
+			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
 		}
 		if($plot->owner === $sender->getName() and !$sender->hasPermission("myplot.admin.buy")){
