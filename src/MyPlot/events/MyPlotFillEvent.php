@@ -10,7 +10,7 @@ class MyPlotFillEvent extends MyPlotPlotEvent implements Cancellable {
     use CancellableTrait;
 
 	/** @var int $maxBlocksPerTick */
-	private $maxBlocksPerTick = 256;
+	private $maxBlocksPerTick = 1024;
 
 	/**
 	 * MyPlotFillEvent constructor.
@@ -18,7 +18,7 @@ class MyPlotFillEvent extends MyPlotPlotEvent implements Cancellable {
 	 * @param Plot $plot
 	 * @param int $maxBlocksPerTick
 	 */
-	public function __construct(Plot $plot, int $maxBlocksPerTick = 256) {
+	public function __construct(Plot $plot, int $maxBlocksPerTick = 1024) {
 		$this->maxBlocksPerTick = $maxBlocksPerTick;
 		parent::__construct($plot);
 	}

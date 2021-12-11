@@ -502,7 +502,7 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function mergePlots(Plot $plot, int $direction, int $maxBlocksPerTick = 256) : bool {
+	public function mergePlots(Plot $plot, int $direction, int $maxBlocksPerTick = 1024) : bool {
 		if (!$this->isLevelLoaded($plot->levelName))
 			return false;
 		/** @var Plot[][] $toMerge */
@@ -812,7 +812,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 1024) : bool {
 		$ev = new MyPlotClearEvent($plot, $maxBlocksPerTick);
 		$ev->call();
 		if($ev->isCancelled()) {
@@ -921,7 +921,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function fillPlot(Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) : bool {
+	public function fillPlot(Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 1024) : bool {
 		$ev = new MyPlotFillEvent($plot, $maxBlocksPerTick);
 		$ev->call();
 		if($ev->isCancelled()) {
@@ -1009,7 +1009,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 1024) : bool {
 		$ev = new MyPlotResetEvent($plot);
 		$ev->call();
 		if($ev->isCancelled())
@@ -1378,7 +1378,7 @@ class MyPlot extends PluginBase
 		$this->getLogger()->debug(TF::BOLD . "Loading Data Provider settings");
 		// Initialize DataProvider
 		/** @var int $cacheSize */
-		$cacheSize = $this->getConfig()->get("PlotCacheSize", 256);
+		$cacheSize = $this->getConfig()->get("PlotCacheSize", 1024);
 		$dataProvider = $this->getConfig()->get("DataProvider", "sqlite3");
 		if(!is_string($dataProvider))
 			$this->dataProvider = new ConfigDataProvider($this, $cacheSize);

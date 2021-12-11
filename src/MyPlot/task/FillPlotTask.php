@@ -41,7 +41,7 @@ class FillPlotTask extends Task {
 	 * @param Plot $plot
 	 * @param int $maxBlocksPerTick
 	 */
-	public function __construct(MyPlot $plugin, Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) {
+	public function __construct(MyPlot $plugin, Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 1024) {
 		$this->plugin = $plugin;
 		$this->plot = $plot;
 		$this->plotBeginPos = $plugin->getPlotPosition($plot);

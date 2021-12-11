@@ -31,7 +31,7 @@ class RoadFillTask extends Task{
 	protected bool $fillCorner;
 	protected int $cornerDirection = -1;
 
-	public function __construct(MyPlot $plugin, Plot $start, Plot $end, bool $fillCorner = false, int $cornerDirection = -1, int $maxBlocksPerTick = 256) {
+	public function __construct(MyPlot $plugin, Plot $start, Plot $end, bool $fillCorner = false, int $cornerDirection = -1, int $maxBlocksPerTick = 1024) {
 		if($start->isSame($end))
 			throw new \Exception("Plot arguments cannot be the same plot or already be merged");
 
