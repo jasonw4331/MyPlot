@@ -42,11 +42,11 @@ class BiomeSubCommand extends SubCommand
 		$biome = strtoupper($args[0]);
 		$plot = $this->getPlugin()->getPlotByPosition($player->getPosition());
 		if($plot === null) {
-			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du stehst auf keinem Grundstück!");
+			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.biome")) {
-			$sender->sendMessage(MyPlot::PREFIX . TextFormat::RED . "Du bist nicht Besitzer dieses Grundstücks!");
+			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
 		if(is_numeric($biome)) {

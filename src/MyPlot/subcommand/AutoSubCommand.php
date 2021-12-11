@@ -24,12 +24,12 @@ class AutoSubCommand extends SubCommand
 	public function execute(CommandSender $sender, array $args) : bool {
 		$levelName = $sender->getWorld()->getFolderName();
 		if(!$this->getPlugin()->isLevelLoaded($levelName)) {
-			$sender->sendMessage(MyPlot::PREFIX . C::RED . "Du bist nicht in der Grundstück-Welt!");
+			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
 			return true;
 		}
 		if(($plot = $this->getPlugin()->getNextFreePlot($levelName)) !== null) {
 			if($this->getPlugin()->teleportPlayerToPlot($sender, $plot, true)) {
-                $sender->sendMessage(MyPlot::PREFIX . C::GREEN . "Du wurdest zu einem freien Grundstück teleportiert!");
+                $sender->sendMessage($this->translateString("auto.success", [$plot->X, $plot->Z]));
 				$cmd = new ClaimSubCommand($this->getPlugin(), "claim");
 				if(isset($args[0]) and strtolower($args[0]) == "true" and $cmd->canUse($sender)) {
 					$cmd->execute($sender, isset($args[1]) ? [$args[1]] : []);
