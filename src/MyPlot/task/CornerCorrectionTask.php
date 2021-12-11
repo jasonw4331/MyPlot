@@ -85,8 +85,8 @@ class CornerCorrectionTask extends Task{
 
 	public function onRun() : void {
 		foreach($this->level->getEntities() as $entity) {
-			if($entity->x > $this->pos->x - 1 and $entity->x < $this->xMax + 1) {
-				if($entity->z > $this->pos->z - 1 and $entity->z < $this->zMax + 1) {
+			if($entity->getPosition()->x > $this->pos->x - 1 and $entity->getPosition()->x < $this->xMax + 1) {
+				if($entity->getPosition()->z > $this->pos->z - 1 and $entity->getPosition()->z < $this->zMax + 1) {
 					if(!$entity instanceof Player) {
 						$entity->flagForDespawn();
 					}else{
