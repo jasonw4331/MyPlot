@@ -27,6 +27,7 @@ use MyPlot\task\FillPlotTask;
 use MyPlot\task\RoadFillTask;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Block;
+use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds as BlockIds;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\data\bedrock\BiomeIds;
@@ -219,6 +220,50 @@ class MyPlot extends PluginBase
 	public function getPlotsOfPlayer(string $username, string $levelName) : array {
 		return $this->dataProvider->getPlotsByOwner($username, $levelName);
 	}
+
+    public function setBorder(Plot $plot, Block $block)
+    {
+        $levelSettings = $this->getLevelSettings($plot->levelName);
+		$plotPos = $this->getPlotPosition($plot);
+		$plotPos->x -= 1;
+		$plotPos->z -= 1;
+		$level = $plotPos->world;
+		$plotPos->y = $levelSettings->groundHeight;
+		$plotSize = $levelSettings->plotSize;
+
+		$xMax = $plotPos->x + $plotSize + 1;
+		$yMax = $plotPos->y + 1;
+		$zMax = $plotPos->z + $plotSize + 1;
+		$plotPos->y += 1;
+
+		$yResetHeight = $plotPos->y + $this->getConfig()->get('resetHeight');
+
+		$air = VanillaBlocks::AIR();
+
+		for($x = $plotPos->x; $x <= $xMax; $x++){
+			for($y = $plotPos->y; $y <= $yResetHeight; $y++){
+				$level->setBlock(new Vector3($x, $y, $plotPos->z), $air);
+				$level->setBlock(new Vector3($x, $y, $zMax), $air);
+			}
+
+			for($y = $plotPos->y; $y <= $yMax; $y++){
+				$level->setBlock(new Vector3($x, $y, $plotPos->z), $block);
+				$level->setBlock(new Vector3($x, $y, $zMax), $block);
+			}
+		}
+
+		for($z = $plotPos->z; $z < $zMax; $z++){
+			for($y = $plotPos->y; $y <= $yResetHeight; $y++){
+				$level->setBlock(new Vector3($plotPos->x, $y, $z), $air);
+				$level->setBlock(new Vector3($xMax, $y, $z), $air);
+			}
+
+			for($y = $plotPos->y; $y <= $yMax; $y++){
+				$level->setBlock(new Vector3($plotPos->x, $y, $z), $block);
+				$level->setBlock(new Vector3($xMax, $y, $z), $block);
+			}
+		}
+    }
 
 	/**
 	 * Get the next free plot in a level
