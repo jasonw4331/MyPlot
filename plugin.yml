@@ -133,6 +133,8 @@ permissions:
     default: op
   myplot.admin.buy:
     default: op
+  myplot.admin.setowner:
+    default: op
   myplot.claimplots:
     default: op
       #children of myplot.claimplots:
