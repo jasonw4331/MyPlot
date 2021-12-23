@@ -4,6 +4,7 @@ namespace MyPlot;
 
 use MyPlot\events\MyPlotBlockEvent;
 use MyPlot\events\MyPlotBorderChangeEvent;
+use MyPlot\events\MyPlotDisposeEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
@@ -433,4 +434,12 @@ class EventListener implements Listener
 			}
 		}
 	}
+
+    public function onPlotDispose(MyPlotDisposeEvent $ev): void
+    {
+        $plot = $ev->getPlot();
+        $plotLevel = MyPlot::getInstance()->getLevelSettings($plot->levelName);
+        $borderBlock = $plotLevel->wallBlock;
+        MyPlot::getInstance()->setBorder($plot, $borderBlock);
+    }
 }
