@@ -440,6 +440,8 @@ class EventListener implements Listener
         $plot = $ev->getPlot();
         $plotLevel = MyPlot::getInstance()->getLevelSettings($plot->levelName);
         $borderBlock = $plotLevel->wallBlock;
+        $wallBlock = $plotLevel->plotFillBlock;
         MyPlot::getInstance()->setBorder($plot, $borderBlock);
+        MyPlot::getInstance()->setWall($plot, $wallBlock);
     }
 }

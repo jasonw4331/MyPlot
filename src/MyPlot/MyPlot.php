@@ -264,6 +264,36 @@ class MyPlot extends PluginBase
 			}
 		}
     }
+    
+    public function setWall(Plot $plot, Block $block): void
+    {
+        $levelSettings = $this->getLevelSettings($plot->levelName);
+        $plotBeginPos = $this->getPlotPosition($plot);
+        $plotBeginPos->x -= 1;
+        $plotBeginPos->z -= 1;
+        $world = $plotBeginPos->world;
+        $plotBeginPos->y = $levelSettings->groundHeight;
+        $plotSize = $levelSettings->plotSize;
+
+        $xMax = $plotBeginPos->x + $plotSize + 1;
+        $yMax = $plotBeginPos->y;
+        $zMax = $plotBeginPos->z + $plotSize + 1;
+        $plotBeginPos->y += 1;
+        
+        for($x = $plotBeginPos->x; $x <= $xMax; $x++){
+            for($y = 1; $y <= $yMax; $y++){
+                $world->setBlock(new Vector3($x, $y, $plotBeginPos->z), $block);
+                $world->setBlock(new Vector3($x, $y, $zMax), $block);
+            }
+        }
+
+        for($z = $plotBeginPos->z; $z < $zMax; $z++){
+            for($y = 1; $y <= $yMax; $y++){
+                $world->setBlock(new Vector3($plotBeginPos->x, $y, $z), $block);
+                $world->setBlock(new Vector3($xMax, $y, $z), $block);
+            }
+        }
+    }
 
 	/**
 	 * Get the next free plot in a level
