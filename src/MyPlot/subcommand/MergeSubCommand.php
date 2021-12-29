@@ -23,7 +23,7 @@ class MergeSubCommand extends SubCommand
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
         $sender->sendMessage("§cDiese Funktion ist aufgrund von Fehlern derzeit deaktiviert!");
-        return false;
+        return true;
 
 		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {

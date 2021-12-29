@@ -901,6 +901,9 @@ class MyPlot extends PluginBase
 		$level = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
 		if($level === null)
 			return false;
+
+        $this->removeRating($plot);
+
 		foreach($level->getEntities() as $entity) {
 			if($this->getPlotBB($plot)->isVectorInXZ($entity->getPosition())) {
 				if(!$entity instanceof Player) {
@@ -984,6 +987,50 @@ class MyPlot extends PluginBase
 		$this->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
 		return true;
 	}
+
+    public function getRatingConfig(): Config
+    {
+        return new Config($this->getDataFolder() . "ratings.yml", Config::YAML);
+    }
+
+    private function buildRatingString($x, $z, string $worldName): string
+    {
+        return (string)$x . "|" . (string)$z . "|" . $worldName;
+    }
+
+    public function ratePlot(Plot $plot, int $rating): void
+    {
+        $cfg = $this->getRatingConfig();
+
+        if ($rating < 0 || $rating > 5) return;
+
+        $str = $this->buildRatingString($plot->X, $plot->Z, $plot->levelName);
+
+        $cfg->set($str, $rating);
+        $cfg->save();
+    }
+
+    public function removeRating(Plot $plot): bool
+    {
+        $cfg = $this->getRatingConfig();
+        $str = $this->buildRatingString($plot->X, $plot->Z, $plot->levelName);
+
+        if (!$cfg->exists($str)) return false;
+
+        $cfg->remove($str);
+        $cfg->save();
+        return true;
+    }
+
+    public function getRating(Plot $plot): int|null
+    {
+        $cfg = $this->getRatingConfig();
+        $str = $this->buildRatingString($plot->X, $plot->Z, $plot->levelName);
+
+        if (!$cfg->exists($str)) return null;
+
+        return (int)$cfg->get($str);
+    }
 
 	/**
 	 * Fills the whole plot with a block

@@ -143,3 +143,5 @@ permissions:
   myplot.claimplots.unlimited:
     default: op
     ###
+  myplot.command.rate:
+    default: op

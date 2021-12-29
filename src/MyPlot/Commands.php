@@ -26,6 +26,7 @@ use MyPlot\subcommand\MergeSubCommand;
 use MyPlot\subcommand\MiddleSubCommand;
 use MyPlot\subcommand\NameSubCommand;
 use MyPlot\subcommand\PvpSubCommand;
+use MyPlot\subcommand\RateSubcommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
 use MyPlot\subcommand\ResetSubCommand;
 use MyPlot\subcommand\SellSubCommand;
@@ -85,6 +86,7 @@ class Commands extends PluginsCommand
 		$this->loadSubCommand(new PvpSubCommand($plugin, "pvp"));
 		$this->loadSubCommand(new KickSubCommand($plugin, "kick"));
 		$this->loadSubCommand(new MergeSubCommand($plugin, "merge"));
+		$this->loadSubCommand(new RateSubcommand($plugin, "rate"));
 		if($plugin->getEconomyProvider() !== null) {
 			$this->loadSubCommand(new SellSubCommand($plugin, "sell"));
 			$this->loadSubCommand(new BuySubCommand($plugin, "buy"));
