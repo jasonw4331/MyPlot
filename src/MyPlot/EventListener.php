@@ -33,6 +33,7 @@ use pocketmine\world\World as Level;
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
+use supercrafter333\BlockZ\blocks\NewBlockIds;
 
 class EventListener implements Listener
 {
@@ -160,7 +161,16 @@ class EventListener implements Listener
             VanillaBlocks::DAYLIGHT_SENSOR()->getId(),
             VanillaBlocks::TNT()->getId(),
             VanillaBlocks::REDSTONE_REPEATER()->getId(),
-            VanillaBlocks::REDSTONE_COMPARATOR()->getId()
+            VanillaBlocks::REDSTONE_COMPARATOR()->getId(),
+            (255 - BlockLegacyIds::CAMPFIRE),
+            (255 - BlockLegacyIds::COMPOSTER),
+            (255 - NewBlockIds::SOUL_CAMPFIRE),
+            (255 - NewBlockIds::CRIMSON_FENCE_GATE),
+            (255 - NewBlockIds::WARPED_FENCE_GATE),
+            (255 - NewBlockIds::CRIMSON_HYPHAE),
+            (255 - NewBlockIds::WARPED_HYPHAE),
+            (255 - NewBlockIds::CRIMSON_STEM),
+            (255 - NewBlockIds::WARPED_STEM)
         ];
 
         $blockedItemIds = [
