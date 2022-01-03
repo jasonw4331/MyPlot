@@ -27,6 +27,7 @@ use pocketmine\event\world\WorldUnloadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\item\VanillaItems;
 use pocketmine\world\generator\GeneratorManager;
 use pocketmine\world\World as Level;
 use pocketmine\player\Player;
@@ -146,9 +147,18 @@ class EventListener implements Listener
             VanillaBlocks::ACACIA_FENCE_GATE()->getId(),
             VanillaBlocks::SPRUCE_FENCE_GATE()->getId(),
             VanillaBlocks::SHULKER_BOX()->getId(),
-            VanillaBlocks::DYED_SHULKER_BOX()->getId()
+            VanillaBlocks::DYED_SHULKER_BOX()->getId(),
+            VanillaBlocks::BEACON()->getId(),
+            VanillaBlocks::FLOWER_POT()->getId(),
+            VanillaBlocks::BED()->getId(),
+            VanillaBlocks::CAKE()->getId(),
+            VanillaBlocks::JUKEBOX()->getId(),
+            VanillaBlocks::NOTE_BLOCK()->getId(),
+            VanillaBlocks::PUMPKIN()->getId(),
+            VanillaBlocks::DAYLIGHT_SENSOR()->getId(),
+            VanillaBlocks::TNT()->getId()
             ];
-		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK && !in_array($blockId, $blockedBlockIds))
+		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK && !in_array($blockId, $blockedBlockIds) && $event->getItem()->getId() !== VanillaItems::SHEARS()->getId())
             return;
 		$this->onEventOnBlock($event);
 	}
