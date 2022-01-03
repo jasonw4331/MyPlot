@@ -125,8 +125,31 @@ class EventListener implements Listener
 	 * @param PlayerInteractEvent $event
 	 */
 	public function onPlayerInteract(PlayerInteractEvent $event) : void {
-		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK)
-			return;
+        $blockId = $event->getBlock()->getId();
+        $blockedBlockIds = [
+            VanillaBlocks::CHEST()->getId(),
+            VanillaBlocks::ENDER_CHEST()->getId(),
+            VanillaBlocks::TRAPPED_CHEST()->getId(),
+            VanillaBlocks::FURNACE()->getId(),
+            VanillaBlocks::BLAST_FURNACE()->getId(),
+            VanillaBlocks::SMOKER()->getId(),
+            VanillaBlocks::ITEM_FRAME()->getId(),
+            VanillaBlocks::BREWING_STAND()->getId(),
+            VanillaBlocks::ENCHANTING_TABLE()->getId(),
+            VanillaBlocks::HOPPER()->getId(),
+            VanillaBlocks::BARREL()->getId(),
+            VanillaBlocks::IRON_TRAPDOOR()->getId(),
+            VanillaBlocks::IRON_DOOR()->getId(),
+            VanillaBlocks::OAK_FENCE_GATE()->getId(),
+            VanillaBlocks::DARK_OAK_FENCE_GATE()->getId(),
+            VanillaBlocks::BIRCH_FENCE_GATE()->getId(),
+            VanillaBlocks::ACACIA_FENCE_GATE()->getId(),
+            VanillaBlocks::SPRUCE_FENCE_GATE()->getId(),
+            VanillaBlocks::SHULKER_BOX()->getId(),
+            VanillaBlocks::DYED_SHULKER_BOX()->getId()
+            ];
+		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK && !in_array($blockId, $blockedBlockIds))
+            return;
 		$this->onEventOnBlock($event);
 	}
 
