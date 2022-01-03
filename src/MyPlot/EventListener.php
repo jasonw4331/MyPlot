@@ -126,6 +126,8 @@ class EventListener implements Listener
 	 */
 	public function onPlayerInteract(PlayerInteractEvent $event) : void {
         $blockId = $event->getBlock()->getId();
+        $itemId = $event->getItem()->getId();
+
         $blockedBlockIds = [
             VanillaBlocks::CHEST()->getId(),
             VanillaBlocks::ENDER_CHEST()->getId(),
@@ -155,12 +157,20 @@ class EventListener implements Listener
             VanillaBlocks::NOTE_BLOCK()->getId(),
             VanillaBlocks::PUMPKIN()->getId(),
             VanillaBlocks::DAYLIGHT_SENSOR()->getId(),
-            VanillaBlocks::TNT()->getId()
-            ];
-		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK && !in_array($blockId, $blockedBlockIds) && $event->getItem()->getId() !== VanillaItems::SHEARS()->getId())
+            VanillaBlocks::TNT()->getId(),
+            VanillaBlocks::REDSTONE_REPEATER()->getId(),
+            VanillaBlocks::REDSTONE_COMPARATOR()->getId()
+        ];
+
+        $blockedItemIds = [
+            VanillaItems::SHEARS()->getId(),
+            VanillaItems::FLINT_AND_STEEL()->getId()
+        ];
+
+        if ($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK && !in_array($blockId, $blockedBlockIds) && !in_array($itemId, $blockedItemIds))
             return;
-		$this->onEventOnBlock($event);
-	}
+        $this->onEventOnBlock($event);
+    }
 
 	/**
 	 * @ignoreCancelled false
