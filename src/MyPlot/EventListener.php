@@ -212,7 +212,7 @@ class EventListener implements Listener
 				 * so the leaves won't go outside the plot
 				 */
 				$block = $event->getBlock();
-				$maxLengthLeaves = (($block->getDamage() & 0x07) == VanillaBlocks::SPRUCE_SAPLING()) ? 3 : 2;
+				$maxLengthLeaves = (($block->getMeta() & 0x07) == VanillaBlocks::SPRUCE_SAPLING()) ? 3 : 2;
 				$beginPos = $this->plugin->getPlotPosition($plot);
 				$endPos = clone $beginPos;
 				$beginPos->x += $maxLengthLeaves;
