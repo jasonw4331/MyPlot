@@ -1,0 +1,5 @@
+version
+check-plugins
+p help
+p gen Plots
+stop

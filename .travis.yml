@@ -1,0 +1,44 @@
+language: php
+php:
+ - 7.3
+sudo: false
+
+before_script:
+ # - pecl install channel://pecl.php.net/pthreads-3.1.6
+ - echo | pecl install channel://pecl.php.net/yaml-2.0.4
+ - git clone https://github.com/pmmp/pthreads.git
+ - cd pthreads
+ - git checkout 1b7da492b944146fa9680f6399bd9c6c6c6095e0
+ - phpize
+ - ./configure
+ - make
+ - make install
+ - cd ..
+ - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+ - mkdir ${TRAVIS_BUILD_DIR}/../PocketMine
+ - cd ${TRAVIS_BUILD_DIR}/../PocketMine
+ - wget -O PocketMine-MP.phar "${1:-"https://jenkins.pmmp.io/job/PocketMine-MP/Stable/artifact/PocketMine-MP.phar"}"
+ - mkdir plugins
+ - cp ${TRAVIS_BUILD_DIR}/tests/PluginChecker.phar plugins/PluginChecker.phar
+ - mkdir unstaged
+ - php ${TRAVIS_BUILD_DIR}/tests/travisPluginTest.php unstaged
+ - cd ${TRAVIS_BUILD_DIR}
+ - chmod 777 ${TRAVIS_BUILD_DIR}/tests/travisScript.sh
+ - chmod 777 ${TRAVIS_BUILD_DIR}/tests/lint.sh
+
+script:
+ - ${TRAVIS_BUILD_DIR}/tests/lint.sh -p php -d ${TRAVIS_BUILD_DIR}/src/MyPlot
+ - cd ${TRAVIS_BUILD_DIR}/../PocketMine && ls
+ - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh MyPlot MyPlot
+ - sed -i 's/world/Plots/' server.properties
+ - ${TRAVIS_BUILD_DIR}/tests/travisScript.sh MyPlot MyPlot
+
+deploy:
+ provider: releases
+ api_key: $GITHUB_TOKEN
+ file_glob: true
+ file: $TRAVIS_BUILD_DIR/../PocketMine/unstaged/MyPlot.phar
+ skip_cleanup: true
+ draft: true
+ on:
+  tags: true

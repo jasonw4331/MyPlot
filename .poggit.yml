@@ -1,0 +1,18 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/jasonwynn10/MyPlot
+projects:
+  MyPlot:
+    icon: "icon.png"
+    path: ""
+    libs:
+      - src: dktapps-pm-pl/pmforms/pmforms
+        version: ^2.0.0
+    lint: false
+    excludeDirs:
+      - tests
+      - .github
+    excludeFiles:
+      - .php-cs-fixer.php
+      - .gitignore
+      - CONTRIBUTING.md
+      - SECURITY.md
+...
