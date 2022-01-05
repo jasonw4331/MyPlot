@@ -28,6 +28,9 @@ class BiomeSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
+        $sender->sendMessage("§cDiese Funktion ist aufgrund von Fehlern derzeit deaktiviert!");
+        return true;
+
 		if(count($args) === 0) {
 			$biomes = TextFormat::WHITE . implode(", ", array_keys(self::BIOMES));
 			$sender->sendMessage($this->translateString("biome.possible", [$biomes]));
@@ -75,6 +78,7 @@ class BiomeSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
+        return null; //deactivated
 		if($player !== null and $this->getPlugin()->getPlotByPosition($player->getPosition()) instanceof Plot)
 			return new BiomeForm(array_keys(self::BIOMES));
 		return null;

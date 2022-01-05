@@ -35,7 +35,7 @@ class ClearPlotTask extends Task {
 	 * @param Plot $plot
 	 * @param int $maxBlocksPerTick
 	 */
-	public function __construct(MyPlot $plugin, Plot $plot, int $maxBlocksPerTick = 256) {
+	public function __construct(MyPlot $plugin, Plot $plot, int $maxBlocksPerTick = 1024) {
 		$this->plugin = $plugin;
 		$this->plot = $plot;
 		$plotLevel = $plugin->getLevelSettings($plot->levelName);
@@ -113,7 +113,7 @@ class ClearPlotTask extends Task {
 				}
 			}
 		}
-		$this->plugin->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this->plugin, $this->plot), 1);
+		//$this->plugin->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this->plugin, $this->plot), 1);
 		$this->plugin->getLogger()->debug("Plot Clear task completed at {$this->plotBeginPos->x};{$this->plotBeginPos->z}");
 	}
 }

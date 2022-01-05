@@ -27,6 +27,7 @@ use MyPlot\task\FillPlotTask;
 use MyPlot\task\RoadFillTask;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Block;
+use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds as BlockIds;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\data\bedrock\BiomeIds;
@@ -219,6 +220,80 @@ class MyPlot extends PluginBase
 	public function getPlotsOfPlayer(string $username, string $levelName) : array {
 		return $this->dataProvider->getPlotsByOwner($username, $levelName);
 	}
+
+    public function setBorder(Plot $plot, Block $block)
+    {
+        $levelSettings = $this->getLevelSettings($plot->levelName);
+		$plotPos = $this->getPlotPosition($plot);
+		$plotPos->x -= 1;
+		$plotPos->z -= 1;
+		$level = $plotPos->world;
+		$plotPos->y = $levelSettings->groundHeight;
+		$plotSize = $levelSettings->plotSize;
+
+		$xMax = $plotPos->x + $plotSize + 1;
+		$yMax = $plotPos->y + 1;
+		$zMax = $plotPos->z + $plotSize + 1;
+		$plotPos->y += 1;
+
+		$yResetHeight = $plotPos->y + $this->getConfig()->get('resetHeight');
+
+		$air = VanillaBlocks::AIR();
+
+		for($x = $plotPos->x; $x <= $xMax; $x++){
+			for($y = $plotPos->y; $y <= $yResetHeight; $y++){
+				$level->setBlock(new Vector3($x, $y, $plotPos->z), $air);
+				$level->setBlock(new Vector3($x, $y, $zMax), $air);
+			}
+
+			for($y = $plotPos->y; $y <= $yMax; $y++){
+				$level->setBlock(new Vector3($x, $y, $plotPos->z), $block);
+				$level->setBlock(new Vector3($x, $y, $zMax), $block);
+			}
+		}
+
+		for($z = $plotPos->z; $z < $zMax; $z++){
+			for($y = $plotPos->y; $y <= $yResetHeight; $y++){
+				$level->setBlock(new Vector3($plotPos->x, $y, $z), $air);
+				$level->setBlock(new Vector3($xMax, $y, $z), $air);
+			}
+
+			for($y = $plotPos->y; $y <= $yMax; $y++){
+				$level->setBlock(new Vector3($plotPos->x, $y, $z), $block);
+				$level->setBlock(new Vector3($xMax, $y, $z), $block);
+			}
+		}
+    }
+    
+    public function setWall(Plot $plot, Block $block): void
+    {
+        $levelSettings = $this->getLevelSettings($plot->levelName);
+        $plotBeginPos = $this->getPlotPosition($plot);
+        $plotBeginPos->x -= 1;
+        $plotBeginPos->z -= 1;
+        $world = $plotBeginPos->world;
+        $plotBeginPos->y = $levelSettings->groundHeight;
+        $plotSize = $levelSettings->plotSize;
+
+        $xMax = $plotBeginPos->x + $plotSize + 1;
+        $yMax = $plotBeginPos->y;
+        $zMax = $plotBeginPos->z + $plotSize + 1;
+        $plotBeginPos->y += 1;
+        
+        for($x = $plotBeginPos->x; $x <= $xMax; $x++){
+            for($y = 1; $y <= $yMax; $y++){
+                $world->setBlock(new Vector3($x, $y, $plotBeginPos->z), $block);
+                $world->setBlock(new Vector3($x, $y, $zMax), $block);
+            }
+        }
+
+        for($z = $plotBeginPos->z; $z < $zMax; $z++){
+            for($y = 1; $y <= $yMax; $y++){
+                $world->setBlock(new Vector3($plotBeginPos->x, $y, $z), $block);
+                $world->setBlock(new Vector3($xMax, $y, $z), $block);
+            }
+        }
+    }
 
 	/**
 	 * Get the next free plot in a level
@@ -502,7 +577,7 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function mergePlots(Plot $plot, int $direction, int $maxBlocksPerTick = 256) : bool {
+	public function mergePlots(Plot $plot, int $direction, int $maxBlocksPerTick = 1024) : bool {
 		if (!$this->isLevelLoaded($plot->levelName))
 			return false;
 		/** @var Plot[][] $toMerge */
@@ -812,7 +887,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 1024) : bool {
 		$ev = new MyPlotClearEvent($plot, $maxBlocksPerTick);
 		$ev->call();
 		if($ev->isCancelled()) {
@@ -826,6 +901,9 @@ class MyPlot extends PluginBase
 		$level = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
 		if($level === null)
 			return false;
+
+        $this->removeRating($plot);
+
 		foreach($level->getEntities() as $entity) {
 			if($this->getPlotBB($plot)->isVectorInXZ($entity->getPosition())) {
 				if(!$entity instanceof Player) {
@@ -910,6 +988,50 @@ class MyPlot extends PluginBase
 		return true;
 	}
 
+    public function getRatingConfig(): Config
+    {
+        return new Config($this->getDataFolder() . "ratings.yml", Config::YAML);
+    }
+
+    private function buildRatingString($x, $z, string $worldName): string
+    {
+        return (string)$x . "|" . (string)$z . "|" . $worldName;
+    }
+
+    public function ratePlot(Plot $plot, int $rating): void
+    {
+        $cfg = $this->getRatingConfig();
+
+        if ($rating < 0 || $rating > 5) return;
+
+        $str = $this->buildRatingString($plot->X, $plot->Z, $plot->levelName);
+
+        $cfg->set($str, $rating);
+        $cfg->save();
+    }
+
+    public function removeRating(Plot $plot): bool
+    {
+        $cfg = $this->getRatingConfig();
+        $str = $this->buildRatingString($plot->X, $plot->Z, $plot->levelName);
+
+        if (!$cfg->exists($str)) return false;
+
+        $cfg->remove($str);
+        $cfg->save();
+        return true;
+    }
+
+    public function getRating(Plot $plot): int|null
+    {
+        $cfg = $this->getRatingConfig();
+        $str = $this->buildRatingString($plot->X, $plot->Z, $plot->levelName);
+
+        if (!$cfg->exists($str)) return null;
+
+        return (int)$cfg->get($str);
+    }
+
 	/**
 	 * Fills the whole plot with a block
 	 *
@@ -921,7 +1043,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function fillPlot(Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) : bool {
+	public function fillPlot(Plot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 1024) : bool {
 		$ev = new MyPlotFillEvent($plot, $maxBlocksPerTick);
 		$ev->call();
 		if($ev->isCancelled()) {
@@ -1009,7 +1131,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return bool
 	 */
-	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 1024) : bool {
 		$ev = new MyPlotResetEvent($plot);
 		$ev->call();
 		if($ev->isCancelled())
@@ -1378,7 +1500,7 @@ class MyPlot extends PluginBase
 		$this->getLogger()->debug(TF::BOLD . "Loading Data Provider settings");
 		// Initialize DataProvider
 		/** @var int $cacheSize */
-		$cacheSize = $this->getConfig()->get("PlotCacheSize", 256);
+		$cacheSize = $this->getConfig()->get("PlotCacheSize", 1024);
 		$dataProvider = $this->getConfig()->get("DataProvider", "sqlite3");
 		if(!is_string($dataProvider))
 			$this->dataProvider = new ConfigDataProvider($this, $cacheSize);

@@ -36,9 +36,9 @@ class ClearSubCommand extends SubCommand
 				$sender->sendMessage(TextFormat::RED . $this->translateString("clear.nomoney"));
 				return true;
 			}
-			$maxBlocksPerTick = $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 256);
+			$maxBlocksPerTick = $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 1024);
 			if(!is_int($maxBlocksPerTick))
-				$maxBlocksPerTick = 256;
+				$maxBlocksPerTick = 1024;
 			if($this->getPlugin()->clearPlot($plot, $maxBlocksPerTick)) {
 				$sender->sendMessage($this->translateString("clear.success"));
 			}else{

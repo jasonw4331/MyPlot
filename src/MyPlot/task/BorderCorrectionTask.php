@@ -32,7 +32,7 @@ class BorderCorrectionTask extends Task{
 	protected Vector3 $pos;
 	protected int $maxBlocksPerTick;
 
-	public function __construct(MyPlot $plugin, Plot $start, Plot $end, bool $fillCorner = false, int $cornerDirection = -1, int $maxBlocksPerTick = 256) {
+	public function __construct(MyPlot $plugin, Plot $start, Plot $end, bool $fillCorner = false, int $cornerDirection = -1, int $maxBlocksPerTick = 1024) {
 		$this->plugin = $plugin;
 		$this->start = $start;
 		$this->end = $end;

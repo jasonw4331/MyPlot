@@ -4,6 +4,7 @@ namespace MyPlot;
 
 use MyPlot\events\MyPlotBlockEvent;
 use MyPlot\events\MyPlotBorderChangeEvent;
+use MyPlot\events\MyPlotDisposeEvent;
 use MyPlot\events\MyPlotPlayerEnterPlotEvent;
 use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use MyPlot\events\MyPlotPvpEvent;
@@ -32,6 +33,7 @@ use pocketmine\world\World as Level;
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
+use supercrafter333\BlockZ\blocks\NewBlockIds;
 
 class EventListener implements Listener
 {
@@ -160,7 +162,16 @@ class EventListener implements Listener
             VanillaBlocks::TNT()->getId(),
             VanillaBlocks::REDSTONE_REPEATER()->getId(),
             VanillaBlocks::REDSTONE_COMPARATOR()->getId(),
-            VanillaBlocks::DRAGON_EGG()->getId()
+            VanillaBlocks::DRAGON_EGG()->getId(),
+            BlockLegacyIds::CAMPFIRE,
+            BlockLegacyIds::COMPOSTER,
+            NewBlockIds::SOUL_CAMPFIRE,
+            NewBlockIds::CRIMSON_FENCE_GATE,
+            NewBlockIds::WARPED_FENCE_GATE,
+            NewBlockIds::CRIMSON_HYPHAE,
+            NewBlockIds::WARPED_HYPHAE,
+            NewBlockIds::CRIMSON_STEM,
+            NewBlockIds::WARPED_STEM
         ];
 
         $blockedItemIds = [
@@ -415,6 +426,20 @@ class EventListener implements Listener
 			$paddingSize = (int) floor((strlen($popup) - strlen($ownerPopup)) / 2);
 			$paddingPopup = str_repeat(" ", max(0, -$paddingSize));
 			$paddingOwnerPopup = str_repeat(" ", max(0, $paddingSize));
+            $rating = $this->plugin->getRating($plot);
+            if ($rating !== null) {
+                if ($rating == 1) {
+                    $popup = "§e★§7☆☆☆☆\n§r" . $popup;
+                } elseif ($rating == 2) {
+                    $popup = "§e★★§7☆☆☆\n§r" . $popup;
+                } elseif ($rating == 3) {
+                    $popup = "§e★★★§7☆☆\n§r" . $popup;
+                } elseif ($rating == 4) {
+                    $popup = "§e★★★★§7☆☆☆\n§r" . $popup;
+                } elseif ($rating == 5) {
+                    $popup = "§e★★★★★\n§r" . $popup;
+                }
+            }
 			$popup = TextFormat::WHITE . $paddingPopup . $popup . "\n" . TextFormat::WHITE . $paddingOwnerPopup . $ownerPopup;
 			$ev->getPlayer()->sendTip($popup);
 		}elseif($plotFrom !== null and ($plot === null or !$plot->isSame($plotFrom))) {
@@ -481,4 +506,14 @@ class EventListener implements Listener
 			}
 		}
 	}
+
+    public function onPlotDispose(MyPlotDisposeEvent $ev): void
+    {
+        $plot = $ev->getPlot();
+        $plotLevel = MyPlot::getInstance()->getLevelSettings($plot->levelName);
+        $borderBlock = $plotLevel->wallBlock;
+        $wallBlock = $plotLevel->plotFillBlock;
+        MyPlot::getInstance()->setBorder($plot, $borderBlock);
+        MyPlot::getInstance()->setWall($plot, $wallBlock);
+    }
 }

@@ -1,4 +1,4 @@
-name: MyPlot
+name: MyPlot-MMC
 main: MyPlot\MyPlot
 version: 2.1.0
 api: 4.0.0
@@ -143,3 +143,5 @@ permissions:
   myplot.claimplots.unlimited:
     default: op
     ###
+  myplot.command.rate:
+    default: op

@@ -37,7 +37,7 @@ class ResetSubCommand extends SubCommand
 				return true;
 			}
 			/** @var int $maxBlocksPerTick */
-			$maxBlocksPerTick = $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 256);
+			$maxBlocksPerTick = $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 1024);
 			if($this->getPlugin()->resetPlot($plot, $maxBlocksPerTick)) {
 				$sender->sendMessage($this->translateString("reset.success"));
 			}else{

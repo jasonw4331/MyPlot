@@ -22,6 +22,9 @@ class MergeSubCommand extends SubCommand
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
+        $sender->sendMessage("§cDiese Funktion ist aufgrund von Fehlern derzeit deaktiviert!");
+        return true;
+
 		$plot = $this->getPlugin()->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
@@ -96,7 +99,7 @@ class MergeSubCommand extends SubCommand
 				return true;
 			}
 		}
-		$maxBlocksPerTick = (int) $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 256);
+		$maxBlocksPerTick = (int) $this->getPlugin()->getConfig()->get("ClearBlocksPerTick", 1024);
 		if($this->getPlugin()->mergePlots($plot, $direction, $maxBlocksPerTick)) {
 			$plot = TextFormat::GREEN . $plot . TextFormat::WHITE;
 			$sender->sendMessage($this->translateString("merge.success", [$plot, $args[0]]));

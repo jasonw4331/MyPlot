@@ -26,7 +26,7 @@
 # Filipino language pack by Lentou
 # Polish language pack by KMatuszak
 # Swedish language pack by HyperEnte
-Language: eng
+Language: deu
 
 # Allows editing language file as a config
 # This is not recommended unless you have a good text editor!
@@ -56,7 +56,7 @@ UseEconomy: false
 
 # Amount of plots to be cached.
 # Increasing this number will improve performance, but also increase memory usage.
-PlotCacheSize: 256
+PlotCacheSize: 1024
 
 # When a player enters a plot, a popup with basic info will be shown
 ShowPlotPopup: true
@@ -69,11 +69,11 @@ FastFilling: false
 
 # Amount of blocks to reset per tick. This only applies if FastClearing is disabled
 # Increasing this number will speed up '/p clear' and '/p reset' but also increases lag
-ClearBlocksPerTick: 256
+ClearBlocksPerTick: 1024
 
 # Amount of blocks to fill per tick. This only applies if FastFilling is disabled
 # Increasing this number will speed up '/p fill' but also increases lag
-FillBlocksPerTick: 256
+FillBlocksPerTick: 1024
 
 # These settings will be used when creating a new world with the default generator.
 DefaultWorld:
