@@ -12,6 +12,7 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\BlockLegacyIds as BlockIds;
 use pocketmine\block\Liquid;
 use pocketmine\block\Sapling;
+use pocketmine\block\utils\TreeType;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -217,7 +218,7 @@ class EventListener implements Listener
 				 * so the leaves won't go outside the plot
 				 */
 				$block = $event->getBlock();
-				$maxLengthLeaves = (($block->getMeta() & 0x07) == VanillaBlocks::SPRUCE_SAPLING()->getMeta()) ? 3 : 2;
+				$maxLengthLeaves = (($block->getIdInfo()->getVariant() & 0x07) == TreeType::SPRUCE()) ? 3 : 2;
 				$beginPos = $this->plugin->getPlotPosition($plot);
 				$endPos = clone $beginPos;
 				$beginPos->x += $maxLengthLeaves;
