@@ -226,7 +226,7 @@ class EventListener implements Listener
 				$plotSize = $this->plugin->getLevelSettings($levelName)->plotSize;
 				$endPos->x += $plotSize - $maxLengthLeaves;
 				$endPos->z += $plotSize - $maxLengthLeaves;
-				if($block->x >= $beginPos->x and $block->z >= $beginPos->z and $block->x < $endPos->x and $block->z < $endPos->z) {
+				if($block->getPosition()->x >= $beginPos->x and $block->getPosition()->z >= $beginPos->z and $block->getPosition()->x < $endPos->x and $block->getPosition()->z < $endPos->z) {
 					return;
 				}
 			}
