@@ -105,13 +105,15 @@ class ClearPlotTask extends Task {
 			$this->pos->x++;
 		}
 		foreach($this->plugin->getPlotChunks($this->plot) as $chunk) {
-			foreach($chunk->getTiles() as $tile) {
-				if(($plot = $this->plugin->getPlotByPosition($tile->getPosition())) != null) {
-					if($this->plot->isSame($plot)) {
-						$tile->close();
-					}
-				}
-			}
+			if (count($chunk->getTiles()) > 0) {
+                foreach ($chunk->getTiles() as $tile) {
+                    if (($plot = $this->plugin->getPlotByPosition($tile->getPosition())) != null) {
+                        if ($this->plot->isSame($plot)) {
+                            $tile->close();
+                        }
+                    }
+                }
+            }
 		}
 		$this->plugin->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this->plugin, $this->plot), 1);
 		$this->plugin->getLogger()->debug("Plot Clear task completed at {$this->plotBeginPos->x};{$this->plotBeginPos->z}");
