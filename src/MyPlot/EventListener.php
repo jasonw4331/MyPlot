@@ -22,6 +22,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
+use pocketmine\event\entity\EntityTrampleFarmlandEvent;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\event\world\WorldUnloadEvent;
 use pocketmine\event\Listener;
@@ -176,6 +177,16 @@ class EventListener implements Listener
         if ($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK && !in_array($blockId, $blockedBlockIds) && !in_array($itemId, $blockedItemIds))
             return;
         $this->onEventOnBlock($event);
+    }
+
+    public function onEntityTrampleFarmland(EntityTrampleFarmlandEvent $ev): void
+    {
+        $player = $ev->getEntity();
+        $plot = MyPlot::getInstance()->getPlotByPosition($ev->getBlock()->getPosition());
+
+        if ($plot !== null && $player instanceof Player) {
+            if ($plot->owner !== $player->getName()) $ev->cancel();
+        }
     }
 
 	/**
