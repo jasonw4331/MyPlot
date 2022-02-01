@@ -6,12 +6,14 @@ use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Dropdown;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\Player;
+use MyPlot\Plot;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class UndenyPlayerForm extends ComplexMyPlotForm {
-	public function __construct() {
+	public function __construct(Plot $plot) {
 		$plugin = MyPlot::getInstance();
+		$this->setPlot($plot);
 		parent::__construct(
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("undenyplayer.form")]),
 			[

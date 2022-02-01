@@ -6,7 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\GiveForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class GiveSubCommand extends SubCommand
@@ -26,7 +26,7 @@ class GiveSubCommand extends SubCommand
 			return false;
 		}
 		$newOwner = $args[0];
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->plugin->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
@@ -35,7 +35,7 @@ class GiveSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		$newOwner = $this->getPlugin()->getServer()->getPlayer($newOwner);
+		$newOwner = $this->plugin->getServer()->getPlayerByPrefix($newOwner);
 		if(!$newOwner instanceof Player) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("give.notonline"));
 			return true;
@@ -43,12 +43,12 @@ class GiveSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("give.toself"));
 			return true;
 		}
-		$maxPlots = $this->getPlugin()->getMaxPlotsOfPlayer($newOwner);
+		$maxPlots = $this->plugin->getMaxPlotsOfPlayer($newOwner);
 		$plotsOfPlayer = 0;
-		foreach($this->getPlugin()->getPlotLevels() as $level => $settings) {
-			$level = $this->getPlugin()->getServer()->getLevelByName((string)$level);
-			if($level !== null and !$level->isClosed()) {
-				$plotsOfPlayer += count($this->getPlugin()->getPlotsOfPlayer($newOwner->getName(), $level->getFolderName()));
+		foreach($this->plugin->getPlotLevels() as $level => $settings) {
+			$level = $this->plugin->getServer()->getWorldManager()->getWorldByName((string)$level);
+			if($level !== null and $level->isLoaded()) {
+				$plotsOfPlayer += count($this->plugin->getPlotsOfPlayer($newOwner->getName(), $level->getFolderName()));
 			}
 		}
 		if($plotsOfPlayer >= $maxPlots) {
@@ -56,7 +56,7 @@ class GiveSubCommand extends SubCommand
 			return true;
 		}
 		if(count($args) == 2 and $args[1] == $this->translateString("confirm")) {
-			if($this->getPlugin()->claimPlot($plot, $newOwner->getName())) {
+			if($this->plugin->claimPlot($plot, $newOwner->getName())) {
 				$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
 				$oldOwnerName = TextFormat::GREEN . $sender->getName() . TextFormat::WHITE;
 				$newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;
@@ -74,7 +74,7 @@ class GiveSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
+		if($player !== null and $this->plugin->getPlotByPosition($player->getPosition()) instanceof Plot)
 			return new GiveForm();
 		return null;
 	}

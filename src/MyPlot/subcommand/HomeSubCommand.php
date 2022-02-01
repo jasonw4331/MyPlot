@@ -6,7 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\HomeForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class HomeSubCommand extends SubCommand
@@ -29,8 +29,12 @@ class HomeSubCommand extends SubCommand
 		}else{
 			return false;
 		}
-		$levelName = $args[1] ?? $sender->getLevelNonNull()->getFolderName();
-		$plots = $this->getPlugin()->getPlotsOfPlayer($sender->getName(), $levelName);
+		$levelName = $args[1] ?? $sender->getWorld()->getFolderName();
+		if(!$this->plugin->isLevelLoaded($levelName)) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("error", [$levelName]));
+			return true;
+		}
+		$plots = $this->plugin->getPlotsOfPlayer($sender->getName(), $levelName);
 		if(count($plots) === 0) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.noplots"));
 			return true;
@@ -46,7 +50,7 @@ class HomeSubCommand extends SubCommand
 			return ($plot1->levelName < $plot2->levelName) ? -1 : 1;
 		});
 		$plot = $plots[$plotNumber - 1];
-		if($this->getPlugin()->teleportPlayerToPlot($sender, $plot)) {
+		if($this->plugin->teleportPlayerToPlot($sender, $plot)) {
 			$sender->sendMessage($this->translateString("home.success", [$plot->__toString(), $plot->levelName]));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("home.error"));
@@ -55,7 +59,7 @@ class HomeSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and count($this->getPlugin()->getPlotsOfPlayer($player->getName(), $player->getLevelNonNull()->getFolderName())) > 0)
+		if($player !== null and count($this->plugin->getPlotsOfPlayer($player->getName(), $player->getWorld()->getFolderName())) > 0)
 			return new HomeForm($player);
 		return null;
 	}

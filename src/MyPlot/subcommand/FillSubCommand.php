@@ -5,10 +5,11 @@ namespace MyPlot\subcommand;
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\FillForm;
 use MyPlot\Plot;
-use pocketmine\block\BlockIds;
+use pocketmine\block\Air;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\item\StringToItemParser;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class FillSubCommand extends SubCommand {
@@ -31,7 +32,7 @@ class FillSubCommand extends SubCommand {
 		if(count($args) < 1) {
 			return false;
 		}
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->plugin->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("notinplot"));
 			return true;
@@ -40,9 +41,10 @@ class FillSubCommand extends SubCommand {
 			$sender->sendMessage(TextFormat::RED.$this->translateString("notowner"));
 			return true;
 		}
-		if(($item = Item::fromString($args[0])) instanceof Item and $item->getBlock()->getId() !== BlockIds::AIR) {
-			$maxBlocksPerTick = (int)$this->getPlugin()->getConfig()->get("FillBlocksPerTick", 256);
-			if($this->getPlugin()->fillPlot($plot, $item->getBlock(), $maxBlocksPerTick)) {
+
+		if(($item = StringToItemParser::getInstance()->parse($args[0])) instanceof Item and $item->getBlock() instanceof Air) {
+			$maxBlocksPerTick = (int)$this->plugin->getConfig()->get("FillBlocksPerTick", 256);
+			if($this->plugin->fillPlot($plot, $item->getBlock(), $maxBlocksPerTick)) {
 				$sender->sendMessage($this->translateString("fill.success", [$item->getBlock()->getName()]));
 			}else {
 				$sender->sendMessage(TextFormat::RED.$this->translateString("error"));
@@ -54,8 +56,8 @@ class FillSubCommand extends SubCommand {
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->getPlugin()->getPlotByPosition($player->asPosition()) instanceof Plot) {
-			return new FillForm($player);
+		if($this->plugin->getPlotByPosition($player->getPosition()) instanceof Plot) {
+			return new FillForm();
 		}
 		return null;
 	}

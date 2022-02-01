@@ -5,16 +5,15 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
+use pocketmine\world\World;
 
 class ClearBorderTask extends Task {
 	protected MyPlot $plugin;
 	protected Plot $plot;
-	protected Level $level;
+	protected World $level;
 	protected int $height;
 	protected Block $plotWallBlock;
 	protected Vector3 $plotBeginPos;
@@ -51,20 +50,20 @@ class ClearBorderTask extends Task {
 
         --$this->plotBeginPos->x;
         --$this->plotBeginPos->z;
-        $this->level = $this->plotBeginPos->getLevelNonNull();
+        $this->level = $this->plotBeginPos->getWorld();
 		$this->height = $plotLevel->groundHeight;
 		$this->plotWallBlock = $plotLevel->wallBlock;
 		$this->roadBlock = $plotLevel->roadBlock;
 		$this->groundBlock = $plotLevel->plotFillBlock;
 		$this->bottomBlock = $plotLevel->bottomBlock;
-		$plugin->getLogger()->debug("Border Clear Task started at plot {$plot->X};{$plot->Z}");
+		$plugin->getLogger()->debug("Border Clear Task started at plot $plot->X;$plot->Z");
 	}
 
-	public function onRun(int $currentTick) : void {
+	public function onRun() : void {
 		for($x = $this->plotBeginPos->x; $x <= $this->xMax; $x++) {
-			for($y = 0; $y < $this->level->getWorldHeight(); ++$y) {
+			for($y = 0; $y < $this->level->getMaxY(); ++$y) {
 				if($y > $this->height + 1)
-					$block = BlockFactory::get(BlockIds::AIR);
+					$block = VanillaBlocks::AIR();
 				elseif($y === $this->height + 1)
 					$block = $this->plotWallBlock;
 				elseif($y === $this->height)
@@ -73,14 +72,14 @@ class ClearBorderTask extends Task {
 					$block = $this->bottomBlock;
 				else//if($y < $this->height)
 					$block = $this->groundBlock;
-				$this->level->setBlock(new Vector3($x, $y, $this->plotBeginPos->z), $block, false, false);
-				$this->level->setBlock(new Vector3($x, $y, $this->zMax), $block, false, false);
+				$this->level->setBlock(new Vector3($x, $y, $this->plotBeginPos->z), $block, false);
+				$this->level->setBlock(new Vector3($x, $y, $this->zMax), $block, false);
 			}
 		}
 		for($z = $this->plotBeginPos->z; $z <= $this->zMax; $z++) {
-			for($y = 0; $y < $this->level->getWorldHeight(); ++$y) {
+			for($y = 0; $y < $this->level->getMaxY(); ++$y) {
 				if($y > $this->height+1)
-					$block = BlockFactory::get(BlockIds::AIR);
+					$block = VanillaBlocks::AIR();
 				elseif($y === $this->height + 1)
 					$block = $this->plotWallBlock;
 				elseif($y === $this->height)
@@ -89,8 +88,8 @@ class ClearBorderTask extends Task {
 					$block = $this->bottomBlock;
 				else//if($y < $this->height)
 					$block = $this->groundBlock;
-				$this->level->setBlock(new Vector3($this->plotBeginPos->x, $y, $z), $block, false, false);
-				$this->level->setBlock(new Vector3($this->xMax, $y, $z), $block, false, false);
+				$this->level->setBlock(new Vector3($this->plotBeginPos->x, $y, $z), $block, false);
+				$this->level->setBlock(new Vector3($this->xMax, $y, $z), $block, false);
 			}
 		}
 		$this->plugin->getLogger()->debug("Border Clear Task completed");

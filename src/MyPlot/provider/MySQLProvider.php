@@ -4,7 +4,7 @@ namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\math\Vector3;
+use pocketmine\math\Facing;
 use pocketmine\Server;
 
 class MySQLProvider extends DataProvider {
@@ -262,7 +262,7 @@ class MySQLProvider extends DataProvider {
         }
         if($adjacent)
             $plots = array_filter($plots, function(Plot $val) use ($plot) : bool {
-                for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+                for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
                     if($plot->getSide($i)->isSame($val))
                         return true;
                 }
@@ -309,10 +309,10 @@ class MySQLProvider extends DataProvider {
 				$this->plugin->getLogger()->critical("The MySQL connection could not be re-established!");
 				$this->plugin->getLogger()->critical("Closing level to prevent griefing!");
 				foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
-					$level = $this->plugin->getServer()->getLevelByName($levelName);
+					$level = $this->plugin->getServer()->getWorldManager()->getWorldByName($levelName);
 					if($level !== null) {
 						$level->save(); // don't force in case owner doesn't want it saved
-						Server::getInstance()->unloadLevel($level, true); // force unload to prevent possible griefing
+						Server::getInstance()->getWorldManager()->unloadWorld($level, true); // force unload to prevent possible griefing
 					}
 				}
 				if($this->db->connect_error !== null and $this->db->connect_error !== '')

@@ -6,7 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\NameForm;
 use MyPlot\Plot;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class NameSubCommand extends SubCommand
@@ -25,7 +25,7 @@ class NameSubCommand extends SubCommand
 		if(count($args) === 0) {
 			return false;
 		}
-		$plot = $this->getPlugin()->getPlotByPosition($sender);
+		$plot = $this->plugin->getPlotByPosition($sender->getPosition());
 		if($plot === null) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 			return true;
@@ -34,7 +34,7 @@ class NameSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		if($this->getPlugin()->renamePlot($plot, $args[0])) {
+		if($this->plugin->renamePlot($plot, $args[0])) {
 			$sender->sendMessage($this->translateString("name.success"));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
@@ -43,8 +43,8 @@ class NameSubCommand extends SubCommand
 	}
 
 	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and $this->getPlugin()->getPlotByPosition($player) instanceof Plot)
-			return new NameForm($player);
+		if($player !== null and ($plot = $this->plugin->getPlotByPosition($player->getPosition())) instanceof Plot)
+			return new NameForm($player, $plot);
 		return null;
 	}
 }

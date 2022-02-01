@@ -7,18 +7,15 @@ use dktapps\pmforms\element\Dropdown;
 use dktapps\pmforms\element\Label;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
+use MyPlot\Plot;
 use MyPlot\subcommand\BiomeSubCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class InfoForm extends ComplexMyPlotForm {
-	public function __construct(Player $player) {
+	public function __construct(Plot $plot) {
 		$plugin = MyPlot::getInstance();
-
-		if(!isset($this->plot))
-			$this->plot = $plugin->getPlotByPosition($player);
-		if(!isset($this->plot))
-			return;
+		$this->setPlot($plot);
 
 		parent::__construct(
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("info.form")]),

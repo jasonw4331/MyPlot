@@ -4,7 +4,7 @@ namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
 use MyPlot\Plot;
-use pocketmine\math\Vector3;
+use pocketmine\math\Facing;
 use pocketmine\utils\Config;
 
 class ConfigDataProvider extends DataProvider {
@@ -30,7 +30,8 @@ class ConfigDataProvider extends DataProvider {
 		$plots[$plotId] = ["level" => $plot->levelName, "x" => $plot->X, "z" => $plot->Z, "name" => $plot->name, "owner" => $plot->owner, "helpers" => $plot->helpers, "denied" => $plot->denied, "biome" => $plot->biome, "pvp" => $plot->pvp, "price" => $plot->price];
 		$this->config->set("plots", $plots);
 		$this->cachePlot($plot);
-		return $this->config->save();
+		$this->config->save();
+		return true;
 	}
 
 	public function deletePlot(Plot $plot) : bool {
@@ -40,7 +41,8 @@ class ConfigDataProvider extends DataProvider {
 		$this->config->set("plots", $plots);
 		$plot = new Plot($plot->levelName, $plot->X, $plot->Z);
 		$this->cachePlot($plot);
-		return $this->config->save();
+		$this->config->save();
+		return true;
 	}
 
 	public function getPlot(string $levelName, int $X, int $Z) : Plot {
@@ -74,7 +76,7 @@ class ConfigDataProvider extends DataProvider {
 		/** @var string[] $ownerKeys */
 		$ownerKeys = array_keys($plots, ["owner" => $owner], true);
 		foreach($ownerKeys as $ownerKey) {
-			if($levelName === "" or strpos($ownerKey, $levelName) !== false) {
+			if($levelName === "" or str_contains($ownerKey, $levelName)) {
 				$X = $plots[$ownerKey]["x"];
 				$Z = $plots[$ownerKey]["z"];
 				$plotName = $plots[$ownerKey]["name"] == "" ? "" : $plots[$ownerKey]["name"];
@@ -142,7 +144,8 @@ class ConfigDataProvider extends DataProvider {
 		}, $plots));
 		$mergedIds = array_unique($mergedIds, SORT_NUMERIC);
 		$this->config->setNested("merges.$originId", $mergedIds);
-		return $this->config->save();
+		$this->config->save();
+		return true;
 	}
 
 	public function getMergedPlots(Plot $plot, bool $adjacent = false) : array {
@@ -167,7 +170,7 @@ class ConfigDataProvider extends DataProvider {
 		}
 		if($adjacent)
 			$plots = array_filter($plots, function(Plot $val) use ($plot) {
-				for($i = Vector3::SIDE_NORTH; $i <= Vector3::SIDE_EAST; ++$i) {
+				for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
 					if($plot->getSide($i)->isSame($val))
 						return true;
 				}

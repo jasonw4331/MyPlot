@@ -4,9 +4,12 @@ namespace MyPlot\events;
 
 use MyPlot\Plot;
 use pocketmine\event\Cancellable;
-use pocketmine\IPlayer;
+use pocketmine\event\CancellableTrait;
+use pocketmine\player\IPlayer;
 
 class MyPlotDenyEvent extends MyPlotPlotEvent implements Cancellable {
+	use CancellableTrait;
+
 	public const ADD = 0;
 	public const REMOVE = 1;
 	private int $type;
@@ -43,10 +46,10 @@ class MyPlotDenyEvent extends MyPlotPlotEvent implements Cancellable {
 	 *
 	 * @return self
 	 */
-	public function setDenied($player) : self {
+	public function setDenied(IPlayer|string $player) : self {
 		if($player instanceof IPlayer) {
 			$this->player = $player->getName();
-		}elseif(is_string($player)) {
+		}else {
 			$this->player = $player;
 		}
 		return $this;

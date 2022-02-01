@@ -5,22 +5,22 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
-use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
+use pocketmine\block\VanillaBlocks;
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\scheduler\CancelTaskException;
 use pocketmine\scheduler\Task;
+use pocketmine\world\World;
 
 class CornerCorrectionTask extends Task{
 
 	protected MyPlot $plugin;
 	protected Plot $start;
-	protected ?Level $level;
+	protected ?World $level;
 	protected int $height;
 	protected Block $plotWallBlock;
 	protected int $maxBlocksPerTick;
-	/** @var Position|Vector3|null $plotBeginPos */
 	protected ?Vector3 $plotBeginPos;
 	protected int $xMax;
 	protected int $zMax;
@@ -34,7 +34,7 @@ class CornerCorrectionTask extends Task{
 		$this->plugin = $plugin;
 		$this->start = $start;
 		$this->plotBeginPos = $plugin->getPlotPosition($start, false);
-		$this->level = $this->plotBeginPos->getLevelNonNull();
+		$this->level = $this->plotBeginPos->getWorld();
 		$this->maxBlocksPerTick = $maxBlocksPerTick;
 
 		$plotLevel = $plugin->getLevelSettings($start->levelName);
@@ -47,42 +47,42 @@ class CornerCorrectionTask extends Task{
 		$this->bottomBlock = $plotLevel->bottomBlock;
 
 		if(($start->Z - $end->Z) === 1) { // North Z-
-			if($cornerDirection === Vector3::SIDE_EAST) {
+			if($cornerDirection === Facing::EAST) {
 				$this->plotBeginPos = $this->plotBeginPos->subtract(0, 0, $roadWidth);
-				$this->plotBeginPos = $this->plotBeginPos->add($plotSize);
-			}elseif($cornerDirection === Vector3::SIDE_WEST) {
+				$this->plotBeginPos = $this->plotBeginPos->add($plotSize, 0, 0);
+			}elseif($cornerDirection === Facing::WEST) {
 				$this->plotBeginPos = $this->plotBeginPos->subtract($roadWidth, 0, $roadWidth);
 			}
 		}elseif(($start->X - $end->X) === -1) { // East X+
-			if($cornerDirection === Vector3::SIDE_NORTH) {
-				$this->plotBeginPos = $this->plotBeginPos->add($plotSize);
+			if($cornerDirection === Facing::NORTH) {
+				$this->plotBeginPos = $this->plotBeginPos->add($plotSize, 0, 0);
 				$this->plotBeginPos = $this->plotBeginPos->subtract(0, 0, $roadWidth);
-			}elseif($cornerDirection === Vector3::SIDE_SOUTH) {
+			}elseif($cornerDirection === Facing::SOUTH) {
 				$this->plotBeginPos = $this->plotBeginPos->add($plotSize, 0, $plotSize);
 			}
 		}elseif(($start->Z - $end->Z) === -1) { // South Z+
-			if($cornerDirection === Vector3::SIDE_EAST) {
+			if($cornerDirection === Facing::EAST) {
 				$this->plotBeginPos = $this->plotBeginPos->add($plotSize, 0, $plotSize);
-				$this->plotBeginPos = $this->plotBeginPos->add($plotSize);
-			}elseif($cornerDirection === Vector3::SIDE_WEST) {
+				$this->plotBeginPos = $this->plotBeginPos->add($plotSize, 0, 0);
+			}elseif($cornerDirection === Facing::WEST) {
 				$this->plotBeginPos = $this->plotBeginPos->add(0, 0, $plotSize);
-				$this->plotBeginPos = $this->plotBeginPos->subtract($roadWidth);
+				$this->plotBeginPos = $this->plotBeginPos->subtract($roadWidth, 0, 0);
 			}
 		}elseif(($start->X - $end->X) === 1) { // West X-
-			if($cornerDirection === Vector3::SIDE_NORTH) {
+			if($cornerDirection === Facing::NORTH) {
 				$this->plotBeginPos = $this->plotBeginPos->subtract($roadWidth, 0, $roadWidth);
-			}elseif($cornerDirection === Vector3::SIDE_SOUTH) {
+			}elseif($cornerDirection === Facing::SOUTH) {
 				$this->plotBeginPos = $this->plotBeginPos->add(0, 0, $plotSize);
-				$this->plotBeginPos = $this->plotBeginPos->subtract($roadWidth);
+				$this->plotBeginPos = $this->plotBeginPos->subtract($roadWidth, 0, 0);
 			}
 		}
 		$this->xMax = (int) ($this->plotBeginPos->x + $roadWidth);
 		$this->zMax = (int) ($this->plotBeginPos->z + $roadWidth);
 		$this->pos = new Vector3($this->plotBeginPos->x, 0, $this->plotBeginPos->z);
-		$plugin->getLogger()->debug("Corner Correction Task started between plots {$start->X};{$start->Z} and {$end->X};{$end->Z}");
+		$plugin->getLogger()->debug("Corner Correction Task started between plots $start->X;$start->Z and $end->X;$end->Z");
 	}
 
-	public function onRun(int $currentTick) : void {
+	public function onRun() : void {
 		foreach($this->level->getEntities() as $entity) {
 			if($entity->x > $this->pos->x - 1 and $entity->x < $this->xMax + 1) {
 				if($entity->z > $this->pos->z - 1 and $entity->z < $this->zMax + 1) {
@@ -97,7 +97,7 @@ class CornerCorrectionTask extends Task{
 		$blocks = 0;
 		while($this->pos->x < $this->xMax) {
 			while($this->pos->z < $this->zMax) {
-				while($this->pos->y < $this->level->getWorldHeight()) {
+				while($this->pos->y < $this->level->getMaxY()) {
 					if($this->pos->y === 0)
 						$block = $this->bottomBlock;
 					elseif($this->pos->y < $this->height)
@@ -105,16 +105,16 @@ class CornerCorrectionTask extends Task{
 					elseif($this->pos->y === $this->height)
 						$block = $this->roadBlock;
 					else
-						$block = Block::get(BlockIds::AIR);
+						$block = VanillaBlocks::AIR();
 
-					$this->level->setBlock($this->pos, $block, false, false);
+					$this->level->setBlock($this->pos, $block, false);
 					$this->pos->y++;
 
 					$blocks++;
 					if($blocks >= $this->maxBlocksPerTick) {
-						$this->setHandler();
+						$this->setHandler(null);
 						$this->plugin->getScheduler()->scheduleDelayedTask($this, 1);
-						return;
+						throw new CancelTaskException();
 					}
 				}
 				$this->pos->y = 0;

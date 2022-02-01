@@ -6,17 +6,14 @@ use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Input;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\Player;
+use MyPlot\Plot;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class NameForm extends ComplexMyPlotForm {
-	public function __construct(Player $player) {
+	public function __construct(Player $player, Plot $plot) {
 		$plugin = MyPlot::getInstance();
-
-		if(!isset($this->plot))
-			$this->plot = $plugin->getPlotByPosition($player);
-		if(!isset($this->plot))
-			return;
+		$this->setPlot($plot);
 
 		parent::__construct(
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("name.form")]),

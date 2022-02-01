@@ -33,17 +33,21 @@ use MyPlot\subcommand\SetOwnerSubCommand;
 use MyPlot\subcommand\SubCommand;
 use MyPlot\subcommand\UnDenySubCommand;
 use MyPlot\subcommand\WarpSubCommand;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
-use pocketmine\network\mcpe\protocol\types\CommandData;
-use pocketmine\network\mcpe\protocol\types\CommandEnum;
-use pocketmine\network\mcpe\protocol\types\CommandParameter;
-use pocketmine\Player;
+use pocketmine\network\mcpe\protocol\types\command\CommandData;
+use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
+use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
+use pocketmine\player\Player;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\plugin\PluginOwnedTrait;
 use pocketmine\utils\TextFormat;
 
-class Commands extends PluginCommand
+class Commands extends Command implements PluginOwned
 {
+	use PluginOwnedTrait;
+
 	/** @var SubCommand[] $subCommands */
 	private array $subCommands = [];
 	/** @var SubCommand[] $aliasSubCommands */
@@ -55,11 +59,9 @@ class Commands extends PluginCommand
 	 * @param MyPlot $plugin
 	 */
 	public function __construct(MyPlot $plugin) {
-		parent::__construct($plugin->getLanguage()->get("command.name"), $plugin);
+		parent::__construct($plugin->getLanguage()->get("command.name"), $plugin->getLanguage()->get("command.desc"), $plugin->getLanguage()->get("command.usage"), [$plugin->getLanguage()->get("command.alias")]);
 		$this->setPermission("myplot.command");
-		$this->setAliases([$plugin->getLanguage()->get("command.alias")]);
-		$this->setDescription($plugin->getLanguage()->get("command.desc"));
-		$this->setUsage($plugin->getLanguage()->get("command.usage"));
+		$this->owningPlugin = $plugin;
 		$this->loadSubCommand(new HelpSubCommand($plugin, "help", $this));
 		$this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
 		$this->loadSubCommand(new GenerateSubCommand($plugin, "generate"));
@@ -89,7 +91,7 @@ class Commands extends PluginCommand
 			$this->loadSubCommand(new SellSubCommand($plugin, "sell"));
 			$this->loadSubCommand(new BuySubCommand($plugin, "buy"));
 		}
-		$styler = $this->getPlugin()->getServer()->getPluginManager()->getPlugin("WorldStyler");
+		$styler = $plugin->getServer()->getPluginManager()->getPlugin("WorldStyler");
 		if($styler !== null) {
 			$this->loadSubCommand(new CloneSubCommand($plugin, "clone"));
 		}
@@ -97,67 +99,43 @@ class Commands extends PluginCommand
 
 		$autofill = $plugin->getServer()->getPluginManager()->getPlugin("EasyCommandAutofill");
 		if($autofill instanceof Main) {
-			$data = new CommandData();
-			$data->commandName = $this->getName();
-			$data->commandDescription = $this->getDescription();
+			$overloads = [];
 			$enumCount = 0;
 			$tree = 0;
 			ksort($this->subCommands, SORT_NATURAL | SORT_FLAG_CASE);
 			foreach($this->subCommands as $subCommandName => $subCommand) {
-				$parameter = new CommandParameter();
-				$parameter->paramName = "MyPlotSubCommand";
-				$parameter->paramType = AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_FLAG_VALID | $enumCount++;
-				$enum = new CommandEnum();
-				$enum->enumName = $subCommandName;
-				$enum->enumValues = [$subCommandName];
-				$parameter->enum = $enum;
-				$parameter->flags = 1;
-				$parameter->isOptional = false;
-				$data->overloads[$tree][0] = $parameter;
+				$overloads[$tree][0] = CommandParameter::enum("MyPlotSubCommand", new CommandEnum($subCommandName, [$subCommandName]), CommandParameter::FLAG_FORCE_COLLAPSE_ENUM, false);
 
 				$usage = $subCommand->getUsage();
 				$commandString = explode(" ", $usage)[0];
-				preg_match_all('/(\s?[<\[]?\s*)([a-zA-Z0-9|]+)(?:\s*:?\s*)(string|int|x y z|float|mixed|target|message|text|json|command|boolean|bool)?(?:\s*[>\]]?\s?)/iu', $usage, $matches, PREG_PATTERN_ORDER, strlen($commandString));
+				preg_match_all('/(\s?[<\[]?\s*)([a-zA-Z0-9|]+)\s*:?\s*(string|int|x y z|float|mixed|target|message|text|json|command|boolean|bool)?\s*[>\]]?\s?/iu', $usage, $matches, PREG_PATTERN_ORDER, strlen($commandString));
 				$argumentCount = count($matches[0])-1;
 				for($argNumber = 1; $argNumber <= $argumentCount; ++$argNumber) {
-					$optional = !($matches[1][$argNumber] === '') && $matches[1][$argNumber] === '[';
+					$optional = $matches[1][$argNumber] === '[';
 					$paramName = strtolower($matches[2][$argNumber]);
 					if(stripos($paramName, "|") === false) {
 						$paramType = match (strtolower($matches[3][$argNumber])) {
-							default => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING,
-							"int" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_INT,
-							"x y z" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_POSITION,
-							"float" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_FLOAT,
-							"target" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_TARGET,
-							"message" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_MESSAGE,
-							"json" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_JSON,
-							"command" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_COMMAND,
-							"boolean", "mixed" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_VALUE,
-							"text" => AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_RAWTEXT,
+							default => AvailableCommandsPacket::ARG_TYPE_STRING,
+							"int" => AvailableCommandsPacket::ARG_TYPE_INT,
+							"x y z" => AvailableCommandsPacket::ARG_TYPE_POSITION,
+							"float" => AvailableCommandsPacket::ARG_TYPE_FLOAT,
+							"target" => AvailableCommandsPacket::ARG_TYPE_TARGET,
+							"message" => AvailableCommandsPacket::ARG_TYPE_MESSAGE,
+							"json" => AvailableCommandsPacket::ARG_TYPE_JSON,
+							"command" => AvailableCommandsPacket::ARG_TYPE_COMMAND,
+							"boolean", "bool", "mixed" => AvailableCommandsPacket::ARG_TYPE_VALUE,
+							"text" => AvailableCommandsPacket::ARG_TYPE_RAWTEXT,
 						};
-						$parameter = new CommandParameter();
-						$parameter->paramName = $paramName;
-						$parameter->paramType = $paramType;
+						$parameter = CommandParameter::standard($paramName, $paramType, 0, $optional);
 					}else{
 						$enumValues = explode("|", $paramName);
-						$parameter = new CommandParameter();
-						$parameter->paramName = $paramName;
-						$parameter->paramType = AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_FLAG_VALID | $enumCount++;
-						$enum = new CommandEnum();
-						$enum->enumName = $data->commandName." Enum#".$enumCount; // TODO: change to readable name
-						$enum->enumValues = $enumValues;
-						$parameter->enum = $enum;
-						$parameter->flags = 1;
+						$parameter = CommandParameter::enum($paramName, new CommandEnum($this->getName()." Enum#".$enumCount, $enumValues), CommandParameter::FLAG_FORCE_COLLAPSE_ENUM, $optional);
 					}
-					$parameter->isOptional = $optional;
-					$data->overloads[$tree][$argNumber] = $parameter;
+					$overloads[$tree][$argNumber] = $parameter;
 				}
 				$tree++;
 			}
-			$data->aliases = new CommandEnum();
-			$data->aliases->enumName = ucfirst($this->getName()) . "Aliases";
-			$data->aliases->enumValues = array_merge([$this->getName()], $this->getAliases());
-			$autofill->addManualOverride($this->getName(), $data);
+			$autofill->addManualOverride($this->getName(), new CommandData($this->getName(), $this->getDescription(), 0, 1, new CommandEnum(ucfirst($this->getName()) . "Aliases", array_merge([$this->getName()], $this->getAliases())), $overloads));
 			$plugin->getLogger()->debug("Command Autofill Enabled");
 		}
 	}
@@ -194,14 +172,14 @@ class Commands extends PluginCommand
 	 */
 	public function execute(CommandSender $sender, string $alias, array $args) : bool {
 		/** @var MyPlot $plugin */
-		$plugin = $this->getPlugin();
+		$plugin = $this->getOwningPlugin();
 		if($plugin->isDisabled()) {
 			$sender->sendMessage($plugin->getLanguage()->get("plugin.disabled"));
 			return true;
 		}
 		if(!isset($args[0])) {
 			$args[0] = "help";
-			if($sender instanceof Player and $plugin->getConfig()->get("UI Forms", true) === true) {
+			if($sender instanceof Player and $plugin->getConfig()->get("UI Forms", true) === true and class_exists('dktapps\\pmforms\\MenuForm')) {
 				$sender->sendForm(new MainForm($sender, $this->subCommands));
 				return true;
 			}

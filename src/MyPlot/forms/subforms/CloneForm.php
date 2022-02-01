@@ -7,20 +7,16 @@ use dktapps\pmforms\element\Input;
 use dktapps\pmforms\element\Label;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
+use MyPlot\Plot;
 use pocketmine\form\FormValidationException;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class CloneForm extends ComplexMyPlotForm {
 
-	public function __construct(Player $player) {
+	public function __construct(Player $player, Plot $plot) {
 		$plugin = MyPlot::getInstance();
-		$plot = $plugin->getPlotByPosition($player);
-		if($plot === null) {
-			$plot = new \stdClass();
-			$plot->X = "";
-			$plot->Z = "";
-		}
+		$this->setPlot($plot);
 		parent::__construct(
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("clone.form")]),
 			[
@@ -44,7 +40,7 @@ class CloneForm extends ComplexMyPlotForm {
 					"3",
 					$plugin->getLanguage()->get("clone.formworld"),
 					"world",
-					$player->getLevelNonNull()->getFolderName()
+					$player->getWorld()->getFolderName()
 				),
 				new Label(
 					"4",
@@ -64,13 +60,13 @@ class CloneForm extends ComplexMyPlotForm {
 					"7",
 					$plugin->getLanguage()->get("clone.formworld"),
 					"world",
-					$player->getLevelNonNull()->getFolderName()
+					$player->getWorld()->getFolderName()
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
 				if(is_numeric($response->getString("1")) and is_numeric($response->getString("2")) and is_numeric($response->getString("5")) and is_numeric($response->getString("6"))) {
-					$originPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("3") === '' ? $player->getLevelNonNull()->getFolderName() : $response->getString("3"), (int)$response->getString("1"), (int)$response->getString("2"));
-					$clonedPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("7") === '' ? $player->getLevelNonNull()->getFolderName() : $response->getString("7"), (int)$response->getString("5"), (int)$response->getString("6"));
+					$originPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("3") === '' ? $player->getWorld()->getFolderName() : $response->getString("3"), (int)$response->getString("1"), (int)$response->getString("2"));
+					$clonedPlot = MyPlot::getInstance()->getProvider()->getPlot($response->getString("7") === '' ? $player->getWorld()->getFolderName() : $response->getString("7"), (int)$response->getString("5"), (int)$response->getString("6"));
 				}else
 					throw new FormValidationException("Unexpected form data returned");
 

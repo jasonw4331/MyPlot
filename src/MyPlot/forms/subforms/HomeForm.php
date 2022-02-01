@@ -5,18 +5,18 @@ namespace MyPlot\forms\subforms;
 use dktapps\pmforms\MenuOption;
 use MyPlot\forms\SimpleMyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class HomeForm extends SimpleMyPlotForm {
 	public function __construct(Player $player) {
 		$plugin = MyPlot::getInstance();
 
-		$plots = $plugin->getPlotsOfPlayer($player->getName(), $player->getLevelNonNull()->getFolderName());
+		$plots = $plugin->getPlotsOfPlayer($player->getName(), $player->getWorld()->getFolderName());
 		$i = 1;
 		$elements = [];
 		foreach($plots as $plot) {
-			$elements[] = new MenuOption(TextFormat::DARK_RED.$i++.") ".$plot->name." ".(string)$plot);
+			$elements[] = new MenuOption(TextFormat::DARK_RED.$i++.") ".$plot->name." ". $plot);
 		}
 		parent::__construct(
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("home.form")]),

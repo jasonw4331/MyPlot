@@ -5,16 +5,20 @@ namespace MyPlot\task;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\block\Block;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\scheduler\CancelTaskException;
 use pocketmine\scheduler\Task;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
 class FillPlotTask extends Task {
 	/** @var MyPlot $plugin */
 	protected $plugin;
 	/** @var Plot $plot */
 	protected $plot;
-	/** @var \pocketmine\level\Level|null $level */
+	/** @var World|null $level */
 	protected $level;
 	/** @var int $height */
 	protected $height;
@@ -22,7 +26,7 @@ class FillPlotTask extends Task {
 	protected $fillBlock;
 	/** @var Block $bottomBlock */
 	protected $bottomBlock;
-	/** @var \pocketmine\level\Position|null $plotBeginPos */
+	/** @var Position|null $plotBeginPos */
 	protected $plotBeginPos;
 	/** @var int $xMax */
 	protected $xMax;
@@ -44,7 +48,7 @@ class FillPlotTask extends Task {
 		$this->plugin = $plugin;
 		$this->plot = $plot;
 		$this->plotBeginPos = $plugin->getPlotPosition($plot);
-		$this->level = $this->plotBeginPos->getLevel();
+		$this->level = $this->plotBeginPos->getWorld();
 		$plotLevel = $plugin->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
 		$this->xMax = (int)($this->plotBeginPos->x + $plotSize);
@@ -54,16 +58,12 @@ class FillPlotTask extends Task {
 		$this->bottomBlock = $plotLevel->bottomBlock;
 		$this->maxBlocksPerTick = $maxBlocksPerTick;
 		$this->pos = new Vector3($this->plotBeginPos->x, 0, $this->plotBeginPos->z);
-		$this->plugin = $plugin;
-		$plugin->getLogger()->debug("Plot Fill Task started at plot {$plot->X};{$plot->Z}");
+		$plugin->getLogger()->debug("Plot Fill Task started at plot $plot->X;$plot->Z");
 	}
 
-	/**
-	 * @param int $currentTick
-	 */
-	public function onRun(int $currentTick) : void {
+	public function onRun() : void {
 		foreach($this->level->getEntities() as $entity) {
-			if($this->plugin->getPlotBB($this->plot)->isVectorInXZ($entity)) {
+			if($this->plugin->getPlotBB($this->plot)->isVectorInXZ($entity->getPosition())) {
 				if(!$entity instanceof Player) {
 					$entity->flagForDespawn();
 				}else {
@@ -74,20 +74,20 @@ class FillPlotTask extends Task {
 		$blocks = 0;
 		while($this->pos->x < $this->xMax) {
 			while($this->pos->z < $this->zMax) {
-				while($this->pos->y < $this->level->getWorldHeight()) {
+				while($this->pos->y < $this->level->getMaxY()) {
 					if($this->pos->y === 0) {
 						$block = $this->bottomBlock;
 					}elseif($this->pos->y <= $this->height) {
 						$block = $this->fillBlock;
 					}else {
-						$block = Block::get(Block::AIR);
+						$block = VanillaBlocks::AIR();
 					}
-					$this->level->setBlock($this->pos, $block, false, false);
+					$this->level->setBlock($this->pos, $block, false);
 					$blocks++;
 					if($blocks >= $this->maxBlocksPerTick) {
-						$this->setHandler();
+						$this->setHandler(null);
 						$this->plugin->getScheduler()->scheduleDelayedTask($this, 1);
-						return;
+						throw new CancelTaskException();
 					}
 					$this->pos->y++;
 				}
@@ -97,11 +97,9 @@ class FillPlotTask extends Task {
 			$this->pos->z = $this->plotBeginPos->z;
 			$this->pos->x++;
 		}
-		foreach($this->level->getTiles() as $tile) {
-			if(($plot = $this->plugin->getPlotByPosition($tile)) != null) {
-				if($this->plot->isSame($plot)) {
-					$tile->close();
-				}
+		foreach($this->plugin->getPlotChunks($this->plot) as [$chunkX, $chunkZ, $chunk]) {
+			foreach($chunk->getTiles() as $tile) {
+				$tile->close();
 			}
 		}
 		$this->plugin->getLogger()->debug("Plot Fill task completed at {$this->plotBeginPos->x};{$this->plotBeginPos->z}");

@@ -4,8 +4,11 @@ namespace MyPlot\events;
 
 use MyPlot\Plot;
 use pocketmine\event\Cancellable;
+use pocketmine\event\CancellableTrait;
 
 class MyPlotSettingEvent extends MyPlotPlotEvent implements Cancellable {
+	use CancellableTrait;
+
 	private Plot $oldPlot;
 
 	public function __construct(Plot $oldPlot, Plot $newPlot) {

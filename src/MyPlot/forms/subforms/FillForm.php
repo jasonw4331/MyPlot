@@ -6,15 +6,13 @@ use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Input;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\Player;
+use MyPlot\Plot;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class FillForm extends ComplexMyPlotForm {
-	public function __construct(Player $player) {
+	public function __construct() {
 		$plugin = MyPlot::getInstance();
-
-		if(!isset($this->plot))
-			$this->plot = $plugin->getPlotByPosition($player);
 
 		parent::__construct(
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("fill.form")]),
