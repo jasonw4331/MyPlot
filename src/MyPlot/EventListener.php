@@ -186,7 +186,7 @@ class EventListener implements Listener
 						return;
 			}
 		}
-		$event->setCancelled();
+		$event->cancel();
 		$this->plugin->getLogger()->debug("Block placement/break/interaction of {$event->getBlock()->getName()} was cancelled at ".$event->getBlock()->getPosition()->__toString());
 	}
 

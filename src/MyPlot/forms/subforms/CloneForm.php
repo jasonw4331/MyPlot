@@ -7,16 +7,22 @@ use dktapps\pmforms\element\Input;
 use dktapps\pmforms\element\Label;
 use MyPlot\forms\ComplexMyPlotForm;
 use MyPlot\MyPlot;
-use MyPlot\Plot;
 use pocketmine\form\FormValidationException;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class CloneForm extends ComplexMyPlotForm {
 
-	public function __construct(Player $player, Plot $plot) {
+	public function __construct(Player $player) {
 		$plugin = MyPlot::getInstance();
+		$plot = $plugin->getPlotByPosition($player->getPosition());
 		$this->setPlot($plot);
+		if($plot === null) {
+			$plot = new \stdClass();
+			$plot->X = "";
+			$plot->Z = "";
+			$plot->levelName = $player->getWorld()->getFolderName();
+		}
 		parent::__construct(
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("clone.form")]),
 			[
@@ -40,7 +46,7 @@ class CloneForm extends ComplexMyPlotForm {
 					"3",
 					$plugin->getLanguage()->get("clone.formworld"),
 					"world",
-					$player->getWorld()->getFolderName()
+					$plot->levelName
 				),
 				new Label(
 					"4",
@@ -60,7 +66,7 @@ class CloneForm extends ComplexMyPlotForm {
 					"7",
 					$plugin->getLanguage()->get("clone.formworld"),
 					"world",
-					$player->getWorld()->getFolderName()
+					$plot->levelName
 				)
 			],
 			function(Player $player, CustomFormResponse $response) use ($plugin) : void {

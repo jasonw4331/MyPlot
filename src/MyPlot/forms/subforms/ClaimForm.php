@@ -20,7 +20,7 @@ class ClaimForm extends ComplexMyPlotForm {
 			$plot = new \stdClass();
 			$plot->X = "";
 			$plot->Z = "";
-			$plot->levelName = "";
+			$plot->levelName = $player->getWorld()->getFolderName();
 		}
 		parent::__construct(
 			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("claim.form")]),

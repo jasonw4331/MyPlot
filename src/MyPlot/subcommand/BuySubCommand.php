@@ -55,7 +55,7 @@ class BuySubCommand extends SubCommand
 			$sender->sendMessage($this->translateString("buy.confirm", ["$plot->X;$plot->Z", $price]));
 			return true;
 		}
-		$oldOwner = $this->plugin->getServer()->getPlayerByPrefix($plot->owner);
+		$oldOwner = $this->plugin->getServer()->getPlayerExact($plot->owner);
 		if($this->plugin->buyPlot($plot, $sender)) {
 			$sender->sendMessage($this->translateString("buy.success", ["$plot->X;$plot->Z", $price]));
 			$oldOwner?->sendMessage($this->translateString("buy.sold", [$sender->getName(), "$plot->X;$plot->Z", $price])); // TODO: queue messages for sending when player rejoins

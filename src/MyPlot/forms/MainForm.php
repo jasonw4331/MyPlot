@@ -26,7 +26,7 @@ class MainForm extends SimpleMyPlotForm {
 		$this->setPlot($plugin->getPlotByPosition($player->getPosition()));
 
 		$elements = [];
-		foreach($subCommands as $name => $command) {
+		foreach($subCommands as $command) {
 			if(!$command->canUse($player) or $command->getForm($player) === null)
 				continue;
 			$name = (new \ReflectionClass($command))->getShortName();
