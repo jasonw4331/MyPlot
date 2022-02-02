@@ -1056,17 +1056,16 @@ class MyPlot extends PluginBase
 		$plotWorld = $this->getLevelSettings($plot->levelName);
 		$world = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
 		$chunks = $this->getPlotChunks($plot);
-		foreach($chunks as $id => $chunk){
-			$coords = explode(';', $id);
+		foreach($this->getPlotChunks($plot) as [$chunkX, $chunkZ, $chunk]) {
 			for($x = 0; $x < 16; ++$x){
 				for($z = 0; $z < 16; ++$z){
-					$chunkPlot = $this->getPlotByPosition(new Position((((int)$coords[0]) << 4) + $x, $plotWorld->groundHeight, (((int)$coords[1]) << 4) + $z, $world));
+					$chunkPlot = $this->getPlotByPosition(new Position(($chunkX << 4) + $x, $plotWorld->groundHeight, ($chunkZ << 4) + $z, $world));
 					if($chunkPlot instanceof Plot and $chunkPlot->isSame($plot)) {
 						$chunk->setBiomeId($x, $z, $biome->getId());
 					}
 				}
 			}
-			$world->setChunk((int)$coords[0], (int)$coords[1], $chunk);
+			$world->setChunk($chunkX, $chunkZ, $chunk);
 		}
 		return !$failed;
 	}
