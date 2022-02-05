@@ -1351,18 +1351,23 @@ class MyPlot extends PluginBase
 	 * @param Plot $plot
 	 * @param float $price
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function sellPlot(Plot $plot, float $price) : bool {
-		if($this->getEconomyProvider() === null or $price < 0)
-			return false;
+	public function sellPlot(Plot $plot, float $price) : Promise {
+		$resolver = new PromiseResolver();
+		if($this->getEconomyProvider() === null or $price < 0) {
+			$resolver->resolve(false);
+			return $resolver->getPromise();
+		}
 
 		$newPlot = clone $plot;
 		$newPlot->price = $price;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
 		$ev->call();
 		if($ev->isCancelled()) {
-			return false;
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
 		$plot = $ev->getPlot();
 		return $this->savePlot($plot);
