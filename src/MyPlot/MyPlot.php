@@ -530,33 +530,52 @@ class MyPlot extends PluginBase
 	 *
 	 * @param Plot $plot
 	 *
-	 * @return AxisAlignedBB
+	 * @return Promise
+	 * @phpstan-return Promise<AxisAlignedBB>
 	 */
-	public function getPlotBB(Plot $plot) : AxisAlignedBB {
-		$plotLevel = $this->getLevelSettings($plot->levelName);
-		$plotSize = $plotLevel->plotSize-1;
-		$pos = $this->getPlotPosition($plot, false);
-		$xMax = (int)($pos->x + $plotSize);
-		$zMax = (int)($pos->z + $plotSize);
-		foreach ($this->dataProvider->getMergedPlots($plot) as $mergedPlot){
-			$xplot = $this->getPlotPosition($mergedPlot, false)->x;
-			$zplot = $this->getPlotPosition($mergedPlot, false)->z;
-			$xMaxPlot = (int)($xplot + $plotSize);
-			$zMaxPlot = (int)($zplot + $plotSize);
-			if($pos->x > $xplot) $pos->x = $xplot;
-			if($pos->z > $zplot) $pos->z = $zplot;
-			if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
-			if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
-		}
+	public function getPlotBB(Plot $plot) : Promise{
+		$resolver = new PromiseResolver();
+		Await::f2c(
+			function() use ($plot){
+				$getPlotPosition = function($plot){
+					$plotLevel = $this->getLevelSettings($plot->levelName);
+					$plotSize = $plotLevel->plotSize;
+					$roadWidth = $plotLevel->roadWidth;
+					$totalSize = $plotSize + $roadWidth;
+					$x = $totalSize * $plot->X;
+					$z = $totalSize * $plot->Z;
+					$level = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
+					return new Position($x, $plotLevel->groundHeight, $z, $level);
+				};
+				$plotLevel = $this->getLevelSettings($plot->levelName);
+				$plotSize = $plotLevel->plotSize - 1;
+				$pos = $getPlotPosition($plot);
+				$xMax = (int) ($pos->x + $plotSize);
+				$zMax = (int) ($pos->z + $plotSize);
+				foreach((yield $this->dataProvider->getMergedPlots($plot)) as $mergedPlot){
+					$xplot = $getPlotPosition($mergedPlot)->x;
+					$zplot = $getPlotPosition($mergedPlot)->z;
+					$xMaxPlot = (int) ($xplot + $plotSize);
+					$zMaxPlot = (int) ($zplot + $plotSize);
+					if($pos->x > $xplot) $pos->x = $xplot;
+					if($pos->z > $zplot) $pos->z = $zplot;
+					if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+					if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+				}
 
-		return new AxisAlignedBB(
-			min($pos->x, $xMax),
-			0,
-			min($pos->z, $zMax),
-			max($pos->x, $xMax),
-			$pos->getWorld()->getMaxY(),
-			max($pos->z, $zMax)
+				return new AxisAlignedBB(
+					min($pos->x, $xMax),
+					$pos->getWorld()->getMinY(),
+					min($pos->z, $zMax),
+					max($pos->x, $xMax),
+					$pos->getWorld()->getMaxY(),
+					max($pos->z, $zMax)
+				);
+			},
+			fn(AxisAlignedBB $aabb) => $resolver->resolve($aabb),
+			fn(\Throwable $e) => $resolver->reject()
 		);
+		return $resolver->getPromise();
 	}
 
 	/**
