@@ -1364,28 +1364,39 @@ class MyPlot extends PluginBase
 	 * @param Plot $plot
 	 * @param Player $player
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function buyPlot(Plot $plot, Player $player) : bool {
-		if($this->getEconomyProvider() === null or !$this->getEconomyProvider()->reduceMoney($player, $plot->price) or !$this->getEconomyProvider()->addMoney($this->getServer()->getOfflinePlayer($plot->owner), $plot->price))
-			return false;
-		$failed = false;
-		foreach ($this->dataProvider->getMergedPlots($plot) as $mergedPlot) {
-			$newPlot = clone $mergedPlot;
-			$newPlot->owner = $player->getName();
-			$newPlot->helpers = [];
-			$newPlot->denied = [];
-			$newPlot->price = 0.0;
-			$ev = new MyPlotSettingEvent($mergedPlot, $newPlot);
-			$ev->call();
-			if ($ev->isCancelled()) {
-				return false;
-			}
-			$mergedPlot = $ev->getPlot();
-			if($this->savePlot($mergedPlot))
-				$failed = true;
+	public function buyPlot(Plot $plot, Player $player) : Promise {
+		$resolver = new PromiseResolver();
+		if($this->getEconomyProvider() === null or !$this->getEconomyProvider()->reduceMoney($player, $plot->price) or !$this->getEconomyProvider()->addMoney($this->getServer()->getOfflinePlayer($plot->owner), $plot->price)) {
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
-		return !$failed;
+		Await::f2c(
+			function() use($plot, $player) {
+				$failed = false;
+				foreach (yield $this->dataProvider->getMergedPlots($plot) as $mergedPlot) {
+					$newPlot = clone $mergedPlot;
+					$newPlot->owner = $player->getName();
+					$newPlot->helpers = [];
+					$newPlot->denied = [];
+					$newPlot->price = 0.0;
+					$ev = new MyPlotSettingEvent($mergedPlot, $newPlot);
+					$ev->call();
+					if ($ev->isCancelled()) {
+						$failed = true;
+					}
+					$mergedPlot = $ev->getPlot();
+					if(! yield $this->dataProvider->savePlot($mergedPlot))
+						$failed = true;
+				}
+				return !$failed;
+			},
+			fn(bool $success) => $resolver->resolve($success),
+			fn() => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
