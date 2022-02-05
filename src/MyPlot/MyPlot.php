@@ -194,10 +194,17 @@ class MyPlot extends PluginBase
 	 *
 	 * @param Plot $plot
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<Plot>
 	 */
-	public function savePlot(Plot $plot) : bool {
-		return $this->dataProvider->savePlot($plot);
+	public function savePlot(Plot $plot) : Promise{
+		$resolver = new PromiseResolver();
+		Await::g2c(
+			$this->dataProvider->savePlot($plot),
+			fn() => $resolver->resolve($plot),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
