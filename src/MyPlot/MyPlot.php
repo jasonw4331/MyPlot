@@ -256,41 +256,51 @@ class MyPlot extends PluginBase
 	 *
 	 * @param Position $position
 	 *
-	 * @return Plot|null
+	 * @return Promise
+	 * @phpstan-return Promise<Plot|null>
 	 */
-	public function getPlotByPosition(Position $position) : ?Plot {
-		$x = $position->x;
-		$z = $position->z;
-		$levelName = $position->getWorld()->getFolderName();
-		if(!$this->isLevelLoaded($levelName))
-			return null;
-		$plotLevel = $this->getLevelSettings($levelName);
+	public function getPlotByPosition(Position $position) : Promise{
+		$resolver = new PromiseResolver();
+		Await::f2c(
+			function() use ($position){
+				$x = $position->x;
+				$z = $position->z;
+				$levelName = $position->getWorld()->getFolderName();
+				if(!$this->isLevelLoaded($levelName))
+					return null;
+				$plotLevel = $this->getLevelSettings($levelName);
 
-		$plot = $this->getPlotFast($x, $z, $plotLevel);
-		if($plot instanceof Plot)
-			return $this->dataProvider->getMergeOrigin($plot);
+				$plot = $this->getPlotFast($x, $z, $plotLevel);
+				if($plot instanceof Plot)
+					return yield $this->dataProvider->getMergeOrigin($plot);
 
-		if(!($basePlot = $this->dataProvider->getPlot($levelName, $x, $z))->isMerged())
-			return null;
+				$basePlot = yield $this->dataProvider->getPlot($levelName, $x, $z);
+				if(!$basePlot->isMerged())
+					return null;
 
-		// no plot found at current location yet, so search cardinal directions
-		$plotN = $basePlot->getSide(Facing::NORTH);
-		if($plotN->isSame($basePlot))
-			return $this->dataProvider->getMergeOrigin($plotN);
+				// no plot found at current location yet, so search cardinal directions
+				$plotN = $basePlot->getSide(Facing::NORTH);
+				if($plotN->isSame($basePlot))
+					return yield $this->dataProvider->getMergeOrigin($plotN);
 
-		$plotS = $basePlot->getSide(Facing::SOUTH);
-		if($plotS->isSame($basePlot))
-			return $this->dataProvider->getMergeOrigin($plotS);
+				$plotS = $basePlot->getSide(Facing::SOUTH);
+				if($plotS->isSame($basePlot))
+					return yield $this->dataProvider->getMergeOrigin($plotS);
 
-		$plotE = $basePlot->getSide(Facing::EAST);
-		if($plotE->isSame($basePlot))
-			return $this->dataProvider->getMergeOrigin($plotE);
+				$plotE = $basePlot->getSide(Facing::EAST);
+				if($plotE->isSame($basePlot))
+					return yield $this->dataProvider->getMergeOrigin($plotE);
 
-		$plotW = $basePlot->getSide(Facing::WEST);
-		if($plotW->isSame($basePlot))
-			return $this->dataProvider->getMergeOrigin($plotW);
+				$plotW = $basePlot->getSide(Facing::WEST);
+				if($plotW->isSame($basePlot))
+					return yield $this->dataProvider->getMergeOrigin($plotW);
 
-		return null;
+				return null;
+			},
+			fn(?Plot $plot) => $resolver->resolve($plot),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
