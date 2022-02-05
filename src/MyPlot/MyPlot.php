@@ -446,7 +446,7 @@ class MyPlot extends PluginBase
 				return false;
 			},
 			fn(bool $isBordering) => $resolver->resolve($isBordering),
-			fn() => $resolver->reject()
+			fn(\Throwable $e) => $resolver->reject()
 		);
 		return $resolver->getPromise();
 	}
