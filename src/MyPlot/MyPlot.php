@@ -1071,15 +1071,23 @@ class MyPlot extends PluginBase
 	 *
 	 * @param Plot $plot
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function disposePlot(Plot $plot) : bool {
+	public function disposePlot(Plot $plot) : Promise {
+		$resolver = new PromiseResolver();
 		$ev = new MyPlotDisposeEvent($plot);
 		$ev->call();
 		if($ev->isCancelled()) {
-			return false;
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
-		return $this->getProvider()->deletePlot($plot);
+		Await::g2c(
+			$this->dataProvider->deletePlot($plot),
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
