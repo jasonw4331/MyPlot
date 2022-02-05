@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot;
 
+use jasonwynn10\MyPlot\utils\AsyncVariants;
 use muqsit\worldstyler\Selection;
 use muqsit\worldstyler\shapes\CommonShape;
 use muqsit\worldstyler\shapes\Cuboid;
@@ -15,12 +16,9 @@ use MyPlot\events\MyPlotMergeEvent;
 use MyPlot\events\MyPlotResetEvent;
 use MyPlot\events\MyPlotSettingEvent;
 use MyPlot\events\MyPlotTeleportEvent;
-use MyPlot\provider\ConfigDataProvider;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
-use MyPlot\provider\MySQLProvider;
-use MyPlot\provider\SQLiteDataProvider;
 use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
 use MyPlot\task\FillPlotTask;
@@ -40,6 +38,8 @@ use pocketmine\permission\PermissionAttachmentInfo;
 use pocketmine\permission\PermissionManager;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\promise\Promise;
+use pocketmine\promise\PromiseResolver;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
@@ -50,6 +50,7 @@ use pocketmine\world\generator\GeneratorManager;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use pocketmine\world\WorldCreationOptions;
+use SOFe\AwaitGenerator\Await;
 
 class MyPlot extends PluginBase
 {
@@ -1345,50 +1346,7 @@ class MyPlot extends PluginBase
 		}
 		$this->getLogger()->debug(TF::BOLD . "Loading Data Provider settings");
 		// Initialize DataProvider
-		/** @var int $cacheSize */
-		$cacheSize = $this->getConfig()->get("PlotCacheSize", 256);
-		$dataProvider = $this->getConfig()->get("DataProvider", "sqlite3");
-		if(!is_string($dataProvider))
-			$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
-		else
-			try {
-				switch(strtolower($dataProvider)) {
-					case "mysqli":
-					case "mysql":
-						if(extension_loaded("mysqli")) {
-							$settings = (array) $this->getConfig()->get("MySQLSettings");
-							$this->dataProvider = new MySQLProvider($this, $cacheSize, $settings);
-						}else {
-							$this->getLogger()->warning("MySQLi is not installed in your php build! JSON will be used instead.");
-							$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
-						}
-					break;
-					case "yaml":
-						if(extension_loaded("yaml")) {
-							$this->dataProvider = new ConfigDataProvider($this, $cacheSize, true);
-						}else {
-							$this->getLogger()->warning("YAML is not installed in your php build! JSON will be used instead.");
-							$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
-						}
-					break;
-					case "sqlite3":
-					case "sqlite":
-						if(extension_loaded("sqlite3")) {
-							$this->dataProvider = new SQLiteDataProvider($this, $cacheSize);
-						}else {
-							$this->getLogger()->warning("SQLite3 is not installed in your php build! JSON will be used instead.");
-							$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
-						}
-					break;
-					case "json":
-					default:
-						$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
-					break;
-				}
-			}catch(\Exception $e) {
-				$this->getLogger()->error("The selected data provider crashed. JSON will be used instead.");
-				$this->dataProvider = new ConfigDataProvider($this, $cacheSize);
-			}
+		$this->dataProvider = new DataProvider($this);
 		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings");
 		if($this->getConfig()->get("FastClearing", false) === true and $this->getServer()->getPluginManager()->getPlugin("WorldStyler") === null) {
 			$this->getConfig()->set("FastClearing", false);

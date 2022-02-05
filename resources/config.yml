@@ -37,17 +37,25 @@ Custom Messages: false
 UI Forms: true
 
 # The data provider where plot data is stored.
-# Current providers are: sqlite, mysql, json, and yaml.
-DataProvider: sqlite
+database:
+  # The database type. "sqlite" and "mysql" are supported.
+  type: sqlite
 
-# contains settings for mysql provider to use when selected
-MySQLSettings:
-  Host: 127.0.0.1
-  Port: 3306
-  Username: default
-  Password: password
-  DatabaseName: MyPlot
-  ShutdownOnFailure: false
+  # Edit these settings only if you choose "sqlite".
+  sqlite:
+    # The file name of the database in the plugin data folder.
+    # You can also put an absolute path here.
+    file: plots.db
+  # Edit these settings only if you choose "mysql".
+  mysql:
+    host: 127.0.0.1
+    # Avoid using the "root" user for security reasons.
+    username: default
+    password: password
+    schema: myplot
+  # The maximum number of simultaneous SQL queries
+  # Recommended: 1 for sqlite, 2 for MySQL. You may want to further increase this value if your MySQL connection is very slow.
+  worker-limit: 1
 
 # Use an economy with MyPlot. This will allow for plot pricing such as claiming, clearing, etc.
 # Currently supported economy plugins: Economy$

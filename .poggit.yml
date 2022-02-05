@@ -4,6 +4,8 @@ projects:
     icon: "icon.png"
     path: ""
     libs:
+      - src: poggit/libasynql/libasynql
+        version: ^3.3.0
       - src: dktapps-pm-pl/pmforms/pmforms
         version: ^2.0.0
     lint: false
