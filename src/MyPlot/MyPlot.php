@@ -458,47 +458,69 @@ class MyPlot extends PluginBase
 	 *
 	 * @param Position $position
 	 *
-	 * @return Plot|null
+	 * @return Promise
+	 * @phpstan-return Promise<Plot|null>
 	 */
-	public function getPlotBorderingPosition(Position $position) : ?Plot {
-		if(!$position->isValid())
-			return null;
-		for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
-			$pos = $position->getSide($i);
-			$x = $pos->x;
-			$z = $pos->z;
-			$levelName = $pos->getWorld()->getFolderName();
-
-			if(!$this->isLevelLoaded($levelName))
+	public function getPlotBorderingPosition(Position $position) : Promise{
+		$resolver = new PromiseResolver();
+		Await::f2c(function() use ($position){
+			if(!$position->isValid())
 				return null;
+			foreach(Facing::HORIZONTAL as $i){
+				$pos = $position->getSide($i);
+				$x = $pos->x;
+				$z = $pos->z;
+				$levelName = $pos->getWorld()->getFolderName();
 
-			$plotLevel = $this->getLevelSettings($levelName);
-			$plotSize = $plotLevel->plotSize;
-			$roadWidth = $plotLevel->roadWidth;
-			$totalSize = $plotSize + $roadWidth;
-			if($x >= 0) {
-				$X = (int) floor($x / $totalSize);
-				$difX = $x % $totalSize;
-			}else{
-				$X = (int) ceil(($x - $plotSize + 1) / $totalSize);
-				$difX = abs(($x - $plotSize + 1) % $totalSize);
-			}
-			if($z >= 0) {
-				$Z = (int) floor($z / $totalSize);
-				$difZ = $z % $totalSize;
-			}else{
-				$Z = (int) ceil(($z - $plotSize + 1) / $totalSize);
-				$difZ = abs(($z - $plotSize + 1) % $totalSize);
-			}
-			if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
-				if($this->getPlotByPosition($pos) instanceof Plot) {
-					return $this->getPlotByPosition($pos);
+				if(!$this->isLevelLoaded($levelName))
+					return null;
+
+				$plotLevel = $this->getLevelSettings($levelName);
+				$plotSize = $plotLevel->plotSize;
+				$roadWidth = $plotLevel->roadWidth;
+				$totalSize = $plotSize + $roadWidth;
+				if($x >= 0){
+					$X = (int) floor($x / $totalSize);
+					$difX = $x % $totalSize;
+				}else{
+					$X = (int) ceil(($x - $plotSize + 1) / $totalSize);
+					$difX = abs(($x - $plotSize + 1) % $totalSize);
 				}
-				continue;
+				if($z >= 0){
+					$Z = (int) floor($z / $totalSize);
+					$difZ = $z % $totalSize;
+				}else{
+					$Z = (int) ceil(($z - $plotSize + 1) / $totalSize);
+					$difZ = abs(($z - $plotSize + 1) % $totalSize);
+				}
+				if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)){
+					$basePlot = yield $this->dataProvider->getPlot($levelName, $x, $z);
+					if(!$basePlot->isMerged())
+						return null;
+
+					// no plot found at current location yet, so search cardinal directions
+					$plotN = $basePlot->getSide(Facing::NORTH);
+					if($plotN->isSame($basePlot))
+						return yield $this->dataProvider->getMergeOrigin($plotN);
+
+					$plotS = $basePlot->getSide(Facing::SOUTH);
+					if($plotS->isSame($basePlot))
+						return yield $this->dataProvider->getMergeOrigin($plotS);
+
+					$plotE = $basePlot->getSide(Facing::EAST);
+					if($plotE->isSame($basePlot))
+						return yield $this->dataProvider->getMergeOrigin($plotE);
+
+					$plotW = $basePlot->getSide(Facing::WEST);
+					if($plotW->isSame($basePlot))
+						return yield $this->dataProvider->getMergeOrigin($plotW);
+					continue;
+				}
+				return yield $this->dataProvider->getPlot($levelName, $X, $Z);
 			}
-			return $this->dataProvider->getPlot($levelName, $X, $Z);
-		}
-		return null;
+			return null;
+		});
+		return $resolver->getPromise();
 	}
 
 	/**
