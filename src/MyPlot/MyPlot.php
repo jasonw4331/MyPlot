@@ -310,7 +310,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return Plot|null
 	 */
-	private function getPlotFast(float &$x, float &$z, PlotLevelSettings $plotLevel) : ?Plot {
+	public function getPlotFast(float &$x, float &$z, PlotLevelSettings $plotLevel) : ?Plot{
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
@@ -331,7 +331,7 @@ class MyPlot extends PluginBase
 		if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1))
 			return null;
 
-		return $this->dataProvider->getPlot($plotLevel->name, $x, $z);
+		return new Plot($plotLevel->name, $x, $z);
 	}
 
 	/**
