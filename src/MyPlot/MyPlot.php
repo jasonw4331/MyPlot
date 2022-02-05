@@ -1211,13 +1211,26 @@ class MyPlot extends PluginBase
 		return $resolver->getPromise();
 	}
 
-	public function setPlotPvp(Plot $plot, bool $pvp) : bool {
+	/**
+	 * TODO: description
+	 *
+	 * @api
+	 *
+	 * @param Plot $plot
+	 * @param bool $pvp
+	 *
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
+	 */
+	public function setPlotPvp(Plot $plot, bool $pvp) : Promise {
+		$resolver = new PromiseResolver();
 		$newPlot = clone $plot;
 		$newPlot->pvp = $pvp;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
 		$ev->call();
 		if($ev->isCancelled()) {
-			return false;
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
 		return $this->savePlot($ev->getPlot());
 	}
