@@ -1154,15 +1154,18 @@ class MyPlot extends PluginBase
 	 * @param Plot $plot
 	 * @param Biome $biome
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function setPlotBiome(Plot $plot, Biome $biome) : bool {
+	public function setPlotBiome(Plot $plot, Biome $biome) : Promise {
+		$resolver = new PromiseResolver();
 		$newPlot = clone $plot;
 		$newPlot->biome = str_replace(" ", "_", strtoupper($biome->getName()));
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
 		$ev->call();
 		if($ev->isCancelled()) {
-			return false;
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
 		$plot = $ev->getPlot();
 		if(defined(BiomeIds::class."::".$plot->biome) and is_int(constant(BiomeIds::class."::".$plot->biome))) {
@@ -1171,30 +1174,41 @@ class MyPlot extends PluginBase
 			$biome = BiomeIds::PLAINS;
 		}
 		$biome = BiomeRegistry::getInstance()->getBiome($biome);
-		if(!$this->isLevelLoaded($plot->levelName))
-			return false;
-		$failed = false;
-		foreach($this->getProvider()->getMergedPlots($plot) as $merged) {
-			$merged->biome = $plot->biome;
-			if(!$this->savePlot($merged))
-				$failed = true;
+		if(!$this->isLevelLoaded($plot->levelName)){
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
-		$plotLevel = $this->getLevelSettings($plot->levelName);
-		$level = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
-		if($level === null)
-			return false;
-		foreach($this->getPlotChunks($plot) as [$chunkX, $chunkZ, $chunk]) {
-			for($x = 0; $x < 16; ++$x) {
-				for($z = 0; $z < 16; ++$z) {
-					$chunkPlot = $this->getPlotByPosition(new Position(($chunkX << 4) + $x, $plotLevel->groundHeight, ($chunkZ << 4) + $z, $level));
-					if($chunkPlot instanceof Plot and $chunkPlot->isSame($plot)) {
-						$chunk->setBiomeId($x, $z, $biome->getId());
-					}
+		Await::f2c(
+			function() use ($plot, $biome, $resolver) {
+				$failed = false;
+				foreach(yield $this->dataProvider->getMergedPlots($plot) as $merged){
+					$merged->biome = $plot->biome;
+					if(!yield $this->dataProvider->savePlot($merged))
+						$failed = true;
 				}
-			}
-			$level->setChunk($chunkX, $chunkZ, $chunk);
-		}
-		return !$failed;
+				$plotLevel = $this->getLevelSettings($plot->levelName);
+				$level = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
+				if($level === null) {
+					return false;
+				}
+				foreach($this->getPlotChunks($plot) as [$chunkX, $chunkZ, $chunk]) {
+					for($x = 0; $x < 16; ++$x) {
+						for($z = 0; $z < 16; ++$z) {
+							$pos = new Position(($chunkX << 4) + $x, $plotLevel->groundHeight, ($chunkZ << 4) + $z, $level);
+							$chunkPlot = $this->getPlotFast($pos->x, $pos->z, $plotLevel);
+							if($chunkPlot instanceof Plot and $chunkPlot->isSame($plot)) {
+								$chunk->setBiomeId($x, $z, $biome->getId());
+							}
+						}
+					}
+					$level->setChunk($chunkX, $chunkZ, $chunk);
+				}
+				return !$failed;
+			},
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	public function setPlotPvp(Plot $plot, bool $pvp) : bool {
