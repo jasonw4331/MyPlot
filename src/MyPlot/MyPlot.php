@@ -1259,13 +1259,26 @@ class MyPlot extends PluginBase
 		return $this->savePlot($ev->getPlot());
 	}
 
-	public function removePlotHelper(Plot $plot, string $player) : bool {
+	/**
+	 * TODO: description
+	 *
+	 * @api
+	 *
+	 * @param Plot   $plot
+	 * @param string $player
+	 *
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
+	 */
+	public function removePlotHelper(Plot $plot, string $player) : Promise {
+		$resolver = new PromiseResolver();
 		$newPlot = clone $plot;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
 		$newPlot->removeHelper($player) ? $ev->uncancel() : $ev->cancel();
 		$ev->call();
 		if($ev->isCancelled()) {
-			return false;
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
 		return $this->savePlot($ev->getPlot());
 	}
