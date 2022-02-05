@@ -342,23 +342,32 @@ class MyPlot extends PluginBase
 	 * @param Plot $plot
 	 * @param bool $mergeOrigin
 	 *
-	 * @return Position
+	 * @return Promise
+	 * @phpstan-return Promise<Position>
 	 */
-	public function getPlotPosition(Plot $plot, bool $mergeOrigin = true) : Position {
-		$plotLevel = $this->getLevelSettings($plot->levelName);
-		$origin = $this->dataProvider->getMergeOrigin($plot);
-		$plotSize = $plotLevel->plotSize;
-		$roadWidth = $plotLevel->roadWidth;
-		$totalSize = $plotSize + $roadWidth;
-		if ($mergeOrigin) {
-			$x = $totalSize * $origin->X;
-			$z = $totalSize * $origin->Z;
-		} else {
-			$x = $totalSize * $plot->X;
-			$z = $totalSize * $plot->Z;
-		}
-		$level = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
-		return new Position($x, $plotLevel->groundHeight, $z, $level);
+	public function getPlotPosition(Plot $plot, bool $mergeOrigin = true) : Promise{
+		$resolver = new PromiseResolver();
+		Await::f2c(
+			function() use ($plot, $mergeOrigin){
+				$plotLevel = $this->getLevelSettings($plot->levelName);
+				$origin = yield $this->dataProvider->getMergeOrigin($plot);
+				$plotSize = $plotLevel->plotSize;
+				$roadWidth = $plotLevel->roadWidth;
+				$totalSize = $plotSize + $roadWidth;
+				if($mergeOrigin){
+					$x = $totalSize * $origin->X;
+					$z = $totalSize * $origin->Z;
+				}else{
+					$x = $totalSize * $plot->X;
+					$z = $totalSize * $plot->Z;
+				}
+				$level = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
+				return new Position($x, $plotLevel->groundHeight, $z, $level);
+			},
+			fn(Position $position) => $resolver->resolve($position),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
