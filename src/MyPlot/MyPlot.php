@@ -768,18 +768,21 @@ class MyPlot extends PluginBase
 	 *
 	 * @api
 	 *
-	 * @param Plot $plot
+	 * @param Plot   $plot
 	 * @param string $newName
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function renamePlot(Plot $plot, string $newName = "") : bool {
+	public function renamePlot(Plot $plot, string $newName = "") : Promise{
 		$newPlot = clone $plot;
 		$newPlot->name = $newName;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
 		$ev->call();
-		if($ev->isCancelled()) {
-			return false;
+		if($ev->isCancelled()){
+			$resolver = new PromiseResolver();
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
 		return $this->savePlot($ev->getPlot());
 	}
