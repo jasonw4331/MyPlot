@@ -377,69 +377,78 @@ class MyPlot extends PluginBase
 	 *
 	 * @param Position $position
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function isPositionBorderingPlot(Position $position) : bool {
-		if(!$position->isValid())
-			return false;
-		for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
-			$pos = $position->getSide($i);
-			$x = $pos->x;
-			$z = $pos->z;
-			$levelName = $pos->getWorld()->getFolderName();
+	public function isPositionBorderingPlot(Position $position) : Promise{
+		$resolver = new PromiseResolver();
+		Await::f2c(
+			function() use ($position){
+				if(!$position->isValid())
+					return false;
+				foreach(Facing::HORIZONTAL as $i){
+					$pos = $position->getSide($i);
+					$x = $pos->x;
+					$z = $pos->z;
+					$levelName = $pos->getWorld()->getFolderName();
 
-			if(!$this->isLevelLoaded($levelName))
+					if(!$this->isLevelLoaded($levelName))
+						return false;
+
+					$plotLevel = $this->getLevelSettings($levelName);
+					$plotSize = $plotLevel->plotSize;
+					$roadWidth = $plotLevel->roadWidth;
+					$totalSize = $plotSize + $roadWidth;
+					if($x >= 0){
+						$difX = $x % $totalSize;
+					}else{
+						$difX = abs(($x - $plotSize + 1) % $totalSize);
+					}
+					if($z >= 0){
+						$difZ = $z % $totalSize;
+					}else{
+						$difZ = abs(($z - $plotSize + 1) % $totalSize);
+					}
+					if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)){
+						continue;
+					}
+					return true;
+				}
+				foreach(Facing::HORIZONTAL as $i){
+					foreach(Facing::HORIZONTAL as $n){
+						if($i === $n or Facing::opposite($i) === $n)
+							continue;
+						$pos = $position->getSide($i)->getSide($n);
+						$x = $pos->x;
+						$z = $pos->z;
+						$levelName = $pos->getWorld()->getFolderName();
+
+						$plotLevel = $this->getLevelSettings($levelName);
+						$plotSize = $plotLevel->plotSize;
+						$roadWidth = $plotLevel->roadWidth;
+						$totalSize = $plotSize + $roadWidth;
+						if($x >= 0){
+							$difX = $x % $totalSize;
+						}else{
+							$difX = abs(($x - $plotSize + 1) % $totalSize);
+						}
+						if($z >= 0){
+							$difZ = $z % $totalSize;
+						}else{
+							$difZ = abs(($z - $plotSize + 1) % $totalSize);
+						}
+						if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)){
+							continue;
+						}
+						return true;
+					}
+				}
 				return false;
-
-			$plotLevel = $this->getLevelSettings($levelName);
-			$plotSize = $plotLevel->plotSize;
-			$roadWidth = $plotLevel->roadWidth;
-			$totalSize = $plotSize + $roadWidth;
-			if($x >= 0) {
-				$difX = $x % $totalSize;
-			}else{
-				$difX = abs(($x - $plotSize + 1) % $totalSize);
-			}
-			if($z >= 0) {
-				$difZ = $z % $totalSize;
-			}else{
-				$difZ = abs(($z - $plotSize + 1) % $totalSize);
-			}
-			if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
-				continue;
-			}
-			return true;
-		}
-		for($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
-			for($n = Facing::NORTH; $n <= Facing::EAST; ++$n) {
-				if($i === $n or Facing::opposite($i) === $n)
-					continue;
-				$pos = $position->getSide($i)->getSide($n);
-				$x = $pos->x;
-				$z = $pos->z;
-				$levelName = $pos->getWorld()->getFolderName();
-
-				$plotLevel = $this->getLevelSettings($levelName);
-				$plotSize = $plotLevel->plotSize;
-				$roadWidth = $plotLevel->roadWidth;
-				$totalSize = $plotSize + $roadWidth;
-				if($x >= 0) {
-					$difX = $x % $totalSize;
-				}else{
-					$difX = abs(($x - $plotSize + 1) % $totalSize);
-				}
-				if($z >= 0) {
-					$difZ = $z % $totalSize;
-				}else{
-					$difZ = abs(($z - $plotSize + 1) % $totalSize);
-				}
-				if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1)) {
-					continue;
-				}
-				return true;
-			}
-		}
-		return false;
+			},
+			fn(bool $isBordering) => $resolver->resolve($isBordering),
+			fn() => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
