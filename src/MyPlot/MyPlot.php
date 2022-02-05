@@ -907,103 +907,113 @@ class MyPlot extends PluginBase
 	 * @param Plot $plot
 	 * @param int $maxBlocksPerTick
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+	public function clearPlot(Plot $plot, int $maxBlocksPerTick = 256) : Promise {
+		$resolver = new PromiseResolver();
 		$ev = new MyPlotClearEvent($plot, $maxBlocksPerTick);
 		$ev->call();
 		if($ev->isCancelled()) {
-			return false;
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
 		$plot = $ev->getPlot();
 		if(!$this->isLevelLoaded($plot->levelName)) {
-			return false;
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
 		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
 		$level = $this->getServer()->getWorldManager()->getWorldByName($plot->levelName);
-		if($level === null)
-			return false;
-		foreach($level->getEntities() as $entity) {
-			if($this->getPlotBB($plot)->isVectorInXZ($entity->getPosition())) {
-				if(!$entity instanceof Player) {
-					$entity->flagForDespawn();
-				}else{
-					$this->teleportPlayerToPlot($entity, $plot);
+		if($level === null){
+			$resolver->resolve(false);
+			return $resolver->getPromise();
+		}
+		Await::f2c(
+			function() use ($plot, $maxBlocksPerTick, $level) : \Generator {
+				foreach($level->getEntities() as $entity) {
+					if((yield $this->getPlotBB($plot))->isVectorInXZ($entity->getPosition())) {
+						if(!$entity instanceof Player) {
+							$entity->flagForDespawn();
+						}else{
+							$this->teleportPlayerToPlot($entity, $plot);
+						}
+					}
 				}
-			}
-		}
-		if($this->getConfig()->get("FastClearing", false) === true) {
-			$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
-			if(!$styler instanceof WorldStyler) {
-				return false;
-			}
-			$plotLevel = $this->getLevelSettings($plot->levelName);
-			$plotSize = $plotLevel->plotSize-1;
-			$plotBeginPos = $this->getPlotPosition($plot);
-			$xMax = (int)($plotBeginPos->x + $plotSize);
-			$zMax = (int)($plotBeginPos->z + $plotSize);
-			foreach ($this->getProvider()->getMergedPlots($plot) as $mergedPlot){
-				$xplot = $this->getPlotPosition($mergedPlot, false)->x;
-				$zplot = $this->getPlotPosition($mergedPlot, false)->z;
-				$xMaxPlot = (int)($xplot + $plotSize);
-				$zMaxPlot = (int)($zplot + $plotSize);
-				if($plotBeginPos->x > $xplot) $plotBeginPos->x = $xplot;
-				if($plotBeginPos->z > $zplot) $plotBeginPos->z = $zplot;
-				if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
-				if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
-			}
-			// Above ground
-			$selection = $styler->getSelection(99998) ?? new Selection(99998);
-			$plotBeginPos->y = $plotLevel->groundHeight+1;
-			$selection->setPosition(1, $plotBeginPos);
-			$selection->setPosition(2, new Vector3($xMax, World::Y_MAX, $zMax));
-			$cuboid = Cuboid::fromSelection($selection);
-			//$cuboid = $cuboid->async();
-			$cuboid->set($plotBeginPos->getWorld(), VanillaBlocks::AIR()->getFullId(), function (float $time, int $changed) : void {
-				$this->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-			});
-			$styler->removeSelection(99998);
-			// Ground Surface
-			$selection = $styler->getSelection(99998) ?? new Selection(99998);
-			$plotBeginPos->y = $plotLevel->groundHeight;
-			$selection->setPosition(1, $plotBeginPos);
-			$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight, $zMax));
-			$cuboid = Cuboid::fromSelection($selection);
-			//$cuboid = $cuboid->async();
-			$cuboid->set($plotBeginPos->getWorld(), $plotLevel->plotFloorBlock->getFullId(), function (float $time, int $changed) : void {
-				$this->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-			});
-			$styler->removeSelection(99998);
-			// Ground
-			$selection = $styler->getSelection(99998) ?? new Selection(99998);
-			$plotBeginPos->y = 1;
-			$selection->setPosition(1, $plotBeginPos);
-			$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight-1, $zMax));
-			$cuboid = Cuboid::fromSelection($selection);
-			//$cuboid = $cuboid->async();
-			$cuboid->set($plotBeginPos->getWorld(), $plotLevel->plotFillBlock->getFullId(), function (float $time, int $changed) : void {
-				$this->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-			});
-			$styler->removeSelection(99998);
-			// Bottom of world
-			$selection = $styler->getSelection(99998) ?? new Selection(99998);
-			$plotBeginPos->y = 0;
-			$selection->setPosition(1, $plotBeginPos);
-			$selection->setPosition(2, new Vector3($xMax, 0, $zMax));
-			$cuboid = Cuboid::fromSelection($selection);
-			//$cuboid = $cuboid->async();
-			$cuboid->set($plotBeginPos->getWorld(), $plotLevel->bottomBlock->getFullId(), function (float $time, int $changed) : void {
-				$this->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-			});
-			$styler->removeSelection(99998);
-			foreach($this->getPlotChunks($plot) as [$chunkX, $chunkZ, $chunk]) {
-				$plotBeginPos->getWorld()->setChunk($chunkX, $chunkZ, $chunk);
-			}
-			$this->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this, $plot), 1);
-			return true;
-		}
-		$this->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
-		return true;
+				$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
+				if($this->getConfig()->get("FastClearing", false) === true && $styler instanceof WorldStyler) {
+					$plotLevel = $this->getLevelSettings($plot->levelName);
+					$plotSize = $plotLevel->plotSize-1;
+					$plotBeginPos = yield AsyncVariants::getPlotPosition($plot);
+					$xMax = (int)($plotBeginPos->x + $plotSize);
+					$zMax = (int)($plotBeginPos->z + $plotSize);
+					foreach(yield $this->dataProvider->getMergedPlots($plot) as $mergedPlot){
+						$xplot = (yield AsyncVariants::getPlotPosition($mergedPlot, false))->x;
+						$zplot = (yield AsyncVariants::getPlotPosition($mergedPlot, false))->z;
+						$xMaxPlot = (int) ($xplot + $plotSize);
+						$zMaxPlot = (int) ($zplot + $plotSize);
+						if($plotBeginPos->x > $xplot) $plotBeginPos->x = $xplot;
+						if($plotBeginPos->z > $zplot) $plotBeginPos->z = $zplot;
+						if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+						if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+					}
+					// Above ground
+					$selection = $styler->getSelection(99998) ?? new Selection(99998);
+					$plotBeginPos->y = $plotLevel->groundHeight+1;
+					$selection->setPosition(1, $plotBeginPos);
+					$selection->setPosition(2, new Vector3($xMax, World::Y_MAX, $zMax));
+					$cuboid = Cuboid::fromSelection($selection);
+					//$cuboid = $cuboid->async();
+					$cuboid->set($plotBeginPos->getWorld(), VanillaBlocks::AIR()->getFullId(), function (float $time, int $changed) : void {
+						$this->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+					});
+					$styler->removeSelection(99998);
+					// Ground Surface
+					$selection = $styler->getSelection(99998) ?? new Selection(99998);
+					$plotBeginPos->y = $plotLevel->groundHeight;
+					$selection->setPosition(1, $plotBeginPos);
+					$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight, $zMax));
+					$cuboid = Cuboid::fromSelection($selection);
+					//$cuboid = $cuboid->async();
+					$cuboid->set($plotBeginPos->getWorld(), $plotLevel->plotFloorBlock->getFullId(), function (float $time, int $changed) : void {
+						$this->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+					});
+					$styler->removeSelection(99998);
+					// Ground
+					$selection = $styler->getSelection(99998) ?? new Selection(99998);
+					$plotBeginPos->y = 1;
+					$selection->setPosition(1, $plotBeginPos);
+					$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight-1, $zMax));
+					$cuboid = Cuboid::fromSelection($selection);
+					//$cuboid = $cuboid->async();
+					$cuboid->set($plotBeginPos->getWorld(), $plotLevel->plotFillBlock->getFullId(), function (float $time, int $changed) : void {
+						$this->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+					});
+					$styler->removeSelection(99998);
+					// Bottom of world
+					$selection = $styler->getSelection(99998) ?? new Selection(99998);
+					$plotBeginPos->y = 0;
+					$selection->setPosition(1, $plotBeginPos);
+					$selection->setPosition(2, new Vector3($xMax, 0, $zMax));
+					$cuboid = Cuboid::fromSelection($selection);
+					//$cuboid = $cuboid->async();
+					$cuboid->set($plotBeginPos->getWorld(), $plotLevel->bottomBlock->getFullId(), function (float $time, int $changed) : void {
+						$this->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+					});
+					$styler->removeSelection(99998);
+					foreach($this->getPlotChunks($plot) as [$chunkX, $chunkZ, $chunk]) {
+						$plotBeginPos->getWorld()->setChunk($chunkX, $chunkZ, $chunk);
+					}
+					$this->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this, $plot), 1);
+					return true;
+				}
+				$this->getScheduler()->scheduleTask(new ClearPlotTask($this, $plot, $maxBlocksPerTick));
+				return true;
+			},
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
