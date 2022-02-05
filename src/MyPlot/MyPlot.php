@@ -234,12 +234,19 @@ class MyPlot extends PluginBase
 	 * @api
 	 *
 	 * @param string $levelName
-	 * @param int $limitXZ
+	 * @param int    $limitXZ
 	 *
-	 * @return Plot|null
+	 * @return Promise
+	 * @phpstan-return Promise<Plot|null>
 	 */
-	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : ?Plot {
-		return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
+	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : Promise{
+		$resolver = new PromiseResolver();
+		Await::g2c(
+			$this->dataProvider->getNextFreePlot($levelName, $limitXZ),
+			fn(?Plot $plot) => $resolver->resolve($plot),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
