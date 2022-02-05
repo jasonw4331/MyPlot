@@ -1117,20 +1117,33 @@ class MyPlot extends PluginBase
 	 *
 	 * @api
 	 *
+	 * @noinspection PhpVoidFunctionResultUsedInspection
+	 *
 	 * @param Plot $plot
 	 * @param int $maxBlocksPerTick
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 256) : bool {
+	public function resetPlot(Plot $plot, int $maxBlocksPerTick = 256) : Promise {
+		$resolver = new PromiseResolver();
 		$ev = new MyPlotResetEvent($plot);
 		$ev->call();
-		if($ev->isCancelled())
-			return false;
-		if($this->disposePlot($plot)) {
-			return $this->clearPlot($plot, $maxBlocksPerTick);
+		if($ev->isCancelled()) {
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
-		return false;
+		Await::g2c(
+			$this->dataProvider->deletePlot($plot),
+			fn(bool $success) =>
+				$success &&
+				$this->clearPlot($plot, $maxBlocksPerTick)->onCompletion(
+					fn(bool $success) => $resolver->resolve($success),
+					fn() => $resolver->reject()
+				),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
