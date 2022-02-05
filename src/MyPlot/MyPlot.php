@@ -212,13 +212,20 @@ class MyPlot extends PluginBase
 	 *
 	 * @api
 	 *
-	 * @param string $username
-	 * @param string $levelName
+	 * @param string      $username
+	 * @param string|null $levelName
 	 *
-	 * @return Plot[]
+	 * @return Promise
+	 * @phpstan-return Promise<array<Plot>>
 	 */
-	public function getPlotsOfPlayer(string $username, string $levelName) : array {
-		return $this->dataProvider->getPlotsByOwner($username, $levelName);
+	public function getPlotsOfPlayer(string $username, ?string $levelName = null) : Promise{
+		$resolver = new PromiseResolver();
+		Await::g2c(
+			$this->dataProvider->getPlotsByOwner($username, $levelName),
+			fn(array $plots) => $resolver->resolve($plots),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
