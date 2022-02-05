@@ -800,92 +800,103 @@ class MyPlot extends PluginBase
 	 * @param Plot $plotFrom
 	 * @param Plot $plotTo
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function clonePlot(Plot $plotFrom, Plot $plotTo) : bool {
+	public function clonePlot(Plot $plotFrom, Plot $plotTo) : Promise {
+		$resolver = new PromiseResolver();
 		$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
 		if(!$styler instanceof WorldStyler) {
-			return false;
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
 		if(!$this->isLevelLoaded($plotFrom->levelName) or !$this->isLevelLoaded($plotTo->levelName)) {
-			return false;
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
-		$world = $this->getServer()->getWorldManager()->getWorldByName($plotTo->levelName);
-		$aabb = $this->getPlotBB($plotTo);
-		foreach($world->getEntities() as $entity) {
-			if($aabb->isVectorInXZ($entity->getPosition())) {
-				if($entity instanceof Player){
-					$this->teleportPlayerToPlot($entity, $plotTo);
+		Await::f2c(
+			function() use ($plotFrom, $plotTo, $styler) {
+				$world = $this->getServer()->getWorldManager()->getWorldByName($plotTo->levelName);
+				$aabb = yield $this->getPlotBB($plotTo);
+				foreach($world->getEntities() as $entity) {
+					if($aabb->isVectorInXZ($entity->getPosition())) {
+						if($entity instanceof Player){
+							$this->teleportPlayerToPlot($entity, $plotTo);
+						}
+					}
 				}
-			}
-		}
-		$ev = new MyPlotCloneEvent($plotFrom, $plotTo);
-		$ev->call();
-		if($ev->isCancelled()) {
-			return false;
-		}
-		$plotFrom = $ev->getPlot();
-		$plotTo = $ev->getClonePlot();
-		if(!$this->isLevelLoaded($plotFrom->levelName) or !$this->isLevelLoaded($plotTo->levelName)) {
-			return false;
-		}
-		$plotLevel = $this->getLevelSettings($plotFrom->levelName);
-		$plotSize = $plotLevel->plotSize-1;
-		$plotBeginPos = $this->getPlotPosition($plotFrom);
-		$level = $plotBeginPos->getWorld();
-		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
-		$plotBeginPos->y = 0;
-		$xMax = (int)($plotBeginPos->x + $plotSize);
-		$zMax = (int)($plotBeginPos->z + $plotSize);
-		foreach ($this->getProvider()->getMergedPlots($plotFrom) as $mergedPlot){
-			$pos = $this->getPlotPosition($mergedPlot, false)->subtract(1,0,1);
-			$xMaxPlot = (int)($pos->x + $plotSize);
-			$zMaxPlot = (int)($pos->z + $plotSize);
-			if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
-			if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
-			if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
-			if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
-		}
-		$selection = $styler->getSelection(99997) ?? new Selection(99997);
-		$selection->setPosition(1, $plotBeginPos);
-		$vec2 = new Vector3($xMax + 1, $level->getMaxY() - 1, $zMax + 1);
-		$selection->setPosition(2, $vec2);
-		$cuboid = Cuboid::fromSelection($selection);
-		//$cuboid = $cuboid->async(); // do not use async because WorldStyler async is very broken right now
-		$cuboid->copy($level, $vec2, function (float $time, int $changed) : void {
-			$this->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's to the MyPlot clipboard.');
-		});
+				$ev = new MyPlotCloneEvent($plotFrom, $plotTo);
+				$ev->call();
+				if($ev->isCancelled()) {
+					return false;
+				}
+				$plotFrom = $ev->getPlot();
+				$plotTo = $ev->getClonePlot();
+				if(!$this->isLevelLoaded($plotFrom->levelName) or !$this->isLevelLoaded($plotTo->levelName)){
+					return false;
+				}
+				$plotLevel = $this->getLevelSettings($plotFrom->levelName);
+				$plotSize = $plotLevel->plotSize - 1;
+				$plotBeginPos = yield AsyncVariants::getPlotPosition($plotFrom);
+				$level = $plotBeginPos->getWorld();
+				$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
+				$plotBeginPos->y = 0;
+				$xMax = (int) ($plotBeginPos->x + $plotSize);
+				$zMax = (int) ($plotBeginPos->z + $plotSize);
+				foreach(yield $this->dataProvider->getMergedPlots($plotFrom) as $mergedPlot){
+					$pos = (yield AsyncVariants::getPlotPosition($mergedPlot, false))->subtract(1, 0, 1);
+					$xMaxPlot = (int) ($pos->x + $plotSize);
+					$zMaxPlot = (int) ($pos->z + $plotSize);
+					if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
+					if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
+					if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+					if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+				}
+				$selection = $styler->getSelection(99997) ?? new Selection(99997);
+				$selection->setPosition(1, $plotBeginPos);
+				$vec2 = new Vector3($xMax + 1, $level->getMaxY() - 1, $zMax + 1);
+				$selection->setPosition(2, $vec2);
+				$cuboid = Cuboid::fromSelection($selection);
+				//$cuboid = $cuboid->async(); // do not use async because WorldStyler async is very broken right now
+				$cuboid->copy($level, $vec2, function(float $time, int $changed) : void{
+					$this->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's to the MyPlot clipboard.');
+				});
 
-		$plotLevel = $this->getLevelSettings($plotTo->levelName);
-		$plotSize = $plotLevel->plotSize-1;
-		$plotBeginPos = $this->getPlotPosition($plotTo);
-		$level = $plotBeginPos->getWorld();
-		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
-		$plotBeginPos->y = 0;
-		$xMax = (int)($plotBeginPos->x + $plotSize);
-		$zMax = (int)($plotBeginPos->z + $plotSize);
-		foreach ($this->getProvider()->getMergedPlots($plotTo) as $mergedPlot){
-			$pos = $this->getPlotPosition($mergedPlot, false)->subtract(1,0,1);
-			$xMaxPlot = (int)($pos->x + $plotSize);
-			$zMaxPlot = (int)($pos->z + $plotSize);
-			if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
-			if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
-			if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
-			if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
-		}
-		$selection->setPosition(1, $plotBeginPos);
-		$vec2 = new Vector3($xMax + 1, $level->getMaxY() - 1, $zMax + 1);
-		$selection->setPosition(2, $vec2);
-		$commonShape = CommonShape::fromSelection($selection);
-		//$commonShape = $commonShape->async(); // do not use async because WorldStyler async is very broken right now
-		$commonShape->paste($level, $vec2, true, function (float $time, int $changed) : void {
-			$this->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from the MyPlot clipboard.');
-		});
-		$styler->removeSelection(99997);
-		foreach($this->getPlotChunks($plotTo) as [$chunkX, $chunkZ, $chunk]) {
-			$level->setChunk($chunkX, $chunkZ, $chunk);
-		}
-		return true;
+				$plotLevel = $this->getLevelSettings($plotTo->levelName);
+				$plotSize = $plotLevel->plotSize - 1;
+				$plotBeginPos = yield AsyncVariants::getPlotPosition($plotTo);
+				$level = $plotBeginPos->getWorld();
+				$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
+				$plotBeginPos->y = 0;
+				$xMax = (int) ($plotBeginPos->x + $plotSize);
+				$zMax = (int) ($plotBeginPos->z + $plotSize);
+				foreach(yield $this->dataProvider->getMergedPlots($plotTo) as $mergedPlot){
+					$pos = (yield AsyncVariants::getPlotPosition($mergedPlot, false))->subtract(1, 0, 1);
+					$xMaxPlot = (int) ($pos->x + $plotSize);
+					$zMaxPlot = (int) ($pos->z + $plotSize);
+					if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
+					if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
+					if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+					if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+				}
+				$selection->setPosition(1, $plotBeginPos);
+				$vec2 = new Vector3($xMax + 1, $level->getMaxY() - 1, $zMax + 1);
+				$selection->setPosition(2, $vec2);
+				$commonShape = CommonShape::fromSelection($selection);
+				//$commonShape = $commonShape->async(); // do not use async because WorldStyler async is very broken right now
+				$commonShape->paste($level, $vec2, true, function (float $time, int $changed) : void {
+					$this->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from the MyPlot clipboard.');
+				});
+				$styler->removeSelection(99997);
+				foreach($this->getPlotChunks($plotTo) as [$chunkX, $chunkZ, $chunk]) {
+					$level->setChunk($chunkX, $chunkZ, $chunk);
+				}
+				return true;
+			},
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
