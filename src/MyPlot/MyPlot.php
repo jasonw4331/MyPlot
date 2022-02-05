@@ -573,83 +573,95 @@ class MyPlot extends PluginBase
 	}
 
 	/**
+	 * TODO: description
+	 *
+	 * @api
+	 *
 	 * @param Plot $plot The plot that is to be expanded
 	 * @param int  $direction The Vector3 direction value to expand towards
 	 * @param int  $maxBlocksPerTick
 	 *
-	 * @return bool
-	 * @throws \Exception
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function mergePlots(Plot $plot, int $direction, int $maxBlocksPerTick = 256) : bool {
-		if (!$this->isLevelLoaded($plot->levelName))
-			return false;
-		/** @var Plot[][] $toMerge */
-		$toMerge = [];
-		$mergedPlots = $this->getProvider()->getMergedPlots($plot);
-		$newPlot = $plot->getSide($direction);
-		$alreadyMerged = false;
-		foreach ($mergedPlots as $mergedPlot) {
-			if ($mergedPlot->isSame($newPlot)) {
-				$alreadyMerged = true;
-			}
-		}
-		if ($alreadyMerged === false and $newPlot->isMerged()) {
-			$this->getLogger()->debug("Failed to merge due to plot origin mismatch");
-			return false;
-		}
-		$toMerge[] = [$plot, $newPlot];
-
-		foreach ($mergedPlots as $mergedPlot) {
-			$newPlot = $mergedPlot->getSide($direction);
-			$alreadyMerged = false;
-			foreach ($mergedPlots as $mergedPlot2) {
-				if ($mergedPlot2->isSame($newPlot)) {
-					$alreadyMerged = true;
-				}
-			}
-			if ($alreadyMerged === false and $newPlot->isMerged()) {
-				$this->getLogger()->debug("Failed to merge due to plot origin mismatch");
-				return false;
-			}
-			$toMerge[] = [$mergedPlot, $newPlot];
-		}
-		/** @var Plot[][] $toFill */
-		$toFill = [];
-		foreach ($toMerge as $pair) {
-			foreach ($toMerge as $pair2) {
-				for ($i = Facing::NORTH; $i <= Facing::EAST; ++$i) {
-					if ($pair[1]->getSide($i)->isSame($pair2[1])) {
-						$toFill[] = [$pair[1], $pair2[1]];
+	public function mergePlots(Plot $plot, int $direction, int $maxBlocksPerTick = 256) : Promise{
+		$resolver = new PromiseResolver();
+		Await::f2c(
+			function() use ($plot, $direction, $maxBlocksPerTick){
+				if(!$this->isLevelLoaded($plot->levelName))
+					return false;
+				/** @var Plot[][] $toMerge */
+				$toMerge = [];
+				$mergedPlots = yield $this->dataProvider->getMergedPlots($plot);
+				$newPlot = $plot->getSide($direction);
+				$alreadyMerged = false;
+				foreach($mergedPlots as $mergedPlot){
+					if($mergedPlot->isSame($newPlot)){
+						$alreadyMerged = true;
 					}
 				}
-			}
-		}
-		$ev = new MyPlotMergeEvent($this->getProvider()->getMergeOrigin($plot), $toMerge);
-		$ev->call();
-		if($ev->isCancelled()) {
-			return false;
-		}
-		foreach ($toMerge as $pair) {
-			if ($pair[1]->owner === "") {
-				$this->getLogger()->debug("Failed to merge due to plot not claimed");
-				return false;
-			} elseif ($plot->owner !== $pair[1]->owner) {
-				$this->getLogger()->debug("Failed to merge due to owner mismatch");
-				return false;
-			}
-		}
+				if($alreadyMerged === false and $newPlot->isMerged()){
+					$this->getLogger()->debug("Failed to merge due to plot origin mismatch");
+					return false;
+				}
+				$toMerge[] = [$plot, $newPlot];
 
-		// TODO: WorldStyler clearing
+				foreach($mergedPlots as $mergedPlot) {
+					$newPlot = $mergedPlot->getSide($direction);
+					$alreadyMerged = false;
+					foreach($mergedPlots as $mergedPlot2){
+						if($mergedPlot2->isSame($newPlot)){
+							$alreadyMerged = true;
+						}
+					}
+					if($alreadyMerged === false and $newPlot->isMerged()){
+						$this->getLogger()->debug("Failed to merge due to plot origin mismatch");
+						return false;
+					}
+					$toMerge[] = [$mergedPlot, $newPlot];
+				}
+				/** @var Plot[][] $toFill */
+				$toFill = [];
+				foreach($toMerge as $pair) {
+					foreach($toMerge as $pair2) {
+						foreach(Facing::HORIZONTAL as $i) {
+							if($pair[1]->getSide($i)->isSame($pair2[1])) {
+								$toFill[] = [$pair[1], $pair2[1]];
+							}
+						}
+					}
+				}
+				$ev = new MyPlotMergeEvent(yield $this->dataProvider->getMergeOrigin($plot), $toMerge);
+				$ev->call();
+				if($ev->isCancelled()) {
+					return false;
+				}
+				foreach($toMerge as $pair) {
+					if($pair[1]->owner === "") {
+						$this->getLogger()->debug("Failed to merge due to plot not claimed");
+						return false;
+					}elseif($plot->owner !== $pair[1]->owner) {
+						$this->getLogger()->debug("Failed to merge due to owner mismatch");
+						return false;
+					}
+				}
 
-		foreach ($toMerge as $pair)
-			$this->getScheduler()->scheduleTask(new RoadFillTask($this, $pair[0], $pair[1], false, -1, $maxBlocksPerTick));
+				// TODO: WorldStyler clearing
 
-		foreach ($toFill as $pair)
-			$this->getScheduler()->scheduleTask(new RoadFillTask($this, $pair[0], $pair[1], true, $direction, $maxBlocksPerTick));
+				foreach($toMerge as $pair)
+					$this->getScheduler()->scheduleTask(new RoadFillTask($this, $pair[0], $pair[1], false, -1, $maxBlocksPerTick));
 
-		return $this->getProvider()->mergePlots($this->getProvider()->getMergeOrigin($plot), ...array_map(function (array $val) : Plot {
-			return $val[1];
-		}, $toMerge));
+				foreach($toFill as $pair)
+					$this->getScheduler()->scheduleTask(new RoadFillTask($this, $pair[0], $pair[1], true, $direction, $maxBlocksPerTick));
+
+				return yield $this->dataProvider->mergePlots(yield $this->dataProvider->getMergeOrigin($plot), ...array_map(function(array $val) : Plot{
+					return $val[1];
+				}, $toMerge));
+			},
+			fn(bool $result) => $resolver->resolve($result),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
