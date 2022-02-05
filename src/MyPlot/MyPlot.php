@@ -738,33 +738,44 @@ class MyPlot extends PluginBase
 	 *
 	 * @api
 	 *
-	 * @param Plot $plot
+	 * @param Plot   $plot
 	 * @param string $claimer
 	 * @param string $plotName
 	 *
-	 * @return bool
+	 * @return Promise
+	 * @phpstan-return Promise<bool>
 	 */
-	public function claimPlot(Plot $plot, string $claimer, string $plotName = "") : bool {
+	public function claimPlot(Plot $plot, string $claimer, string $plotName = "") : Promise{
+		$resolver = new PromiseResolver();
 		$newPlot = clone $plot;
 		$newPlot->owner = $claimer;
 		$newPlot->price = 0.0;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
 		$ev->call();
-		if($ev->isCancelled()) {
-			return false;
+		if($ev->isCancelled()){
+			$resolver->resolve(false);
+			return $resolver->getPromise();
 		}
 		$plot = $ev->getPlot();
-		$failed = false;
-		foreach($this->getProvider()->getMergedPlots($plot) as $merged) {
-			if($plotName !== "") {
-				$this->renamePlot($merged, $plotName);
-			}
-			$merged->owner = $claimer;
-			$merged->price = 0.0;
-			if(!$this->savePlot($merged))
-				$failed = true;
-		}
-		return !$failed;
+		Await::f2c(
+			function() use ($plot, $claimer, $plotName) : \Generator{
+				$failed = false;
+				foreach(yield $this->dataProvider->getMergedPlots($plot) as $merged) {
+					$merged->owner = $claimer;
+					$merged->price = 0.0;
+					if($plotName !== "")
+						$merged->name = $plotName;
+					$saved = yield $this->dataProvider->savePlot($plot);
+					if(!$saved) {
+						$failed = true;
+					}
+				}
+				return !$failed;
+			},
+			fn(bool $succeeded) => $resolver->resolve($succeeded),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
