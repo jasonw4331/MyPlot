@@ -31,16 +31,7 @@ use pocketmine\world\World;
 
 class EventListener implements Listener
 {
-	private MyPlot $plugin;
-
-	/**
-	 * EventListener constructor.
-	 *
-	 * @param MyPlot $plugin
-	 */
-	public function __construct(MyPlot $plugin) {
-		$this->plugin = $plugin;
-	}
+	public function __construct(private MyPlot $plugin, private InternalAPI $api) {}
 
 	/**
 	 * @ignoreCancelled false
@@ -66,7 +57,7 @@ class EventListener implements Listener
 			foreach(array_keys($default) as $key) {
 				$settings[$key] = $config->get((string)$key);
 			}
-			$this->plugin->addLevelSettings($levelName, new PlotLevelSettings($levelName, $settings));
+			$this->api->addLevelSettings($levelName, new PlotLevelSettings($levelName, $settings));
 
 			if($this->plugin->getConfig()->get('AllowFireTicking', false) === false) {
 				$ref = new \ReflectionClass($event->getWorld());
@@ -90,7 +81,7 @@ class EventListener implements Listener
 			return;
 		}
 		$levelName = $event->getWorld()->getFolderName();
-		if($this->plugin->unloadLevelSettings($levelName)) {
+		if($this->api->unloadLevelSettings($levelName)) {
 			$this->plugin->getLogger()->debug("Level " . $event->getWorld()->getFolderName() . " unloaded!");
 		}
 	}
@@ -137,7 +128,7 @@ class EventListener implements Listener
 
 	private function onEventOnBlock(BlockPlaceEvent|SignChangeEvent|PlayerInteractEvent|BlockBreakEvent $event) : void {
 		$levelName = $event->getBlock()->getPosition()->getWorld()->getFolderName();
-		if(!$this->plugin->isLevelLoaded($levelName)) {
+		if($this->api->getLevelSettings($levelName) === null) {
 			return;
 		}
 		$plot = $this->plugin->getPlotByPosition($event->getBlock()->getPosition());
@@ -162,7 +153,7 @@ class EventListener implements Listener
 				$endPos = clone $beginPos;
 				$beginPos->x += $maxLengthLeaves;
 				$beginPos->z += $maxLengthLeaves;
-				$plotSize = $this->plugin->getLevelSettings($levelName)->plotSize;
+				$plotSize = $this->api->getLevelSettings($levelName)->plotSize;
 				$endPos->x += $plotSize - $maxLengthLeaves;
 				$endPos->z += $plotSize - $maxLengthLeaves;
 				if($block->getPosition()->x >= $beginPos->x and $block->getPosition()->z >= $beginPos->z and $block->getPosition()->x < $endPos->x and $block->getPosition()->z < $endPos->z) {
@@ -171,7 +162,7 @@ class EventListener implements Listener
 			}
 		}elseif($event->getPlayer()->hasPermission("myplot.admin.build.road"))
 			return;
-		elseif($this->plugin->isPositionBorderingPlot($event->getBlock()->getPosition()) and $this->plugin->getLevelSettings($levelName)->editBorderBlocks) {
+		elseif($this->plugin->isPositionBorderingPlot($event->getBlock()->getPosition()) and $this->api->getLevelSettings($levelName)->editBorderBlocks) {
 			$plot = $this->plugin->getPlotBorderingPosition($event->getBlock()->getPosition());
 			if($plot instanceof Plot) {
 				$ev = new MyPlotBorderChangeEvent($plot, $event->getBlock(), $event->getPlayer(), $event);
@@ -201,7 +192,7 @@ class EventListener implements Listener
 			return;
 		}
 		$levelName = $event->getEntity()->getWorld()->getFolderName();
-		if(!$this->plugin->isLevelLoaded($levelName))
+		if($this->api->getLevelSettings($levelName) === null)
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getPosition());
 		if($plot === null) {
@@ -210,7 +201,7 @@ class EventListener implements Listener
 		}
 		$beginPos = $this->plugin->getPlotPosition($plot);
 		$endPos = clone $beginPos;
-		$levelSettings = $this->plugin->getLevelSettings($levelName);
+		$levelSettings = $this->api->getLevelSettings($levelName);
 		$plotSize = $levelSettings->plotSize;
 		$endPos->x += $plotSize;
 		$endPos->z += $plotSize;
@@ -237,9 +228,9 @@ class EventListener implements Listener
 		if(!$level instanceof World)
 			return;
 		$levelName = $level->getFolderName();
-		if(!$this->plugin->isLevelLoaded($levelName))
+		if($this->api->getLevelSettings($levelName) === null)
 			return;
-		$settings = $this->plugin->getLevelSettings($levelName);
+		$settings = $this->api->getLevelSettings($levelName);
 		if($settings->restrictEntityMovement and !($event->getEntity() instanceof Player)) {
 			$event->cancel();
 			$this->plugin->getLogger()->debug("Cancelled entity motion on " . $levelName);
@@ -257,9 +248,9 @@ class EventListener implements Listener
 			return;
 		}
 		$levelName = $event->getBlock()->getPosition()->getWorld()->getFolderName();
-		if(!$this->plugin->isLevelLoaded($levelName))
+		if($this->api->getLevelSettings($levelName) === null)
 			return;
-		$settings = $this->plugin->getLevelSettings($levelName);
+		$settings = $this->api->getLevelSettings($levelName);
 
 		$newBlockInPlot = ($plotA = $this->plugin->getPlotByPosition($event->getBlock()->getPosition())) instanceof Plot;
 		$sourceBlockInPlot = ($plotB = $this->plugin->getPlotByPosition($event->getSource()->getPosition())) instanceof Plot;
@@ -305,7 +296,7 @@ class EventListener implements Listener
 
 	private function onEventOnMove(Player $player, EntityTeleportEvent|PlayerMoveEvent $event) : void {
 		$levelName = $player->getWorld()->getFolderName();
-		if (!$this->plugin->isLevelLoaded($levelName))
+		if ($this->api->getLevelSettings($levelName) === null)
 			return;
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
@@ -367,10 +358,10 @@ class EventListener implements Listener
 		$damager = $event->getDamager();
 		if($damaged instanceof Player and $damager instanceof Player and !$event->isCancelled()) {
 			$levelName = $damaged->getWorld()->getFolderName();
-			if(!$this->plugin->isLevelLoaded($levelName)) {
+			if($this->api->getLevelSettings($levelName) === null) {
 				return;
 			}
-			$settings = $this->plugin->getLevelSettings($levelName);
+			$settings = $this->api->getLevelSettings($levelName);
 			$plot = $this->plugin->getPlotByPosition($damaged->getPosition());
 			if($plot !== null) {
 				$ev = new MyPlotPvpEvent($plot, $damager, $damaged, $event);
