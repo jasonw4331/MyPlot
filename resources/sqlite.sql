@@ -120,7 +120,6 @@ WHERE mergedPlotsV2.level = :level
   AND mergedZ = :mergedZ;
 -- #      }
 -- #    }
--- #  }
 -- #    {merge-plots
 -- #      {by-origin
 -- #        :level string
@@ -164,17 +163,20 @@ WHERE level = :level
 -- #        :X int
 -- #        :Z int
 -- #        :biome string
+-- #        :pvp bool false
+-- #        :price int
 UPDATE plotsV2
 SET name    = '',
     owner   = '',
     helpers = '',
     denied  = '',
     biome   = :biome,
-    pvp     = 0,
-    price   = 0.0
+    pvp     = :pvp,
+    price   = :price
 WHERE level = :level
   AND X = :X
   AND Z = :Z;
 -- #      }
 -- #    }
 -- #  }
+-- #}

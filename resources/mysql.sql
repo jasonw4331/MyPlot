@@ -123,7 +123,6 @@ WHERE mergedPlotsV2.level = :level
   AND mergedZ = :mergedZ;
 -- #      }
 -- #    }
--- #  }
 -- #    {merge-plots
 -- #      {by-origin
 -- #        :level string
@@ -183,3 +182,4 @@ WHERE level = :level
 -- #      }
 -- #    }
 -- #  }
+-- #}
