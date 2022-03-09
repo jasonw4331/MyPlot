@@ -7,7 +7,7 @@ use MyPlot\MyPlot;
 class SinglePlot extends BasePlot {
 	public string $biome = "PLAINS";
 	public bool $pvp = true;
-	public float $price = 0.0;
+	public int $price = 0;
 
 	public function __construct(public string $levelName, public int $X, public int $Z, public string $name = "", public string $owner = "", public array $helpers = [], public array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, float $price = -1) {
 		parent::__construct($levelName, $X, $Z);
@@ -18,7 +18,7 @@ class SinglePlot extends BasePlot {
 		}else{
 			$this->pvp = $pvp;
 		}
-		if(MyPlot::getInstance()->getConfig()->get('UseEconomy', false) === true)
+		if(MyPlot::getInstance()->getEconomyProvider() !== null)
 			$this->price = $price < 0 ? $settings->claimPrice : $price;
 		else
 			$this->price = 0;

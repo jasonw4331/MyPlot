@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace MyPlot;
 
 use jasonwynn10\MyPlot\utils\AsyncVariants;
@@ -10,8 +9,10 @@ use muqsit\worldstyler\shapes\Cuboid;
 use muqsit\worldstyler\WorldStyler;
 use MyPlot\events\MyPlotMergeEvent;
 use MyPlot\plot\BasePlot;
+use MyPlot\plot\MergedPlot;
 use MyPlot\plot\SinglePlot;
 use MyPlot\provider\DataProvider;
+use MyPlot\provider\EconomyProvider;
 use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
 use MyPlot\task\FillPlotTask;
@@ -33,9 +34,17 @@ final class InternalAPI{
 	private array $levels = [];
 	private DataProvider $dataProvider;
 
-	public function __construct(private MyPlot $plugin){
+	public function __construct(private MyPlot $plugin, private ?EconomyProvider $economyProvider){
 		$plugin->getLogger()->debug(TF::BOLD . "Loading Data Provider settings");
 		$this->dataProvider = new DataProvider($plugin);
+	}
+
+	public function getEconomyProvider() : ?EconomyProvider {
+		return $this->economyProvider;
+	}
+
+	public function setEconomyProvider(?EconomyProvider $economyProvider) : void{
+		$this->economyProvider = $economyProvider;
 	}
 
 	public function getAllLevelSettings() : array{
@@ -73,9 +82,9 @@ final class InternalAPI{
 		);
 	}
 
-	private function generatePlotsToSave(SinglePlot $plot) : \Generator{
+	public function generatePlotsToSave(SinglePlot $plot) : \Generator{
 		$failed = false;
-		foreach(yield $this->dataProvider->getMergedPlots($plot) as $merged){
+		foreach((yield $this->dataProvider->getMergedPlots($plot)) as $merged){
 			$savePlot = clone $plot;
 			$savePlot->X = $merged->X;
 			$savePlot->Z = $merged->Z;
@@ -92,35 +101,51 @@ final class InternalAPI{
 	 * @param string        $username
 	 * @param string|null   $levelName
 	 * @param callable|null $onComplete
-	 * @phpstan-param (callable(array<Plot>): void)|null $onComplete
+	 * @phpstan-param (callable(array<BasePlot>): void)|null $onComplete
 	 * @param callable|null $onFail
 	 * @phpstan-param (callable(\Throwable): void)|null  $catches
 	 */
 	public function getPlotsOfPlayer(string $username, ?string $levelName, ?callable $onComplete = null, ?callable $onFail = null) : void{
 		Await::g2c(
-			$this->dataProvider->getPlotsByOwner($username, $levelName),
+			$this->generatePlotsOfPlayer($username, $levelName),
 			$onComplete,
 			$onFail === null ? [] : [$onFail]
 		);
 	}
 
 	/**
+	 * @param string      $username
+	 * @param string|null $levelName
+	 *
+	 * @return \Generator<array<BasePlot>>
+	 */
+	public function generatePlotsOfPlayer(string $username, ?string $levelName) : \Generator {
+		false && yield;
+		return $this->dataProvider->getPlotsByOwner($username, $levelName);
+	}
+
+	/**
 	 * @param string        $levelName
 	 * @param int           $limitXZ
 	 * @param callable|null $onComplete
-	 * @phpstan-param (callable(Plot): void)|null $onComplete
+	 * @phpstan-param (callable(BasePlot): void)|null $onComplete
 	 * @param callable|null $onFail
 	 * @phpstan-param (callable(\Throwable): void)|null    $catches
 	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ, ?callable $onComplete = null, ?callable $onFail = null) : void{
 		Await::g2c(
-			$this->dataProvider->getNextFreePlot($levelName, $limitXZ),
+			$this->generateNextFreePlot($levelName, $limitXZ),
 			$onComplete,
 			$onFail === null ? [] : [$onFail]
 		);
 	}
 
-	public function getPlotFast(float &$x, float &$z, PlotLevelSettings $plotLevel) : ?SinglePlot{
+	public function generateNextFreePlot(string $levelName, int $limitXZ) : \Generator{
+		false && yield;
+		return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
+	}
+
+	public function getPlotFast(float &$x, float &$z, PlotLevelSettings $plotLevel) : ?BasePlot{
 		$plotSize = $plotLevel->plotSize;
 		$roadWidth = $plotLevel->roadWidth;
 		$totalSize = $plotSize + $roadWidth;
@@ -141,15 +166,45 @@ final class InternalAPI{
 		if(($difX > $plotSize - 1) or ($difZ > $plotSize - 1))
 			return null;
 
-		return new SinglePlot($plotLevel->name, $x, $z);
+		return new BasePlot($plotLevel->name, $x, $z);
+	}
+
+	/**
+	 * @param string        $worldName
+	 * @param int           $X
+	 * @param int           $Z
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(SinglePlot): void)|null   $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function getPlot(string $worldName, int $X, int $Z, ?callable $onComplete = null, ?callable $onFail = null) : void {
+		Await::g2c(
+			$this->generatePlot($worldName, $X, $Z),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	/**
+	 * @param string $worldName
+	 * @param int    $X
+	 * @param int    $Z
+	 *
+	 * @return \Generator<SinglePlot>
+	 */
+	public function generatePlot(string $worldName, int $X, int $Z) : \Generator {
+		false && yield;
+		// TODO: if merged return MergedPlot object
+		return $this->dataProvider->getPlot($worldName, $X, $Z);
 	}
 
 	/**
 	 * @param Position      $position
 	 * @param callable|null $onComplete
-	 * @phpstan-param (callable(Plot): void)|null $onComplete
+	 * @phpstan-param (callable(BasePlot): void)|null   $onComplete
 	 * @param callable|null $onFail
-	 * @phpstan-param (callable(\Throwable): void)|null    $catches
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
 	 */
 	public function getPlotByPosition(Position $position, ?callable $onComplete = null, ?callable $onFail = null) : void{
 		Await::g2c(
@@ -159,7 +214,7 @@ final class InternalAPI{
 		);
 	}
 
-	private function generatePlotByPosition(Position $position) : \Generator{
+	public function generatePlotByPosition(Position $position) : \Generator{
 		$x = $position->x;
 		$z = $position->z;
 		$levelName = $position->getWorld()->getFolderName();
@@ -211,7 +266,7 @@ final class InternalAPI{
 		);
 	}
 
-	private function generatePlotPosition(SinglePlot $plot, bool $mergeOrigin) : \Generator{
+	public function generatePlotPosition(BasePlot $plot, bool $mergeOrigin) : \Generator{
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$origin = yield $this->dataProvider->getMergeOrigin($plot);
 		$plotSize = $plotLevel->plotSize;
@@ -249,7 +304,7 @@ final class InternalAPI{
 	/**
 	 * @param Position      $position
 	 * @param callable|null $onComplete
-	 * @phpstan-param (callable(Plot): void)|null       $onComplete
+	 * @phpstan-param (callable(BasePlot): void)|null       $onComplete
 	 * @param callable|null $onFail
 	 * @phpstan-param (callable(\Throwable): void)|null $catches
 	 */
@@ -261,7 +316,7 @@ final class InternalAPI{
 		);
 	}
 
-	private function generatePlotBorderingPosition(Position $position) : \Generator{
+	public function generatePlotBorderingPosition(Position $position) : \Generator{
 		if(!$position->isValid())
 			return null;
 		foreach(Facing::HORIZONTAL as $i){
@@ -334,7 +389,7 @@ final class InternalAPI{
 		);
 	}
 
-	private function generatePlotBB(SinglePlot $plot) : \Generator{
+	public function generatePlotBB(SinglePlot $plot) : \Generator{
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize - 1;
 		$pos = yield $this->generatePlotPosition($plot, false);
@@ -378,11 +433,12 @@ final class InternalAPI{
 		);
 	}
 
-	private function generateMergePlots(SinglePlot $plot, int $direction, int $maxBlocksPerTick) : \Generator{
+	public function generateMergePlots(SinglePlot $plot, int $direction, int $maxBlocksPerTick) : \Generator{
 		if($this->getLevelSettings($plot->levelName) === null)
 			return false;
 		/** @var SinglePlot[][] $toMerge */
 		$toMerge = [];
+		/** @var SinglePlot[] $mergedPlots */
 		$mergedPlots = yield $this->dataProvider->getMergedPlots($plot);
 		$newPlot = $plot->getSide($direction);
 		$alreadyMerged = false;
@@ -467,13 +523,13 @@ final class InternalAPI{
 		);
 	}
 
-	private function generatePlayerTeleport(Player $player, SinglePlot $plot, bool $center) : \Generator{
+	public function generatePlayerTeleport(Player $player, BasePlot $plot, bool $center) : \Generator{
 		if($center){
-			$pos = $plot->isMerged() ? yield $this->getMergeMid($plot) : yield $this->getPlotMid($plot);
+			$pos = $plot instanceof MergedPlot ? yield $this->getMergeMid($plot) : yield $this->getPlotMid($plot);
 			return $player->teleport($pos);
 		}
 
-		if($plot->isMerged()){
+		if($plot instanceof MergedPlot){
 			$plotLevel = $this->getLevelSettings($plot->levelName);
 
 			$mergedPlots = yield $this->dataProvider->getMergedPlots($plot);
@@ -502,7 +558,7 @@ final class InternalAPI{
 		return $player->teleport($pos);
 	}
 
-	private function getPlotMid(SinglePlot $plot) : \Generator{
+	private function getPlotMid(BasePlot $plot) : \Generator{
 		if($this->getLevelSettings($plot->levelName) === null)
 			return null;
 
@@ -516,18 +572,30 @@ final class InternalAPI{
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize;
 		$mergedPlots = yield $this->dataProvider->getMergedPlots($plot);
-		$minx = (yield $this->generatePlotPosition(yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
-			return (yield $this->generatePlotPosition($a, false))->x < (yield $this->generatePlotPosition($b, false))->x ? $a : $b;
-		}), false))->x;
-		$maxx = (yield $this->generatePlotPosition(yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
+		$minx = (yield $this->generatePlotPosition(
+			yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
+				return (yield $this->generatePlotPosition($a, false))->x < (yield $this->generatePlotPosition($b, false))->x ? $a : $b;
+			}),
+			false
+		))->x;
+		$maxx = (yield $this->generatePlotPosition(
+			yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
 				return (yield $this->generatePlotPosition($a, false))->x > (yield $this->generatePlotPosition($b, false))->x ? $a : $b;
-			}), false))->x + $plotSize;
-		$minz = (yield $this->generatePlotPosition(yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
-			return (yield $this->generatePlotPosition($a, false))->z < (yield $this->generatePlotPosition($b, false))->z ? $a : $b;
-		}), false))->z;
-		$maxz = (yield $this->generatePlotPosition(yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
+			}),
+			false
+			))->x + $plotSize;
+		$minz = (yield $this->generatePlotPosition(
+			yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
+				return (yield $this->generatePlotPosition($a, false))->z < (yield $this->generatePlotPosition($b, false))->z ? $a : $b;
+			}),
+			false
+		))->z;
+		$maxz = (yield $this->generatePlotPosition(
+			yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
 				return (yield $this->generatePlotPosition($a, false))->z > (yield $this->generatePlotPosition($b, false))->z ? $a : $b;
-			}), false))->z + $plotSize;
+			}),
+			false
+			))->z + $plotSize;
 		return new Position(($minx + $maxx) / 2, $plotLevel->groundHeight, ($minz + $maxz) / 2, $this->plugin->getServer()->getWorldManager()->getWorldByName($plot->levelName));
 	}
 
@@ -832,7 +900,7 @@ final class InternalAPI{
 		);
 	}
 
-	private function generatePlotBiome(SinglePlot $plot, Biome $biome) : \Generator{
+	public function generatePlotBiome(SinglePlot $plot, Biome $biome) : \Generator{
 		$failed = false;
 		foreach(yield $this->dataProvider->getMergedPlots($plot) as $merged){
 			$merged->biome = $plot->biome;
@@ -874,7 +942,7 @@ final class InternalAPI{
 		);
 	}
 
-	private function generatePlotChunks(SinglePlot $plot) : \Generator{
+	public function generatePlotChunks(SinglePlot $plot) : \Generator{
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		if($plotLevel === null){
 			return [];

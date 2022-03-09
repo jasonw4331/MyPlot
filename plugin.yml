@@ -10,10 +10,11 @@ authors:
 description: "Plots and Protection Plugin for PocketMine-MP Servers"
 load: STARTUP
 softdepend:
-- EconomyAPI
+- Capital
 - DEVirion
-- WorldStyler
 - EasyCommandAutofill
+- EconomyAPI
+- WorldStyler
 permissions:
   myplot.command:
     default: true

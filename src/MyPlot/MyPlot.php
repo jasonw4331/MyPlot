@@ -11,7 +11,9 @@ use MyPlot\events\MyPlotGenerationEvent;
 use MyPlot\events\MyPlotResetEvent;
 use MyPlot\events\MyPlotSettingEvent;
 use MyPlot\events\MyPlotTeleportEvent;
+use MyPlot\plot\BasePlot;
 use MyPlot\plot\SinglePlot;
+use MyPlot\provider\CapitalProvider;
 use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
 use onebone\economyapi\EconomyAPI;
@@ -36,12 +38,12 @@ use pocketmine\world\format\Chunk;
 use pocketmine\world\generator\GeneratorManager;
 use pocketmine\world\Position;
 use pocketmine\world\WorldCreationOptions;
+use SOFe\Capital\Capital;
 
 class MyPlot extends PluginBase
 {
 	private static MyPlot $instance;
 	private Language $language;
-	private ?EconomyProvider $economyProvider;
 	private InternalAPI $internalAPI;
 
 	public static function getInstance() : self {
@@ -78,7 +80,7 @@ class MyPlot extends PluginBase
 	 * @return EconomyProvider|null
 	 */
 	public function getEconomyProvider() : ?EconomyProvider {
-		return $this->economyProvider;
+		return $this->internalAPI->getEconomyProvider();
 	}
 
 	/**
@@ -96,7 +98,7 @@ class MyPlot extends PluginBase
 			$this->getConfig()->set("UseEconomy", true);
 			$this->getLogger()->info("A custom economy provider has been registered. Economy mode now enabled!");
 		}
-		$this->economyProvider = $provider;
+		$this->internalAPI->setEconomyProvider($provider);
 	}
 
 	/**
@@ -248,6 +250,25 @@ class MyPlot extends PluginBase
 	}
 
 	/**
+	 * @param string $levelName
+	 * @param int    $X
+	 * @param int    $Z
+	 *
+	 * @return Promise<BasePlot>
+	 */
+	public function getPlot(string $levelName, int $X, int $Z) : Promise{
+		$resolver = new PromiseResolver();
+		$this->internalAPI->getPlot(
+			$levelName,
+			$X,
+			$Z,
+			fn(?SinglePlot $plot) => $resolver->resolve($plot),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
+	}
+
+	/**
 	 * Finds the plot at a certain position or null if there is no plot at that position
 	 *
 	 * @api
@@ -385,7 +406,7 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function teleportPlayerToPlot(Player $player, SinglePlot $plot, bool $center = false) : Promise {
+	public function teleportPlayerToPlot(Player $player, BasePlot $plot, bool $center = false) : Promise {
 		$resolver = new PromiseResolver();
 		$ev = new MyPlotTeleportEvent($plot, $player, $center);
 		$ev->call();
@@ -422,7 +443,7 @@ class MyPlot extends PluginBase
 		$newPlot->denied = [];
 		if($plotName !== "")
 			$newPlot->name = $plotName;
-		$newPlot->price = 0.0;
+		$newPlot->price = 0;
 		$ev = new MyPlotSettingEvent($plot, $newPlot);
 		$ev->call();
 		if($ev->isCancelled()){
@@ -790,14 +811,14 @@ class MyPlot extends PluginBase
 	 * @api
 	 *
 	 * @param SinglePlot $plot
-	 * @param float      $price
+	 * @param int        $price
 	 *
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function sellPlot(SinglePlot $plot, float $price) : Promise {
+	public function sellPlot(SinglePlot $plot, int $price) : Promise {
 		$resolver = new PromiseResolver();
-		if($this->getEconomyProvider() === null or $price < 0) {
+		if($this->internalAPI->getEconomyProvider() === null or $price <= 0) {
 			$resolver->resolve(false);
 			return $resolver->getPromise();
 		}
@@ -827,16 +848,16 @@ class MyPlot extends PluginBase
 	 */
 	public function buyPlot(SinglePlot $plot, Player $player) : Promise {
 		$resolver = new PromiseResolver();
-		if($this->getEconomyProvider() === null) {
+		if($this->internalAPI->getEconomyProvider() === null) {
 			$resolver->resolve(false);
 			return $resolver->getPromise();
 		}
-		if(!$this->getEconomyProvider()->reduceMoney($player, $plot->price)) {
+		if(!$this->economyProvider->reduceMoney($player, $plot->price)) {
 			$resolver->resolve(false);
 			return $resolver->getPromise();
 		}
-		if(!$this->getEconomyProvider()->addMoney($this->getServer()->getOfflinePlayer($plot->owner), $plot->price)) {
-			$this->getEconomyProvider()->addMoney($player, $plot->price);
+		if(!$this->economyProvider->addMoney($this->getServer()->getOfflinePlayer($plot->owner), $plot->price)) {
+			$this->economyProvider->addMoney($player, $plot->price);
 			$resolver->resolve(false);
 			return $resolver->getPromise();
 		}
@@ -931,32 +952,41 @@ class MyPlot extends PluginBase
 			}
 			$this->language = new Language($lang, $this->getFile() . "resources/");
 		}
-		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings");
+
+		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings"); // TODO: finish libEfficientWE
 		if($this->getConfig()->get("FastClearing", false) === true and $this->getServer()->getPluginManager()->getPlugin("WorldStyler") === null) {
 			$this->getConfig()->set("FastClearing", false);
 			$this->getLogger()->info(TF::BOLD . "WorldStyler not found. Legacy clearing will be used.");
 		}
 
 		$this->getLogger()->debug(TF::BOLD . "Loading economy settings");
+		$economyProvider = null;
 		if($this->getConfig()->get("UseEconomy", false) === true) {
 			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
 				if($plugin instanceof EconomyAPI) {
-					$this->economyProvider = new EconomySProvider($plugin);
-					$this->getLogger()->debug("Eco set to EconomySProvider");
+					$economyProvider = new EconomySProvider($plugin);
+					$this->getLogger()->debug("Economy set to EconomyAPI");
 				}else
-					$this->getLogger()->debug("Eco not instance of EconomyAPI");
+					$this->getLogger()->debug("Invalid instance of EconomyAPI");
 			}
-			if(!isset($this->economyProvider)) {
-				$this->getLogger()->info("No supported economy plugin found!");
+			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("Capital")) !== null) {
+				if($plugin instanceof Capital) {
+					$economyProvider = new CapitalProvider();
+					$this->getLogger()->debug("Economy set to Capital");
+				}else
+					$this->getLogger()->debug("Invalid instance of Capital");
+			}
+			if(!isset($economyProvider)) {
+				$this->getLogger()->warning("No supported economy plugin found!");
 				$this->getConfig()->set("UseEconomy", false);
 				//$this->getConfig()->save();
 			}
 		}
 
-		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Commands");
-		$this->getServer()->getCommandMap()->register("myplot", new Commands($this));
+		$this->internalAPI = new InternalAPI($this, $economyProvider);
 
-		$this->internalAPI = new InternalAPI($this);
+		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Commands");
+		$this->getServer()->getCommandMap()->register("myplot", new Commands($this, $this->internalAPI));
 	}
 
 	public function onEnable() : void {

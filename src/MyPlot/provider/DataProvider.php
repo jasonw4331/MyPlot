@@ -3,19 +3,21 @@ declare(strict_types=1);
 namespace MyPlot\provider;
 
 use MyPlot\MyPlot;
-use MyPlot\Plot;
+use MyPlot\plot\BasePlot;
+use MyPlot\plot\MergedPlot;
+use MyPlot\plot\SinglePlot;
 use pocketmine\math\Facing;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 
-final class DataProvider{
+final class DataProvider {
 
-	/** @var Plot[] $cache */
+	/** @var BasePlot[] $cache */
 	private array $cache = [];
 	private int $cacheSize;
 	private DataConnector $database;
 
-	public function __construct(protected MyPlot $plugin){
+	public function __construct(private MyPlot $plugin) {
 		$this->database = libasynql::create($plugin, $plugin->getConfig()->get("Database"), [
 			'sqlite' => 'sqlite.sql',
 			'mysql' => 'mysql.sql',
@@ -23,7 +25,7 @@ final class DataProvider{
 		$this->cacheSize = $plugin->getConfig()->get("PlotCacheSize", 2048);
 	}
 
-	private function cachePlot(Plot $plot) : void{
+	private function cachePlot(BasePlot $plot) : void{
 		if($this->cacheSize > 0){
 			$key = $plot->levelName . ';' . $plot->X . ';' . $plot->Z;
 			if(isset($this->cache[$key])){
@@ -36,7 +38,7 @@ final class DataProvider{
 		}
 	}
 
-	private function getPlotFromCache(string $levelName, int $X, int $Z) : ?Plot{
+	private function getPlotFromCache(string $levelName, int $X, int $Z) : ?BasePlot{
 		if($this->cacheSize > 0){
 			$key = $levelName . ';' . $X . ';' . $Z;
 			if(isset($this->cache[$key])){
@@ -47,7 +49,12 @@ final class DataProvider{
 		return null;
 	}
 
-	public function savePlot(Plot $plot) : \Generator{
+	/**
+	 * @param SinglePlot $plot
+	 *
+	 * @return \Generator<bool>
+	 */
+	public function savePlot(SinglePlot $plot) : \Generator{
 		[$insertId, $affectedRows] = yield $this->database->asyncInsert('myplot.add.plot', [
 			'level' => $plot->levelName,
 			'X' => $plot->X,
@@ -67,8 +74,13 @@ final class DataProvider{
 		return true;
 	}
 
-	public function deletePlot(Plot $plot) : \Generator{
-		if($plot->isMerged()){
+	/**
+	 * @param BasePlot $plot
+	 *
+	 * @return \Generator<bool>
+	 */
+	public function deletePlot(BasePlot $plot) : \Generator{
+		if($plot instanceof MergedPlot) {
 			$changedRows = yield $this->database->asyncChange('myplot.remove.merge.by-xz', [
 				'level' => $plot->levelName,
 				'X' => $plot->X,
@@ -84,10 +96,17 @@ final class DataProvider{
 		if($changedRows < 1){
 			return false;
 		}
-		$this->cachePlot(new Plot($plot->levelName, $plot->X, $plot->Z));
+		$this->cachePlot(new BasePlot($plot->levelName, $plot->X, $plot->Z));
 		return true;
 	}
 
+	/**
+	 * @param string $levelName
+	 * @param int    $X
+	 * @param int    $Z
+	 *
+	 * @return \Generator<SinglePlot>
+	 */
 	public function getPlot(string $levelName, int $X, int $Z) : \Generator{
 		$plot = $this->getPlotFromCache($levelName, $X, $Z);
 		if($plot !== null){
@@ -98,9 +117,15 @@ final class DataProvider{
 			'X' => $X,
 			'Z' => $Z
 		]);
-		return new Plot($levelName, $X, $Z, $row['name'], $row['owner'], explode(",", $row['helpers']), explode(",", $row['denied']), $row['biome'], $row['pvp'], $row['price']);
+		return new SinglePlot($levelName, $X, $Z, $row['name'], $row['owner'], explode(",", $row['helpers']), explode(",", $row['denied']), $row['biome'], $row['pvp'], $row['price']);
 	}
 
+	/**
+	 * @param string $owner
+	 * @param string $levelName
+	 *
+	 * @return \Generator<array<SinglePlot>>
+	 */
 	public function getPlotsByOwner(string $owner, string $levelName = "") : \Generator{
 		if($levelName !== null){
 			$rows = yield $this->database->asyncSelect('myplot.get.all-plots.by-owner-and-level', [
@@ -114,11 +139,17 @@ final class DataProvider{
 		}
 		$plots = [];
 		foreach($rows as $row){
-			$plots[] = new Plot($row['level'], $row['X'], $row['Z'], $row['name'], $row['owner'], explode(",", $row['helpers']), explode(",", $row['denied']), $row['biome'], $row['pvp'], $row['price']);
+			$plots[] = new SinglePlot($row['level'], $row['X'], $row['Z'], $row['name'], $row['owner'], explode(",", $row['helpers']), explode(",", $row['denied']), $row['biome'], $row['pvp'], $row['price']);
 		}
 		return $plots;
 	}
 
+	/**
+	 * @param string $levelName
+	 * @param int    $limitXZ
+	 *
+	 * @return \Generator<BasePlot|null>
+	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : \Generator{
 		for($i = 0; $limitXZ <= 0 or $i < $limitXZ; $i++){
 			$rows = yield $this->database->asyncSelect('myplot.get.highest-existing.by-interval', [
@@ -135,14 +166,20 @@ final class DataProvider{
 			for($a = 0; $a <= $i; $a++){
 				if(($ret = self::findEmptyPlotSquared($a, $i, $plots)) !== null){
 					[$X, $Z] = $ret;
-					return new Plot($levelName, $X, $Z);
+					return new BasePlot($levelName, $X, $Z);
 				}
 			}
 		}
 		return null;
 	}
 
-	public function mergePlots(Plot $base, Plot ...$plots) : \Generator{
+	/**
+	 * @param BasePlot $base
+	 * @param BasePlot ...$plots
+	 *
+	 * @return \Generator<bool>
+	 */
+	public function mergePlots(BasePlot $base, BasePlot ...$plots) : \Generator{
 		$ret = true;
 		foreach($plots as $plot){
 			[$insertId, $affectedRows] = yield $this->database->asyncInsert('myplot.add.merge', [
@@ -160,7 +197,13 @@ final class DataProvider{
 		return $ret;
 	}
 
-	public function getMergedPlots(Plot $plot, bool $adjacent = false) : \Generator{
+	/**
+	 * @param BasePlot $plot
+	 * @param bool     $adjacent
+	 *
+	 * @return \Generator<array<SinglePlot>>
+	 */
+	public function getMergedPlots(BasePlot $plot, bool $adjacent = false) : \Generator{
 		$origin = yield $this->getMergeOrigin($plot);
 		$rows = $this->database->asyncSelect('myplot.get.merge-plots.by-origin', [
 			'level' => $plot->levelName,
@@ -172,10 +215,10 @@ final class DataProvider{
 			$helpers = explode(",", $row["helpers"]);
 			$denied = explode(",", $row["denied"]);
 			$pvp = is_numeric($row["pvp"]) ? (bool) $row["pvp"] : null;
-			$plots[] = new Plot($row["level"], $row["X"], $row["Z"], $row["name"], $row["owner"], $helpers, $denied, $row["biome"], $pvp, $row["price"]);
+			$plots[] = new SinglePlot($row["level"], $row["X"], $row["Z"], $row["name"], $row["owner"], $helpers, $denied, $row["biome"], $pvp, $row["price"]);
 		}
 		if($adjacent)
-			$plots = array_filter($plots, function(Plot $val) use ($plot) : bool{
+			$plots = array_filter($plots, function(BasePlot $val) use ($plot) : bool{
 				foreach(Facing::HORIZONTAL as $i){
 					if($plot->getSide($i)->isSame($val))
 						return true;
@@ -185,13 +228,31 @@ final class DataProvider{
 		return $plots;
 	}
 
-	public function getMergeOrigin(Plot $plot) : \Generator{
+	/**
+	 * @param BasePlot $plot
+	 *
+	 * @return \Generator<MergedPlot>
+	 */
+	public function getMergeOrigin(BasePlot $plot) : \Generator{
 		$row = yield $this->database->asyncSelect('myplot.get.merge-origin.by-merged', [
 			'level' => $plot->levelName,
 			'mergedX' => $plot->X,
 			'mergedZ' => $plot->Z
 		]);
-		return new Plot($row['level'], $row['X'], $row['Z'], $row['name'], $row['owner'], explode(",", $row['helpers']), explode(",", $row['denied']), $row['biome'], $row['pvp'], $row['price']);
+		return new MergedPlot(
+			$row['level'],
+			$row['X'],
+			$row['Z'],
+			$row['name'],
+			$row['owner'],
+			explode(",", $row['helpers']),
+			explode(",", $row['denied']),
+			$row['biome'],
+			$row['pvp'],
+			$row['price'],
+			$xWidth,
+			$zWidth
+		);
 	}
 
 	public function close() : void{

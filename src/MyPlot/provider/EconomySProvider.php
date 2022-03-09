@@ -5,43 +5,61 @@ namespace MyPlot\provider;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\player\IPlayer;
 use pocketmine\player\Player;
+use pocketmine\promise\Promise;
+use pocketmine\promise\PromiseResolver;
 
 class EconomySProvider implements EconomyProvider {
-	private EconomyAPI $plugin;
+	public function __construct(private EconomyAPI $plugin) {}
 
 	/**
-	 * EconomySProvider constructor.
-	 *
-	 * @param EconomyAPI $plugin
+	 * @inheritDoc
 	 */
-	public function __construct(EconomyAPI $plugin) {
-		$this->plugin = $plugin;
-	}
-
-	public function reduceMoney(Player $player, float $amount) : bool {
-		if($amount == 0) {
+	public function reduceMoney(Player $player, int $amount, string $reason = "Unknown") : \Generator {
+		0 && yield;
+		if($amount === 0) {
 			return true;
 		}elseif($amount < 0) {
 			$amount = -$amount;
 		}
-		$ret = $this->plugin->reduceMoney($player, $amount, true, "MyPlot");
+		$ret = $this->plugin->reduceMoney($player, $amount, false, "MyPlot");
 		if($ret === EconomyAPI::RET_SUCCESS) {
 			$this->plugin->getLogger()->debug("MyPlot Reduced money of " . $player->getName());
 			return true;
 		}
-		$this->plugin->getLogger()->debug("MyPlot failed to reduce money of ".$player->getName());
 		return false;
 	}
 
-	public function addMoney(IPlayer $player, float $amount) : bool {
-		if($amount < 1)
-			return true;
-		$ret = $this->plugin->addMoney($player->getName(), $amount, true, "MyPlot");
-		if($ret === EconomyAPI::RET_SUCCESS) {
-			$this->plugin->getLogger()->debug("MyPlot Add money of " . $player->getName());
+	/**
+	 * @inheritDoc
+	 */
+	public function addMoney(Player $player, int $amount, string $reason = "Unknown") : \Generator {
+		0 && yield;
+		if($amount === 0) {
 			return true;
 		}
-		$this->plugin->getLogger()->debug("MyPlot failed to add money of ".$player->getName());
+		$ret = $this->plugin->addMoney($player, $amount, false, "MyPlot");
+		if($ret === EconomyAPI::RET_SUCCESS) {
+			return true;
+		}
 		return false;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function transactMoney(Player $player1, Player $player2, int $amount, string $reason = "Unknown") : \Generator {
+		0 && yield;
+		if($amount < 1){
+			return true;
+		}
+		$ret = $this->plugin->reduceMoney($player1, $amount, true, "MyPlot");
+		if($ret !== EconomyAPI::RET_SUCCESS) {
+			return false;
+		}
+		$ret = $this->plugin->addMoney($player2, $amount, true, "MyPlot");
+		if($ret !== EconomyAPI::RET_SUCCESS) {
+			return false;
+		}
+		return true;
 	}
 }
