@@ -181,5 +181,19 @@ WHERE level = :level
   AND Z = :z;
 -- #      }
 -- #    }
+-- #    {merge-entry
+-- #      :level string
+-- #      :originX int
+-- #      :originZ int
+-- #      :mergedX int
+-- #      :mergedZ int
+DELETE
+FROM mergedPlotsV2
+WHERE level = :level
+  AND originX = :originX
+  AND originZ = :originZ
+  AND mergedX = :mergedX
+  AND mergedZ = :mergedZ;
+-- #    }
 -- #  }
 -- #}
