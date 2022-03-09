@@ -2,10 +2,10 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
-use MyPlot\forms\MyPlotForm;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use SOFe\AwaitGenerator\Await;
 
 class AutoSubCommand extends SubCommand
 {
@@ -19,30 +19,29 @@ class AutoSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) : bool {
-		$levelName = $sender->getWorld()->getFolderName();
-		if(!$this->plugin->isLevelLoaded($levelName)) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
-			return true;
-		}
-		if(($plot = $this->plugin->getNextFreePlot($levelName)) !== null) {
-			if($this->plugin->teleportPlayerToPlot($sender, $plot, true)) {
-				$sender->sendMessage($this->translateString("auto.success", [$plot->X, $plot->Z]));
-				/** @noinspection PhpParamsInspection */
-				$cmd = new ClaimSubCommand($this->plugin, "claim");
-				if(isset($args[0]) and strtolower($args[0]) == "true" and $cmd->canUse($sender)) {
-					$cmd->execute($sender, isset($args[1]) ? [$args[1]] : []);
+	public function execute(CommandSender $sender, array $args) : bool{
+		Await::f2c(
+			function() use ($sender, $args) : \Generator{
+				$levelName = $sender->getWorld()->getFolderName();
+				if($this->internalAPI->getLevelSettings($levelName) === null){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("auto.notplotworld"));
+					return;
 				}
-			}else {
+				$plot = yield $this->internalAPI->generateNextFreePlot($levelName, 0);
+				if($plot === null){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("auto.noplots"));
+					return;
+				}
+				if(yield $this->internalAPI->generatePlayerTeleport($sender, $plot, true)){
+					$sender->sendMessage($this->translateString("auto.success", [$plot->X, $plot->Z]));
+					$cmd = new ClaimSubCommand($this->plugin, $this->internalAPI, "claim");
+					if(isset($args[0]) and strtolower($args[0]) === "true" and $cmd->canUse($sender))
+						$cmd->execute($sender, isset($args[1]) ? [$args[1]] : []);
+					return;
+				}
 				$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 			}
-		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("auto.noplots"));
-		}
+		);
 		return true;
-	}
-
-	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return null;
 	}
 }

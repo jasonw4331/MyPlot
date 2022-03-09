@@ -8,6 +8,7 @@ use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use SOFe\AwaitGenerator\Await;
 
 class UnDenySubCommand extends SubCommand
 {
@@ -21,37 +22,40 @@ class UnDenySubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) : bool {
-		if(count($args) === 0) {
-			return false;
-		}
-		$dplayerName = $args[0];
-		$plot = $this->plugin->getPlotByPosition($sender->getPosition());
-		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
-			return true;
-		}
-		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.undenyplayer")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
-			return true;
-		}
-		$dplayer = $this->plugin->getServer()->getPlayerByPrefix($dplayerName);
-		if($dplayer === null)
-			$dplayer = $this->plugin->getServer()->getOfflinePlayer($dplayerName);
-		if($this->plugin->removePlotDenied($plot, $dplayer->getName())) {
-			$sender->sendMessage($this->translateString("undenyplayer.success1", [$dplayer->getName()]));
-			if($dplayer instanceof Player) {
-				$dplayer->sendMessage($this->translateString("undenyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
+	public function execute(CommandSender $sender, array $args) : bool{
+		Await::f2c(
+			function() use ($sender, $args) : \Generator{
+				if(count($args) === 0){
+					$sender->sendMessage($this->translateString("subcommand.usage", [$this->getUsage()]));
+					return;
+				}
+				$dplayerName = $args[0];
+				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				if($plot === null){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+					return;
+				}
+				if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.undenyplayer")){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+					return;
+				}
+				$dplayer = $this->plugin->getServer()->getPlayerByPrefix($dplayerName);
+				if($dplayer === null)
+					$dplayer = $this->plugin->getServer()->getOfflinePlayer($dplayerName);
+				if(yield $this->internalAPI->generateRemovePlotDenied($plot, $dplayer->getName())){
+					$sender->sendMessage($this->translateString("undenyplayer.success1", [$dplayer->getName()]));
+					if($dplayer instanceof Player){
+						$dplayer->sendMessage($this->translateString("undenyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
+					}
+				}else{
+					$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+				}
 			}
-		}else{
-			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
-		}
+		);
 		return true;
 	}
 
-	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and ($plot = $this->plugin->getPlotByPosition($player->getPosition())) instanceof Plot)
-			return new UndenyPlayerForm($plot);
-		return null;
+	public function getFormClass() : ?string{
+		return UndenyPlayerForm::class;
 	}
 }

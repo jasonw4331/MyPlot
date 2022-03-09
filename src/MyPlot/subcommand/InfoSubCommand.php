@@ -4,10 +4,10 @@ namespace MyPlot\subcommand;
 
 use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\InfoForm;
-use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use SOFe\AwaitGenerator\Await;
 
 class InfoSubCommand extends SubCommand
 {
@@ -21,52 +21,50 @@ class InfoSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) : bool {
-		if(isset($args[0])) {
-			if(isset($args[1]) and is_numeric($args[1])) {
-				$key = max(((int) $args[1] - 1), 1);
-				/** @var Plot[] $plots */
-				$plots = [];
-				foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
-					$plots = array_merge($plots, $this->plugin->getPlotsOfPlayer($args[0], $levelName));
+	public function execute(CommandSender $sender, array $args) : bool{
+		Await::f2c(
+			function() use ($sender, $args) : \Generator{
+				if(isset($args[0])){
+					if(isset($args[1]) and is_numeric($args[1])){
+						$key = max(((int) $args[1] - 1), 1);
+						$plots = yield $this->internalAPI->generatePlotsOfPlayer($args[0], null);
+						if(isset($plots[$key])){
+							$plot = $plots[$key];
+							$sender->sendMessage($this->translateString("info.about", [TextFormat::GREEN . $plot]));
+							$sender->sendMessage($this->translateString("info.owner", [TextFormat::GREEN . $plot->owner]));
+							$sender->sendMessage($this->translateString("info.plotname", [TextFormat::GREEN . $plot->name]));
+							$helpers = implode(", ", $plot->helpers);
+							$sender->sendMessage($this->translateString("info.helpers", [TextFormat::GREEN . $helpers]));
+							$denied = implode(", ", $plot->denied);
+							$sender->sendMessage($this->translateString("info.denied", [TextFormat::GREEN . $denied]));
+							$sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
+							return;
+						}
+						$sender->sendMessage(TextFormat::RED . $this->translateString("info.notfound"));
+						return;
+					}
+					$sender->sendMessage($this->translateString("subcommand.usage", [$this->getUsage()]));
+					return;
 				}
-				if(isset($plots[$key])) {
-					$plot = $plots[$key];
-					$sender->sendMessage($this->translateString("info.about", [TextFormat::GREEN . $plot]));
-					$sender->sendMessage($this->translateString("info.owner", [TextFormat::GREEN . $plot->owner]));
-					$sender->sendMessage($this->translateString("info.plotname", [TextFormat::GREEN . $plot->name]));
-					$helpers = implode(", ", $plot->helpers);
-					$sender->sendMessage($this->translateString("info.helpers", [TextFormat::GREEN . $helpers]));
-					$denied = implode(", ", $plot->denied);
-					$sender->sendMessage($this->translateString("info.denied", [TextFormat::GREEN . $denied]));
-					$sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
-				}else{
-					$sender->sendMessage(TextFormat::RED . $this->translateString("info.notfound"));
+				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				if($plot === null){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+					return;
 				}
-			}else{
-				return false;
+				$sender->sendMessage($this->translateString("info.about", [TextFormat::GREEN . $plot]));
+				$sender->sendMessage($this->translateString("info.owner", [TextFormat::GREEN . $plot->owner]));
+				$sender->sendMessage($this->translateString("info.plotname", [TextFormat::GREEN . $plot->name]));
+				$helpers = implode(", ", $plot->helpers);
+				$sender->sendMessage($this->translateString("info.helpers", [TextFormat::GREEN . $helpers]));
+				$denied = implode(", ", $plot->denied);
+				$sender->sendMessage($this->translateString("info.denied", [TextFormat::GREEN . $denied]));
+				$sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
 			}
-		}else{
-			$plot = $this->plugin->getPlotByPosition($sender->getPosition());
-			if($plot === null) {
-				$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
-				return true;
-			}
-			$sender->sendMessage($this->translateString("info.about", [TextFormat::GREEN . $plot]));
-			$sender->sendMessage($this->translateString("info.owner", [TextFormat::GREEN . $plot->owner]));
-			$sender->sendMessage($this->translateString("info.plotname", [TextFormat::GREEN . $plot->name]));
-			$helpers = implode(", ", $plot->helpers);
-			$sender->sendMessage($this->translateString("info.helpers", [TextFormat::GREEN . $helpers]));
-			$denied = implode(", ", $plot->denied);
-			$sender->sendMessage($this->translateString("info.denied", [TextFormat::GREEN . $denied]));
-			$sender->sendMessage($this->translateString("info.biome", [TextFormat::GREEN . $plot->biome]));
-		}
+		);
 		return true;
 	}
 
-	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and ($plot = $this->plugin->getPlotByPosition($player->getPosition())) instanceof Plot)
-			return new InfoForm($plot);
-		return null;
+	public function getFormClass() : ?string{
+		return InfoForm::class;
 	}
 }

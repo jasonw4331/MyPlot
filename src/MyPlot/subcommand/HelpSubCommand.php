@@ -4,34 +4,24 @@ namespace MyPlot\subcommand;
 
 use MyPlot\Commands;
 use MyPlot\forms\MyPlotForm;
+use MyPlot\InternalAPI;
 use MyPlot\MyPlot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
-class HelpSubCommand extends SubCommand
-{
-	private Commands $cmds;
-
-	/**
-	 * HelpSubCommand constructor.
-	 *
-	 * @param MyPlot $plugin
-	 * @param string $name
-	 * @param Commands $cmds
-	 */
-	public function __construct(MyPlot $plugin, string $name, Commands $cmds) {
-		parent::__construct($plugin, $name);
-		$this->cmds = $cmds;
+class HelpSubCommand extends SubCommand{
+	public function __construct(MyPlot $plugin, InternalAPI $api, string $name, private Commands $cmds){
+		parent::__construct($plugin, $api, $name);
 	}
 
-	public function canUse(CommandSender $sender) : bool {
+	public function canUse(CommandSender $sender) : bool{
 		return $sender->hasPermission("myplot.command.help");
 	}
 
 	/**
 	 * @param CommandSender $sender
-	 * @param string[] $args
+	 * @param string[]      $args
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
@@ -63,9 +53,5 @@ class HelpSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::AQUA . $command->getDescription());
 		}
 		return true;
-	}
-
-	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return null;
 	}
 }

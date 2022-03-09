@@ -11,6 +11,7 @@ use pocketmine\item\Item;
 use pocketmine\item\StringToItemParser;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use SOFe\AwaitGenerator\Await;
 
 class FillSubCommand extends SubCommand {
 	/**
@@ -28,37 +29,47 @@ class FillSubCommand extends SubCommand {
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) : bool {
-		if(count($args) < 1) {
-			return false;
-		}
-		$plot = $this->plugin->getPlotByPosition($sender->getPosition());
-		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED.$this->translateString("notinplot"));
-			return true;
-		}
-		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.fill")) {
-			$sender->sendMessage(TextFormat::RED.$this->translateString("notowner"));
-			return true;
-		}
-
-		if(($item = StringToItemParser::getInstance()->parse($args[0])) instanceof Item and $item->getBlock() instanceof Air) {
-			$maxBlocksPerTick = (int)$this->plugin->getConfig()->get("FillBlocksPerTick", 256);
-			if($this->plugin->fillPlot($plot, $item->getBlock(), $maxBlocksPerTick)) {
-				$sender->sendMessage($this->translateString("fill.success", [$item->getBlock()->getName()]));
-			}else {
-				$sender->sendMessage(TextFormat::RED.$this->translateString("error"));
+	public function execute(CommandSender $sender, array $args) : bool{
+		Await::f2c(
+			function() use ($sender, $args) : \Generator{
+				if(count($args) < 1 or !($item = StringToItemParser::getInstance()->parse($args[0])) instanceof Item or !$item->getBlock() instanceof Air){
+					$sender->sendMessage($this->translateString("subcommand.usage", [$this->getUsage()]));
+					return;
+				}
+				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				if($plot === null){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+					return;
+				}
+				if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.fill")){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+					return;
+				}
+				if(!isset($args[1]) or $args[1] !== $this->translateString("confirm")){
+					$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
+					$sender->sendMessage($this->translateString("fill.confirm", [$plotId]));
+					return;
+				}
+				$economy = $this->internalAPI->getEconomyProvider();
+				$price = $this->internalAPI->getLevelSettings($plot->levelName)->fillPrice;
+				if($economy !== null and !(yield $economy->reduceMoney($sender, $price, 'used plot fill command'))){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("fill.nomoney"));
+					return;
+				}
+				$maxBlocksPerTick = $this->plugin->getConfig()->get("FillBlocksPerTick", 256);
+				if(!is_int($maxBlocksPerTick))
+					$maxBlocksPerTick = 256;
+				if(yield $this->plugin->fillPlot($plot, $item->getBlock(), $maxBlocksPerTick)){
+					$sender->sendMessage($this->translateString("fill.success", [$item->getBlock()->getName()]));
+				}else{
+					$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+				}
 			}
-		}else {
-			return false;
-		}
+		);
 		return true;
 	}
 
-	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($this->plugin->getPlotByPosition($player->getPosition()) instanceof Plot) {
-			return new FillForm();
-		}
-		return null;
+	public function getFormClass() : ?string{
+		return FillForm::class;
 	}
 }

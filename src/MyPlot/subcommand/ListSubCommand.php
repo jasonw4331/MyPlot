@@ -6,6 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat as TF;
+use SOFe\AwaitGenerator\Await;
 
 class ListSubCommand extends SubCommand {
 	public function canUse(CommandSender $sender) : bool {
@@ -18,44 +19,44 @@ class ListSubCommand extends SubCommand {
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) : bool {
-		if($sender->hasPermission("myplot.admin.list")) {
-			if(count($args) > 0) {
-				foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
-					$plots = $this->plugin->getPlotsOfPlayer($args[0], $levelName);
-					foreach($plots as $plot) {
-						$name = $plot->name;
-						$x = $plot->X;
-						$z = $plot->Z;
-						$sender->sendMessage(TF::YELLOW . $this->translateString("list.found", [$name, $x, $z]));
+	public function execute(CommandSender $sender, array $args) : bool{
+		Await::f2c(
+			function() use ($sender, $args) : \Generator{
+				if($sender->hasPermission("myplot.admin.list")){
+					if(count($args) > 0){
+						foreach($this->internalAPI->getAllLevelSettings() as $levelName => $settings){
+							$plots = yield $this->internalAPI->generatePlotsOfPlayer($args[0], $levelName);
+							foreach($plots as $plot){
+								$name = $plot->name;
+								$x = $plot->X;
+								$z = $plot->Z;
+								$sender->sendMessage(TF::YELLOW . $this->translateString("list.found", [$name, $x, $z]));
+							}
+						}
+					}else{
+						foreach($this->internalAPI->getAllLevelSettings() as $levelName => $settings){
+							$plots = yield $this->internalAPI->generatePlotsOfPlayer($sender->getName(), $levelName);
+							foreach($plots as $plot){
+								$name = $plot->name;
+								$x = $plot->X;
+								$z = $plot->Z;
+								$sender->sendMessage(TF::YELLOW . $this->translateString("list.found", [$name, $x, $z]));
+							}
+						}
 					}
-				}
-			}else{
-				foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
-					$plots = $this->plugin->getPlotsOfPlayer($sender->getName(), $levelName);
-					foreach($plots as $plot) {
-						$name = $plot->name;
-						$x = $plot->X;
-						$z = $plot->Z;
-						$sender->sendMessage(TF::YELLOW . $this->translateString("list.found", [$name, $x, $z]));
+				}elseif($sender->hasPermission("myplot.command.list")){
+					foreach($this->internalAPI->getAllLevelSettings() as $levelName => $settings){
+						$plots = yield $this->internalAPI->generatePlotsOfPlayer($sender->getName(), $levelName);
+						foreach($plots as $plot){
+							$name = $plot->name;
+							$x = $plot->X;
+							$z = $plot->Z;
+							$sender->sendMessage(TF::YELLOW . $this->translateString("list.found", [$name, $x, $z]));
+						}
 					}
 				}
 			}
-		}elseif($sender->hasPermission("myplot.command.list")) {
-			foreach($this->plugin->getPlotLevels() as $levelName => $settings) {
-				$plots = $this->plugin->getPlotsOfPlayer($sender->getName(), $levelName);
-				foreach($plots as $plot) {
-					$name = $plot->name;
-					$x = $plot->X;
-					$z = $plot->Z;
-					$sender->sendMessage(TF::YELLOW . $this->translateString("list.found", [$name, $x, $z]));
-				}
-			}
-		}
+		);
 		return true;
-	}
-
-	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return null; // this will probably be merged into the homes command
 	}
 }

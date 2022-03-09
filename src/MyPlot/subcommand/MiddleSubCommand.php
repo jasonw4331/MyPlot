@@ -6,6 +6,7 @@ use MyPlot\forms\MyPlotForm;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use SOFe\AwaitGenerator\Await;
 
 class MiddleSubCommand extends SubCommand
 {
@@ -19,26 +20,27 @@ class MiddleSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) : bool {
-		if(count($args) != 0) {
-			return false;
-		}
-		$plot = $this->plugin->getPlotByPosition($sender->getPosition());
-		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
-			return true;
-		}
-		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.middle")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
-			return true;
-		}
-		if($this->plugin->teleportPlayerToPlot($sender, $plot, true)) {
-			$sender->sendMessage(TextFormat::GREEN . $this->translateString("middle.success"));
-		}
+	public function execute(CommandSender $sender, array $args) : bool{
+		Await::f2c(
+			function() use ($sender, $args) : \Generator{
+				if(count($args) != 0){
+					$sender->sendMessage($this->translateString("subcommand.usage", [$this->getUsage()]));
+					return;
+				}
+				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				if($plot === null){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+					return;
+				}
+				if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.middle")){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+					return;
+				}
+				if(yield $this->internalAPI->generatePlayerTeleport($sender, $plot, true)){
+					$sender->sendMessage(TextFormat::GREEN . $this->translateString("middle.success"));
+				}
+			}
+		);
 		return true;
-	}
-
-	public function getForm(?Player $player = null) : ?MyPlotForm {
-		return null;
 	}
 }

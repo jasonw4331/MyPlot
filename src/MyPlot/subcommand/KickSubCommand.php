@@ -8,6 +8,7 @@ use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use SOFe\AwaitGenerator\Await;
 
 class KickSubCommand extends SubCommand
 {
@@ -21,43 +22,48 @@ class KickSubCommand extends SubCommand
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, array $args) : bool {
-		if (!isset($args[0])) return false;
-		$plot = $this->plugin->getPlotByPosition($sender->getPosition());
-		if($plot === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
-			return true;
-		}
-		if ($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.kick")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
-			return true;
-		}
-		$target = $this->plugin->getServer()->getPlayerByPrefix($args[0]);
-		if ($target === null) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.noPlayer"));
-			return true;
-		}
-		if (($targetPlot = $this->plugin->getPlotByPosition($target->getPosition())) === null or !$plot->isSame($targetPlot)) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.notInPlot"));
-			return true;
-		}
-		if ($target->hasPermission("myplot.admin.kick.bypass")) {
-			$sender->sendMessage(TextFormat::RED . $this->translateString("kick.cannotkick"));
-			$target->sendMessage($this->translateString("kick.attemptkick", [$target->getName()]));
-			return true;
-		}
-		if ($this->plugin->teleportPlayerToPlot($target, $plot)) {
-			$sender->sendMessage($this->translateString("kick.success1", [$target->getName(), $plot->__toString()]));
-			$target->sendMessage($this->translateString("kick.success2", [$sender->getName(), $plot->__toString()]));
-			return true;
-		}
-		$sender->sendMessage($this->translateString("error"));
+	public function execute(CommandSender $sender, array $args) : bool{
+		Await::f2c(
+			function() use ($sender, $args) : \Generator{
+				if(!isset($args[0])){
+					$sender->sendMessage($this->translateString("subcommand.usage", [$this->getUsage()]));
+					return;
+				}
+				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				if($plot === null){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
+					return;
+				}
+				if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.kick")){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+					return;
+				}
+				$target = $this->plugin->getServer()->getPlayerByPrefix($args[0]);
+				if($target === null){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("kick.noPlayer"));
+					return;
+				}
+				if(($targetPlot = yield $this->internalAPI->generatePlotByPosition($target->getPosition())) === null or !$plot->isSame($targetPlot)){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("kick.notInPlot"));
+					return;
+				}
+				if($target->hasPermission("myplot.admin.kick.bypass")){
+					$sender->sendMessage(TextFormat::RED . $this->translateString("kick.cannotkick"));
+					$target->sendMessage($this->translateString("kick.attemptkick", [$target->getName()]));
+					return;
+				}
+				if(!yield $this->internalAPI->generatePlayerTeleport($target, $plot, false)){
+					$sender->sendMessage($this->translateString("kick.success1", [$target->getName(), $plot->__toString()]));
+					$target->sendMessage($this->translateString("kick.success2", [$sender->getName(), $plot->__toString()]));
+				}else{
+					$sender->sendMessage($this->translateString("error"));
+				}
+			}
+		);
 		return true;
 	}
 
-	public function getForm(?Player $player = null) : ?MyPlotForm {
-		if($player !== null and ($plot = $this->plugin->getPlotByPosition($player->getPosition())) instanceof Plot)
-			return new KickForm($plot);
-		return null;
+	public function getFormClass() : ?string{
+		return KickForm::class;
 	}
 }
