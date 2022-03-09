@@ -8,7 +8,7 @@ use pocketmine\promise\Promise;
 use pocketmine\promise\PromiseResolver;
 use SOFe\AwaitGenerator\Await;
 
-class EconomyWrapper{
+final class EconomyWrapper{
 
 	public function __construct(private InternalEconomyProvider $provider){ }
 

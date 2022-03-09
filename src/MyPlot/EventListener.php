@@ -29,19 +29,16 @@ use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
 
-class EventListener implements Listener
-{
-	public function __construct(private MyPlot $plugin, private InternalAPI $api) {}
+final class EventListener implements Listener{
+	public function __construct(private MyPlot $plugin, private InternalAPI $api){ }
 
 	/**
 	 * @ignoreCancelled false
 	 * @priority LOWEST
 	 *
 	 * @param WorldLoadEvent $event
-	 *
-	 * @throws \ReflectionException
 	 */
-	public function onLevelLoad(WorldLoadEvent $event) : void {
+	public function onLevelLoad(WorldLoadEvent $event) : void{
 		if(file_exists($this->plugin->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$event->getWorld()->getFolderName().".yml")) {
 			$this->plugin->getLogger()->debug("MyPlot level " . $event->getWorld()->getFolderName() . " loaded!");
 			$settings = $event->getWorld()->getProvider()->getWorldData()->getGeneratorOptions();

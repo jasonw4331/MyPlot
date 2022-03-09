@@ -31,14 +31,13 @@ use pocketmine\world\Position;
 use pocketmine\world\WorldCreationOptions;
 use SOFe\Capital\Capital;
 
-class MyPlot extends PluginBase
-{
+final class MyPlot extends PluginBase{
 	private static MyPlot $instance;
 	private Language $language;
 	private InternalAPI $internalAPI;
 	private ?EconomyWrapper $economyProvider;
 
-	public static function getInstance() : self {
+	public static function getInstance() : self{
 		return self::$instance;
 	}
 

@@ -5,7 +5,7 @@ namespace MyPlot\provider;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\player\Player;
 
-class InternalEconomySProvider implements InternalEconomyProvider{
+final class InternalEconomySProvider implements InternalEconomyProvider{
 	public function __construct(private EconomyAPI $plugin){ }
 
 	/**
