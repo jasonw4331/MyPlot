@@ -4,7 +4,7 @@ namespace MyPlot\provider;
 
 use pocketmine\player\Player;
 
-interface EconomyProvider {
+interface InternalEconomyProvider{
 	/**
 	 * @param Player $player
 	 * @param int    $amount

@@ -8,7 +8,7 @@ use SOFe\Capital\LabelSet;
 use SOFe\Capital\Plugin\MainClass;
 use SOFe\Capital\Schema;
 
-class CapitalProvider implements EconomyProvider{
+class InternalCapitalProvider implements InternalEconomyProvider{
 
 	private Schema\Complete $selector;
 

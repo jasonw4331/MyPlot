@@ -7,24 +7,35 @@ use muqsit\worldstyler\Selection;
 use muqsit\worldstyler\shapes\CommonShape;
 use muqsit\worldstyler\shapes\Cuboid;
 use muqsit\worldstyler\WorldStyler;
+use MyPlot\events\MyPlotClearEvent;
+use MyPlot\events\MyPlotCloneEvent;
+use MyPlot\events\MyPlotDisposeEvent;
+use MyPlot\events\MyPlotFillEvent;
 use MyPlot\events\MyPlotMergeEvent;
+use MyPlot\events\MyPlotResetEvent;
+use MyPlot\events\MyPlotSaveEvent;
+use MyPlot\events\MyPlotSettingEvent;
+use MyPlot\events\MyPlotTeleportEvent;
 use MyPlot\plot\BasePlot;
 use MyPlot\plot\MergedPlot;
 use MyPlot\plot\SinglePlot;
 use MyPlot\provider\DataProvider;
-use MyPlot\provider\EconomyProvider;
+use MyPlot\provider\InternalEconomyProvider;
 use MyPlot\task\ClearBorderTask;
 use MyPlot\task\ClearPlotTask;
 use MyPlot\task\FillPlotTask;
 use MyPlot\task\RoadFillTask;
 use pocketmine\block\Block;
 use pocketmine\block\VanillaBlocks;
+use pocketmine\data\bedrock\BiomeIds;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\promise\PromiseResolver;
 use pocketmine\utils\TextFormat as TF;
 use pocketmine\world\biome\Biome;
+use pocketmine\world\biome\BiomeRegistry;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use SOFe\AwaitGenerator\Await;
@@ -34,16 +45,16 @@ final class InternalAPI{
 	private array $levels = [];
 	private DataProvider $dataProvider;
 
-	public function __construct(private MyPlot $plugin, private ?EconomyProvider $economyProvider){
+	public function __construct(private MyPlot $plugin, private ?InternalEconomyProvider $economyProvider){
 		$plugin->getLogger()->debug(TF::BOLD . "Loading Data Provider settings");
 		$this->dataProvider = new DataProvider($plugin);
 	}
 
-	public function getEconomyProvider() : ?EconomyProvider {
+	public function getEconomyProvider() : ?InternalEconomyProvider{
 		return $this->economyProvider;
 	}
 
-	public function setEconomyProvider(?EconomyProvider $economyProvider) : void{
+	public function setEconomyProvider(?InternalEconomyProvider $economyProvider) : void{
 		$this->economyProvider = $economyProvider;
 	}
 
@@ -83,6 +94,9 @@ final class InternalAPI{
 	}
 
 	public function generatePlotsToSave(SinglePlot $plot) : \Generator{
+		$ev = new MyPlotSaveEvent($plot);
+		$ev->call();
+		$plot = $ev->getPlot();
 		$failed = false;
 		foreach((yield $this->dataProvider->getMergedPlots($plot)) as $merged){
 			$savePlot = clone $plot;
@@ -120,8 +134,7 @@ final class InternalAPI{
 	 * @return \Generator<array<BasePlot>>
 	 */
 	public function generatePlotsOfPlayer(string $username, ?string $levelName) : \Generator {
-		false && yield;
-		return $this->dataProvider->getPlotsByOwner($username, $levelName);
+		return yield $this->dataProvider->getPlotsByOwner($username, $levelName);
 	}
 
 	/**
@@ -141,8 +154,7 @@ final class InternalAPI{
 	}
 
 	public function generateNextFreePlot(string $levelName, int $limitXZ) : \Generator{
-		false && yield;
-		return $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
+		return yield $this->dataProvider->getNextFreePlot($levelName, $limitXZ);
 	}
 
 	public function getPlotFast(float &$x, float &$z, PlotLevelSettings $plotLevel) : ?BasePlot{
@@ -194,9 +206,8 @@ final class InternalAPI{
 	 * @return \Generator<SinglePlot>
 	 */
 	public function generatePlot(string $worldName, int $X, int $Z) : \Generator {
-		false && yield;
 		// TODO: if merged return MergedPlot object
-		return $this->dataProvider->getPlot($worldName, $X, $Z);
+		return yield $this->dataProvider->getPlot($worldName, $X, $Z);
 	}
 
 	/**
@@ -389,7 +400,7 @@ final class InternalAPI{
 		);
 	}
 
-	public function generatePlotBB(SinglePlot $plot) : \Generator{
+	public function generatePlotBB(BasePlot $plot) : \Generator{
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$plotSize = $plotLevel->plotSize - 1;
 		$pos = yield $this->generatePlotPosition($plot, false);
@@ -524,6 +535,11 @@ final class InternalAPI{
 	}
 
 	public function generatePlayerTeleport(Player $player, BasePlot $plot, bool $center) : \Generator{
+		$ev = new MyPlotTeleportEvent($plot, $player, $center);
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+
 		if($center){
 			$pos = $plot instanceof MergedPlot ? yield $this->getMergeMid($plot) : yield $this->getPlotMid($plot);
 			return $player->teleport($pos);
@@ -591,12 +607,72 @@ final class InternalAPI{
 			false
 		))->z;
 		$maxz = (yield $this->generatePlotPosition(
-			yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
-				return (yield $this->generatePlotPosition($a, false))->z > (yield $this->generatePlotPosition($b, false))->z ? $a : $b;
-			}),
-			false
+				yield AsyncVariants::array_reduce($mergedPlots, function(SinglePlot $a, SinglePlot $b){
+					return (yield $this->generatePlotPosition($a, false))->z > (yield $this->generatePlotPosition($b, false))->z ? $a : $b;
+				}),
+				false
 			))->z + $plotSize;
 		return new Position(($minx + $maxx) / 2, $plotLevel->groundHeight, ($minz + $maxz) / 2, $this->plugin->getServer()->getWorldManager()->getWorldByName($plot->levelName));
+	}
+
+	/**
+	 * @param SinglePlot    $plot
+	 * @param string        $claimer
+	 * @param string        $plotName
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function claimPlot(SinglePlot $plot, string $claimer, string $plotName, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateClaimPlot($plot, $claimer, $plotName),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	public function generateClaimPlot(SinglePlot $plot, string $claimer, string $plotName) : \Generator{
+		$newPlot = clone $plot;
+		$newPlot->owner = $claimer;
+		$newPlot->helpers = [];
+		$newPlot->denied = [];
+		if($plotName !== "")
+			$newPlot->name = $plotName;
+		$newPlot->price = 0;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled()){
+			return false;
+		}
+		return yield $this->generatePlotsToSave($ev->getPlot());
+	}
+
+	/**
+	 * @param SinglePlot    $plot
+	 * @param string        $newName
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function renamePlot(SinglePlot $plot, string $newName, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateRenamePlot($plot, $newName),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	public function generateRenamePlot(SinglePlot $plot, string $newName) : \Generator{
+		$newPlot = clone $plot;
+		$newPlot->name = $newName;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled()){
+			return false;
+		}
+		return yield $this->generatePlotsToSave($ev->getPlot());
 	}
 
 	/**
@@ -608,79 +684,96 @@ final class InternalAPI{
 	 * @param callable|null $onFail
 	 * @phpstan-param (callable(\Throwable): void)|null $catches
 	 */
-	public function clonePlot(SinglePlot $plotFrom, SinglePlot $plotTo, WorldStyler $styler, ?callable $onComplete = null, ?callable $onFail = null) : void{
-		Await::f2c(
-			function() use ($plotFrom, $plotTo, $styler){
-				$world = $this->plugin->getServer()->getWorldManager()->getWorldByName($plotTo->levelName);
-				$aabb = yield $this->generatePlotBB($plotTo);
-				foreach($world->getEntities() as $entity){
-					if($aabb->isVectorInXZ($entity->getPosition())){
-						if($entity instanceof Player){
-							$this->generatePlayerTeleport($entity, $plotTo, false);
-						}
-					}
-				}
-				$plotLevel = $this->getLevelSettings($plotFrom->levelName);
-				$plotSize = $plotLevel->plotSize - 1;
-				$plotBeginPos = yield $this->generatePlotPosition($plotFrom, true);
-				$level = $plotBeginPos->getWorld();
-				$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
-				$plotBeginPos->y = 0;
-				$xMax = $plotBeginPos->x + $plotSize;
-				$zMax = $plotBeginPos->z + $plotSize;
-				foreach(yield $this->dataProvider->getMergedPlots($plotFrom) as $mergedPlot){
-					$pos = (yield $this->generatePlotPosition($mergedPlot, false))->subtract(1, 0, 1);
-					$xMaxPlot = $pos->x + $plotSize;
-					$zMaxPlot = $pos->z + $plotSize;
-					if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
-					if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
-					if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
-					if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
-				}
-				$selection = $styler->getSelection(99997) ?? new Selection(99997);
-				$selection->setPosition(1, $plotBeginPos);
-				$vec2 = new Vector3($xMax + 1, $level->getMaxY() - 1, $zMax + 1);
-				$selection->setPosition(2, $vec2);
-				$cuboid = Cuboid::fromSelection($selection);
-				//$cuboid = $cuboid->async(); // do not use async because WorldStyler async is very broken right now
-				$cuboid->copy($level, $vec2, function(float $time, int $changed) : void{
-					$this->plugin->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's to the MyPlot clipboard.');
-				});
-
-				$plotLevel = $this->getLevelSettings($plotTo->levelName);
-				$plotSize = $plotLevel->plotSize - 1;
-				$plotBeginPos = yield $this->generatePlotPosition($plotTo, true);
-				$level = $plotBeginPos->getWorld();
-				$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
-				$plotBeginPos->y = 0;
-				$xMax = $plotBeginPos->x + $plotSize;
-				$zMax = $plotBeginPos->z + $plotSize;
-				foreach(yield $this->dataProvider->getMergedPlots($plotTo) as $mergedPlot){
-					$pos = (yield $this->generatePlotPosition($mergedPlot, false))->subtract(1, 0, 1);
-					$xMaxPlot = $pos->x + $plotSize;
-					$zMaxPlot = $pos->z + $plotSize;
-					if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
-					if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
-					if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
-					if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
-				}
-				$selection->setPosition(1, $plotBeginPos);
-				$vec2 = new Vector3($xMax + 1, $level->getMaxY() - 1, $zMax + 1);
-				$selection->setPosition(2, $vec2);
-				$commonShape = CommonShape::fromSelection($selection);
-				//$commonShape = $commonShape->async(); // do not use async because WorldStyler async is very broken right now
-				$commonShape->paste($level, $vec2, true, function(float $time, int $changed) : void{
-					$this->plugin->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from the MyPlot clipboard.');
-				});
-				$styler->removeSelection(99997);
-				foreach((yield $this->generatePlotChunks($plotTo)) as [$chunkX, $chunkZ, $chunk]){
-					$level->setChunk($chunkX, $chunkZ, $chunk);
-				}
-				return true;
-			},
+	public function clonePlot(SinglePlot $plotFrom, SinglePlot $plotTo, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateClonePlot($plotFrom, $plotTo),
 			$onComplete,
 			$onFail === null ? [] : [$onFail]
 		);
+	}
+
+	public function generateClonePlot(SinglePlot $plotFrom, SinglePlot $plotTo) : \Generator{
+		$styler = $this->plugin->getServer()->getPluginManager()->getPlugin("WorldStyler");
+		if(!$styler instanceof WorldStyler){
+			return false;
+		}
+		$ev = new MyPlotCloneEvent($plotFrom, $plotTo);
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+
+		$plotFrom = $ev->getPlot();
+		$plotTo = $ev->getClonePlot();
+		if($this->getLevelSettings($plotFrom->levelName) === null or $this->getLevelSettings($plotTo->levelName) === null){
+			return false;
+		}
+
+		$world = $this->plugin->getServer()->getWorldManager()->getWorldByName($plotTo->levelName);
+		$aabb = yield $this->generatePlotBB($plotTo);
+		foreach($world->getEntities() as $entity){
+			if($aabb->isVectorInXZ($entity->getPosition())){
+				if($entity instanceof Player){
+					yield $this->generatePlayerTeleport($entity, $plotTo, false);
+				}
+			}
+		}
+		$plotLevel = $this->getLevelSettings($plotFrom->levelName);
+		$plotSize = $plotLevel->plotSize - 1;
+		$plotBeginPos = yield $this->generatePlotPosition($plotFrom, true);
+		$level = $plotBeginPos->getWorld();
+		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
+		$plotBeginPos->y = 0;
+		$xMax = $plotBeginPos->x + $plotSize;
+		$zMax = $plotBeginPos->z + $plotSize;
+		foreach(yield $this->dataProvider->getMergedPlots($plotFrom) as $mergedPlot){
+			$pos = (yield $this->generatePlotPosition($mergedPlot, false))->subtract(1, 0, 1);
+			$xMaxPlot = $pos->x + $plotSize;
+			$zMaxPlot = $pos->z + $plotSize;
+			if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
+			if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
+			if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+			if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+		}
+		$selection = $styler->getSelection(99997) ?? new Selection(99997);
+		$selection->setPosition(1, $plotBeginPos);
+		$vec2 = new Vector3($xMax + 1, $level->getMaxY() - 1, $zMax + 1);
+		$selection->setPosition(2, $vec2);
+		$cuboid = Cuboid::fromSelection($selection);
+		//$cuboid = $cuboid->async(); // do not use async because WorldStyler async is very broken right now
+		$cuboid->copy($level, $vec2, function(float $time, int $changed) : void{
+			$this->plugin->getLogger()->debug(TF::GREEN . 'Copied ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's to the MyPlot clipboard.');
+		});
+
+		$plotLevel = $this->getLevelSettings($plotTo->levelName);
+		$plotSize = $plotLevel->plotSize - 1;
+		$plotBeginPos = yield $this->generatePlotPosition($plotTo, true);
+		$level = $plotBeginPos->getWorld();
+		$plotBeginPos = $plotBeginPos->subtract(1, 0, 1);
+		$plotBeginPos->y = 0;
+		$xMax = $plotBeginPos->x + $plotSize;
+		$zMax = $plotBeginPos->z + $plotSize;
+		foreach(yield $this->dataProvider->getMergedPlots($plotTo) as $mergedPlot){
+			$pos = (yield $this->generatePlotPosition($mergedPlot, false))->subtract(1, 0, 1);
+			$xMaxPlot = $pos->x + $plotSize;
+			$zMaxPlot = $pos->z + $plotSize;
+			if($plotBeginPos->x > $pos->x) $plotBeginPos->x = $pos->x;
+			if($plotBeginPos->z > $pos->z) $plotBeginPos->z = $pos->z;
+			if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+			if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+		}
+		$selection->setPosition(1, $plotBeginPos);
+		$vec2 = new Vector3($xMax + 1, $level->getMaxY() - 1, $zMax + 1);
+		$selection->setPosition(2, $vec2);
+		$commonShape = CommonShape::fromSelection($selection);
+		//$commonShape = $commonShape->async(); // do not use async because WorldStyler async is very broken right now
+		$commonShape->paste($level, $vec2, true, function(float $time, int $changed) : void{
+			$this->plugin->getLogger()->debug(TF::GREEN . 'Pasted ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's from the MyPlot clipboard.');
+		});
+		$styler->removeSelection(99997);
+		foreach((yield $this->generatePlotChunks($plotTo)) as [$chunkX, $chunkZ, $chunk]){
+			$level->setChunk($chunkX, $chunkZ, $chunk);
+		}
+		return true;
 	}
 
 	/**
@@ -691,95 +784,108 @@ final class InternalAPI{
 	 * @param callable|null $onFail
 	 * @phpstan-param (callable(\Throwable): void)|null    $catches
 	 */
-	public function clearPlot(SinglePlot $plot, int $maxBlocksPerTick, ?callable $onComplete = null, ?callable $onFail = null) : void{
-		Await::f2c(
-			function() use ($plot, $maxBlocksPerTick) : \Generator{
-				$level = $this->plugin->getServer()->getWorldManager()->getWorldByName($plot->levelName);
-				if($level === null){
-					return false;
-				}
-				foreach($level->getEntities() as $entity){
-					if((yield $this->generatePlotBB($plot))->isVectorInXZ($entity->getPosition())){
-						if(!$entity instanceof Player){
-							$entity->flagForDespawn();
-						}else{
-							$this->generatePlayerTeleport($entity, $plot, false);
-						}
-					}
-				}
-				$styler = $this->plugin->getServer()->getPluginManager()->getPlugin("WorldStyler");
-				if($this->plugin->getConfig()->get("FastClearing", false) === true && $styler instanceof WorldStyler){
-					$plotLevel = $this->getLevelSettings($plot->levelName);
-					$plotSize = $plotLevel->plotSize - 1;
-					$plotBeginPos = yield $this->generatePlotPosition($plot, true);
-					$xMax = $plotBeginPos->x + $plotSize;
-					$zMax = $plotBeginPos->z + $plotSize;
-					foreach(yield $this->dataProvider->getMergedPlots($plot) as $mergedPlot){
-						$xplot = (yield $this->generatePlotPosition($mergedPlot, false))->x;
-						$zplot = (yield $this->generatePlotPosition($mergedPlot, false))->z;
-						$xMaxPlot = (int) ($xplot + $plotSize);
-						$zMaxPlot = (int) ($zplot + $plotSize);
-						if($plotBeginPos->x > $xplot) $plotBeginPos->x = $xplot;
-						if($plotBeginPos->z > $zplot) $plotBeginPos->z = $zplot;
-						if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
-						if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
-					}
-					// Above ground
-					$selection = $styler->getSelection(99998) ?? new Selection(99998);
-					$plotBeginPos->y = $plotLevel->groundHeight + 1;
-					$selection->setPosition(1, $plotBeginPos);
-					$selection->setPosition(2, new Vector3($xMax, World::Y_MAX, $zMax));
-					$cuboid = Cuboid::fromSelection($selection);
-					//$cuboid = $cuboid->async();
-					$cuboid->set($plotBeginPos->getWorld(), VanillaBlocks::AIR()->getFullId(), function(float $time, int $changed) : void{
-						$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-					});
-					$styler->removeSelection(99998);
-					// Ground Surface
-					$selection = $styler->getSelection(99998) ?? new Selection(99998);
-					$plotBeginPos->y = $plotLevel->groundHeight;
-					$selection->setPosition(1, $plotBeginPos);
-					$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight, $zMax));
-					$cuboid = Cuboid::fromSelection($selection);
-					//$cuboid = $cuboid->async();
-					$cuboid->set($plotBeginPos->getWorld(), $plotLevel->plotFloorBlock->getFullId(), function(float $time, int $changed) : void{
-						$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-					});
-					$styler->removeSelection(99998);
-					// Ground
-					$selection = $styler->getSelection(99998) ?? new Selection(99998);
-					$plotBeginPos->y = 1;
-					$selection->setPosition(1, $plotBeginPos);
-					$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight - 1, $zMax));
-					$cuboid = Cuboid::fromSelection($selection);
-					//$cuboid = $cuboid->async();
-					$cuboid->set($plotBeginPos->getWorld(), $plotLevel->plotFillBlock->getFullId(), function(float $time, int $changed) : void{
-						$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-					});
-					$styler->removeSelection(99998);
-					// Bottom of world
-					$selection = $styler->getSelection(99998) ?? new Selection(99998);
-					$plotBeginPos->y = 0;
-					$selection->setPosition(1, $plotBeginPos);
-					$selection->setPosition(2, new Vector3($xMax, 0, $zMax));
-					$cuboid = Cuboid::fromSelection($selection);
-					//$cuboid = $cuboid->async();
-					$cuboid->set($plotBeginPos->getWorld(), $plotLevel->bottomBlock->getFullId(), function(float $time, int $changed) : void{
-						$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-					});
-					$styler->removeSelection(99998);
-					foreach($this->plugin->getPlotChunks($plot) as [$chunkX, $chunkZ, $chunk]){
-						$plotBeginPos->getWorld()->setChunk($chunkX, $chunkZ, $chunk);
-					}
-					$this->plugin->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this->plugin, $plot), 1);
-					return true;
-				}
-				$this->plugin->getScheduler()->scheduleTask(new ClearPlotTask($this->plugin, $plot, $maxBlocksPerTick));
-				return true;
-			},
+	public function clearPlot(BasePlot $plot, int $maxBlocksPerTick, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateClearPlot($plot, $maxBlocksPerTick),
 			$onComplete,
 			$onFail === null ? [] : [$onFail]
 		);
+	}
+
+	public function generateClearPlot(BasePlot $plot, int $maxBlocksPerTick) : \Generator{
+		$ev = new MyPlotClearEvent($plot, $maxBlocksPerTick);
+		$ev->call();
+		if($ev->isCancelled()){
+			return false;
+		}
+		$plot = $ev->getPlot();
+		if($this->getLevelSettings($plot->levelName) === null){
+			return false;
+		}
+		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
+
+		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName($plot->levelName);
+		if($level === null){
+			return false;
+		}
+		foreach($level->getEntities() as $entity){
+			if((yield $this->generatePlotBB($plot))->isVectorInXZ($entity->getPosition())){
+				if(!$entity instanceof Player){
+					$entity->flagForDespawn();
+				}else{
+					$this->generatePlayerTeleport($entity, $plot, false);
+				}
+			}
+		}
+		$styler = $this->plugin->getServer()->getPluginManager()->getPlugin("WorldStyler");
+		if($this->plugin->getConfig()->get("FastClearing", false) === true && $styler instanceof WorldStyler){
+			$plotLevel = $this->getLevelSettings($plot->levelName);
+			$plotSize = $plotLevel->plotSize - 1;
+			$plotBeginPos = yield $this->generatePlotPosition($plot, true);
+			$xMax = $plotBeginPos->x + $plotSize;
+			$zMax = $plotBeginPos->z + $plotSize;
+			foreach(yield $this->dataProvider->getMergedPlots($plot) as $mergedPlot){
+				$xplot = (yield $this->generatePlotPosition($mergedPlot, false))->x;
+				$zplot = (yield $this->generatePlotPosition($mergedPlot, false))->z;
+				$xMaxPlot = (int) ($xplot + $plotSize);
+				$zMaxPlot = (int) ($zplot + $plotSize);
+				if($plotBeginPos->x > $xplot) $plotBeginPos->x = $xplot;
+				if($plotBeginPos->z > $zplot) $plotBeginPos->z = $zplot;
+				if($xMax < $xMaxPlot) $xMax = $xMaxPlot;
+				if($zMax < $zMaxPlot) $zMax = $zMaxPlot;
+			}
+			// Above ground
+			$selection = $styler->getSelection(99998) ?? new Selection(99998);
+			$plotBeginPos->y = $plotLevel->groundHeight + 1;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($xMax, World::Y_MAX, $zMax));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->getWorld(), VanillaBlocks::AIR()->getFullId(), function(float $time, int $changed) : void{
+				$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			// Ground Surface
+			$selection = $styler->getSelection(99998) ?? new Selection(99998);
+			$plotBeginPos->y = $plotLevel->groundHeight;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight, $zMax));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->getWorld(), $plotLevel->plotFloorBlock->getFullId(), function(float $time, int $changed) : void{
+				$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			// Ground
+			$selection = $styler->getSelection(99998) ?? new Selection(99998);
+			$plotBeginPos->y = 1;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($xMax, $plotLevel->groundHeight - 1, $zMax));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->getWorld(), $plotLevel->plotFillBlock->getFullId(), function(float $time, int $changed) : void{
+				$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			// Bottom of world
+			$selection = $styler->getSelection(99998) ?? new Selection(99998);
+			$plotBeginPos->y = 0;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($xMax, 0, $zMax));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->getWorld(), $plotLevel->bottomBlock->getFullId(), function(float $time, int $changed) : void{
+				$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			foreach($this->plugin->getPlotChunks($plot) as [$chunkX, $chunkZ, $chunk]){
+				$plotBeginPos->getWorld()->setChunk($chunkX, $chunkZ, $chunk);
+			}
+			$this->plugin->getScheduler()->scheduleDelayedTask(new ClearBorderTask($this->plugin, $plot), 1);
+			return true;
+		}
+		$this->plugin->getScheduler()->scheduleTask(new ClearPlotTask($this->plugin, $plot, $maxBlocksPerTick));
+		return true;
 	}
 
 	/**
@@ -791,59 +897,72 @@ final class InternalAPI{
 	 * @param callable|null $onFail
 	 * @phpstan-param (callable(\Throwable): void)|null    $catches
 	 */
-	public function fillPlot(SinglePlot $plot, Block $plotFillBlock, int $maxBlocksPerTick, ?callable $onComplete = null, ?callable $onFail = null) : void{
-		Await::f2c(
-			function() use ($plot, $plotFillBlock, $maxBlocksPerTick){
-				foreach($this->plugin->getServer()->getWorldManager()->getWorldByName($plot->levelName)->getEntities() as $entity){
-					if((yield $this->generatePlotBB($plot))->isVectorInXZ($entity->getPosition()) && $entity->getPosition()->y <= $this->getLevelSettings($plot->levelName)->groundHeight){
-						if(!$entity instanceof Player){
-							$entity->flagForDespawn();
-						}else{
-							$this->generatePlayerTeleport($entity, $plot, false);
-						}
-					}
-				}
-				if($this->plugin->getConfig()->get("FastFilling", false) === true){
-					$styler = $this->plugin->getServer()->getPluginManager()->getPlugin("WorldStyler");
-					if(!$styler instanceof WorldStyler){
-						return false;
-					}
-					$plotLevel = $this->getLevelSettings($plot->levelName);
-					$plotSize = $plotLevel->plotSize - 1;
-					$plotBeginPos = yield $this->generatePlotPosition($plot, false);
-					// Ground
-					$selection = $styler->getSelection(99998);
-					$plotBeginPos->y = 1;
-					$selection->setPosition(1, $plotBeginPos);
-					$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, $plotLevel->groundHeight, $plotBeginPos->z + $plotSize));
-					$cuboid = Cuboid::fromSelection($selection);
-					//$cuboid = $cuboid->async();
-					$cuboid->set($plotBeginPos->getWorld(), $plotFillBlock->getFullId(), function(float $time, int $changed) : void{
-						$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-					});
-					$styler->removeSelection(99998);
-					// Bottom of world
-					$selection = $styler->getSelection(99998);
-					$plotBeginPos->y = 0;
-					$selection->setPosition(1, $plotBeginPos);
-					$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, 0, $plotBeginPos->z + $plotSize));
-					$cuboid = Cuboid::fromSelection($selection);
-					//$cuboid = $cuboid->async();
-					$cuboid->set($plotBeginPos->getWorld(), $plotLevel->bottomBlock->getFullId(), function(float $time, int $changed) : void{
-						$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
-					});
-					$styler->removeSelection(99998);
-					foreach((yield $this->generatePlotChunks($plot)) as [$chunkX, $chunkZ, $chunk]){
-						$plotBeginPos->getWorld()?->setChunk($chunkX, $chunkZ, $chunk);
-					}
-					return true;
-				}
-				$this->plugin->getScheduler()->scheduleTask(new FillPlotTask($this->plugin, $plot, $plotFillBlock, $maxBlocksPerTick));
-				return true;
-			},
+	public function fillPlot(BasePlot $plot, Block $plotFillBlock, int $maxBlocksPerTick, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateFillPlot($plot, $plotFillBlock, $maxBlocksPerTick),
 			$onComplete,
 			$onFail === null ? [] : [$onFail]
 		);
+	}
+
+	public function generateFillPlot(BasePlot $plot, Block $plotFillBlock, int $maxBlocksPerTick) : \Generator{
+		$ev = new MyPlotFillEvent($plot, $maxBlocksPerTick);
+		$ev->call();
+		if($ev->isCancelled()){
+			return false;
+		}
+		$plot = $ev->getPlot();
+		if($this->getLevelSettings($plot->levelName) === null){
+			return false;
+		}
+		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
+
+		foreach($this->plugin->getServer()->getWorldManager()->getWorldByName($plot->levelName)->getEntities() as $entity){
+			if((yield $this->generatePlotBB($plot))->isVectorInXZ($entity->getPosition()) && $entity->getPosition()->y <= $this->getLevelSettings($plot->levelName)->groundHeight){
+				if(!$entity instanceof Player){
+					$entity->flagForDespawn();
+				}else{
+					$this->generatePlayerTeleport($entity, $plot, false);
+				}
+			}
+		}
+		if($this->plugin->getConfig()->get("FastFilling", false) === true){
+			$styler = $this->plugin->getServer()->getPluginManager()->getPlugin("WorldStyler");
+			if(!$styler instanceof WorldStyler){
+				return false;
+			}
+			$plotLevel = $this->getLevelSettings($plot->levelName);
+			$plotSize = $plotLevel->plotSize - 1;
+			$plotBeginPos = yield $this->generatePlotPosition($plot, false);
+			// Ground
+			$selection = $styler->getSelection(99998);
+			$plotBeginPos->y = 1;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, $plotLevel->groundHeight, $plotBeginPos->z + $plotSize));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->getWorld(), $plotFillBlock->getFullId(), function(float $time, int $changed) : void{
+				$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			// Bottom of world
+			$selection = $styler->getSelection(99998);
+			$plotBeginPos->y = 0;
+			$selection->setPosition(1, $plotBeginPos);
+			$selection->setPosition(2, new Vector3($plotBeginPos->x + $plotSize, 0, $plotBeginPos->z + $plotSize));
+			$cuboid = Cuboid::fromSelection($selection);
+			//$cuboid = $cuboid->async();
+			$cuboid->set($plotBeginPos->getWorld(), $plotLevel->bottomBlock->getFullId(), function(float $time, int $changed) : void{
+				$this->plugin->getLogger()->debug('Set ' . number_format($changed) . ' blocks in ' . number_format($time, 10) . 's');
+			});
+			$styler->removeSelection(99998);
+			foreach((yield $this->generatePlotChunks($plot)) as [$chunkX, $chunkZ, $chunk]){
+				$plotBeginPos->getWorld()?->setChunk($chunkX, $chunkZ, $chunk);
+			}
+			return true;
+		}
+		$this->plugin->getScheduler()->scheduleTask(new FillPlotTask($this->plugin, $plot, $plotFillBlock, $maxBlocksPerTick));
+		return true;
 	}
 
 	/**
@@ -853,35 +972,53 @@ final class InternalAPI{
 	 * @param callable|null $onFail
 	 * @phpstan-param (callable(\Throwable): void)|null    $catches
 	 */
-	public function disposePlot(SinglePlot $plot, ?callable $onComplete = null, ?callable $onFail = null) : void{
+	public function disposePlot(BasePlot $plot, ?callable $onComplete = null, ?callable $onFail = null) : void{
 		Await::g2c(
-			$this->dataProvider->deletePlot($plot),
+			$this->generateDisposePlot($plot),
 			$onComplete,
 			$onFail === null ? [] : [$onFail]
 		);
+	}
+
+	public function generateDisposePlot(BasePlot $plot) : \Generator{
+		$ev = new MyPlotDisposeEvent($plot);
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+		$plot = $ev->getPlot();
+		return yield $this->dataProvider->deletePlot($plot);
 	}
 
 	/**
 	 * @param SinglePlot    $plot
 	 * @param int           $maxBlocksPerTick
 	 * @param callable|null $onComplete
-	 * @phpstan-param (callable(bool): void)|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
 	 * @param callable|null $onFail
-	 * @phpstan-param (callable(\Throwable): void)|null    $catches
-	 *
-	 * @noinspection PhpVoidFunctionResultUsedInspection
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
 	 */
 	public function resetPlot(SinglePlot $plot, int $maxBlocksPerTick, ?callable $onComplete = null, ?callable $onFail = null) : void{
-		$this->disposePlot(
-			$plot,
-			fn(bool $success) => $success && $this->clearPlot(
-					$plot,
-					$maxBlocksPerTick,
-					$onComplete,
-					$onFail
-				),
-			$onFail
+		Await::g2c(
+			$this->generateResetPlot($plot, $maxBlocksPerTick),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
 		);
+	}
+
+	public function generateResetPlot(SinglePlot $plot, int $maxBlocksPerTick) : \Generator{
+		$ev = new MyPlotResetEvent($plot);
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+		$plot = $ev->getPlot();
+		if(!yield $this->generateDisposePlot($plot)){
+			return false;
+		}
+		if(!yield $this->generateClearPlot($plot, $maxBlocksPerTick)){
+			yield $this->generatePlotsToSave($plot);
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -901,6 +1038,23 @@ final class InternalAPI{
 	}
 
 	public function generatePlotBiome(SinglePlot $plot, Biome $biome) : \Generator{
+		$newPlot = clone $plot;
+		$newPlot->biome = str_replace(" ", "_", strtoupper($biome->getName()));
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+		$plot = $ev->getPlot();
+		if(defined(BiomeIds::class . "::" . $plot->biome) and is_int(constant(BiomeIds::class . "::" . $plot->biome))){
+			$biome = constant(BiomeIds::class . "::" . $plot->biome);
+		}else{
+			$biome = BiomeIds::PLAINS;
+		}
+		$biome = BiomeRegistry::getInstance()->getBiome($biome);
+		if($this->getLevelSettings($plot->levelName) === null){
+			return false;
+		}
+
 		$failed = false;
 		foreach(yield $this->dataProvider->getMergedPlots($plot) as $merged){
 			$merged->biome = $plot->biome;
@@ -929,6 +1083,203 @@ final class InternalAPI{
 
 	/**
 	 * @param SinglePlot    $plot
+	 * @param bool          $pvp
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function setPlotPvp(SinglePlot $plot, bool $pvp, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generatePlotPvp($plot, $pvp),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	public function generatePlotPvp(SinglePlot $plot, bool $pvp) : \Generator{
+		$newPlot = clone $plot;
+		$newPlot->pvp = $pvp;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+		$plot = $ev->getPlot();
+		return yield $this->dataProvider->savePlot($plot);
+	}
+
+	/**
+	 * @param SinglePlot    $plot
+	 * @param string        $player
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function addPlotHelper(SinglePlot $plot, string $player, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateAddPlotHelper($plot, $player),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	public function generateAddPlotHelper(SinglePlot $plot, string $player) : \Generator{
+		$newPlot = clone $plot;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$newPlot->addHelper($player) ? $ev->uncancel() : $ev->cancel();
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+		$plot = $ev->getPlot();
+		return yield $this->dataProvider->savePlot($plot);
+	}
+
+	/**
+	 * @param SinglePlot    $plot
+	 * @param string        $player
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function removePlotHelper(SinglePlot $plot, string $player, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateRemovePlotHelper($plot, $player),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	public function generateRemovePlotHelper(SinglePlot $plot, string $player) : \Generator{
+		$newPlot = clone $plot;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$newPlot->removeHelper($player) ? $ev->uncancel() : $ev->cancel();
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+		$plot = $ev->getPlot();
+		return yield $this->dataProvider->savePlot($plot);
+	}
+
+	/**
+	 * @param SinglePlot    $plot
+	 * @param string        $player
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function addPlotDenied(SinglePlot $plot, string $player, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateAddPlotDenied($plot, $player),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	public function generateAddPlotDenied(SinglePlot $plot, string $player) : \Generator{
+		$newPlot = clone $plot;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$newPlot->denyPlayer($player) ? $ev->uncancel() : $ev->cancel();
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+		$plot = $ev->getPlot();
+		return yield $this->dataProvider->savePlot($plot);
+	}
+
+	/**
+	 * @param SinglePlot    $plot
+	 * @param string        $player
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function removePlotDenied(SinglePlot $plot, string $player, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateRemovePlotDenied($plot, $player),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	public function generateRemovePlotDenied(SinglePlot $plot, string $player) : \Generator{
+		$newPlot = clone $plot;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$newPlot->unDenyPlayer($player) ? $ev->uncancel() : $ev->cancel();
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+		$plot = $ev->getPlot();
+		return yield $this->dataProvider->savePlot($plot);
+	}
+
+	/**
+	 * @param SinglePlot    $plot
+	 * @param int           $price
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function sellPlot(SinglePlot $plot, int $price, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateSellPlot($plot, $price),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	public function generateSellPlot(SinglePlot $plot, int $price) : \Generator{
+		if($this->economyProvider === null or $price <= 0){
+			return false;
+		}
+
+		$newPlot = clone $plot;
+		$newPlot->price = $price;
+		$ev = new MyPlotSettingEvent($plot, $newPlot);
+		$ev->call();
+		if($ev->isCancelled())
+			return false;
+		$plot = $ev->getPlot();
+		return yield $this->dataProvider->savePlot($plot);
+	}
+
+	/**
+	 * @param SinglePlot    $plot
+	 * @param Player        $player
+	 * @param callable|null $onComplete
+	 * @phpstan-param (callable(bool): void)|null       $onComplete
+	 * @param callable|null $onFail
+	 * @phpstan-param (callable(\Throwable): void)|null $catches
+	 */
+	public function buyPlot(SinglePlot $plot, Player $player, ?callable $onComplete = null, ?callable $onFail = null) : void{
+		Await::g2c(
+			$this->generateBuyPlot($plot, $player),
+			$onComplete,
+			$onFail === null ? [] : [$onFail]
+		);
+	}
+
+	public function generateBuyPlot(SinglePlot $plot, Player $player) : \Generator{
+		if($this->economyProvider === null){
+			return false;
+		}
+		if(!yield $this->economyProvider->reduceMoney($player, $plot->price)){
+			return false;
+		}
+		if(!yield $this->economyProvider->addMoney($this->plugin->getServer()->getOfflinePlayer($plot->owner), $plot->price)){
+			yield $this->economyProvider->addMoney($player, $plot->price);
+			return false;
+		}
+
+		return yield $this->generateClaimPlot($plot, $player->getName(), '');
+	}
+
+	/**
+	 * @param SinglePlot    $plot
 	 * @param callable|null $onComplete
 	 * @phpstan-param (callable(array<int, Chunk>): void)|null $onComplete
 	 * @param callable|null $onFail
@@ -942,7 +1293,7 @@ final class InternalAPI{
 		);
 	}
 
-	public function generatePlotChunks(SinglePlot $plot) : \Generator{
+	public function generatePlotChunks(BasePlot $plot) : \Generator{
 		$plotLevel = $this->getLevelSettings($plot->levelName);
 		if($plotLevel === null){
 			return [];

@@ -2,23 +2,15 @@
 declare(strict_types=1);
 namespace MyPlot;
 
-use muqsit\worldstyler\WorldStyler;
-use MyPlot\events\MyPlotClearEvent;
-use MyPlot\events\MyPlotCloneEvent;
-use MyPlot\events\MyPlotDisposeEvent;
-use MyPlot\events\MyPlotFillEvent;
 use MyPlot\events\MyPlotGenerationEvent;
-use MyPlot\events\MyPlotResetEvent;
-use MyPlot\events\MyPlotSettingEvent;
-use MyPlot\events\MyPlotTeleportEvent;
 use MyPlot\plot\BasePlot;
 use MyPlot\plot\SinglePlot;
-use MyPlot\provider\CapitalProvider;
-use MyPlot\provider\EconomyProvider;
-use MyPlot\provider\EconomySProvider;
+use MyPlot\provider\EconomyWrapper;
+use MyPlot\provider\InternalCapitalProvider;
+use MyPlot\provider\InternalEconomyProvider;
+use MyPlot\provider\InternalEconomySProvider;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Block;
-use pocketmine\data\bedrock\BiomeIds;
 use pocketmine\lang\Language;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
@@ -33,7 +25,6 @@ use pocketmine\promise\PromiseResolver;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 use pocketmine\world\biome\Biome;
-use pocketmine\world\biome\BiomeRegistry;
 use pocketmine\world\format\Chunk;
 use pocketmine\world\generator\GeneratorManager;
 use pocketmine\world\Position;
@@ -45,6 +36,7 @@ class MyPlot extends PluginBase
 	private static MyPlot $instance;
 	private Language $language;
 	private InternalAPI $internalAPI;
+	private ?EconomyWrapper $economyProvider;
 
 	public static function getInstance() : self {
 		return self::$instance;
@@ -75,30 +67,32 @@ class MyPlot extends PluginBase
 	/**
 	 * Returns the EconomyProvider that is being used
 	 *
+	 * @return InternalEconomyProvider|null
 	 * @api
 	 *
-	 * @return EconomyProvider|null
 	 */
-	public function getEconomyProvider() : ?EconomyProvider {
-		return $this->internalAPI->getEconomyProvider();
+	public function getEconomyProvider() : ?EconomyWrapper{
+		return $this->economyProvider;
 	}
 
 	/**
 	 * Allows setting the economy provider to a custom provider or to null to disable economy mode
 	 *
+	 * @param bool $enable
+	 *
 	 * @api
 	 *
-	 * @param EconomyProvider|null $provider
 	 */
-	public function setEconomyProvider(?EconomyProvider $provider) : void {
-		if($provider === null) {
+	public function toggleEconomy(bool $enable) : void{
+		if(!$enable){
+			$this->getLogger()->info("Economy mode has been disabled via API");
+			$this->internalAPI->setEconomyProvider(null);
+			$this->economyProvider = null;
 			$this->getConfig()->set("UseEconomy", false);
-			$this->getLogger()->info("Economy mode disabled!");
 		}else{
-			$this->getConfig()->set("UseEconomy", true);
-			$this->getLogger()->info("A custom economy provider has been registered. Economy mode now enabled!");
+			$this->getLogger()->info("Economy mode has been enabled via API");
+			$this->internalAPI->setEconomyProvider($this->checkEconomy());
 		}
-		$this->internalAPI->setEconomyProvider($provider);
 	}
 
 	/**
@@ -108,7 +102,7 @@ class MyPlot extends PluginBase
 	 *
 	 * @return PlotLevelSettings[]
 	 */
-	public function getPlotLevels() : array {
+	public function getAllLevelSettings() : array{
 		return $this->internalAPI->getAllLevelSettings();
 	}
 
@@ -151,7 +145,6 @@ class MyPlot extends PluginBase
 	public function unloadLevelSettings(string $levelName) : bool {
 		return $this->internalAPI->unloadLevelSettings($levelName);
 	}
-
 
 	/**
 	 * Generate a new plot level with optional settings
@@ -408,12 +401,6 @@ class MyPlot extends PluginBase
 	 */
 	public function teleportPlayerToPlot(Player $player, BasePlot $plot, bool $center = false) : Promise {
 		$resolver = new PromiseResolver();
-		$ev = new MyPlotTeleportEvent($plot, $player, $center);
-		$ev->call();
-		if($ev->isCancelled()){
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
 		$this->internalAPI->teleportPlayerToPlot(
 			$player,
 			$plot,
@@ -437,21 +424,15 @@ class MyPlot extends PluginBase
 	 * @phpstan-return Promise<bool>
 	 */
 	public function claimPlot(SinglePlot $plot, string $claimer, string $plotName = "") : Promise{
-		$newPlot = clone $plot;
-		$newPlot->owner = $claimer;
-		$newPlot->helpers = [];
-		$newPlot->denied = [];
-		if($plotName !== "")
-			$newPlot->name = $plotName;
-		$newPlot->price = 0;
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$ev->call();
-		if($ev->isCancelled()){
-			$resolver = new PromiseResolver();
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		return $this->savePlot($ev->getPlot());
+		$resolver = new PromiseResolver();
+		$this->internalAPI->claimPlot(
+			$plot,
+			$claimer,
+			$plotName,
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
@@ -466,16 +447,14 @@ class MyPlot extends PluginBase
 	 * @phpstan-return Promise<bool>
 	 */
 	public function renamePlot(SinglePlot $plot, string $newName = "") : Promise{
-		$newPlot = clone $plot;
-		$newPlot->name = $newName;
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$ev->call();
-		if($ev->isCancelled()){
-			$resolver = new PromiseResolver();
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		return $this->savePlot($ev->getPlot());
+		$resolver = new PromiseResolver();
+		$this->internalAPI->renamePlot(
+			$plot,
+			$newName,
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
@@ -491,27 +470,9 @@ class MyPlot extends PluginBase
 	 */
 	public function clonePlot(SinglePlot $plotFrom, SinglePlot $plotTo) : Promise {
 		$resolver = new PromiseResolver();
-		$styler = $this->getServer()->getPluginManager()->getPlugin("WorldStyler");
-		if(!$styler instanceof WorldStyler) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$ev = new MyPlotCloneEvent($plotFrom, $plotTo);
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$plotFrom = $ev->getPlot();
-		$plotTo = $ev->getClonePlot();
-		if($this->internalAPI->getLevelSettings($plotFrom->levelName) === null or $this->internalAPI->getLevelSettings($plotTo->levelName) === null) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
 		$this->internalAPI->clonePlot(
 			$plotFrom,
 			$plotTo,
-			$styler,
 			fn(bool $success) => $resolver->resolve($success),
 			fn(\Throwable $e) => $resolver->reject()
 		);
@@ -529,20 +490,8 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function clearPlot(SinglePlot $plot, int $maxBlocksPerTick = 256) : Promise {
+	public function clearPlot(BasePlot $plot, int $maxBlocksPerTick = 256) : Promise{
 		$resolver = new PromiseResolver();
-		$ev = new MyPlotClearEvent($plot, $maxBlocksPerTick);
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$plot = $ev->getPlot();
-		if($this->internalAPI->getLevelSettings($plot->levelName) === null) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
 		$this->internalAPI->clearPlot(
 			$plot,
 			$maxBlocksPerTick,
@@ -564,20 +513,8 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function fillPlot(SinglePlot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) : Promise {
+	public function fillPlot(BasePlot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) : Promise{
 		$resolver = new PromiseResolver();
-		$ev = new MyPlotFillEvent($plot, $maxBlocksPerTick);
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$plot = $ev->getPlot();
-		if($this->internalAPI->getLevelSettings($plot->levelName) === null) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$maxBlocksPerTick = $ev->getMaxBlocksPerTick();
 		$this->internalAPI->fillPlot(
 			$plot,
 			$plotFillBlock,
@@ -600,13 +537,6 @@ class MyPlot extends PluginBase
 	 */
 	public function disposePlot(SinglePlot $plot) : Promise {
 		$resolver = new PromiseResolver();
-		$ev = new MyPlotDisposeEvent($plot);
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$plot = $ev->getPlot();
 		$this->internalAPI->disposePlot(
 			$plot,
 			fn(bool $success) => $resolver->resolve($success),
@@ -628,13 +558,6 @@ class MyPlot extends PluginBase
 	 */
 	public function resetPlot(SinglePlot $plot, int $maxBlocksPerTick = 256) : Promise {
 		$resolver = new PromiseResolver();
-		$ev = new MyPlotResetEvent($plot);
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$plot = $ev->getPlot();
 		$this->internalAPI->resetPlot(
 			$plot,
 			$maxBlocksPerTick,
@@ -657,25 +580,6 @@ class MyPlot extends PluginBase
 	 */
 	public function setPlotBiome(SinglePlot $plot, Biome $biome) : Promise {
 		$resolver = new PromiseResolver();
-		$newPlot = clone $plot;
-		$newPlot->biome = str_replace(" ", "_", strtoupper($biome->getName()));
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$plot = $ev->getPlot();
-		if(defined(BiomeIds::class."::".$plot->biome) and is_int(constant(BiomeIds::class."::".$plot->biome))) {
-			$biome = constant(BiomeIds::class."::".$plot->biome);
-		}else{
-			$biome = BiomeIds::PLAINS;
-		}
-		$biome = BiomeRegistry::getInstance()->getBiome($biome);
-		if($this->internalAPI->getLevelSettings($plot->levelName) === null){
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
 		$this->internalAPI->setPlotBiome(
 			$plot,
 			$biome,
@@ -696,17 +600,15 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function setPlotPvp(SinglePlot $plot, bool $pvp) : Promise {
-		$newPlot = clone $plot;
-		$newPlot->pvp = $pvp;
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver = new PromiseResolver();
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		return $this->savePlot($ev->getPlot());
+	public function setPlotPvp(SinglePlot $plot, bool $pvp) : Promise{
+		$resolver = new PromiseResolver();
+		$this->internalAPI->setPlotPvp(
+			$plot,
+			$pvp,
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
@@ -720,17 +622,15 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function addPlotHelper(SinglePlot $plot, string $player) : Promise {
-		$newPlot = clone $plot;
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$newPlot->addHelper($player) ? $ev->uncancel() : $ev->cancel();
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver = new PromiseResolver();
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		return $this->savePlot($ev->getPlot());
+	public function addPlotHelper(SinglePlot $plot, string $player) : Promise{
+		$resolver = new PromiseResolver();
+		$this->internalAPI->addPlotHelper(
+			$plot,
+			$player,
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
@@ -744,17 +644,15 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function removePlotHelper(SinglePlot $plot, string $player) : Promise {
-		$newPlot = clone $plot;
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$newPlot->removeHelper($player) ? $ev->uncancel() : $ev->cancel();
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver = new PromiseResolver();
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		return $this->savePlot($ev->getPlot());
+	public function removePlotHelper(SinglePlot $plot, string $player) : Promise{
+		$resolver = new PromiseResolver();
+		$this->internalAPI->removePlotHelper(
+			$plot,
+			$player,
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
@@ -768,17 +666,15 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function addPlotDenied(SinglePlot $plot, string $player) : Promise {
-		$newPlot = clone $plot;
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$newPlot->denyPlayer($player) ? $ev->uncancel() : $ev->cancel();
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver = new PromiseResolver();
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		return $this->savePlot($ev->getPlot());
+	public function addPlotDenied(SinglePlot $plot, string $player) : Promise{
+		$resolver = new PromiseResolver();
+		$this->internalAPI->addPlotDenied(
+			$plot,
+			$player,
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
@@ -792,17 +688,15 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function removePlotDenied(SinglePlot $plot, string $player) : Promise {
-		$newPlot = clone $plot;
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$newPlot->unDenyPlayer($player) ? $ev->uncancel() : $ev->cancel();
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver = new PromiseResolver();
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		return $this->savePlot($ev->getPlot());
+	public function removePlotDenied(SinglePlot $plot, string $player) : Promise{
+		$resolver = new PromiseResolver();
+		$this->internalAPI->removePlotDenied(
+			$plot,
+			$player,
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
@@ -816,23 +710,15 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function sellPlot(SinglePlot $plot, int $price) : Promise {
+	public function sellPlot(SinglePlot $plot, int $price) : Promise{
 		$resolver = new PromiseResolver();
-		if($this->internalAPI->getEconomyProvider() === null or $price <= 0) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-
-		$newPlot = clone $plot;
-		$newPlot->price = $price;
-		$ev = new MyPlotSettingEvent($plot, $newPlot);
-		$ev->call();
-		if($ev->isCancelled()) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		$plot = $ev->getPlot();
-		return $this->savePlot($plot);
+		$this->internalAPI->sellPlot(
+			$plot,
+			$price,
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
@@ -846,23 +732,15 @@ class MyPlot extends PluginBase
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function buyPlot(SinglePlot $plot, Player $player) : Promise {
+	public function buyPlot(SinglePlot $plot, Player $player) : Promise{
 		$resolver = new PromiseResolver();
-		if($this->internalAPI->getEconomyProvider() === null) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		if(!$this->economyProvider->reduceMoney($player, $plot->price)) {
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-		if(!$this->economyProvider->addMoney($this->getServer()->getOfflinePlayer($plot->owner), $plot->price)) {
-			$this->economyProvider->addMoney($player, $plot->price);
-			$resolver->resolve(false);
-			return $resolver->getPromise();
-		}
-
-		return $this->claimPlot($plot, $player->getName());
+		$this->internalAPI->buyPlot(
+			$plot,
+			$player,
+			fn(bool $success) => $resolver->resolve($success),
+			fn(\Throwable $e) => $resolver->reject()
+		);
+		return $resolver->getPromise();
 	}
 
 	/**
@@ -908,9 +786,9 @@ class MyPlot extends PluginBase
 		 * @var string $name
 		 * @var Permission $perm
 		 */
-		foreach($perms as $name => $perm) {
+		foreach($perms as $name => $perm){
 			$maxPlots = substr($name, 18);
-			if(is_numeric($maxPlots)) {
+			if(is_numeric($maxPlots)){
 				return (int) $maxPlots;
 			}
 		}
@@ -918,6 +796,33 @@ class MyPlot extends PluginBase
 	}
 
 	/* -------------------------- Non-API part -------------------------- */
+
+	private function checkEconomy() : InternalEconomySProvider{
+		$this->getLogger()->debug(TF::BOLD . "Loading economy settings");
+		$this->economyProvider = $economyProvider = null;
+		if(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null){
+			if($plugin instanceof EconomyAPI){
+				$economyProvider = new InternalEconomySProvider($plugin);
+				$this->economyProvider = new EconomyWrapper($economyProvider);
+				$this->getLogger()->info("Economy set to EconomyAPI");
+			}else
+				$this->getLogger()->debug("Invalid instance of EconomyAPI");
+		}
+		if(($plugin = $this->getServer()->getPluginManager()->getPlugin("Capital")) !== null){
+			if($plugin instanceof Capital){
+				$economyProvider = new InternalCapitalProvider();
+				$this->economyProvider = new EconomyWrapper($economyProvider);
+				$this->getLogger()->info("Economy set to Capital");
+			}else
+				$this->getLogger()->debug("Invalid instance of Capital");
+		}
+		if(!isset($economyProvider)){
+			$this->getLogger()->warning("No supported economy plugin found!");
+			$this->getConfig()->set("UseEconomy", false);
+			//$this->getConfig()->save();
+		}
+		return $economyProvider;
+	}
 
 	public function onLoad() : void{
 		self::$instance = $this;
@@ -954,36 +859,15 @@ class MyPlot extends PluginBase
 		}
 
 		$this->getLogger()->debug(TF::BOLD . "Loading Plot Clearing settings"); // TODO: finish libEfficientWE
-		if($this->getConfig()->get("FastClearing", false) === true and $this->getServer()->getPluginManager()->getPlugin("WorldStyler") === null) {
+		if($this->getConfig()->get("FastClearing", false) === true and $this->getServer()->getPluginManager()->getPlugin("WorldStyler") === null){
 			$this->getConfig()->set("FastClearing", false);
 			$this->getLogger()->info(TF::BOLD . "WorldStyler not found. Legacy clearing will be used.");
 		}
 
-		$this->getLogger()->debug(TF::BOLD . "Loading economy settings");
-		$economyProvider = null;
-		if($this->getConfig()->get("UseEconomy", false) === true) {
-			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null) {
-				if($plugin instanceof EconomyAPI) {
-					$economyProvider = new EconomySProvider($plugin);
-					$this->getLogger()->debug("Economy set to EconomyAPI");
-				}else
-					$this->getLogger()->debug("Invalid instance of EconomyAPI");
-			}
-			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("Capital")) !== null) {
-				if($plugin instanceof Capital) {
-					$economyProvider = new CapitalProvider();
-					$this->getLogger()->debug("Economy set to Capital");
-				}else
-					$this->getLogger()->debug("Invalid instance of Capital");
-			}
-			if(!isset($economyProvider)) {
-				$this->getLogger()->warning("No supported economy plugin found!");
-				$this->getConfig()->set("UseEconomy", false);
-				//$this->getConfig()->save();
-			}
-		}
-
-		$this->internalAPI = new InternalAPI($this, $economyProvider);
+		$this->internalAPI = new InternalAPI(
+			$this,
+			$this->getConfig()->get("UseEconomy", false) === true ? $this->checkEconomy() : null
+		);
 
 		$this->getLogger()->debug(TF::BOLD . "Loading MyPlot Commands");
 		$this->getServer()->getCommandMap()->register("myplot", new Commands($this, $this->internalAPI));

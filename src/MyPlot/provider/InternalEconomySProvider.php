@@ -3,22 +3,19 @@ declare(strict_types=1);
 namespace MyPlot\provider;
 
 use onebone\economyapi\EconomyAPI;
-use pocketmine\player\IPlayer;
 use pocketmine\player\Player;
-use pocketmine\promise\Promise;
-use pocketmine\promise\PromiseResolver;
 
-class EconomySProvider implements EconomyProvider {
-	public function __construct(private EconomyAPI $plugin) {}
+class InternalEconomySProvider implements InternalEconomyProvider{
+	public function __construct(private EconomyAPI $plugin){ }
 
 	/**
 	 * @inheritDoc
 	 */
-	public function reduceMoney(Player $player, int $amount, string $reason = "Unknown") : \Generator {
+	public function reduceMoney(Player $player, int $amount, string $reason = "Unknown") : \Generator{
 		0 && yield;
-		if($amount === 0) {
+		if($amount === 0){
 			return true;
-		}elseif($amount < 0) {
+		}elseif($amount < 0){
 			$amount = -$amount;
 		}
 		$ret = $this->plugin->reduceMoney($player, $amount, false, "MyPlot");
