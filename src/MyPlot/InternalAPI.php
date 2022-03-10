@@ -772,31 +772,24 @@ final class InternalAPI{
 		if($ev->isCancelled())
 			return false;
 		$plot = $ev->getPlot();
+		$plotLevel = $this->getLevelSettings($plot->levelName);
+		if($plotLevel === null)
+			return false;
+
 		if(defined(BiomeIds::class . "::" . $plot->biome) and is_int(constant(BiomeIds::class . "::" . $plot->biome))){
 			$biome = constant(BiomeIds::class . "::" . $plot->biome);
 		}else{
 			$biome = BiomeIds::PLAINS;
 		}
 		$biome = BiomeRegistry::getInstance()->getBiome($biome);
-		if($this->getLevelSettings($plot->levelName) === null){
-			return false;
-		}
 
-		$failed = false;
-		foreach(yield $this->dataProvider->getMergedPlot($plot) as $merged){
-			$merged->biome = $plot->biome;
-			if(!yield $this->dataProvider->savePlot($merged))
-				$failed = true;
-		}
-		$plotLevel = $this->getLevelSettings($plot->levelName);
 		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName($plot->levelName);
-		if($level === null){
+		if($level === null)
 			return false;
-		}
 		foreach($this->getPlotChunks($plot) as [$chunkX, $chunkZ, $chunk]){
-			for($x = 0; $x < 16; ++$x){
-				for($z = 0; $z < 16; ++$z){
-					$pos = new Position(($chunkX << 4) + $x, $plotLevel->groundHeight, ($chunkZ << 4) + $z, $level);
+			for($x = 0; $x < Chunk::EDGE_LENGTH; ++$x){
+				for($z = 0; $z < Chunk::EDGE_LENGTH; ++$z){
+					$pos = new Position(($chunkX << Chunk::COORD_MASK) + $x, $plotLevel->groundHeight, ($chunkZ << Chunk::COORD_MASK) + $z, $level);
 					$chunkPlot = $this->getPlotFast($pos->x, $pos->z, $plotLevel);
 					if($chunkPlot instanceof SinglePlot and $chunkPlot->isSame($plot)){
 						$chunk->setBiomeId($x, $z, $biome->getId());
@@ -805,7 +798,7 @@ final class InternalAPI{
 			}
 			$level->setChunk($chunkX, $chunkZ, $chunk);
 		}
-		return !$failed;
+		return yield $this->generatePlotsToSave($plot);
 	}
 
 	/**
@@ -1017,10 +1010,10 @@ final class InternalAPI{
 			return [];
 
 		$aabb = $this->getPlotBB($plot);
-		$xMin = $aabb->minX >> 4;
-		$zMin = $aabb->minZ >> 4;
-		$xMax = $aabb->maxX >> 4;
-		$zMax = $aabb->maxZ >> 4;
+		$xMin = $aabb->minX >> Chunk::COORD_MASK;
+		$zMin = $aabb->minZ >> Chunk::COORD_MASK;
+		$xMax = $aabb->maxX >> Chunk::COORD_MASK;
+		$zMax = $aabb->maxZ >> Chunk::COORD_MASK;
 
 		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName($plot->levelName);
 		$chunks = [];

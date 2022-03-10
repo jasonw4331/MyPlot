@@ -5,15 +5,13 @@ namespace MyPlot\plot;
 use MyPlot\MyPlot;
 
 class SinglePlot extends BasePlot {
-	public string $biome = "PLAINS";
 	public bool $pvp = true;
-	public int $price = 0;
 
-	public function __construct(public string $levelName, public int $X, public int $Z, public string $name = "", public string $owner = "", public array $helpers = [], public array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, float $price = -1) {
+	public function __construct(public string $levelName, public int $X, public int $Z, public string $name = "", public string $owner = "", public array $helpers = [], public array $denied = [], public string $biome = "PLAINS", ?bool $pvp = null, public int $price = -1){
 		parent::__construct($levelName, $X, $Z);
 		$this->biome = strtoupper($biome);
 		$settings = MyPlot::getInstance()->getLevelSettings($levelName);
-		if(!isset($pvp)) {
+		if(!isset($pvp)){
 			$this->pvp = !$settings->restrictPVP;
 		}else{
 			$this->pvp = $pvp;
@@ -24,14 +22,29 @@ class SinglePlot extends BasePlot {
 			$this->price = 0;
 	}
 
+	public static function fromBase(BasePlot $plot, string $name, string $owner, array $helpers, array $denied, string $biome, ?bool $pvp, int $price) : SinglePlot{
+		return new SinglePlot(
+			$plot->levelName,
+			$plot->X,
+			$plot->Z,
+			$name,
+			$owner,
+			$helpers,
+			$denied,
+			$biome,
+			$pvp,
+			$price
+		);
+	}
+
 	/**
-	 * @api
-	 *
 	 * @param string $username
 	 *
 	 * @return bool
+	 * @api
+	 *
 	 */
-	public function isHelper(string $username) : bool {
+	public function isHelper(string $username) : bool{
 		return in_array($username, $this->helpers, true);
 	}
 

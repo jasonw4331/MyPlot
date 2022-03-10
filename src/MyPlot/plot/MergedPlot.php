@@ -9,29 +9,41 @@ use pocketmine\math\Vector3;
 
 class MergedPlot extends SinglePlot{
 
-	public int $xWidth;
-	public int $zWidth;
-
 	public function __construct(
 		string $levelName,
-		int $X,
-		int $Z,
+		int $X, // Must always be lowest X coordinate in merge array
+		int $Z, // Must always be lowest Z coordinate in merge array
+		public int $xWidth,
+		public int $zWidth,
 		string $name = "",
 		string $owner = "",
 		array $helpers = [],
 		array $denied = [],
 		string $biome = "PLAINS",
 		?bool $pvp = null,
-		float $price = -1,
-		int $xWidth = 0,
-		int $zWidth = 0,
+		int $price = -1
 	){
-		parent::__construct($levelName, $X, $Z, $name, $owner, $helpers, $denied, $biome, $pvp, $price);
-		if($xWidth === 0 and $zWidth === 0){
+		if($xWidth <= 0 and $zWidth <= 0){
 			throw new \InvalidArgumentException("Plot merge width must be greater than 0");
 		}
-		$this->xWidth = $xWidth;
-		$this->zWidth = $zWidth;
+		parent::__construct($levelName, $X, $Z, $name, $owner, $helpers, $denied, $biome, $pvp, $price);
+	}
+
+	public static function fromSingle(SinglePlot $plot, int $xWidth, int $zWidth) : MergedPlot{
+		return new MergedPlot(
+			$plot->levelName,
+			$plot->X,
+			$plot->Z,
+			$xWidth,
+			$zWidth,
+			$plot->name,
+			$plot->owner,
+			$plot->helpers,
+			$plot->denied,
+			$plot->biome,
+			$plot->pvp,
+			$plot->price
+		);
 	}
 
 	/**
@@ -49,30 +61,30 @@ class MergedPlot extends SinglePlot{
 
 		return (
 			new AxisAlignedBB(
-				min($this->X, $this->X + $this->xWidth),
+				$this->X,
 				0,
-				min($this->Z, $this->Z + $this->zWidth),
-				max($this->X, $this->X + $this->xWidth),
+				$this->Z,
+				$this->X + $this->xWidth,
 				1,
-				max($this->Z, $this->Z + $this->zWidth)
+				$this->Z + $this->zWidth
 			)
 		)->isVectorInXZ(new Vector3($plot->X, 0, $plot->Z));
 	}
 
-	public function getSide(int $side, int $step = 1) : BasePlot {
-		if(Facing::axis($side) === Axis::X) {
-			if(Facing::isPositive($side) and $this->xWidth > 0) {
-				return parent::getSide($side, $step);
-			}elseif(!Facing::isPositive($side) and $this->xWidth < 0) {
-				return parent::getSide($side, $step);
+	public function getSide(int $side, int $step = 1) : BasePlot{
+		$axis = Facing::axis($side);
+		$isPositive = Facing::isPositive($side);
+		if($axis === Axis::X){
+			if($isPositive){
+				return parent::getSide($side, $step + $this->xWidth);
 			}
-		}elseif(Facing::axis($side) === Axis::Z){
-			if(Facing::isPositive($side)and $this->zWidth > 0) {
-				return parent::getSide($side, $step);
-			}elseif(!Facing::isPositive($side) and $this->xWidth < 0) {
-				return parent::getSide($side, $step);
+			return parent::getSide($side, $step);
+		}elseif($axis === Axis::Z){
+			if($isPositive){
+				return parent::getSide($side, $step + $this->zWidth);
 			}
+			return parent::getSide($side, $step);
 		}
-		return parent::getSide($side, $step);
+		throw new \InvalidArgumentException("Invalid Axis " . $axis);
 	}
 }

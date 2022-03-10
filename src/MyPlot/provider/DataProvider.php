@@ -26,6 +26,21 @@ final class DataProvider {
 
 	private function cachePlot(BasePlot $plot) : void{
 		if($this->cacheSize > 0){
+			if($plot instanceof MergedPlot){
+				for($x = $plot->X; $x <= $plot->xWidth + $plot->X; ++$x){
+					for($z = $plot->Z; $z <= $plot->zWidth + $plot->Z; ++$z){
+						$key = $plot->levelName . ';' . $x . ';' . $z;
+						if(isset($this->cache[$key])){
+							unset($this->cache[$key]);
+						}elseif($this->cacheSize <= count($this->cache)){
+							array_shift($this->cache);
+						}
+						$this->cache = array_merge([$key => clone $plot], $this->cache);
+						$this->plugin->getLogger()->debug("Plot $x;$z has been cached");
+					}
+				}
+				return;
+			}
 			$key = $plot->levelName . ';' . $plot->X . ';' . $plot->Z;
 			if(isset($this->cache[$key])){
 				unset($this->cache[$key]);
@@ -79,23 +94,28 @@ final class DataProvider {
 	 * @return \Generator<bool>
 	 */
 	public function deletePlot(BasePlot $plot) : \Generator{
-		if($plot instanceof MergedPlot) {
+		if($plot instanceof MergedPlot){
+			$plotLevel = $this->plugin->getLevelSettings($plot->levelName);
+
 			$changedRows = yield $this->database->asyncChange('myplot.remove.merge.by-xz', [
 				'level' => $plot->levelName,
 				'X' => $plot->X,
 				'Z' => $plot->Z,
+				'pvp' => !$plotLevel->restrictPVP,
+				'price' => $plotLevel->claimPrice,
 			]);
+			$this->cachePlot(new MergedPlot($plot->levelName, $plot->X, $plot->Z, $plot->xWidth, $plot->zWidth, pvp: !$plotLevel->restrictPVP, price: $plotLevel->claimPrice));
 		}else{
 			$changedRows = yield $this->database->asyncChange('myplot.remove.plot.by-xz', [
 				'level' => $plot->levelName,
 				'X' => $plot->X,
 				'Z' => $plot->Z,
 			]);
+			$this->cachePlot(new BasePlot($plot->levelName, $plot->X, $plot->Z));
 		}
 		if($changedRows < 1){
 			return false;
 		}
-		$this->cachePlot(new BasePlot($plot->levelName, $plot->X, $plot->Z));
 		return true;
 	}
 
@@ -141,7 +161,7 @@ final class DataProvider {
 		}
 		$plots = [];
 		foreach($rows as $row){
-			$plots[] = new SinglePlot($row['level'], $row['X'], $row['Z'], $row['name'], $row['owner'], explode(",", $row['helpers']), explode(",", $row['denied']), $row['biome'], $row['pvp'], $row['price']);
+			$plots[] = yield $this->getMergedPlot(new BasePlot($row['level'], $row['X'], $row['Z']));
 		}
 		return $plots;
 	}
@@ -182,18 +202,18 @@ final class DataProvider {
 	 * @return \Generator<bool>
 	 */
 	public function mergePlots(SinglePlot $base, BasePlot ...$plots) : \Generator{
-		$xClosestToZero = 0;
-		$zClosestToZero = 0;
+		$minX = 0;
+		$minZ = 0;
 		foreach($plots as $plot){
-			if(max(-abs($xClosestToZero), -abs($plot->X)))
-				$xClosestToZero = $plot->X;
-			if(max(-abs($zClosestToZero), -abs($plot->Z)))
-				$zClosestToZero = $plot->Z;
+			if(min($minX, $plot->X))
+				$minX = $plot->X;
+			if(min($minZ, $plot->Z))
+				$minZ = $plot->Z;
 		}
 
 		$ret = true;
 		foreach($plots as $plot){
-			if($xClosestToZero !== $base->X and $zClosestToZero !== $base->Z){
+			if($minX !== $base->X and $minZ !== $base->Z){
 				$affectedRows = yield $this->database->asyncChange('myplot.remove.merge-entry', [
 					'level' => $plot->levelName,
 					'originX' => $base->X,
@@ -208,8 +228,8 @@ final class DataProvider {
 			}
 			[$insertId, $affectedRows] = yield $this->database->asyncInsert('myplot.add.merge', [
 				'level' => $plot->levelName,
-				'originX' => $xClosestToZero,
-				'originZ' => $zClosestToZero,
+				'originX' => $minX,
+				'originZ' => $minZ,
 				'mergedX' => $plot->X,
 				'mergedZ' => $plot->Z
 			]);
@@ -224,9 +244,13 @@ final class DataProvider {
 	/**
 	 * @param BasePlot $plot
 	 *
-	 * @return \Generator<SinglePlot>
+	 * @return \Generator<SinglePlot|null>
 	 */
 	public function getMergedPlot(BasePlot $plot) : \Generator{
+		$plot = $this->getPlotFromCache($plot->levelName, $plot->X, $plot->Z);
+		if($plot instanceof MergedPlot)
+			return $plot;
+
 		$rows = yield $this->database->asyncSelect('myplot.get.merge-plots.by-origin', [
 			'level' => $plot->levelName,
 			'originX' => $plot->X,
@@ -246,23 +270,26 @@ final class DataProvider {
 		foreach($rows as $row){
 			$highestX = max($highestX, $row['X']);
 			$highestZ = max($highestZ, $row['Z']);
-			$lowestX = max($lowestX, $row['X']);
-			$lowestZ = max($lowestZ, $row['Z']);
+			$lowestX = min($lowestX, $row['X']);
+			$lowestZ = min($lowestZ, $row['Z']);
 		}
-		return new MergedPlot(
+
+		$plot = new MergedPlot(
 			$rows[0]["level"],
 			$rows[0]["X"],
 			$rows[0]["Z"],
+			$highestX - $lowestX,
+			$highestZ - $lowestZ,
 			$rows[0]["name"],
 			$rows[0]["owner"],
 			explode(",", $rows[0]["helpers"]),
 			explode(",", $rows[0]["denied"]),
 			$rows[0]["biome"],
 			is_numeric($rows[0]["pvp"]) ? (bool) $rows[0]["pvp"] : null,
-			$rows[0]["price"] * ($highestX - $lowestX) * ($highestZ - $lowestZ),
-			$highestX - $lowestX,
-			$highestZ - $lowestZ
+			$rows[0]["price"] * ($highestX - $lowestX) * ($highestZ - $lowestZ)
 		);
+		$this->cachePlot($plot);
+		return $plot;
 	}
 
 	public function close() : void{

@@ -74,7 +74,7 @@ WHERE level = :level
 -- #    {all-plots
 -- #      {by-owner
 -- #        :owner string
-SELECT *
+SELECT level, X, Z
 FROM plotsV2
 WHERE owner = :owner;
 -- #      }
@@ -83,7 +83,7 @@ WHERE owner = :owner;
 -- #      {by-owner-and-level
 -- #        :owner string
 -- #        :level string
-SELECT *
+SELECT level, X, Z
 FROM plotsV2
 WHERE owner = :owner
   AND level = :level;
@@ -114,10 +114,10 @@ SELECT plotsV2.level,
        pvp,
        price
 FROM plotsV2
-     LEFT JOIN mergedPlotsV2
-     ON mergedPlotsV2.level = plotsV2.level
-         AND mergedX = X
-         AND mergedZ = Z
+         LEFT JOIN mergedPlotsV2
+                   ON mergedPlotsV2.level = plotsV2.level
+                       AND mergedX = X
+                       AND mergedZ = Z
 WHERE mergedPlotsV2.level = :level
   AND originX = :originX
   AND originZ = :originZ;
@@ -139,10 +139,10 @@ SELECT plotsV2.level,
        pvp,
        price
 FROM plotsV2
-     LEFT JOIN mergedPlotsV2
-     ON mergedPlotsV2.level = plotsV2.level
-         AND mergedX = X
-         AND mergedZ = Z
+         LEFT JOIN mergedPlotsV2
+                   ON mergedPlotsV2.level = plotsV2.level
+                       AND mergedX = X
+                       AND mergedZ = Z
 WHERE mergedPlotsV2.level = :level
   AND originX = (
     SELECT originX
@@ -187,7 +187,6 @@ SET name    = '',
     owner   = '',
     helpers = '',
     denied  = '',
-    biome   = :biome,
     pvp     = :pvp,
     price   = :price
 WHERE level = :level
