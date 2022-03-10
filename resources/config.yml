@@ -64,7 +64,7 @@ UseEconomy: false
 
 # Amount of plots to be cached.
 # Increasing this number will improve performance, but also increase memory usage.
-PlotCacheSize: 256
+PlotCacheSize: 2048
 
 # When a player enters a plot, a popup with basic info will be shown
 ShowPlotPopup: true
