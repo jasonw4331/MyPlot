@@ -6,7 +6,6 @@ use MyPlot\MyPlot;
 use MyPlot\plot\BasePlot;
 use MyPlot\plot\MergedPlot;
 use MyPlot\plot\SinglePlot;
-use pocketmine\math\Facing;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 
@@ -105,11 +104,11 @@ final class DataProvider {
 	 * @param int    $X
 	 * @param int    $Z
 	 *
-	 * @return \Generator<SinglePlot>
+	 * @return \Generator<SinglePlot|null>
 	 */
 	public function getPlot(string $levelName, int $X, int $Z) : \Generator{
 		$plot = $this->getPlotFromCache($levelName, $X, $Z);
-		if($plot !== null){
+		if($plot instanceof SinglePlot){
 			return $plot;
 		}
 		$row = yield $this->database->asyncSelect('myplot.get.plot.by-xz', [
@@ -117,6 +116,9 @@ final class DataProvider {
 			'X' => $X,
 			'Z' => $Z
 		]);
+		if(count($row) < 1)
+			return null;
+
 		return new SinglePlot($levelName, $X, $Z, $row['name'], $row['owner'], explode(",", $row['helpers']), explode(",", $row['denied']), $row['biome'], $row['pvp'], $row['price']);
 	}
 
@@ -174,18 +176,40 @@ final class DataProvider {
 	}
 
 	/**
-	 * @param BasePlot $base
-	 * @param BasePlot ...$plots
+	 * @param SinglePlot $base
+	 * @param BasePlot   ...$plots
 	 *
 	 * @return \Generator<bool>
 	 */
-	public function mergePlots(BasePlot $base, BasePlot ...$plots) : \Generator{
+	public function mergePlots(SinglePlot $base, BasePlot ...$plots) : \Generator{
+		$xClosestToZero = 0;
+		$zClosestToZero = 0;
+		foreach($plots as $plot){
+			if(max(-abs($xClosestToZero), -abs($plot->X)))
+				$xClosestToZero = $plot->X;
+			if(max(-abs($zClosestToZero), -abs($plot->Z)))
+				$zClosestToZero = $plot->Z;
+		}
+
 		$ret = true;
 		foreach($plots as $plot){
+			if($xClosestToZero !== $base->X and $zClosestToZero !== $base->Z){
+				$affectedRows = yield $this->database->asyncChange('myplot.remove.merge-entry', [
+					'level' => $plot->levelName,
+					'originX' => $base->X,
+					'originZ' => $base->Z,
+					'mergedX' => $plot->X,
+					'mergedZ' => $plot->Z
+				]);
+				if($affectedRows < 1){
+					MyPlot::getInstance()->getLogger()->debug("Failed to delete merge entry for $plot with base $base");
+					$ret = false;
+				}
+			}
 			[$insertId, $affectedRows] = yield $this->database->asyncInsert('myplot.add.merge', [
-				'level' => $base->levelName,
-				'originX' => $base->X,
-				'originZ' => $base->Z,
+				'level' => $plot->levelName,
+				'originX' => $xClosestToZero,
+				'originZ' => $zClosestToZero,
 				'mergedX' => $plot->X,
 				'mergedZ' => $plot->Z
 			]);
@@ -199,59 +223,45 @@ final class DataProvider {
 
 	/**
 	 * @param BasePlot $plot
-	 * @param bool     $adjacent
 	 *
-	 * @return \Generator<array<SinglePlot>>
+	 * @return \Generator<SinglePlot>
 	 */
-	public function getMergedPlots(BasePlot $plot, bool $adjacent = false) : \Generator{
-		$origin = yield $this->getMergeOrigin($plot);
-		$rows = $this->database->asyncSelect('myplot.get.merge-plots.by-origin', [
+	public function getMergedPlot(BasePlot $plot) : \Generator{
+		$rows = yield $this->database->asyncSelect('myplot.get.merge-plots.by-origin', [
 			'level' => $plot->levelName,
 			'originX' => $plot->X,
 			'originZ' => $plot->Z
 		]);
-		$plots = [$origin];
-		foreach($rows as $row){
-			$helpers = explode(",", $row["helpers"]);
-			$denied = explode(",", $row["denied"]);
-			$pvp = is_numeric($row["pvp"]) ? (bool) $row["pvp"] : null;
-			$plots[] = new SinglePlot($row["level"], $row["X"], $row["Z"], $row["name"], $row["owner"], $helpers, $denied, $row["biome"], $pvp, $row["price"]);
+		if(count($rows) < 1){
+			$rows = yield $this->database->asyncSelect('myplot.get.merge-plots.by-merged', [
+				'level' => $plot->levelName,
+				'mergedX' => $plot->X,
+				'mergedZ' => $plot->Z
+			]);
+			if(count($rows) < 1){
+				return yield $this->getPlot($plot->levelName, $plot->X, $plot->Z);
+			}
 		}
-		if($adjacent)
-			$plots = array_filter($plots, function(BasePlot $val) use ($plot) : bool{
-				foreach(Facing::HORIZONTAL as $i){
-					if($plot->getSide($i)->isSame($val))
-						return true;
-				}
-				return false;
-			});
-		return $plots;
-	}
-
-	/**
-	 * @param BasePlot $plot
-	 *
-	 * @return \Generator<MergedPlot>
-	 */
-	public function getMergeOrigin(BasePlot $plot) : \Generator{
-		$row = yield $this->database->asyncSelect('myplot.get.merge-origin.by-merged', [
-			'level' => $plot->levelName,
-			'mergedX' => $plot->X,
-			'mergedZ' => $plot->Z
-		]);
+		$highestX = $highestZ = $lowestX = $lowestZ = 0;
+		foreach($rows as $row){
+			$highestX = max($highestX, $row['X']);
+			$highestZ = max($highestZ, $row['Z']);
+			$lowestX = max($lowestX, $row['X']);
+			$lowestZ = max($lowestZ, $row['Z']);
+		}
 		return new MergedPlot(
-			$row['level'],
-			$row['X'],
-			$row['Z'],
-			$row['name'],
-			$row['owner'],
-			explode(",", $row['helpers']),
-			explode(",", $row['denied']),
-			$row['biome'],
-			$row['pvp'],
-			$row['price'],
-			$xWidth,
-			$zWidth
+			$rows[0]["level"],
+			$rows[0]["X"],
+			$rows[0]["Z"],
+			$rows[0]["name"],
+			$rows[0]["owner"],
+			explode(",", $rows[0]["helpers"]),
+			explode(",", $rows[0]["denied"]),
+			$rows[0]["biome"],
+			is_numeric($rows[0]["pvp"]) ? (bool) $rows[0]["pvp"] : null,
+			$rows[0]["price"] * ($highestX - $lowestX) * ($highestZ - $lowestZ),
+			$highestX - $lowestX,
+			$highestZ - $lowestZ
 		);
 	}
 

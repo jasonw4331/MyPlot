@@ -246,14 +246,12 @@ final class MyPlot extends PluginBase{
 	 * @param int    $X
 	 * @param int    $Z
 	 *
-	 * @return Promise<BasePlot>
+	 * @return Promise<SinglePlot|null>
 	 */
 	public function getPlot(string $levelName, int $X, int $Z) : Promise{
 		$resolver = new PromiseResolver();
 		$this->internalAPI->getPlot(
-			$levelName,
-			$X,
-			$Z,
+			new BasePlot($levelName, $X, $Z),
 			fn(?SinglePlot $plot) => $resolver->resolve($plot),
 			fn(\Throwable $e) => $resolver->reject()
 		);
@@ -283,23 +281,14 @@ final class MyPlot extends PluginBase{
 	/**
 	 * Get the beginning position of a plot
 	 *
+	 * @param BasePlot $plot
+	 *
+	 * @return Position
 	 * @api
 	 *
-	 * @param SinglePlot $plot
-	 * @param bool       $mergeOrigin
-	 *
-	 * @return Promise
-	 * @phpstan-return Promise<Position>
 	 */
-	public function getPlotPosition(SinglePlot $plot, bool $mergeOrigin = true) : Promise{
-		$resolver = new PromiseResolver();
-		$this->internalAPI->getPlotPosition(
-			$plot,
-			$mergeOrigin,
-			fn(Position $position) => $resolver->resolve($position),
-			fn(\Throwable $e) => $resolver->reject()
-		);
-		return $resolver->getPromise();
+	public function getPlotPosition(BasePlot $plot) : Position{
+		return $this->internalAPI->getPlotPosition($plot);
 	}
 
 	/**
@@ -345,21 +334,14 @@ final class MyPlot extends PluginBase{
 	/**
 	 * Returns the AABB of the plot area
 	 *
-	 * @api
-	 *
 	 * @param SinglePlot $plot
 	 *
-	 * @return Promise
-	 * @phpstan-return Promise<AxisAlignedBB>
+	 * @return AxisAlignedBB
+	 * @api
+	 *
 	 */
-	public function getPlotBB(SinglePlot $plot) : Promise{
-		$resolver = new PromiseResolver();
-		$this->internalAPI->getPlotBB(
-			$plot,
-			fn(AxisAlignedBB $bb) => $resolver->resolve($bb),
-			fn(\Throwable $e) => $resolver->reject()
-		);
-		return $resolver->getPromise();
+	public function getPlotBB(SinglePlot $plot) : AxisAlignedBB{
+		return $this->internalAPI->getPlotBB($plot);
 	}
 
 	/**
@@ -395,19 +377,10 @@ final class MyPlot extends PluginBase{
 	 * @param SinglePlot $plot
 	 * @param bool       $center
 	 *
-	 * @return Promise
-	 * @phpstan-return Promise<bool>
+	 * @return bool
 	 */
-	public function teleportPlayerToPlot(Player $player, BasePlot $plot, bool $center = false) : Promise {
-		$resolver = new PromiseResolver();
-		$this->internalAPI->teleportPlayerToPlot(
-			$player,
-			$plot,
-			$center,
-			fn(bool $success) => $resolver->resolve($success),
-			fn(\Throwable $e) => $resolver->reject()
-		);
-		return $resolver->getPromise();
+	public function teleportPlayerToPlot(Player $player, BasePlot $plot, bool $center = false) : bool{
+		return $this->internalAPI->teleportPlayerToPlot($player, $plot, $center);
 	}
 
 	/**
@@ -464,40 +437,24 @@ final class MyPlot extends PluginBase{
 	 * @param SinglePlot $plotFrom
 	 * @param SinglePlot $plotTo
 	 *
-	 * @return Promise
-	 * @phpstan-return Promise<bool>
+	 * @return bool
 	 */
-	public function clonePlot(SinglePlot $plotFrom, SinglePlot $plotTo) : Promise {
-		$resolver = new PromiseResolver();
-		$this->internalAPI->clonePlot(
-			$plotFrom,
-			$plotTo,
-			fn(bool $success) => $resolver->resolve($success),
-			fn(\Throwable $e) => $resolver->reject()
-		);
-		return $resolver->getPromise();
+	public function clonePlot(SinglePlot $plotFrom, SinglePlot $plotTo) : bool{
+		return $this->internalAPI->clonePlot($plotFrom, $plotTo);
 	}
 
 	/**
 	 * Reset all the blocks inside a plot
 	 *
+	 * @param BasePlot $plot
+	 * @param int      $maxBlocksPerTick
+	 *
+	 * @return bool
 	 * @api
 	 *
-	 * @param SinglePlot $plot
-	 * @param int        $maxBlocksPerTick
-	 *
-	 * @return Promise
-	 * @phpstan-return Promise<bool>
 	 */
-	public function clearPlot(BasePlot $plot, int $maxBlocksPerTick = 256) : Promise{
-		$resolver = new PromiseResolver();
-		$this->internalAPI->clearPlot(
-			$plot,
-			$maxBlocksPerTick,
-			fn(bool $success) => $resolver->resolve($success),
-			fn(\Throwable $e) => $resolver->reject()
-		);
-		return $resolver->getPromise();
+	public function clearPlot(BasePlot $plot, int $maxBlocksPerTick = 256) : bool{
+		return $this->internalAPI->clearPlot($plot, $maxBlocksPerTick);
 	}
 
 	/**
@@ -749,16 +706,11 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @param SinglePlot $plot
 	 *
-	 * @return Promise<array<int, Chunk>>
+	 * @return array
+	 * @phpstan-return array<array<int|Chunk|null>>
 	 */
-	public function getPlotChunks(SinglePlot $plot) : Promise {
-		$resolver = new PromiseResolver();
-		$this->internalAPI->getPlotChunks(
-			$plot,
-			fn(array $chunks) => $resolver->resolve($chunks),
-			fn(\Throwable $e) => $resolver->reject()
-		);
-		return $resolver->getPromise();
+	public function getPlotChunks(BasePlot $plot) : array{
+		$this->internalAPI->getPlotChunks($plot);
 	}
 
 	/**
