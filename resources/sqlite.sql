@@ -98,28 +98,6 @@ FROM plotsV2
 WHERE (level = :level AND ((abs(X) = :number AND abs(Z) <= :number) OR (abs(Z) = :number AND abs(X) <= :number)));
 -- #      }
 -- #    }
--- #    {merge-origin
--- #      {by-merged
--- #        :level string
--- #        :mergedX int
--- #        :mergedZ int
-SELECT plotsV2.level,
-       X,
-       Z,
-       name,
-       owner,
-       helpers,
-       denied,
-       biome,
-       pvp,
-       price
-FROM plotsV2
-         LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plotsV2.level
-WHERE mergedPlotsV2.level = :level
-  AND mergedX = :mergedX
-  AND mergedZ = :mergedZ;
--- #      }
--- #    }
 -- #    {merge-plots
 -- #      {by-origin
 -- #        :level string
@@ -136,11 +114,50 @@ SELECT plotsV2.level,
        pvp,
        price
 FROM plotsV2
-         LEFT JOIN mergedPlotsV2 ON mergedPlotsV2.level = plotsV2.level AND mergedPlotsV2.mergedX = plotsV2.X AND
-                                    mergedPlotsV2.mergedZ = plotsV2.Z
+     LEFT JOIN mergedPlotsV2
+     ON mergedPlotsV2.level = plotsV2.level
+         AND mergedX = X
+         AND mergedZ = Z
 WHERE mergedPlotsV2.level = :level
   AND originX = :originX
   AND originZ = :originZ;
+-- #      }
+-- #    }
+-- #    {merge-plots
+-- #      {by-merged
+-- #        :level string
+-- #        :mergedX int
+-- #        :mergedZ int
+SELECT plotsV2.level,
+       X,
+       Z,
+       name,
+       owner,
+       helpers,
+       denied,
+       biome,
+       pvp,
+       price
+FROM plotsV2
+     LEFT JOIN mergedPlotsV2
+     ON mergedPlotsV2.level = plotsV2.level
+         AND mergedX = X
+         AND mergedZ = Z
+WHERE mergedPlotsV2.level = :level
+  AND originX = (
+    SELECT originX
+    FROM mergedPlotsV2
+    WHERE mergedX = :mergedX
+      AND mergedZ = :mergedZ
+      AND mergedPlotsV2.level = :level
+)
+  AND originZ = (
+    SELECT originZ
+    FROM mergedPlotsV2
+    WHERE mergedX = :mergedX
+      AND mergedZ = :mergedZ
+      AND mergedPlotsV2.level = :level
+);
 -- #      }
 -- #    }
 -- #  }
