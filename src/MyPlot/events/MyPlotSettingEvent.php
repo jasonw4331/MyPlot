@@ -2,26 +2,29 @@
 declare(strict_types=1);
 namespace MyPlot\events;
 
-use MyPlot\Plot;
+use MyPlot\plot\BasePlot;
+use MyPlot\plot\SinglePlot;
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
 
-class MyPlotSettingEvent extends MyPlotPlotEvent implements Cancellable {
+class MyPlotSettingEvent extends MyPlotPlotEvent implements Cancellable{
 	use CancellableTrait;
 
-	private Plot $oldPlot;
+	private SinglePlot $oldPlot;
 
-	public function __construct(Plot $oldPlot, Plot $newPlot) {
+	public function __construct(SinglePlot $oldPlot, SinglePlot $newPlot){
 		$this->oldPlot = $oldPlot;
 		parent::__construct($newPlot);
 	}
 
-	public function getOldPlot() : Plot {
+	public function getOldPlot() : SinglePlot{
 		return $this->oldPlot;
 	}
 
-	public function setOldPlot(Plot $oldPlot) : self {
-		$this->oldPlot = $oldPlot;
-		return $this;
+	/**
+	 * @return SinglePlot
+	 */
+	public function getPlot() : BasePlot{
+		return parent::getPlot();
 	}
 }

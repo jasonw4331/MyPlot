@@ -1,22 +1,32 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\subcommand;
 
-use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\DenyPlayerForm;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use SOFe\AwaitGenerator\Await;
 
-class DenyPlayerSubCommand extends SubCommand
-{
-	public function canUse(CommandSender $sender) : bool {
-		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.denyplayer");
+class DenyPlayerSubCommand extends SubCommand{
+	public function canUse(CommandSender $sender) : bool{
+		if(!$sender->hasPermission("myplot.command.denyplayer")){
+			return false;
+		}
+		if($sender instanceof Player){
+			$pos = $sender->getPosition();
+			$plotLevel = $this->internalAPI->getLevelSettings($sender->getWorld()->getFolderName());
+			if($this->internalAPI->getPlotFast($pos->x, $pos->z, $plotLevel) === null){
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
-	 * @param Player $sender
+	 * @param Player   $sender
 	 * @param string[] $args
 	 *
 	 * @return bool
@@ -29,7 +39,7 @@ class DenyPlayerSubCommand extends SubCommand
 					return;
 				}
 				$dplayer = $args[0];
-				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				$plot = yield from $this->internalAPI->generatePlotByPosition($sender->getPosition());
 				if($plot === null){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 					return;
@@ -39,11 +49,11 @@ class DenyPlayerSubCommand extends SubCommand
 					return;
 				}
 				if($dplayer === "*"){
-					if(yield $this->internalAPI->generateAddPlotDenied($plot, $dplayer)){
+					if(yield from $this->internalAPI->generateAddPlotDenied($plot, $dplayer)){
 						$sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer]));
 						foreach($this->plugin->getServer()->getOnlinePlayers() as $player){
-							if((yield $this->internalAPI->generatePlotBB($plot))->isVectorInside($player) and !($player->getName() === $plot->owner) and !$player->hasPermission("myplot.admin.denyplayer.bypass") and !$plot->isHelper($player->getName()))
-								$this->internalAPI->generatePlayerTeleport($player, $plot, false);
+							if($this->internalAPI->getPlotBB($plot)->isVectorInside($player->getPosition()) and !($player->getName() === $plot->owner) and !$player->hasPermission("myplot.admin.denyplayer.bypass") and !$plot->isHelper($player->getName()))
+								$this->internalAPI->teleportPlayerToPlot($player, $plot, false);
 							else{
 								$sender->sendMessage($this->translateString("denyplayer.cannotdeny", [$player->getName()]));
 								$player->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));
@@ -65,11 +75,11 @@ class DenyPlayerSubCommand extends SubCommand
 					$dplayer->sendMessage($this->translateString("denyplayer.attempteddeny", [$sender->getName()]));
 					return;
 				}
-				if(yield $this->plugin->addPlotDenied($plot, $dplayer->getName())){
+				if(yield from $this->internalAPI->generateAddPlotDenied($plot, $dplayer->getName())){
 					$sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer->getName()]));
 					$dplayer->sendMessage($this->translateString("denyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
-					if((yield $this->internalAPI->generatePlotBB($plot))->isVectorInside($dplayer))
-						$this->internalAPI->generatePlayerTeleport($dplayer, $plot, false);
+					if($this->internalAPI->getPlotBB($plot)->isVectorInside($dplayer->getPosition()))
+						$this->internalAPI->teleportPlayerToPlot($dplayer, $plot, false);
 				}else{
 					$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 				}

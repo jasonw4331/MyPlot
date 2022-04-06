@@ -29,6 +29,15 @@ CREATE TABLE IF NOT EXISTS mergedPlotsV2
 );
 -- #    }
 -- #  }
+-- #  {test
+-- #    {table
+-- #      :tableName string
+SELECT COUNT(name) AS tables
+FROM sqlite_master
+WHERE type = 'table'
+  AND name = :tableName;
+-- #    }
+-- #  }
 -- #  {add
 -- #    {plot
 -- #      :level string
@@ -40,7 +49,7 @@ CREATE TABLE IF NOT EXISTS mergedPlotsV2
 -- #      :denied string
 -- #      :biome string
 -- #      :pvp bool false
--- #      :price int
+-- #      :price float
 INSERT OR
 REPLACE
 INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price)
@@ -179,9 +188,8 @@ WHERE level = :level
 -- #        :level string
 -- #        :X int
 -- #        :Z int
--- #        :biome string
 -- #        :pvp bool false
--- #        :price int
+-- #        :price float
 UPDATE plotsV2
 SET name    = '',
     owner   = '',

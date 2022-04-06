@@ -9,7 +9,7 @@ use pocketmine\world\ChunkManager;
 use pocketmine\world\format\Chunk;
 use pocketmine\world\generator\Generator;
 
-class MyPlotGenerator extends Generator {
+class MyPlotGenerator extends Generator{
 	protected Block $roadBlock;
 	protected Block $bottomBlock;
 	protected Block $plotFillBlock;
@@ -29,9 +29,9 @@ class MyPlotGenerator extends Generator {
 	 * @param int    $seed
 	 * @param string $preset
 	 */
-	public function __construct(int $seed, string $preset) {
+	public function __construct(int $seed, string $preset){
 		$settings = json_decode($preset, true);
-		if($settings === false or is_null($settings)) {
+		if($settings === false or is_null($settings)){
 			$settings = [];
 		}
 		$this->roadBlock = PlotLevelSettings::parseBlock($settings, "RoadBlock", VanillaBlocks::OAK_PLANKS());
@@ -54,7 +54,7 @@ class MyPlotGenerator extends Generator {
 		]));
 	}
 
-	public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ) : void {
+	public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ) : void{
 		$shape = $this->getShape($chunkX << 4, $chunkZ << 4);
 		$chunk = $world->getChunk($chunkX, $chunkZ);
 		$bottomBlockId = $this->bottomBlock->getFullId();
@@ -63,17 +63,17 @@ class MyPlotGenerator extends Generator {
 		$roadBlockId = $this->roadBlock->getFullId();
 		$wallBlockId = $this->wallBlock->getFullId();
 		$groundHeight = $this->groundHeight;
-		for($Z = 0; $Z < 16; ++$Z) {
-			for($X = 0; $X < 16; ++$X) {
+		for($Z = 0; $Z < 16; ++$Z){
+			for($X = 0; $X < 16; ++$X){
 				$chunk->setBiomeId($X, $Z, BiomeIds::PLAINS);
 				$chunk->setFullBlock($X, 0, $Z, $bottomBlockId);
-				for($y = 1; $y < $groundHeight; ++$y) {
+				for($y = 1; $y < $groundHeight; ++$y){
 					$chunk->setFullBlock($X, $y, $Z, $plotFillBlockId);
 				}
 				$type = $shape[($Z << 4) | $X];
-				if($type === self::PLOT) {
+				if($type === self::PLOT){
 					$chunk->setFullBlock($X, $groundHeight, $Z, $plotFloorBlockId);
-				}elseif($type === self::ROAD) {
+				}elseif($type === self::ROAD){
 					$chunk->setFullBlock($X, $groundHeight, $Z, $roadBlockId);
 				}else{
 					$chunk->setFullBlock($X, $groundHeight, $Z, $roadBlockId);
@@ -92,47 +92,47 @@ class MyPlotGenerator extends Generator {
 	 *
 	 * @return \SplFixedArray<int>
 	 */
-	public function getShape(int $x, int $z) : \SplFixedArray {
+	public function getShape(int $x, int $z) : \SplFixedArray{
 		$totalSize = $this->plotSize + $this->roadWidth;
-		if($x >= 0) {
+		if($x >= 0){
 			$X = $x % $totalSize;
 		}else{
 			$X = $totalSize - abs($x % $totalSize);
 		}
-		if($z >= 0) {
+		if($z >= 0){
 			$Z = $z % $totalSize;
 		}else{
 			$Z = $totalSize - abs($z % $totalSize);
 		}
 		$startX = $X;
 		$shape = new \SplFixedArray(256);
-		for($z = 0; $z < 16; $z++, $Z++) {
-			if($Z === $totalSize) {
+		for($z = 0; $z < 16; $z++, $Z++){
+			if($Z === $totalSize){
 				$Z = 0;
 			}
-			if($Z < $this->plotSize) {
+			if($Z < $this->plotSize){
 				$typeZ = self::PLOT;
-			}elseif($Z === $this->plotSize or $Z === ($totalSize - 1)) {
+			}elseif($Z === $this->plotSize or $Z === ($totalSize - 1)){
 				$typeZ = self::WALL;
 			}else{
 				$typeZ = self::ROAD;
 			}
-			for($x = 0, $X = $startX; $x < 16; $x++, $X++) {
-				if($X === $totalSize) {
+			for($x = 0, $X = $startX; $x < 16; $x++, $X++){
+				if($X === $totalSize){
 					$X = 0;
 				}
-				if($X < $this->plotSize) {
+				if($X < $this->plotSize){
 					$typeX = self::PLOT;
-				}elseif($X === $this->plotSize or $X === ($totalSize - 1)) {
+				}elseif($X === $this->plotSize or $X === ($totalSize - 1)){
 					$typeX = self::WALL;
 				}else{
 					$typeX = self::ROAD;
 				}
-				if($typeX === $typeZ) {
+				if($typeX === $typeZ){
 					$type = $typeX;
-				}elseif($typeX === self::PLOT) {
+				}elseif($typeX === self::PLOT){
 					$type = $typeZ;
-				}elseif($typeZ === self::PLOT) {
+				}elseif($typeZ === self::PLOT){
 					$type = $typeX;
 				}else{
 					$type = self::ROAD;
@@ -143,5 +143,5 @@ class MyPlotGenerator extends Generator {
 		return $shape;
 	}
 
-	public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ) : void {}
+	public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ) : void{ }
 }

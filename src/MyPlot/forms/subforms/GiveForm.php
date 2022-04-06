@@ -1,37 +1,25 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\forms\subforms;
 
-use dktapps\pmforms\CustomFormResponse;
-use dktapps\pmforms\element\Dropdown;
-use MyPlot\forms\ComplexMyPlotForm;
+use cosmicpe\form\CustomForm;
+use cosmicpe\form\entries\custom\DropdownEntry;
+use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
+use MyPlot\plot\BasePlot;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
-class GiveForm extends ComplexMyPlotForm {
-	/** @var string[] $players */
-	private array $players = [];
-
-	public function __construct() {
-		$plugin = MyPlot::getInstance();
-		$players = [];
-		foreach($plugin->getServer()->getOnlinePlayers() as $player) {
-			$players[] = $player->getDisplayName();
-			$this->players[] = $player->getName();
-		}
-		parent::__construct(
-			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("give.form")]),
-			[
-				new Dropdown(
-					"0",
-					$plugin->getLanguage()->get("give.dropdown"),
-					$players
-				)
-			],
-			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
-				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("give.name").' "'.$this->players[$response->getInt("0")].'"', true);
-			}
+class GiveForm extends CustomForm implements MyPlotForm{
+	public function __construct(MyPlot $plugin, Player $player, ?BasePlot $plot){
+		parent::__construct(TextFormat::BLACK . $plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("give.form")]));
+		$this->addEntry(
+			new DropdownEntry(
+				$plugin->getLanguage()->get("give.dropdown"),
+				...array_map(fn(Player $player) => $player->getDisplayName(), $plugin->getServer()->getOnlinePlayers())
+			),
+			\Closure::fromCallable(fn(Player $player, DropdownEntry $entry) => $plugin->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name") . " " . $plugin->getLanguage()->get("give.name") . ' "' . $entry->getValue() . '"', true))
 		);
 	}
 }

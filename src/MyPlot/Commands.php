@@ -51,9 +51,10 @@ class Commands extends Command implements PluginOwned{
 	/** @var MyPlotSubCommand[] $aliasSubCommands */
 	private array $aliasSubCommands = [];
 
-	public function __construct(private MyPlot $owningPlugin, private InternalAPI $internalAPI){
+	public function __construct(MyPlot $owningPlugin, private InternalAPI $internalAPI){
 		parent::__construct($owningPlugin->getLanguage()->get("command.name"), $owningPlugin->getLanguage()->get("command.desc"), $owningPlugin->getLanguage()->get("command.usage"), [$owningPlugin->getLanguage()->get("command.alias")]);
 		$this->setPermission("myplot.command");
+		$this->owningPlugin = $owningPlugin;
 		$this->loadSubCommand(new HelpSubCommand($owningPlugin, $internalAPI, "help", $this));
 		$this->loadSubCommand(new ClaimSubCommand($owningPlugin, $internalAPI, "claim"));
 		$this->loadSubCommand(new GenerateSubCommand($owningPlugin, $internalAPI, "generate"));
@@ -100,42 +101,68 @@ class Commands extends Command implements PluginOwned{
 
 				$usage = $subCommand->getUsage();
 				$commandString = explode(" ", $usage)[0];
-				preg_match_all('/(\s?[<\[]?\s*)([a-zA-Z0-9|]+)\s*:?\s*(string|int|x y z|float|mixed|target|message|text|json|command|boolean|bool)?\s*[>\]]?\s?/iu', $usage, $matches, PREG_PATTERN_ORDER, strlen($commandString));
-				$argumentCount = count($matches[0])-1;
-				for($argNumber = 1; $argNumber <= $argumentCount; ++$argNumber) {
-					$optional = $matches[1][$argNumber] === '[';
-					$paramName = strtolower($matches[2][$argNumber]);
-					if(stripos($paramName, "|") === false) {
-						$paramType = match (strtolower($matches[3][$argNumber])) {
-							default => AvailableCommandsPacket::ARG_TYPE_STRING,
-							"int" => AvailableCommandsPacket::ARG_TYPE_INT,
-							"x y z" => AvailableCommandsPacket::ARG_TYPE_POSITION,
-							"float" => AvailableCommandsPacket::ARG_TYPE_FLOAT,
-							"target" => AvailableCommandsPacket::ARG_TYPE_TARGET,
-							"message" => AvailableCommandsPacket::ARG_TYPE_MESSAGE,
-							"json" => AvailableCommandsPacket::ARG_TYPE_JSON,
-							"command" => AvailableCommandsPacket::ARG_TYPE_COMMAND,
-							"boolean", "bool", "mixed" => AvailableCommandsPacket::ARG_TYPE_VALUE,
-							"text" => AvailableCommandsPacket::ARG_TYPE_RAWTEXT,
-						};
-						$parameter = CommandParameter::standard($paramName, $paramType, 0, $optional);
-					}else{
-						$enumValues = explode("|", $paramName);
-						$parameter = CommandParameter::enum($paramName, new CommandEnum($this->getName()." Enum#".$enumCount, $enumValues), CommandParameter::FLAG_FORCE_COLLAPSE_ENUM, $optional);
+				preg_match_all('/\h*([<\[])?\h*([\w|]+)\h*:?\h*([\w\h]+)?\h*[>\]]?\h*/iu', $usage, $matches, PREG_PATTERN_ORDER, strlen($commandString)); // https://regex101.com/r/1REoJG/22
+				$argumentCount = count($matches[0]) - 1;
+				for($argNumber = 1; $argNumber <= $argumentCount; ++$argNumber){
+					if(!isset($matches[1][$argNumber])){
+						$paramName = strtolower($matches[2][$argNumber]);
+						$paramName = $paramName === 'bool' ? 'Boolean' : $paramName;
+
+						$softEnums = $autofill->getSoftEnums();
+						if(isset($softEnums[$paramName])){
+							$enum = $softEnums[$paramName];
+						}else{
+							$autofill->addSoftEnum($enum = new CommandEnum($paramName, [$paramName]), false);
+						}
+						$overloads[$tree][$argNumber] = CommandParameter::enum($paramName, $enum, CommandParameter::FLAG_FORCE_COLLAPSE_ENUM, false); // collapse and assume required because no optional identifier exists in usage message
+						continue;
 					}
-					$overloads[$tree][$argNumber] = $parameter;
+					$optional = str_contains($matches[1][$argNumber], '[');
+					$paramName = strtolower($matches[2][$argNumber]);
+					$paramType = strtolower($matches[3][$argNumber] ?? '');
+					if(in_array($paramType, array_keys(array_merge($autofill->getSoftEnums(), $autofill->getHardcodedEnums())), true)){
+						$paramType = $paramType === 'bool' ? 'Boolean' : $paramType;
+						$enum = $autofill->getSoftEnums()[$paramType] ?? $autofill->getHardcodedEnums()[$paramType];
+						$overloads[$tree][$argNumber] = CommandParameter::enum($paramName, $enum, 0, $optional);
+					}elseif(str_contains($paramName, "|")){
+						++$enumCount;
+						$enumValues = explode("|", $paramName);
+						$autofill->addSoftEnum($enum = new CommandEnum($subCommandName . " Enum#" . $enumCount, $enumValues), false);
+						$overloads[$tree][$argNumber] = CommandParameter::enum($paramName, $enum, CommandParameter::FLAG_FORCE_COLLAPSE_ENUM, $optional);
+					}elseif(str_contains($paramName, "/")){
+						++$enumCount;
+						$enumValues = explode("/", $paramName);
+						$autofill->addSoftEnum($enum = new CommandEnum($subCommandName . " Enum#" . $enumCount, $enumValues), false);
+						$overloads[$tree][$argNumber] = CommandParameter::enum($paramName, $enum, CommandParameter::FLAG_FORCE_COLLAPSE_ENUM, $optional);
+					}else{
+						$paramType = match ($paramType) { // ordered by constant value
+							'int' => AvailableCommandsPacket::ARG_TYPE_INT,
+							'float' => AvailableCommandsPacket::ARG_TYPE_FLOAT,
+							'mixed' => AvailableCommandsPacket::ARG_TYPE_VALUE,
+							'player', 'target' => AvailableCommandsPacket::ARG_TYPE_TARGET,
+							'string' => AvailableCommandsPacket::ARG_TYPE_STRING,
+							'x y z' => AvailableCommandsPacket::ARG_TYPE_POSITION,
+							'message' => AvailableCommandsPacket::ARG_TYPE_MESSAGE,
+							default => AvailableCommandsPacket::ARG_TYPE_RAWTEXT,
+							'json' => AvailableCommandsPacket::ARG_TYPE_JSON,
+							'command' => AvailableCommandsPacket::ARG_TYPE_COMMAND,
+						};
+						$overloads[$tree][$argNumber] = CommandParameter::standard($paramName, $paramType, 0, $optional);
+					}
 				}
 				$tree++;
 			}
-			$autofill->addManualOverride($this->getName(), new CommandData($this->getName(), $this->getDescription(), 0, 1, new CommandEnum(ucfirst($this->getName()) . "Aliases", array_merge([$this->getName()], $this->getAliases())), $overloads));
-			$plugin->getLogger()->debug("Command Autofill Enabled");
+			$data = $autofill->generateGenericCommandData($this->getName(), $this->getAliases(), $this->getDescription(), $this->getUsage());
+			$data->overloads = $overloads;
+			$autofill->addManualOverride('myplot:' . $this->getName(), $data);
+			$owningPlugin->getLogger()->debug("Command Autofill Enabled");
 		}
 	}
 
 	/**
 	 * @return MyPlotSubCommand[]
 	 */
-	public function getCommands() : array {
+	public function getCommands() : array{
 		return $this->subCommands;
 	}
 
@@ -162,25 +189,25 @@ class Commands extends Command implements PluginOwned{
 		if(!isset($args[0])){
 			$args[0] = "help";
 			if($sender instanceof Player and $this->owningPlugin->getConfig()->get("UI Forms", true) === true and class_exists('cosmicpe\\form\\PaginatedForm')){
-				$sender->sendForm(new MainForm(1, $sender, $this->internalAPI));
+				$sender->sendForm(new MainForm(1, $sender, $this->owningPlugin, $this->internalAPI));
 				return true;
 			}
 		}
 		$subCommand = strtolower((string) array_shift($args));
-		if(isset($this->subCommands[$subCommand])) {
+		if(isset($this->subCommands[$subCommand])){
 			$command = $this->subCommands[$subCommand];
-		}elseif(isset($this->aliasSubCommands[$subCommand])) {
+		}elseif(isset($this->aliasSubCommands[$subCommand])){
 			$command = $this->aliasSubCommands[$subCommand];
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->owningPlugin->getLanguage()->get("command.unknown"));
 			return true;
 		}
-		if($command->canUse($sender)) {
-			if(!$command->execute($sender, $args)) {
-				$sender->sendMessage($this->owningPlugin->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]));
-			}
-		}else{
-			$sender->sendMessage(TextFormat::RED . $this->owningPlugin->getLanguage()->get("command.unknown"));
+		if(!$command->canUse($sender)){
+			$sender->sendMessage(TextFormat::RED . $this->owningPlugin->getLanguage()->get("command.usable"));
+			return true;
+		}
+		if(!$command->execute($sender, $args)){
+			$sender->sendMessage($this->owningPlugin->getLanguage()->translateString("subcommand.usage", [$command->getUsage()]));
 		}
 		return true;
 	}

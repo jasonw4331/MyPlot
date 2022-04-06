@@ -55,19 +55,19 @@ class MergedPlot extends SinglePlot{
 	 *
 	 * @return bool
 	 */
-	public function isSame(BasePlot $plot) : bool {
+	public function isSame(BasePlot $plot) : bool{
 		if(parent::isSame($plot))
 			return true;
 
 		return (
-			new AxisAlignedBB(
-				$this->X,
-				0,
-				$this->Z,
-				$this->X + $this->xWidth,
-				1,
-				$this->Z + $this->zWidth
-			)
+		new AxisAlignedBB(
+			$this->X,
+			0,
+			$this->Z,
+			$this->X + $this->xWidth,
+			1,
+			$this->Z + $this->zWidth
+		)
 		)->isVectorInXZ(new Vector3($plot->X, 0, $plot->Z));
 	}
 

@@ -1,23 +1,32 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\subcommand;
 
-use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\KickForm;
-use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use SOFe\AwaitGenerator\Await;
 
-class KickSubCommand extends SubCommand
-{
-	public function canUse(CommandSender $sender) : bool {
-		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.kick");
+class KickSubCommand extends SubCommand{
+	public function canUse(CommandSender $sender) : bool{
+		if(!$sender->hasPermission("myplot.command.kick")){
+			return false;
+		}
+		if($sender instanceof Player){
+			$pos = $sender->getPosition();
+			$plotLevel = $this->internalAPI->getLevelSettings($sender->getWorld()->getFolderName());
+			if($this->internalAPI->getPlotFast($pos->x, $pos->z, $plotLevel) === null){
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
-	 * @param Player $sender
+	 * @param Player   $sender
 	 * @param string[] $args
 	 *
 	 * @return bool
@@ -29,7 +38,7 @@ class KickSubCommand extends SubCommand
 					$sender->sendMessage($this->translateString("subcommand.usage", [$this->getUsage()]));
 					return;
 				}
-				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				$plot = yield from $this->internalAPI->generatePlotByPosition($sender->getPosition());
 				if($plot === null){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 					return;
@@ -43,7 +52,7 @@ class KickSubCommand extends SubCommand
 					$sender->sendMessage(TextFormat::RED . $this->translateString("kick.noPlayer"));
 					return;
 				}
-				if(($targetPlot = yield $this->internalAPI->generatePlotByPosition($target->getPosition())) === null or !$plot->isSame($targetPlot)){
+				if(($targetPlot = yield from $this->internalAPI->generatePlotByPosition($target->getPosition())) === null or !$plot->isSame($targetPlot)){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("kick.notInPlot"));
 					return;
 				}
@@ -52,7 +61,7 @@ class KickSubCommand extends SubCommand
 					$target->sendMessage($this->translateString("kick.attemptkick", [$target->getName()]));
 					return;
 				}
-				if(!yield $this->internalAPI->generatePlayerTeleport($target, $plot, false)){
+				if($this->internalAPI->teleportPlayerToPlot($target, $plot, false)){
 					$sender->sendMessage($this->translateString("kick.success1", [$target->getName(), $plot->__toString()]));
 					$target->sendMessage($this->translateString("kick.success2", [$sender->getName(), $plot->__toString()]));
 				}else{

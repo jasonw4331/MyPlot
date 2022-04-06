@@ -1,99 +1,81 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\forms\subforms;
 
-use dktapps\pmforms\CustomFormResponse;
-use dktapps\pmforms\element\Input;
-use dktapps\pmforms\element\Slider;
-use dktapps\pmforms\element\Toggle;
-use MyPlot\forms\ComplexMyPlotForm;
+use cosmicpe\form\CustomForm;
+use cosmicpe\form\entries\custom\InputEntry;
+use cosmicpe\form\entries\custom\SliderEntry;
+use cosmicpe\form\entries\custom\ToggleEntry;
+use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
-use MyPlot\Plot;
-use pocketmine\block\BlockLegacyIds;
+use MyPlot\plot\BasePlot;
+use pocketmine\item\ItemBlock;
+use pocketmine\item\StringToItemParser;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
-class GenerateForm extends ComplexMyPlotForm {
-	/** @var string[] $keys */
-	private array $keys = [];
+class GenerateForm extends CustomForm implements MyPlotForm{
+	public function __construct(MyPlot $plugin, Player $player, ?BasePlot $plot){
+		parent::__construct(TextFormat::BLACK . $plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("generate.form")]));
 
-	public function __construct() {
-		$plugin = MyPlot::getInstance();
-		$elements = [
-			new Input(
-				"0",
-				$plugin->getLanguage()->get("generate.formworld"),
-				"plots"
-			),
-			new Input(
-				"1",
-				$plugin->getLanguage()->get("generate.formgenerator"),
-				"",
-				"myplot"
-			)
-		];
-		$i = 2;
-		foreach($plugin->getConfig()->get("DefaultWorld", []) as $key => $value) {
-			if(is_numeric($value)) {
+		static $outputs = [];
+		$this->addEntry(
+			new InputEntry($plugin->getLanguage()->get("generate.formworld"), 'plots'),
+			\Closure::fromCallable(fn(Player $player, InputEntry $entry) => $outputs[] = $entry->getValue())
+		);
+		$this->addEntry(
+			new InputEntry($plugin->getLanguage()->get("generate.formgenerator"), '', 'myplot'),
+			\Closure::fromCallable(fn(Player $player, InputEntry $entry) => $outputs[] = $entry->getValue())
+		);
+
+		foreach($plugin->getConfig()->get("DefaultWorld", []) as $key => $value){
+			if(is_numeric($value)){
 				if($value > 0)
-					$elements[] = new Slider("$i", $key, 1, 4 * (float)$value, 1, (float)$value);
+					$this->addEntry(
+						new SliderEntry($key, 1, 4 * $value, 1, $value),
+						\Closure::fromCallable(fn(Player $player, SliderEntry $entry) => $outputs[] = $entry->getValue())
+					);
 				else
-					$elements[] = new Slider("$i", $key, 1, 1000, 1, 1.0);
-			}elseif(is_bool($value)) {
-				$elements[] = new Toggle("$i", $key, $value);
-			}elseif(is_string($value)) {
-				$elements[] = new Input("$i", $key, "", $value);
+					$this->addEntry(
+						new SliderEntry($key, 1, 1000, 1, 1),
+						\Closure::fromCallable(fn(Player $player, SliderEntry $entry) => $outputs[] = $entry->getValue())
+					);
+			}elseif(is_bool($value)){
+				$this->addEntry(
+					new ToggleEntry($key, $value),
+					\Closure::fromCallable(fn(Player $player, ToggleEntry $entry) => $outputs[] = $entry->getValue())
+				);
+			}elseif(is_string($value)){
+				$this->addEntry(
+					new InputEntry($key, '', $value),
+					\Closure::fromCallable(fn(Player $player, InputEntry $entry) => $outputs[] = $entry->getValue())
+				);
 			}
-			$this->keys[] = $key;
-			$i++;
 		}
-		$this->keys[] = "teleport";
-		$elements[] = new Toggle("$i", $plugin->getLanguage()->get("generate.formteleport"), true);
 
-		parent::__construct(
-			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("generate.form")]),
-			$elements,
-			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
-				$copy = [];
-				foreach($response->getAll() as $key => $value) {
-					if(isset($this->keys[((int)$key)-2]))
-						$copy[$this->keys[((int)$key)-2]] = $value;
-					else
-						$copy[] = $value;
-				}
-				$data = $copy;
-
-				$world = array_shift($data);
-				if($player->getServer()->getWorldManager()->isWorldGenerated($world)) {
-					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("generate.exists", [$world]));
+		$this->addEntry(
+			new ToggleEntry($plugin->getLanguage()->get("generate.formteleport"), true),
+			\Closure::fromCallable(function(Player $player, ToggleEntry $entry) use ($plugin, $outputs){
+				$worldName = array_shift($outputs);
+				if($player->getServer()->getWorldManager()->isWorldGenerated($worldName)){
+					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("generate.exists", [$worldName]));
 					return;
 				}
-				$teleport = array_pop($data);
 
-				$blockIds = array_slice($data, -5, 5, true);
-				$blockIds = array_map(function($val) {
-					if(str_contains($val, ':')) {
-						$peices = explode(':', $val);
-						if(defined(BlockLegacyIds::class."::".strtoupper(str_replace(' ', '_', $peices[0]))))
-							return constant(BlockLegacyIds::class."::".strtoupper(str_replace(' ', '_', $val))).':'.($peices[1] ?? 0);
-						return $val;
-					}elseif(is_numeric($val))
-						return $val.':0';
-					elseif(defined(BlockLegacyIds::class."::".strtoupper(str_replace(' ', '_', $val))))
-						return constant(BlockLegacyIds::class."::".strtoupper(str_replace(' ', '_', $val))).':0';
-					return $val;
-				}, $blockIds);
-				foreach($blockIds as $key => $val)
-					$data[$key] = $val;
+				$blockNames = array_slice($outputs, -6, 5, true); // TODO: UPDATE WHEN CONFIG IS UPDATED
+				$blockNames = array_map(fn(string $blockName) => str_replace(' ', '_', $blockName), $blockNames);
+				$blockNames = array_filter($blockNames, fn(string $blockName) => StringToItemParser::getInstance()->parse($blockName) instanceof ItemBlock);
+				$outputs = array_merge($outputs, $blockNames);
 
-				if($plugin->generateLevel($world, array_shift($data), $data)) {
-					if($teleport)
-						$plugin->teleportPlayerToPlot($player, new Plot($world, 0, 0));
-					$player->sendMessage($plugin->getLanguage()->translateString("generate.success", [$world]));
+				if($plugin->generateLevel($worldName, array_shift($outputs), $outputs)){
+					if($entry->getValue() === true)
+						$plugin->teleportPlayerToPlot($player, new BasePlot($worldName, 0, 0));
+					$player->sendMessage($plugin->getLanguage()->translateString("generate.success", [$worldName]));
 				}else{
 					$player->sendMessage(TextFormat::RED . $plugin->getLanguage()->translateString("generate.error"));
 				}
-			}
+			})
 		);
 	}
 }

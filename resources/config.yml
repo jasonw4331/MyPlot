@@ -37,7 +37,7 @@ Custom Messages: false
 UI Forms: true
 
 # The data provider where plot data is stored.
-database:
+Database:
   # The database type. "sqlite" and "mysql" are supported.
   type: sqlite
 
@@ -64,7 +64,7 @@ UseEconomy: false
 
 # Amount of plots to be cached.
 # Increasing this number will improve performance, but also increase memory usage.
-PlotCacheSize: 2048
+PlotCacheSize: 2500
 
 # When a player enters a plot, a popup with basic info will be shown
 ShowPlotPopup: true
@@ -129,12 +129,12 @@ DefaultWorld:
   RoadWidth: 7
 
   # The block that the road is made of (Default is Oak Planks)
-  RoadBlock: '5:0'
+  RoadBlock: oak planks
   # The block that plot walls are made of (Default is Stone Slabs)
-  WallBlock: '44:0'
+  WallBlock: stone slab
   # The block used as the plot floor (Default is Grass)
-  PlotFloorBlock: '2:0'
+  PlotFloorBlock: grass
   # The block that fills the rest of the plot (Default is Dirt)
-  PlotFillBlock: '3:0'
+  PlotFillBlock: dirt
   # The block at the bottom (Default is Bedrock)
-  BottomBlock: '7:0'
+  BottomBlock: bedrock

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\subcommand;
 
 use pocketmine\command\CommandSender;
@@ -7,14 +8,24 @@ use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use SOFe\AwaitGenerator\Await;
 
-class BuySubCommand extends SubCommand
-{
-	public function canUse(CommandSender $sender) : bool {
-		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.buy");
+class BuySubCommand extends SubCommand{
+	public function canUse(CommandSender $sender) : bool{
+		if(!$sender->hasPermission("myplot.command.buy")){
+			return false;
+		}
+		if($sender instanceof Player){
+			$pos = $sender->getPosition();
+			$plotLevel = $this->internalAPI->getLevelSettings($sender->getWorld()->getFolderName());
+			if($this->internalAPI->getPlotFast($pos->x, $pos->z, $plotLevel) === null){
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
-	 * @param Player $sender
+	 * @param Player   $sender
 	 * @param string[] $args
 	 *
 	 * @return bool
@@ -28,7 +39,7 @@ class BuySubCommand extends SubCommand
 					$command->execute($sender, []);
 					return;
 				}
-				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				$plot = yield from $this->internalAPI->generatePlotByPosition($sender->getPosition());
 				if($plot === null){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 					return;
@@ -42,7 +53,7 @@ class BuySubCommand extends SubCommand
 					return;
 				}
 				$maxPlots = $this->plugin->getMaxPlotsOfPlayer($sender);
-				if(count(yield $this->internalAPI->generatePlotsOfPlayer($sender->getName(), null)) >= $maxPlots){
+				if(count(yield from $this->internalAPI->generatePlotsOfPlayer($sender->getName(), null)) >= $maxPlots){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxplots", [$maxPlots]));
 					return;
 				}
@@ -52,7 +63,7 @@ class BuySubCommand extends SubCommand
 					return;
 				}
 				$oldOwner = $this->plugin->getServer()->getPlayerExact($plot->owner);
-				if(yield $this->internalAPI->generateBuyPlot($plot, $sender)){
+				if(yield from $this->internalAPI->generateBuyPlot($plot, $sender)){
 					$sender->sendMessage($this->translateString("buy.success", ["$plot->X;$plot->Z", $price]));
 					$oldOwner?->sendMessage($this->translateString("buy.sold", [$sender->getName(), "$plot->X;$plot->Z", $price])); // TODO: queue messages for sending when player rejoins
 				}else{

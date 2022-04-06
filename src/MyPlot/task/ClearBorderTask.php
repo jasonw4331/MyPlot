@@ -3,95 +3,80 @@ declare(strict_types=1);
 namespace MyPlot\task;
 
 use MyPlot\MyPlot;
-use MyPlot\Plot;
-use pocketmine\block\Block;
+use MyPlot\plot\BasePlot;
+use MyPlot\PlotLevelSettings;
 use pocketmine\block\VanillaBlocks;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
+use pocketmine\scheduler\CancelTaskException;
 use pocketmine\scheduler\Task;
 use pocketmine\world\World;
 
-class ClearBorderTask extends Task {
-	protected MyPlot $plugin;
-	protected Plot $plot;
-	protected World $level;
-	protected int $height;
-	protected Block $plotWallBlock;
+class ClearBorderTask extends Task{
+	protected AxisAlignedBB $aabb;
 	protected Vector3 $plotBeginPos;
-	protected int $xMax;
-	protected int $zMax;
-	protected Block $roadBlock;
-	protected Block $groundBlock;
-	protected Block $bottomBlock;
+	protected PlotLevelSettings $plotLevel;
+	protected Vector3 $pos;
+	protected World $world;
 
-	/**
-	 * ClearBorderTask constructor.
-	 *
-	 * @param MyPlot $plugin
-	 * @param Plot $plot
-	 */
-	public function __construct(MyPlot $plugin, Plot $plot) {
-		$this->plugin = $plugin;
-		$this->plot = $plot;
-		$plotLevel = $plugin->getLevelSettings($plot->levelName);
-		$plotSize = $plotLevel->plotSize;
-        $this->plotBeginPos = $plugin->getPlotPosition($plot, false);
-        $this->xMax = (int)($this->plotBeginPos->x + $plotSize);
-        $this->zMax = (int)($this->plotBeginPos->z + $plotSize);
-        foreach ($plugin->getProvider()->getMergedPlots($plot) as $mergedPlot){
-            $xplot = $plugin->getPlotPosition($mergedPlot, false)->x;
-            $zplot = $plugin->getPlotPosition($mergedPlot, false)->z;
-            $xMaxPlot = (int)($xplot + $plotSize);
-            $zMaxPlot = (int)($zplot + $plotSize);
-            if($this->plotBeginPos->x > $xplot) $this->plotBeginPos->x = $xplot;
-            if($this->plotBeginPos->z > $zplot) $this->plotBeginPos->z = $zplot;
-            if($this->xMax < $xMaxPlot) $this->xMax = $xMaxPlot;
-            if($this->zMax < $zMaxPlot) $this->zMax = $zMaxPlot;
-        }
-
-        --$this->plotBeginPos->x;
-        --$this->plotBeginPos->z;
-        $this->level = $this->plotBeginPos->getWorld();
-		$this->height = $plotLevel->groundHeight;
-		$this->plotWallBlock = $plotLevel->wallBlock;
-		$this->roadBlock = $plotLevel->roadBlock;
-		$this->groundBlock = $plotLevel->plotFillBlock;
-		$this->bottomBlock = $plotLevel->bottomBlock;
+	public function __construct(private MyPlot $plugin, private BasePlot $plot, private int $maxBlocksPerTick = 256){
+		$this->world = $this->plugin->getServer()->getWorldManager()->getWorldByName($plot->levelName);
+		$this->plotLevel = $plugin->getLevelSettings($plot->levelName);
+		$this->aabb = $aabb = $this->plugin->getPlotBB($plot)->expand(1, 0, 1);
+		$this->plotBeginPos = $this->pos = new Vector3(
+			$aabb->minX,
+			$aabb->minY,
+			$aabb->minZ
+		);
 		$plugin->getLogger()->debug("Border Clear Task started at plot $plot->X;$plot->Z");
 	}
 
-	public function onRun() : void {
-		for($x = $this->plotBeginPos->x; $x <= $this->xMax; $x++) {
-			for($y = 0; $y < $this->level->getMaxY(); ++$y) {
-				if($y > $this->height + 1)
+	public function onRun() : void{
+		$blocks = 0;
+		for($x = $this->plotBeginPos->x; $x <= $this->aabb->maxX; $x++){
+			for($y = 0; $y < $this->aabb->maxY; ++$y){
+				if($y > $this->plotLevel->groundHeight + 1)
 					$block = VanillaBlocks::AIR();
-				elseif($y === $this->height + 1)
-					$block = $this->plotWallBlock;
-				elseif($y === $this->height)
-					$block = $this->roadBlock;
-				elseif($y === 0)
-					$block = $this->bottomBlock;
-				else//if($y < $this->height)
-					$block = $this->groundBlock;
-				$this->level->setBlock(new Vector3($x, $y, $this->plotBeginPos->z), $block, false);
-				$this->level->setBlock(new Vector3($x, $y, $this->zMax), $block, false);
+				elseif($y === $this->plotLevel->groundHeight + 1)
+					$block = $this->plotLevel->wallBlock;
+				elseif($y === $this->plotLevel->groundHeight)
+					$block = $this->plotLevel->roadBlock;
+				elseif($y === $this->aabb->minY)
+					$block = $this->plotLevel->bottomBlock;
+				else//if($y < $this->plotLevel->groundHeight)
+					$block = $this->plotLevel->plotFloorBlock;
+				$this->world->setBlock(new Vector3($x, $y, $this->plotBeginPos->z), $block, false);
+				$this->world->setBlock(new Vector3($x, $y, $this->aabb->maxZ), $block, false);
+				$blocks += 2;
 			}
 		}
-		for($z = $this->plotBeginPos->z; $z <= $this->zMax; $z++) {
-			for($y = 0; $y < $this->level->getMaxY(); ++$y) {
-				if($y > $this->height+1)
+		if($blocks >= $this->maxBlocksPerTick){
+			$this->setHandler(null);
+			$this->plugin->getScheduler()->scheduleDelayedTask($this, 1);
+			throw new CancelTaskException();
+		}
+		for($z = $this->plotBeginPos->z; $z <= $this->aabb->maxZ; $z++){
+			for($y = 0; $y < $this->aabb->maxY; ++$y){
+				if($y > $this->plotLevel->groundHeight + 1)
 					$block = VanillaBlocks::AIR();
-				elseif($y === $this->height + 1)
-					$block = $this->plotWallBlock;
-				elseif($y === $this->height)
-					$block = $this->roadBlock;
-				elseif($y === 0)
-					$block = $this->bottomBlock;
-				else//if($y < $this->height)
-					$block = $this->groundBlock;
-				$this->level->setBlock(new Vector3($this->plotBeginPos->x, $y, $z), $block, false);
-				$this->level->setBlock(new Vector3($this->xMax, $y, $z), $block, false);
+				elseif($y === $this->plotLevel->groundHeight + 1)
+					$block = $this->plotLevel->wallBlock;
+				elseif($y === $this->plotLevel->groundHeight)
+					$block = $this->plotLevel->roadBlock;
+				elseif($y === $this->aabb->minY)
+					$block = $this->plotLevel->bottomBlock;
+				else//if($y < $this->plotLevel->groundHeight)
+					$block = $this->plotLevel->plotFloorBlock;
+				$this->world->setBlock(new Vector3($this->plotBeginPos->x, $y, $z), $block, false);
+				$this->world->setBlock(new Vector3($this->aabb->maxX, $y, $z), $block, false);
+				$blocks += 2;
 			}
 		}
-		$this->plugin->getLogger()->debug("Border Clear Task completed");
+		if($blocks >= $this->maxBlocksPerTick){
+			$this->setHandler(null);
+			$this->plugin->getScheduler()->scheduleDelayedTask($this, 1);
+			throw new CancelTaskException();
+		}
+		$this->plugin->getLogger()->debug("Border Clear Task completed at {$this->plot->X};{$this->plot->Z}");
 	}
 }

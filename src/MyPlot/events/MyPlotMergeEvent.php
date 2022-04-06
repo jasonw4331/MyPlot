@@ -2,33 +2,38 @@
 declare(strict_types=1);
 namespace MyPlot\events;
 
-use MyPlot\Plot;
+use MyPlot\plot\BasePlot;
+use MyPlot\plot\MergedPlot;
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
 
-class MyPlotMergeEvent extends MyPlotPlotEvent implements Cancellable {
+class MyPlotMergeEvent extends MyPlotPlotEvent implements Cancellable{
 	use CancellableTrait;
 
-    /** @var Plot[][] $toMerge */
-    private array $toMerge;
+	/** @var BasePlot[] $toMerge */
+	private array $toMerge;
+	private int $direction;
 
 
-    /**
-     * MyPlotMergeEvent constructor.
-     * @param Plot $plot
-     * @param Plot[][] $toMerge
-     */
-    public function __construct(Plot $plot, array $toMerge) {
-        $this->toMerge = $toMerge;
+	/**
+	 * MyPlotMergeEvent constructor.
+	 *
+	 * @param MergedPlot $plot
+	 * @param int        $direction
+	 * @param BasePlot[] $toMerge
+	 */
+	public function __construct(MergedPlot $plot, int $direction, array $toMerge){
 		parent::__construct($plot);
+		$this->direction = $direction;
+		$this->toMerge = $toMerge;
 	}
 
-    /**
-     * @return Plot[][]
-     */
-    public function getToMergePairs() : array {
-        return $this->toMerge;
-    }
+	/**
+	 * @return BasePlot[]
+	 */
+	public function getToMergePairs() : array{
+		return $this->toMerge;
+	}
 
 
 }

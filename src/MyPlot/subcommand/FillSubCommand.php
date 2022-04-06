@@ -1,10 +1,9 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\subcommand;
 
-use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\FillForm;
-use MyPlot\Plot;
 use pocketmine\block\Air;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
@@ -13,18 +12,29 @@ use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use SOFe\AwaitGenerator\Await;
 
-class FillSubCommand extends SubCommand {
+class FillSubCommand extends SubCommand{
 	/**
 	 * @param CommandSender $sender
 	 *
 	 * @return bool
 	 */
-	public function canUse(CommandSender $sender) : bool {
-		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.fill");
+	public function canUse(CommandSender $sender) : bool{
+		if(!$sender->hasPermission("myplot.command.fill")){
+			return false;
+		}
+		if($sender instanceof Player){
+			$pos = $sender->getPosition();
+			$plotLevel = $this->internalAPI->getLevelSettings($sender->getWorld()->getFolderName());
+			if($this->internalAPI->getPlotFast($pos->x, $pos->z, $plotLevel) === null){
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
-	 * @param Player $sender
+	 * @param Player   $sender
 	 * @param string[] $args
 	 *
 	 * @return bool
@@ -36,7 +46,7 @@ class FillSubCommand extends SubCommand {
 					$sender->sendMessage($this->translateString("subcommand.usage", [$this->getUsage()]));
 					return;
 				}
-				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				$plot = yield from $this->internalAPI->generatePlotByPosition($sender->getPosition());
 				if($plot === null){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 					return;
@@ -52,14 +62,14 @@ class FillSubCommand extends SubCommand {
 				}
 				$economy = $this->internalAPI->getEconomyProvider();
 				$price = $this->internalAPI->getLevelSettings($plot->levelName)->fillPrice;
-				if($economy !== null and !(yield $economy->reduceMoney($sender, $price, 'used plot fill command'))){
+				if($economy !== null and !(yield from $economy->reduceMoney($sender, $price, 'used plot fill command'))){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("fill.nomoney"));
 					return;
 				}
 				$maxBlocksPerTick = $this->plugin->getConfig()->get("FillBlocksPerTick", 256);
 				if(!is_int($maxBlocksPerTick))
 					$maxBlocksPerTick = 256;
-				if(yield $this->plugin->fillPlot($plot, $item->getBlock(), $maxBlocksPerTick)){
+				if($this->internalAPI->fillPlot($plot, $item->getBlock(), $maxBlocksPerTick)){
 					$sender->sendMessage($this->translateString("fill.success", [$item->getBlock()->getName()]));
 				}else{
 					$sender->sendMessage(TextFormat::RED . $this->translateString("error"));

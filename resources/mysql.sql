@@ -29,6 +29,15 @@ CREATE TABLE IF NOT EXISTS mergedPlotsV2
 );
 -- #    }
 -- #  }
+-- #  {test
+-- #    {table
+-- #      :tableName string
+SELECT COUNT(*) AS tables
+FROM information_schema.tables
+WHERE table_schema = DATABASE()
+  AND table_name = :tableName;
+-- #    }
+-- #  }
 -- #  {add
 -- #    {plot
 -- #      :level string
@@ -40,9 +49,8 @@ CREATE TABLE IF NOT EXISTS mergedPlotsV2
 -- #      :denied string
 -- #      :biome string
 -- #      :pvp bool false
--- #      :price int
-INSERT
-INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price)
+-- #      :price float
+INSERT INTO plotsV2 (level, X, Z, name, owner, helpers, denied, biome, pvp, price)
 VALUES (:level, :X, :Z, :name, :owner, :helpers, :denied, :biome, :pvp, :price)
 ON DUPLICATE KEY UPDATE name    = VALUES(:name),
                         owner   = VALUES(:owner),
@@ -58,8 +66,7 @@ ON DUPLICATE KEY UPDATE name    = VALUES(:name),
 -- #      :originZ int
 -- #      :mergedX int
 -- #      :mergedZ int
-INSERT IGNORE
-INTO mergedPlotsV2 (`level`, `originX`, `originZ`, `mergedX`, `mergedZ`)
+INSERT IGNORE INTO mergedPlotsV2 (`level`, `originX`, `originZ`, `mergedX`, `mergedZ`)
 VALUES (:level, :originX, :originZ, :mergedX, :mergedZ);
 -- #    }
 -- #  }
@@ -123,7 +130,7 @@ FROM plotsV2
                    ON mergedPlotsV2.level = plotsV2.level
                        AND mergedX = X
                        AND mergedZ = Z
-WHERE mergedPlotsV2.level = :level
+WHERE mergedplotsV2.level = :level
   AND originX = :originX
   AND originZ = :originZ;
 -- #      }
@@ -184,9 +191,8 @@ WHERE level = :level
 -- #        :level string
 -- #        :x int
 -- #        :z int
--- #        :biome string
 -- #        :pvp bool false
--- #        :price int
+-- #        :price float
 UPDATE plotsV2
 SET name    = '',
     owner   = '',

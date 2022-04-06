@@ -21,7 +21,7 @@ final class InternalCapitalProvider implements InternalEconomyProvider{
 	/**
 	 * @inheritDoc
 	 */
-	public function reduceMoney(Player $player, int $amount, string $reason = 'Unknown') : \Generator {
+	public function reduceMoney(Player $player, int $amount, string $reason = 'Unknown') : \Generator{
 		/** @var Capital $api */
 		$api = yield from Capital::get(MainClass::$context);
 		yield from $api->takeMoney(
@@ -36,7 +36,7 @@ final class InternalCapitalProvider implements InternalEconomyProvider{
 	/**
 	 * @inheritDoc
 	 */
-	public function addMoney(Player $player, int $amount, string $reason = 'Unknown') : \Generator {
+	public function addMoney(Player $player, int $amount, string $reason = 'Unknown') : \Generator{
 		/** @var Capital $api */
 		$api = yield from Capital::get(MainClass::$context);
 		yield from $api->addMoney(
@@ -51,7 +51,7 @@ final class InternalCapitalProvider implements InternalEconomyProvider{
 	/**
 	 * @inheritDoc
 	 */
-	public function transactMoney(Player $player1, Player $player2, int $amount, string $reason = 'Unknown') : \Generator {
+	public function transactMoney(Player $player1, Player $player2, int $amount, string $reason = 'Unknown') : \Generator{
 		/** @var Capital $api */
 		$api = yield from Capital::get(MainClass::$context);
 		yield from $api->pay(

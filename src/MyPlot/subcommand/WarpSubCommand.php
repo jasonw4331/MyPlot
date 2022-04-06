@@ -1,22 +1,22 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\subcommand;
 
-use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\WarpForm;
+use MyPlot\plot\BasePlot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use SOFe\AwaitGenerator\Await;
 
-class WarpSubCommand extends SubCommand
-{
-	public function canUse(CommandSender $sender) : bool {
+class WarpSubCommand extends SubCommand{
+	public function canUse(CommandSender $sender) : bool{
 		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.warp");
 	}
 
 	/**
-	 * @param Player $sender
+	 * @param Player   $sender
 	 * @param string[] $args
 	 *
 	 * @return bool
@@ -38,12 +38,12 @@ class WarpSubCommand extends SubCommand
 					$sender->sendMessage(TextFormat::RED . $this->translateString("warp.wrongid"));
 					return;
 				}
-				$plot = yield $this->internalAPI->generatePlot($levelName, (int) $plotIdArray[0], (int) $plotIdArray[1]);
+				$plot = yield from $this->internalAPI->generatePlot(new BasePlot($levelName, (int) $plotIdArray[0], (int) $plotIdArray[1]));
 				if($plot->owner == "" and !$sender->hasPermission("myplot.admin.warp")){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("warp.unclaimed"));
 					return;
 				}
-				if(yield $this->internalAPI->generatePlayerTeleport($sender, $plot, false)){
+				if($this->internalAPI->teleportPlayerToPlot($sender, $plot, false)){
 					$plot = TextFormat::GREEN . $plot . TextFormat::WHITE;
 					$sender->sendMessage($this->translateString("warp.success", [$plot]));
 				}else{

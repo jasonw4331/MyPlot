@@ -19,7 +19,7 @@ final class InternalEconomySProvider implements InternalEconomyProvider{
 			$amount = -$amount;
 		}
 		$ret = $this->plugin->reduceMoney($player, $amount, false, "MyPlot");
-		if($ret === EconomyAPI::RET_SUCCESS) {
+		if($ret === EconomyAPI::RET_SUCCESS){
 			$this->plugin->getLogger()->debug("MyPlot Reduced money of " . $player->getName());
 			return true;
 		}
@@ -29,13 +29,13 @@ final class InternalEconomySProvider implements InternalEconomyProvider{
 	/**
 	 * @inheritDoc
 	 */
-	public function addMoney(Player $player, int $amount, string $reason = "Unknown") : \Generator {
+	public function addMoney(Player $player, int $amount, string $reason = "Unknown") : \Generator{
 		0 && yield;
-		if($amount === 0) {
+		if($amount === 0){
 			return true;
 		}
 		$ret = $this->plugin->addMoney($player, $amount, false, "MyPlot");
-		if($ret === EconomyAPI::RET_SUCCESS) {
+		if($ret === EconomyAPI::RET_SUCCESS){
 			return true;
 		}
 		return false;
@@ -44,17 +44,17 @@ final class InternalEconomySProvider implements InternalEconomyProvider{
 	/**
 	 * @inheritDoc
 	 */
-	public function transactMoney(Player $player1, Player $player2, int $amount, string $reason = "Unknown") : \Generator {
+	public function transactMoney(Player $player1, Player $player2, int $amount, string $reason = "Unknown") : \Generator{
 		0 && yield;
 		if($amount < 1){
 			return true;
 		}
 		$ret = $this->plugin->reduceMoney($player1, $amount, true, "MyPlot");
-		if($ret !== EconomyAPI::RET_SUCCESS) {
+		if($ret !== EconomyAPI::RET_SUCCESS){
 			return false;
 		}
 		$ret = $this->plugin->addMoney($player2, $amount, true, "MyPlot");
-		if($ret !== EconomyAPI::RET_SUCCESS) {
+		if($ret !== EconomyAPI::RET_SUCCESS){
 			return false;
 		}
 		return true;

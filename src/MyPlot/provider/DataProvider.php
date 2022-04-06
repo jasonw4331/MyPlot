@@ -2,26 +2,47 @@
 declare(strict_types=1);
 namespace MyPlot\provider;
 
+use MyPlot\InternalAPI;
 use MyPlot\MyPlot;
 use MyPlot\plot\BasePlot;
 use MyPlot\plot\MergedPlot;
 use MyPlot\plot\SinglePlot;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
+use poggit\libasynql\SqlThread;
+use SOFe\AwaitGenerator\Await;
 
-final class DataProvider {
+final class DataProvider{
 
 	/** @var BasePlot[] $cache */
 	private array $cache = [];
 	private int $cacheSize;
 	private DataConnector $database;
 
-	public function __construct(private MyPlot $plugin) {
+	/** @noinspection PhpVoidFunctionResultUsedInspection */
+	public function __construct(private MyPlot $plugin, InternalAPI $internalAPI){
 		$this->database = libasynql::create($plugin, $plugin->getConfig()->get("Database"), [
 			'sqlite' => 'sqlite.sql',
 			'mysql' => 'mysql.sql',
-		]);
-		$this->cacheSize = $plugin->getConfig()->get("PlotCacheSize", 2048);
+		], true);
+		$this->database->executeGeneric('myplot.init.plots');
+		$this->database->executeGeneric('myplot.init.mergedPlots');
+		$this->database->executeSelect(
+			'myplot.test.table',
+			['tableName' => 'plotsV2'],
+			fn(array $rows) => $rows[0]['tables'] === 0 ?: $this->database->executeMulti('myplot.convert.tables', [], SqlThread::MODE_CHANGE)
+		);
+		$this->cacheSize = $plugin->getConfig()->get("PlotCacheSize", 2500);
+		$maxPlotCoord = floor(sqrt($this->cacheSize) / 2);
+		foreach($internalAPI->getAllLevelSettings() as $levelName => $settings){
+			for($x = -$maxPlotCoord; $x < $maxPlotCoord; ++$x){
+				for($z = -$maxPlotCoord; $z < $maxPlotCoord; ++$z){
+					Await::g2c(
+						$this->getMergedPlot(new BasePlot($levelName, $x, $z))
+					);
+				}
+			}
+		}
 	}
 
 	private function cachePlot(BasePlot $plot) : void{
@@ -52,15 +73,15 @@ final class DataProvider {
 		}
 	}
 
-	private function getPlotFromCache(string $levelName, int $X, int $Z) : ?BasePlot{
+	public function getPlotFromCache(string $levelName, int $X, int $Z) : BasePlot{
 		if($this->cacheSize > 0){
 			$key = $levelName . ';' . $X . ';' . $Z;
 			if(isset($this->cache[$key])){
-				#$this->plugin->getLogger()->debug("Plot {$X};{$Z} was loaded from the cache");
-				return $this->cache[$key];
+				$this->plugin->getLogger()->debug("Plot {$X};{$Z} was loaded from the cache");
+				return $this->cache[$key] ?? new BasePlot($levelName, $X, $Z);
 			}
 		}
-		return null;
+		return new BasePlot($levelName, $X, $Z);
 	}
 
 	/**
@@ -69,7 +90,7 @@ final class DataProvider {
 	 * @return \Generator<bool>
 	 */
 	public function savePlot(SinglePlot $plot) : \Generator{
-		[$insertId, $affectedRows] = yield $this->database->asyncInsert('myplot.add.plot', [
+		[$insertId, $affectedRows] = yield from $this->database->asyncInsert('myplot.add.plot', [
 			'level' => $plot->levelName,
 			'X' => $plot->X,
 			'Z' => $plot->Z,
@@ -97,7 +118,7 @@ final class DataProvider {
 		if($plot instanceof MergedPlot){
 			$plotLevel = $this->plugin->getLevelSettings($plot->levelName);
 
-			$changedRows = yield $this->database->asyncChange('myplot.remove.merge.by-xz', [
+			$changedRows = yield from $this->database->asyncChange('myplot.remove.merge.by-xz', [
 				'level' => $plot->levelName,
 				'X' => $plot->X,
 				'Z' => $plot->Z,
@@ -106,7 +127,7 @@ final class DataProvider {
 			]);
 			$this->cachePlot(new MergedPlot($plot->levelName, $plot->X, $plot->Z, $plot->xWidth, $plot->zWidth, pvp: !$plotLevel->restrictPVP, price: $plotLevel->claimPrice));
 		}else{
-			$changedRows = yield $this->database->asyncChange('myplot.remove.plot.by-xz', [
+			$changedRows = yield from $this->database->asyncChange('myplot.remove.plot.by-xz', [
 				'level' => $plot->levelName,
 				'X' => $plot->X,
 				'Z' => $plot->Z,
@@ -124,22 +145,22 @@ final class DataProvider {
 	 * @param int    $X
 	 * @param int    $Z
 	 *
-	 * @return \Generator<SinglePlot|null>
+	 * @return \Generator<BasePlot>
 	 */
 	public function getPlot(string $levelName, int $X, int $Z) : \Generator{
 		$plot = $this->getPlotFromCache($levelName, $X, $Z);
 		if($plot instanceof SinglePlot){
 			return $plot;
 		}
-		$row = yield $this->database->asyncSelect('myplot.get.plot.by-xz', [
+		$row = (yield from $this->database->asyncSelect('myplot.get.plot.by-xz', [
 			'level' => $levelName,
 			'X' => $X,
 			'Z' => $Z
-		]);
+		]))[0];
 		if(count($row) < 1)
-			return null;
+			return $plot;
 
-		return new SinglePlot($levelName, $X, $Z, $row['name'], $row['owner'], explode(",", $row['helpers']), explode(",", $row['denied']), $row['biome'], $row['pvp'], $row['price']);
+		return new SinglePlot($levelName, $X, $Z, $row['name'], $row['owner'], explode(",", $row['helpers']), explode(",", $row['denied']), $row['biome'], (bool) $row['pvp'], $row['price']);
 	}
 
 	/**
@@ -149,19 +170,19 @@ final class DataProvider {
 	 * @return \Generator<array<SinglePlot>>
 	 */
 	public function getPlotsByOwner(string $owner, string $levelName = "") : \Generator{
-		if($levelName !== null){
-			$rows = yield $this->database->asyncSelect('myplot.get.all-plots.by-owner-and-level', [
+		if($levelName !== ''){
+			$rows = yield from $this->database->asyncSelect('myplot.get.all-plots.by-owner-and-level', [
 				'owner' => $owner,
 				'level' => $levelName,
 			]);
 		}else{
-			$rows = yield $this->database->asyncSelect('myplot.get.all-plots.by-owner', [
+			$rows = yield from $this->database->asyncSelect('myplot.get.all-plots.by-owner', [
 				'owner' => $owner,
 			]);
 		}
 		$plots = [];
 		foreach($rows as $row){
-			$plots[] = yield $this->getMergedPlot(new BasePlot($row['level'], $row['X'], $row['Z']));
+			$plots[] = yield from $this->getMergedPlot(new BasePlot($row['level'], $row['X'], $row['Z']));
 		}
 		return $plots;
 	}
@@ -174,7 +195,7 @@ final class DataProvider {
 	 */
 	public function getNextFreePlot(string $levelName, int $limitXZ = 0) : \Generator{
 		for($i = 0; $limitXZ <= 0 or $i < $limitXZ; $i++){
-			$rows = yield $this->database->asyncSelect('myplot.get.highest-existing.by-interval', [
+			$rows = yield from $this->database->asyncSelect('myplot.get.highest-existing.by-interval', [
 				'level' => $levelName,
 				'number' => $i,
 			]);
@@ -196,12 +217,12 @@ final class DataProvider {
 	}
 
 	/**
-	 * @param SinglePlot $base
+	 * @param MergedPlot $base
 	 * @param BasePlot   ...$plots
 	 *
 	 * @return \Generator<bool>
 	 */
-	public function mergePlots(SinglePlot $base, BasePlot ...$plots) : \Generator{
+	public function mergePlots(MergedPlot $base, BasePlot ...$plots) : \Generator{
 		$minX = 0;
 		$minZ = 0;
 		foreach($plots as $plot){
@@ -214,7 +235,7 @@ final class DataProvider {
 		$ret = true;
 		foreach($plots as $plot){
 			if($minX !== $base->X and $minZ !== $base->Z){
-				$affectedRows = yield $this->database->asyncChange('myplot.remove.merge-entry', [
+				$affectedRows = yield from $this->database->asyncChange('myplot.remove.merge-entry', [
 					'level' => $plot->levelName,
 					'originX' => $base->X,
 					'originZ' => $base->Z,
@@ -226,7 +247,7 @@ final class DataProvider {
 					$ret = false;
 				}
 			}
-			[$insertId, $affectedRows] = yield $this->database->asyncInsert('myplot.add.merge', [
+			[$insertId, $affectedRows] = yield from $this->database->asyncInsert('myplot.add.merge', [
 				'level' => $plot->levelName,
 				'originX' => $minX,
 				'originZ' => $minZ,
@@ -244,26 +265,26 @@ final class DataProvider {
 	/**
 	 * @param BasePlot $plot
 	 *
-	 * @return \Generator<SinglePlot|null>
+	 * @return \Generator<BasePlot>
 	 */
 	public function getMergedPlot(BasePlot $plot) : \Generator{
 		$plot = $this->getPlotFromCache($plot->levelName, $plot->X, $plot->Z);
 		if($plot instanceof MergedPlot)
 			return $plot;
 
-		$rows = yield $this->database->asyncSelect('myplot.get.merge-plots.by-origin', [
+		$rows = yield from $this->database->asyncSelect('myplot.get.merge-plots.by-origin', [
 			'level' => $plot->levelName,
 			'originX' => $plot->X,
 			'originZ' => $plot->Z
 		]);
 		if(count($rows) < 1){
-			$rows = yield $this->database->asyncSelect('myplot.get.merge-plots.by-merged', [
+			$rows = yield from $this->database->asyncSelect('myplot.get.merge-plots.by-merged', [
 				'level' => $plot->levelName,
 				'mergedX' => $plot->X,
 				'mergedZ' => $plot->Z
 			]);
 			if(count($rows) < 1){
-				return yield $this->getPlot($plot->levelName, $plot->X, $plot->Z);
+				return yield from $this->getPlot($plot->levelName, $plot->X, $plot->Z);
 			}
 		}
 		$highestX = $highestZ = $lowestX = $lowestZ = 0;
@@ -314,13 +335,13 @@ final class DataProvider {
 			if(!isset($plots[$b][-$a]))
 				return [$b, -$a];
 		}
-		if($b !== 0) {
+		if($b !== 0){
 			if(!isset($plots[-$b][$a]))
 				return [-$b, $a];
 			if(!isset($plots[$a][-$b]))
 				return [$a, -$b];
 		}
-		if(($a | $b) === 0) {
+		if(($a | $b) === 0){
 			if(!isset($plots[-$a][-$b]))
 				return [-$a, -$b];
 			if(!isset($plots[-$b][-$a]))

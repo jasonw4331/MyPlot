@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot\events;
 
-use MyPlot\Plot;
+use MyPlot\plot\BasePlot;
 use pocketmine\block\Block;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -13,7 +13,7 @@ use pocketmine\event\Event;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\player\Player;
 
-class MyPlotBlockEvent extends MyPlotPlotEvent implements Cancellable {
+class MyPlotBlockEvent extends MyPlotPlotEvent implements Cancellable{
 	use CancellableTrait;
 
 	private Block $block;
@@ -24,30 +24,30 @@ class MyPlotBlockEvent extends MyPlotPlotEvent implements Cancellable {
 	/**
 	 * MyPlotBlockEvent constructor.
 	 *
-	 * @param Plot $plot
-	 * @param Block $block
-	 * @param Player $player
+	 * @param BasePlot                                                            $plot
+	 * @param Block                                                               $block
+	 * @param Player                                                              $player
 	 * @param BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent|SignChangeEvent $event
 	 */
-	public function __construct(Plot $plot, Block $block, Player $player, Event $event) {
+	public function __construct(BasePlot $plot, Block $block, Player $player, Event $event){
 		$this->block = $block;
 		$this->player = $player;
 		$this->event = $event;
 		parent::__construct($plot);
 	}
 
-	public function getBlock() : Block {
+	public function getBlock() : Block{
 		return $this->block;
 	}
 
 	/**
 	 * @return BlockPlaceEvent|BlockBreakEvent|PlayerInteractEvent|SignChangeEvent
 	 */
-	public function getEvent() : Event {
+	public function getEvent() : Event{
 		return $this->event;
 	}
 
-	public function getPlayer() : Player {
+	public function getPlayer() : Player{
 		return $this->player;
 	}
 }

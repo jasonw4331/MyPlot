@@ -2,14 +2,15 @@
 declare(strict_types=1);
 namespace MyPlot;
 
+use cooldogedev\BedrockEconomy\api\BedrockEconomyAPI;
+use cooldogedev\BedrockEconomy\BedrockEconomy;
 use MyPlot\events\MyPlotGenerationEvent;
 use MyPlot\plot\BasePlot;
 use MyPlot\plot\SinglePlot;
 use MyPlot\provider\EconomyWrapper;
+use MyPlot\provider\InternalBedrockEconomyProvider;
 use MyPlot\provider\InternalCapitalProvider;
-use MyPlot\provider\InternalEconomyProvider;
 use MyPlot\provider\InternalEconomySProvider;
-use onebone\economyapi\EconomyAPI;
 use pocketmine\block\Block;
 use pocketmine\lang\Language;
 use pocketmine\math\AxisAlignedBB;
@@ -35,7 +36,7 @@ final class MyPlot extends PluginBase{
 	private static MyPlot $instance;
 	private Language $language;
 	private InternalAPI $internalAPI;
-	private ?EconomyWrapper $economyProvider;
+	private ?EconomyWrapper $economyProvider = null;
 
 	public static function getInstance() : self{
 		return self::$instance;
@@ -48,7 +49,7 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @return Language
 	 */
-	public function getLanguage() : Language {
+	public function getLanguage() : Language{
 		return $this->language;
 	}
 
@@ -59,16 +60,16 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @return Language
 	 */
-	public function getFallBackLang() : Language {
+	public function getFallBackLang() : Language{
 		return new Language(Language::FALLBACK_LANGUAGE, $this->getFile() . "resources/");
 	}
 
 	/**
-	 * Returns the EconomyProvider that is being used
+	 * Returns the EconomyWrapper instance which is used to access the economy provider
 	 *
-	 * @return InternalEconomyProvider|null
 	 * @api
 	 *
+	 * @return EconomyWrapper|null
 	 */
 	public function getEconomyProvider() : ?EconomyWrapper{
 		return $this->economyProvider;
@@ -77,10 +78,9 @@ final class MyPlot extends PluginBase{
 	/**
 	 * Allows setting the economy provider to a custom provider or to null to disable economy mode
 	 *
-	 * @param bool $enable
-	 *
 	 * @api
 	 *
+	 * @param bool $enable
 	 */
 	public function toggleEconomy(bool $enable) : void{
 		if(!$enable){
@@ -114,7 +114,7 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @return PlotLevelSettings|null
 	 */
-	public function getLevelSettings(string $levelName) : ?PlotLevelSettings {
+	public function getLevelSettings(string $levelName) : ?PlotLevelSettings{
 		return $this->internalAPI->getLevelSettings($levelName);
 	}
 
@@ -128,7 +128,7 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @return void
 	 */
-	public function addLevelSettings(string $levelName, PlotLevelSettings $settings) : void {
+	public function addLevelSettings(string $levelName, PlotLevelSettings $settings) : void{
 		$this->internalAPI->addLevelSettings($levelName, $settings);
 	}
 
@@ -141,7 +141,7 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @return bool
 	 */
-	public function unloadLevelSettings(string $levelName) : bool {
+	public function unloadLevelSettings(string $levelName) : bool{
 		return $this->internalAPI->unloadLevelSettings($levelName);
 	}
 
@@ -150,27 +150,27 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @api
 	 *
-	 * @param string $levelName
-	 * @param string $generator
+	 * @param string  $levelName
+	 * @param string  $generator
 	 * @param mixed[] $settings
 	 *
 	 * @return bool
 	 */
-	public function generateLevel(string $levelName, string $generator = MyPlotGenerator::NAME, array $settings = []) : bool {
+	public function generateLevel(string $levelName, string $generator = MyPlotGenerator::NAME, array $settings = []) : bool{
 		$ev = new MyPlotGenerationEvent($levelName, $generator, $settings);
 		$ev->call();
-		if($ev->isCancelled() or $this->getServer()->getWorldManager()->isWorldGenerated($levelName)) {
+		if($ev->isCancelled() or $this->getServer()->getWorldManager()->isWorldGenerated($levelName)){
 			return false;
 		}
 		$generator = GeneratorManager::getInstance()->getGenerator($generator);
-		if(count($settings) === 0) {
+		if(count($settings) === 0){
 			$this->getConfig()->reload();
 			$settings = $this->getConfig()->get("DefaultWorld", []);
 		}
-		$default = array_filter((array) $this->getConfig()->get("DefaultWorld", []), function($key) : bool {
+		$default = array_filter((array) $this->getConfig()->get("DefaultWorld", []), function($key) : bool{
 			return !in_array($key, ["PlotSize", "GroundHeight", "RoadWidth", "RoadBlock", "WallBlock", "PlotFloorBlock", "PlotFillBlock", "BottomBlock"], true);
 		}, ARRAY_FILTER_USE_KEY);
-		new Config($this->getDataFolder()."worlds".DIRECTORY_SEPARATOR.$levelName.".yml", Config::YAML, $default);
+		new Config($this->getDataFolder() . "worlds" . DIRECTORY_SEPARATOR . $levelName . ".yml", Config::YAML, $default);
 		$return = $this->getServer()->getWorldManager()->generateWorld($levelName, WorldCreationOptions::create()->setGeneratorClass($generator->getGeneratorClass())->setGeneratorOptions(json_encode($settings)), true);
 		$level = $this->getServer()->getWorldManager()->getWorldByName($levelName);
 		$level?->setSpawnLocation(new Vector3(0, $this->getConfig()->getNested("DefaultWorld.GroundHeight", 64) + 1, 0));
@@ -259,6 +259,17 @@ final class MyPlot extends PluginBase{
 	}
 
 	/**
+	 * @param float             &$x
+	 * @param float             &$z
+	 * @param PlotLevelSettings  $plotLevel
+	 *
+	 * @return BasePlot|null
+	 */
+	public function getPlotFast(float &$x, float &$z, PlotLevelSettings $plotLevel) : ?BasePlot{
+		return $this->internalAPI->getPlotFast($x, $z, $plotLevel);
+	}
+
+	/**
 	 * Finds the plot at a certain position or null if there is no plot at that position
 	 *
 	 * @api
@@ -281,11 +292,11 @@ final class MyPlot extends PluginBase{
 	/**
 	 * Get the beginning position of a plot
 	 *
+	 * @api
+	 *
 	 * @param BasePlot $plot
 	 *
 	 * @return Position
-	 * @api
-	 *
 	 */
 	public function getPlotPosition(BasePlot $plot) : Position{
 		return $this->internalAPI->getPlotPosition($plot);
@@ -298,17 +309,10 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @param Position $position
 	 *
-	 * @return Promise
-	 * @phpstan-return Promise<bool>
+	 * @return bool
 	 */
-	public function isPositionBorderingPlot(Position $position) : Promise{
-		$resolver = new PromiseResolver();
-		$this->internalAPI->isPositionBorderingPlot(
-			$position,
-			fn(bool $bordering) => $resolver->resolve($bordering),
-			fn(\Throwable $e) => $resolver->reject()
-		);
-		return $resolver->getPromise();
+	public function isPositionBorderingPlot(Position $position) : bool{
+		return $this->internalAPI->isPositionBorderingPlot($position);
 	}
 
 	/**
@@ -318,29 +322,22 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @param Position $position
 	 *
-	 * @return Promise
-	 * @phpstan-return Promise<SinglePlot|null>
+	 * @return BasePlot|null
 	 */
-	public function getPlotBorderingPosition(Position $position) : Promise{
-		$resolver = new PromiseResolver();
-		$this->internalAPI->getPlotBorderingPosition(
-			$position,
-			fn(SinglePlot $plot) => $resolver->resolve($plot),
-			fn(\Throwable $e) => $resolver->reject()
-		);
-		return $resolver->getPromise();
+	public function getPlotBorderingPosition(Position $position) : ?BasePlot{
+		return $this->internalAPI->getPlotBorderingPosition($position);
 	}
 
 	/**
 	 * Returns the AABB of the plot area
 	 *
-	 * @param SinglePlot $plot
-	 *
-	 * @return AxisAlignedBB
 	 * @api
 	 *
+	 * @param BasePlot $plot
+	 *
+	 * @return AxisAlignedBB
 	 */
-	public function getPlotBB(SinglePlot $plot) : AxisAlignedBB{
+	public function getPlotBB(BasePlot $plot) : AxisAlignedBB{
 		return $this->internalAPI->getPlotBB($plot);
 	}
 
@@ -446,12 +443,12 @@ final class MyPlot extends PluginBase{
 	/**
 	 * Reset all the blocks inside a plot
 	 *
+	 * @api
+	 *
 	 * @param BasePlot $plot
 	 * @param int      $maxBlocksPerTick
 	 *
 	 * @return bool
-	 * @api
-	 *
 	 */
 	public function clearPlot(BasePlot $plot, int $maxBlocksPerTick = 256) : bool{
 		return $this->internalAPI->clearPlot($plot, $maxBlocksPerTick);
@@ -466,19 +463,14 @@ final class MyPlot extends PluginBase{
 	 * @param Block      $plotFillBlock
 	 * @param int        $maxBlocksPerTick
 	 *
-	 * @return Promise
-	 * @phpstan-return Promise<bool>
+	 * @return bool
 	 */
-	public function fillPlot(BasePlot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) : Promise{
-		$resolver = new PromiseResolver();
-		$this->internalAPI->fillPlot(
+	public function fillPlot(BasePlot $plot, Block $plotFillBlock, int $maxBlocksPerTick = 256) : bool{
+		return $this->internalAPI->fillPlot(
 			$plot,
 			$plotFillBlock,
-			$maxBlocksPerTick,
-			fn(bool $success) => $resolver->resolve($success),
-			fn(\Throwable $e) => $resolver->reject()
+			$maxBlocksPerTick
 		);
-		return $resolver->getPromise();
 	}
 
 	/**
@@ -491,7 +483,7 @@ final class MyPlot extends PluginBase{
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function disposePlot(SinglePlot $plot) : Promise {
+	public function disposePlot(SinglePlot $plot) : Promise{
 		$resolver = new PromiseResolver();
 		$this->internalAPI->disposePlot(
 			$plot,
@@ -512,7 +504,7 @@ final class MyPlot extends PluginBase{
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function resetPlot(SinglePlot $plot, int $maxBlocksPerTick = 256) : Promise {
+	public function resetPlot(SinglePlot $plot, int $maxBlocksPerTick = 256) : Promise{
 		$resolver = new PromiseResolver();
 		$this->internalAPI->resetPlot(
 			$plot,
@@ -534,7 +526,7 @@ final class MyPlot extends PluginBase{
 	 * @return Promise
 	 * @phpstan-return Promise<bool>
 	 */
-	public function setPlotBiome(SinglePlot $plot, Biome $biome) : Promise {
+	public function setPlotBiome(SinglePlot $plot, Biome $biome) : Promise{
 		$resolver = new PromiseResolver();
 		$this->internalAPI->setPlotBiome(
 			$plot,
@@ -710,7 +702,7 @@ final class MyPlot extends PluginBase{
 	 * @phpstan-return array<array<int|Chunk|null>>
 	 */
 	public function getPlotChunks(BasePlot $plot) : array{
-		$this->internalAPI->getPlotChunks($plot);
+		return $this->internalAPI->getPlotChunks($plot);
 	}
 
 	/**
@@ -722,19 +714,19 @@ final class MyPlot extends PluginBase{
 	 *
 	 * @return int
 	 */
-	public function getMaxPlotsOfPlayer(Player $player) : int {
+	public function getMaxPlotsOfPlayer(Player $player) : int{
 		if($player->hasPermission("myplot.claimplots.unlimited"))
 			return PHP_INT_MAX;
 		$perms = array_map(fn(PermissionAttachmentInfo $attachment) => $attachment->getValue(), $player->getEffectivePermissions()); // outputs permission string => value
 		$perms = array_merge(PermissionManager::getInstance()->getPermission(DefaultPermissions::ROOT_USER)->getChildren(), $perms);
-		$perms = array_filter($perms, function(string $name) : bool {
+		$perms = array_filter($perms, function(string $name) : bool{
 			return (str_starts_with($name, "myplot.claimplots."));
 		}, ARRAY_FILTER_USE_KEY);
 		if(count($perms) === 0)
 			return 0;
 		krsort($perms, SORT_FLAG_CASE | SORT_NATURAL);
 		/**
-		 * @var string $name
+		 * @var string     $name
 		 * @var Permission $perm
 		 */
 		foreach($perms as $name => $perm){
@@ -750,19 +742,24 @@ final class MyPlot extends PluginBase{
 
 	private function checkEconomy() : InternalEconomySProvider{
 		$this->getLogger()->debug(TF::BOLD . "Loading economy settings");
-		$this->economyProvider = $economyProvider = null;
+		$economyProvider = null;
 		if(($plugin = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) !== null){
 			if($plugin instanceof EconomyAPI){
 				$economyProvider = new InternalEconomySProvider($plugin);
-				$this->economyProvider = new EconomyWrapper($economyProvider);
 				$this->getLogger()->info("Economy set to EconomyAPI");
 			}else
 				$this->getLogger()->debug("Invalid instance of EconomyAPI");
 		}
+		if(($plugin = $this->getServer()->getPluginManager()->getPlugin("BedrockEconomy")) !== null){
+			if($plugin instanceof BedrockEconomy){
+				$economyProvider = new InternalBedrockEconomyProvider(BedrockEconomyAPI::getInstance());
+				$this->getLogger()->info("Economy set to BedrockEconomy");
+			}else
+				$this->getLogger()->debug("Invalid instance of BedrockEconomy");
+		}
 		if(($plugin = $this->getServer()->getPluginManager()->getPlugin("Capital")) !== null){
 			if($plugin instanceof Capital){
 				$economyProvider = new InternalCapitalProvider();
-				$this->economyProvider = new EconomyWrapper($economyProvider);
 				$this->getLogger()->info("Economy set to Capital");
 			}else
 				$this->getLogger()->debug("Invalid instance of Capital");
@@ -771,6 +768,8 @@ final class MyPlot extends PluginBase{
 			$this->getLogger()->warning("No supported economy plugin found!");
 			$this->getConfig()->set("UseEconomy", false);
 			//$this->getConfig()->save();
+		}else{
+			$this->economyProvider = new EconomyWrapper($economyProvider);
 		}
 		return $economyProvider;
 	}
@@ -788,22 +787,22 @@ final class MyPlot extends PluginBase{
 		$this->getLogger()->debug(TF::BOLD . "Loading Languages");
 		/** @var string $lang */
 		$lang = $this->getConfig()->get("Language", Language::FALLBACK_LANGUAGE);
-		if($this->getConfig()->get("Custom Messages", false) === true) {
-			if(!file_exists($this->getDataFolder()."lang.ini")) {
+		if($this->getConfig()->get("Custom Messages", false) === true){
+			if(!file_exists($this->getDataFolder() . "lang.ini")){
 				/** @var string|resource $resource */
-				$resource = $this->getResource($lang.".ini") ?? file_get_contents($this->getFile()."resources/".Language::FALLBACK_LANGUAGE.".ini");
-				file_put_contents($this->getDataFolder()."lang.ini", $resource);
-				if(is_resource($resource)) {
+				$resource = $this->getResource($lang . ".ini") ?? file_get_contents($this->getFile() . "resources/" . Language::FALLBACK_LANGUAGE . ".ini");
+				file_put_contents($this->getDataFolder() . "lang.ini", $resource);
+				if(is_resource($resource)){
 					fclose($resource);
 				}
-				$this->saveResource(Language::FALLBACK_LANGUAGE.".ini", true);
+				$this->saveResource(Language::FALLBACK_LANGUAGE . ".ini", true);
 				$this->getLogger()->debug("Custom Language ini created");
 			}
 			$this->language = new Language("lang", $this->getDataFolder());
 		}else{
-			if(file_exists($this->getDataFolder()."lang.ini")) {
-				unlink($this->getDataFolder()."lang.ini");
-				unlink($this->getDataFolder().Language::FALLBACK_LANGUAGE.".ini");
+			if(file_exists($this->getDataFolder() . "lang.ini")){
+				unlink($this->getDataFolder() . "lang.ini");
+				unlink($this->getDataFolder() . Language::FALLBACK_LANGUAGE . ".ini");
 				$this->getLogger()->debug("Custom Language ini deleted");
 			}
 			$this->language = new Language($lang, $this->getFile() . "resources/");
@@ -824,12 +823,12 @@ final class MyPlot extends PluginBase{
 		$this->getServer()->getCommandMap()->register("myplot", new Commands($this, $this->internalAPI));
 	}
 
-	public function onEnable() : void {
+	public function onEnable() : void{
 		$this->getLogger()->debug(TF::BOLD . "Loading Events");
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this, $this->internalAPI), $this);
 	}
 
-	public function onDisable() : void {
+	public function onDisable() : void{
 		$this->internalAPI->onDisable();
 	}
 }

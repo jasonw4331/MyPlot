@@ -6,7 +6,7 @@ class AsyncVariants{
 	public static function array_map(?callable $callback, array $array, array ...$arrays) : \Generator{
 		$result = [];
 		foreach([$array, ...$arrays] as $key => $value){
-			$result[$key] = $callback === null ? $value : yield $callback($value, $key);
+			$result[$key] = $callback === null ? $value : yield from $callback($value, $key);
 		}
 		return $result;
 	}

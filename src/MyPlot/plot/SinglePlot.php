@@ -4,7 +4,7 @@ namespace MyPlot\plot;
 
 use MyPlot\MyPlot;
 
-class SinglePlot extends BasePlot {
+class SinglePlot extends BasePlot{
 	public bool $pvp = true;
 
 	public function __construct(public string $levelName, public int $X, public int $Z, public string $name = "", public string $owner = "", public array $helpers = [], public array $denied = [], public string $biome = "PLAINS", ?bool $pvp = null, public int $price = -1){
@@ -22,7 +22,7 @@ class SinglePlot extends BasePlot {
 			$this->price = 0;
 	}
 
-	public static function fromBase(BasePlot $plot, string $name, string $owner, array $helpers, array $denied, string $biome, ?bool $pvp, int $price) : SinglePlot{
+	public static function fromBase(BasePlot $plot, string $name = '', string $owner = '', array $helpers = [], array $denied = [], string $biome = "PLAINS", ?bool $pvp = null, int $price = -1) : SinglePlot{
 		return new SinglePlot(
 			$plot->levelName,
 			$plot->X,
@@ -55,8 +55,8 @@ class SinglePlot extends BasePlot {
 	 *
 	 * @return bool
 	 */
-	public function addHelper(string $username) : bool {
-		if(!$this->isHelper($username)) {
+	public function addHelper(string $username) : bool{
+		if(!$this->isHelper($username)){
 			$this->unDenyPlayer($username);
 			$this->helpers[] = $username;
 			return true;
@@ -71,12 +71,12 @@ class SinglePlot extends BasePlot {
 	 *
 	 * @return bool
 	 */
-	public function removeHelper(string $username) : bool {
-		if(!$this->isHelper($username)) {
+	public function removeHelper(string $username) : bool{
+		if(!$this->isHelper($username)){
 			return false;
 		}
 		$key = array_search($username, $this->helpers, true);
-		if($key === false) {
+		if($key === false){
 			return false;
 		}
 		unset($this->helpers[$key]);
@@ -90,7 +90,7 @@ class SinglePlot extends BasePlot {
 	 *
 	 * @return bool
 	 */
-	public function isDenied(string $username) : bool {
+	public function isDenied(string $username) : bool{
 		return in_array($username, $this->denied, true);
 	}
 
@@ -101,8 +101,8 @@ class SinglePlot extends BasePlot {
 	 *
 	 * @return bool
 	 */
-	public function denyPlayer(string $username) : bool {
-		if(!$this->isDenied($username)) {
+	public function denyPlayer(string $username) : bool{
+		if(!$this->isDenied($username)){
 			$this->removeHelper($username);
 			$this->denied[] = $username;
 			return true;
@@ -117,12 +117,12 @@ class SinglePlot extends BasePlot {
 	 *
 	 * @return bool
 	 */
-	public function unDenyPlayer(string $username) : bool {
-		if(!$this->isDenied($username)) {
+	public function unDenyPlayer(string $username) : bool{
+		if(!$this->isDenied($username)){
 			return false;
 		}
 		$key = array_search($username, $this->denied, true);
-		if($key === false) {
+		if($key === false){
 			return false;
 		}
 		unset($this->denied[$key]);

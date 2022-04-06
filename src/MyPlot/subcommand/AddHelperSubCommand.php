@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\subcommand;
 
 use MyPlot\forms\subforms\AddHelperForm;
@@ -8,14 +9,23 @@ use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use SOFe\AwaitGenerator\Await;
 
-class AddHelperSubCommand extends SubCommand
-{
-	public function canUse(CommandSender $sender) : bool {
-		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.addhelper");
+class AddHelperSubCommand extends SubCommand{
+	public function canUse(CommandSender $sender) : bool{
+		if(!$sender->hasPermission("myplot.command.addhelper")){
+			return false;
+		}
+		if($sender instanceof Player){
+			$pos = $sender->getPosition();
+			$plotLevel = $this->internalAPI->getLevelSettings($sender->getWorld()->getFolderName());
+			if($this->internalAPI->getPlotFast($pos->x, $pos->z, $plotLevel) === null){
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
-	 * @param Player $sender
+	 * @param Player   $sender
 	 * @param string[] $args
 	 *
 	 * @return bool
@@ -28,7 +38,7 @@ class AddHelperSubCommand extends SubCommand
 					return;
 				}
 				$helperName = $args[0];
-				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				$plot = yield from $this->internalAPI->generatePlotByPosition($sender->getPosition());
 				if($plot === null){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 					return;
@@ -40,7 +50,7 @@ class AddHelperSubCommand extends SubCommand
 				$helper = $this->plugin->getServer()->getPlayerByPrefix($helperName);
 				if($helper === null)
 					$helper = $this->plugin->getServer()->getOfflinePlayer($helperName);
-				if(yield $this->internalAPI->generateAddPlotHelper($plot, $helper->getName())){
+				if(yield from $this->internalAPI->generateAddPlotHelper($plot, $helper->getName())){
 					$sender->sendMessage($this->translateString("addhelper.success", [$helper->getName()]));
 				}else{
 					$sender->sendMessage(TextFormat::RED . $this->translateString("error"));

@@ -1,21 +1,23 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\subcommand;
 
 use MyPlot\forms\subforms\ClaimForm;
+use MyPlot\plot\BasePlot;
+use MyPlot\plot\SinglePlot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use SOFe\AwaitGenerator\Await;
 
-class ClaimSubCommand extends SubCommand
-{
-	public function canUse(CommandSender $sender) : bool {
-		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.claim");
+class ClaimSubCommand extends SubCommand{
+	public function canUse(CommandSender $sender) : bool{
+		return $sender->hasPermission("myplot.command.claim") and $sender instanceof Player;
 	}
 
 	/**
-	 * @param Player $sender
+	 * @param Player   $sender
 	 * @param string[] $args
 	 *
 	 * @return bool
@@ -23,16 +25,48 @@ class ClaimSubCommand extends SubCommand
 	public function execute(CommandSender $sender, array $args) : bool{
 		Await::f2c(
 			function() use ($sender, $args) : \Generator{
+				$pos = $sender->getPosition();
+				$x = $pos->x;
+				$z = $pos->z;
+				$levelName = $sender->getWorld()->getFolderName();
+				$plot = $this->internalAPI->getPlotFast($x, $z, $this->internalAPI->getLevelSettings($levelName));
+
 				$name = "";
-				if(isset($args[0])){
-					$name = $args[0];
+				switch(count($args)){
+					case 1:
+						if(str_contains($args[0], ';')){
+							$coords = explode(';', $args[0]);
+							if(count($coords) !== 2 or !is_numeric($coords[0]) or !is_numeric($coords[1])){
+								$sender->sendMessage(TextFormat::RED . 'Usage: ' . $this->translateString('claim.usage'));
+								return;
+							}
+							$plot = new BasePlot($levelName, (int) $coords[0], (int) $coords[1]);
+						}else{
+							$name = $args[0];
+						}
+						break;
+					case 2:
+						if(!str_contains($args[0], ';')){
+							$sender->sendMessage(TextFormat::RED . 'Usage: /plot claim <X;Z> <name: string>');
+							return;
+						}
+						$coords = explode(';', $args[0]);
+						if(count($coords) !== 2 or !is_numeric($coords[0]) or !is_numeric($coords[1])){
+							$sender->sendMessage(TextFormat::RED . 'Usage: /plot claim <X;Z> <name: string>');
+							return;
+						}
+						$plot = new BasePlot($levelName, (int) $coords[0], (int) $coords[1]);
+						$name = $args[1];
 				}
-				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
 				if($plot === null){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 					return;
 				}
-				if($plot->owner != ""){
+				$plot = yield from $this->internalAPI->generatePlot($plot);
+				if(!$plot instanceof SinglePlot)
+					$plot = SinglePlot::fromBase($plot);
+
+				if($plot->owner !== ""){
 					if($plot->owner === $sender->getName()){
 						$sender->sendMessage(TextFormat::RED . $this->translateString("claim.yourplot"));
 					}else{
@@ -41,23 +75,16 @@ class ClaimSubCommand extends SubCommand
 					return;
 				}
 				$maxPlots = $this->plugin->getMaxPlotsOfPlayer($sender);
-				$plotsOfPlayer = 0;
-				foreach($this->internalAPI->getAllLevelSettings() as $worldName => $settings){
-					$worldName = $this->plugin->getServer()->getWorldManager()->getWorldByName($worldName);
-					if($worldName !== null and $worldName->isLoaded()){
-						$plotsOfPlayer += count(yield $this->internalAPI->generatePlotsOfPlayer($sender->getName(), $worldName->getFolderName()));
-					}
-				}
-				if($plotsOfPlayer >= $maxPlots){
+				if(count(yield from $this->internalAPI->generatePlotsOfPlayer($sender->getName(), null)) >= $maxPlots){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("claim.maxplots", [$maxPlots]));
 					return;
 				}
 				$economy = $this->internalAPI->getEconomyProvider();
-				if($economy !== null and !(yield $economy->reduceMoney($sender, $plot->price, 'used plot claim command'))){
+				if($economy !== null and !(yield from $economy->reduceMoney($sender, $plot->price, 'used plot claim command'))){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("claim.nomoney"));
 					return;
 				}
-				if(yield $this->internalAPI->generateClaimPlot($plot, $sender->getName(), $name)){
+				if(yield from $this->internalAPI->generateClaimPlot($plot, $sender->getName(), $name)){
 					$sender->sendMessage($this->translateString("claim.success"));
 				}else{
 					$sender->sendMessage(TextFormat::RED . $this->translateString("error"));

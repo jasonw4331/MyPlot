@@ -1,55 +1,41 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\forms\subforms;
 
 
-use dktapps\pmforms\CustomFormResponse;
-use dktapps\pmforms\element\Input;
-use MyPlot\forms\ComplexMyPlotForm;
+use cosmicpe\form\CustomForm;
+use cosmicpe\form\entries\custom\InputEntry;
+use MyPlot\forms\MyPlotForm;
 use MyPlot\MyPlot;
-use pocketmine\form\FormValidationException;
+use MyPlot\plot\BasePlot;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
-class WarpForm extends ComplexMyPlotForm {
+class WarpForm extends CustomForm implements MyPlotForm{
 
-	public function __construct(Player $player) {
-		$plugin = MyPlot::getInstance();
-		parent::__construct(
-			TextFormat::BLACK.$plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("warp.form")]),
-			[
-				new Input(
-					"0",
-					$plugin->getLanguage()->get("warp.formxcoord"),
-					"2"
-				),
-				new Input(
-					"1",
-					$plugin->getLanguage()->get("warp.formzcoord"),
-					"-4"
-				),
-				new Input(
-					"2",
-					$plugin->getLanguage()->get("warp.formworld"),
-					"world",
-					$player->getWorld()->getFolderName()
-				)
-			],
-			function(Player $player, CustomFormResponse $response) use ($plugin) : void {
-				if(is_numeric($response->getString("0")) and is_numeric($response->getString("1")) and $plugin->isLevelLoaded($response->getString("2")))
-					$data =[
-						(int)$response->getString("0"),
-						(int)$response->getString("1"),
-						$response->getString("2") === '' ? $player->getWorld()->getFolderName() : $response->getString("2")
-					];
-				elseif($response->getString("0") === '' and $response->getString("1") === '') {
-					$player->sendForm(new self($player));
-					throw new FormValidationException("Invalid form data returned");
-				}else
-					throw new FormValidationException("Unexpected form data returned");
-
-				$player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name")." ".$plugin->getLanguage()->get("warp.name")." $data[0];$data[1] $data[2]", true);
-			}
+	public function __construct(MyPlot $plugin, Player $player, ?BasePlot $plot){
+		parent::__construct(TextFormat::BLACK . $plugin->getLanguage()->translateString("form.header", [$plugin->getLanguage()->get("warp.form")]));
+		$this->addEntry(
+			new InputEntry(
+				$plugin->getLanguage()->get("warp.formxcoord"),
+				"2"
+			),
+			\Closure::fromCallable(fn(Player $player, InputEntry $entry) => $plot->X = (int) $entry->getValue())
+		);
+		$this->addEntry(
+			new InputEntry(
+				$plugin->getLanguage()->get("warp.formzcoord"),
+				"-4"
+			),
+			\Closure::fromCallable(fn(Player $player, InputEntry $entry) => $plot->Z = (int) $entry->getValue())
+		);
+		$this->addEntry(
+			new InputEntry(
+				$plugin->getLanguage()->get("warp.formworld"),
+				$player->getWorld()->getFolderName()
+			),
+			\Closure::fromCallable(fn(Player $player, InputEntry $entry) => $player->getServer()->dispatchCommand($player, $plugin->getLanguage()->get("command.name") . " " . $plugin->getLanguage()->get("warp.name") . " $plot->X;$plot->Z {$entry->getValue()}", true))
 		);
 	}
 }

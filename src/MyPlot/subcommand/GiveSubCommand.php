@@ -1,23 +1,32 @@
 <?php
 declare(strict_types=1);
+
 namespace MyPlot\subcommand;
 
-use MyPlot\forms\MyPlotForm;
 use MyPlot\forms\subforms\GiveForm;
-use MyPlot\Plot;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use SOFe\AwaitGenerator\Await;
 
-class GiveSubCommand extends SubCommand
-{
-	public function canUse(CommandSender $sender) : bool {
-		return ($sender instanceof Player) and $sender->hasPermission("myplot.command.give");
+class GiveSubCommand extends SubCommand{
+	public function canUse(CommandSender $sender) : bool{
+		if(!$sender->hasPermission("myplot.command.give")){
+			return false;
+		}
+		if($sender instanceof Player){
+			$pos = $sender->getPosition();
+			$plotLevel = $this->internalAPI->getLevelSettings($sender->getWorld()->getFolderName());
+			if($this->internalAPI->getPlotFast($pos->x, $pos->z, $plotLevel) === null){
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
-	 * @param Player $sender
+	 * @param Player   $sender
 	 * @param string[] $args
 	 *
 	 * @return bool
@@ -30,7 +39,7 @@ class GiveSubCommand extends SubCommand
 					return;
 				}
 				$newOwner = $args[0];
-				$plot = yield $this->internalAPI->generatePlotByPosition($sender->getPosition());
+				$plot = yield from $this->internalAPI->generatePlotByPosition($sender->getPosition());
 				if($plot === null){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("notinplot"));
 					return;
@@ -48,7 +57,7 @@ class GiveSubCommand extends SubCommand
 					return;
 				}
 				$maxPlots = $this->plugin->getMaxPlotsOfPlayer($newOwner);
-				if(count(yield $this->internalAPI->generatePlotsOfPlayer($newOwner->getName(), null)) >= $maxPlots){
+				if(count(yield from $this->internalAPI->generatePlotsOfPlayer($newOwner->getName(), null)) >= $maxPlots){
 					$sender->sendMessage(TextFormat::RED . $this->translateString("give.maxedout", [$maxPlots]));
 					return;
 				}
@@ -58,7 +67,7 @@ class GiveSubCommand extends SubCommand
 					$sender->sendMessage($this->translateString("give.confirm", [$plotId, $newOwnerName]));
 					return;
 				}
-				if(yield $this->internalAPI->generateClaimPlot($plot, $newOwner->getName(), '')){
+				if(yield from $this->internalAPI->generateClaimPlot($plot, $newOwner->getName(), '')){
 					$plotId = TextFormat::GREEN . $plot . TextFormat::WHITE;
 					$oldOwnerName = TextFormat::GREEN . $sender->getName() . TextFormat::WHITE;
 					$newOwnerName = TextFormat::GREEN . $newOwner->getName() . TextFormat::WHITE;
