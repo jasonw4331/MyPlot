@@ -53,9 +53,7 @@ class InfoForm extends CustomForm implements MyPlotForm{
 				return TextFormat::DARK_BLUE . ucfirst(strtolower(str_replace("_", " ", $text)));
 			},
 			array_keys(BiomeSubCommand::BIOMES)
-		),
-			(int) array_search($plot->biome, array_keys(BiomeSubCommand::BIOMES), true)
-		));
+		)));
 		$this->addEntry(new LabelEntry($plugin->getLanguage()->translateString("info.formpvp", [$plot->pvp ? "Enabled" : "Disabled"]))); // TODO: translations
 	}
 }
