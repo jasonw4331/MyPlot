@@ -130,7 +130,7 @@ FROM plotsV2
                    ON mergedPlotsV2.level = plotsV2.level
                        AND mergedX = X
                        AND mergedZ = Z
-WHERE mergedplotsV2.level = :level
+WHERE mergedPlotsV2.level = :level
   AND originX = :originX
   AND originZ = :originZ;
 -- #      }
