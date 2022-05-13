@@ -39,7 +39,7 @@ class DenyPlayerSubCommand extends SubCommand
 			if($this->plugin->addPlotDenied($plot, $dplayer)) {
 				$sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer]));
 				foreach($this->plugin->getServer()->getOnlinePlayers() as $player) {
-					if($this->plugin->getPlotBB($plot)->isVectorInside($player) and !($player->getName() === $plot->owner) and !$player->hasPermission("myplot.admin.denyplayer.bypass") and !$plot->isHelper($player->getName()))
+					if($this->plugin->getPlotBB($plot)->isVectorInside($player->getPosition()) and !($player->getName() === $plot->owner) and !$player->hasPermission("myplot.admin.denyplayer.bypass") and !$plot->isHelper($player->getName()))
 						$this->plugin->teleportPlayerToPlot($player, $plot);
 					else {
 						$sender->sendMessage($this->translateString("denyplayer.cannotdeny", [$player->getName()]));
@@ -64,7 +64,7 @@ class DenyPlayerSubCommand extends SubCommand
 		if($this->plugin->addPlotDenied($plot, $dplayer->getName())) {
 			$sender->sendMessage($this->translateString("denyplayer.success1", [$dplayer->getName()]));
 			$dplayer->sendMessage($this->translateString("denyplayer.success2", [$plot->X, $plot->Z, $sender->getName()]));
-			if($this->plugin->getPlotBB($plot)->isVectorInside($dplayer))
+			if($this->plugin->getPlotBB($plot)->isVectorInside($dplayer->getPosition()))
 				$this->plugin->teleportPlayerToPlot($dplayer, $plot);
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
