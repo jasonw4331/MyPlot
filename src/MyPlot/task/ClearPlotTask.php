@@ -106,6 +106,8 @@ class ClearPlotTask extends Task {
 		}
 
 		foreach($this->plugin->getPlotChunks($this->plot) as [$chunkX, $chunkZ, $chunk]) {
+			if($chunk === null)
+				continue;
 			foreach($chunk->getTiles() as $tile) {
 				$tile->close();
 			}
